@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Bash(claude mcp *)",
+      "Skill(update-config)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__query-docs",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\Lexa\\\\app\" -Recurse -Directory | Where-Object { $_.Name -ne \"node_modules\" } | ForEach-Object { $_.FullName -replace [regex]::Escape\\(\"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\Lexa\\\\app\"\\), \".\" } | Sort-Object)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\Lexa\\\\app\" -File | ForEach-Object { $_.Name })",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\Lexa\\\\app\\\\app\" -Recurse -File | ForEach-Object { $_.FullName -replace [regex]::Escape\\(\"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\Lexa\\\\app\\\\app\"\\), \"app\" } | Sort-Object)",
+      "Skill(context7-mcp)",
+      "Bash(dir *)",
+      "PowerShell(pnpm *)"
+    ]
+  }
+}
