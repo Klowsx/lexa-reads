@@ -33,6 +33,11 @@ yarn-error.*
 # local env files
 .env*.local
 
+# graphify - local-only artifacts
+graphify-out/manifest.json
+graphify-out/cost.json
+graphify-out/cache/
+
 # typescript
 *.tsbuildinfo
 

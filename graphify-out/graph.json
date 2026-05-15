@@ -1,0 +1,501 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "label": "engram.ts",
+      "file_type": "code",
+      "source_file": "engram.ts",
+      "source_location": "L1",
+      "id": "engram_ts",
+      "community": 0,
+      "norm_label": "engram.ts"
+    },
+    {
+      "label": "ENGRAM_PORT",
+      "file_type": "code",
+      "source_file": "engram.ts",
+      "source_location": "L21",
+      "id": "plugins_engram_engram_port",
+      "community": 0,
+      "norm_label": "engram_port"
+    },
+    {
+      "label": "ENGRAM_TOOLS",
+      "file_type": "code",
+      "source_file": "engram.ts",
+      "source_location": "L26",
+      "id": "plugins_engram_engram_tools",
+      "community": 0,
+      "norm_label": "engram_tools"
+    },
+    {
+      "label": "engramFetch()",
+      "file_type": "code",
+      "source_file": "engram.ts",
+      "source_location": "L126",
+      "id": "plugins_engram_engramfetch",
+      "community": 0,
+      "norm_label": "engramfetch()"
+    },
+    {
+      "label": "isEngramRunning()",
+      "file_type": "code",
+      "source_file": "engram.ts",
+      "source_location": "L143",
+      "id": "plugins_engram_isengramrunning",
+      "community": 0,
+      "norm_label": "isengramrunning()"
+    },
+    {
+      "label": "extractProjectName()",
+      "file_type": "code",
+      "source_file": "engram.ts",
+      "source_location": "L156",
+      "id": "plugins_engram_extractprojectname",
+      "community": 0,
+      "norm_label": "extractprojectname()"
+    },
+    {
+      "label": "truncate()",
+      "file_type": "code",
+      "source_file": "engram.ts",
+      "source_location": "L182",
+      "id": "plugins_engram_truncate",
+      "community": 0,
+      "norm_label": "truncate()"
+    },
+    {
+      "label": "stripPrivateTags()",
+      "file_type": "code",
+      "source_file": "engram.ts",
+      "source_location": "L192",
+      "id": "plugins_engram_stripprivatetags",
+      "community": 0,
+      "norm_label": "stripprivatetags()"
+    },
+    {
+      "label": "Engram()",
+      "file_type": "code",
+      "source_file": "engram.ts",
+      "source_location": "L199",
+      "id": "plugins_engram_engram",
+      "community": 0,
+      "norm_label": "engram()"
+    },
+    {
+      "label": "Claude-Mem Memory Context",
+      "file_type": "document",
+      "source_file": ".config/opencode/AGENTS.md",
+      "source_location": null,
+      "id": "AGENTS_claude_mem_context",
+      "community": 2,
+      "norm_label": "claude-mem memory context"
+    },
+    {
+      "label": "Context7 MCP",
+      "file_type": "document",
+      "source_file": ".config/opencode/AGENTS.md",
+      "source_location": null,
+      "id": "AGENTS_context7_mcp",
+      "community": 2,
+      "norm_label": "context7 mcp"
+    },
+    {
+      "label": "Library Documentation Workflow",
+      "file_type": "rationale",
+      "source_file": ".config/opencode/AGENTS.md",
+      "source_location": null,
+      "id": "AGENTS_library_doc_workflow",
+      "community": 2,
+      "norm_label": "library documentation workflow"
+    },
+    {
+      "label": "Engram Plugin",
+      "file_type": "code",
+      "source_file": "plugins/engram.ts",
+      "source_location": null,
+      "id": "engram_plugin",
+      "community": 1,
+      "norm_label": "engram plugin"
+    },
+    {
+      "label": "Engram Go Binary (Backend)",
+      "file_type": "code",
+      "source_file": "plugins/engram.ts",
+      "source_location": null,
+      "id": "engram_go_backend",
+      "community": 1,
+      "norm_label": "engram go binary (backend)"
+    },
+    {
+      "label": "engramFetch (HTTP Client)",
+      "file_type": "code",
+      "source_file": "plugins/engram.ts",
+      "source_location": null,
+      "id": "engram_fetch_http",
+      "community": 1,
+      "norm_label": "engramfetch (http client)"
+    },
+    {
+      "label": "ensureSession",
+      "file_type": "code",
+      "source_file": "plugins/engram.ts",
+      "source_location": null,
+      "id": "ensure_session_fn",
+      "community": 1,
+      "norm_label": "ensuresession"
+    },
+    {
+      "label": "ENGRAM_TOOLS (Set)",
+      "file_type": "code",
+      "source_file": "plugins/engram.ts",
+      "source_location": null,
+      "id": "ENGRAM_TOOLS_set",
+      "community": 1,
+      "norm_label": "engram_tools (set)"
+    },
+    {
+      "label": "MEMORY_INSTRUCTIONS",
+      "file_type": "code",
+      "source_file": "plugins/engram.ts",
+      "source_location": null,
+      "id": "MEMORY_INSTRUCTIONS_block",
+      "community": 2,
+      "norm_label": "memory_instructions"
+    },
+    {
+      "label": "OpenCode Event System",
+      "file_type": "rationale",
+      "source_file": "plugins/engram.ts",
+      "source_location": null,
+      "id": "opencode_event_system",
+      "community": 1,
+      "norm_label": "opencode event system"
+    },
+    {
+      "label": "Session On-Demand Creation",
+      "file_type": "rationale",
+      "source_file": "plugins/engram.ts",
+      "source_location": null,
+      "id": "session_on_demand_pattern",
+      "community": 1,
+      "norm_label": "session on-demand creation"
+    },
+    {
+      "label": "Sub-Agent Session Filtering",
+      "file_type": "rationale",
+      "source_file": "plugins/engram.ts",
+      "source_location": null,
+      "id": "sub_agent_filtering_pattern",
+      "community": 1,
+      "norm_label": "sub-agent session filtering"
+    },
+    {
+      "label": "Passive Learning Capture",
+      "file_type": "rationale",
+      "source_file": "plugins/engram.ts",
+      "source_location": null,
+      "id": "passive_learning_capture",
+      "community": 1,
+      "norm_label": "passive learning capture"
+    },
+    {
+      "label": "Compaction Persistence Hooks",
+      "file_type": "rationale",
+      "source_file": "plugins/engram.ts",
+      "source_location": null,
+      "id": "compaction_hooks",
+      "community": 2,
+      "norm_label": "compaction persistence hooks"
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engram.ts",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "engram_ts",
+      "target": "plugins_engram_engram_port",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engram.ts",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "engram_ts",
+      "target": "plugins_engram_engram_tools",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engram.ts",
+      "source_location": "L126",
+      "weight": 1.0,
+      "source": "engram_ts",
+      "target": "plugins_engram_engramfetch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engram.ts",
+      "source_location": "L143",
+      "weight": 1.0,
+      "source": "engram_ts",
+      "target": "plugins_engram_isengramrunning",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engram.ts",
+      "source_location": "L156",
+      "weight": 1.0,
+      "source": "engram_ts",
+      "target": "plugins_engram_extractprojectname",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engram.ts",
+      "source_location": "L182",
+      "weight": 1.0,
+      "source": "engram_ts",
+      "target": "plugins_engram_truncate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engram.ts",
+      "source_location": "L192",
+      "weight": 1.0,
+      "source": "engram_ts",
+      "target": "plugins_engram_stripprivatetags",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engram.ts",
+      "source_location": "L199",
+      "weight": 1.0,
+      "source": "engram_ts",
+      "target": "plugins_engram_engram",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engram.ts",
+      "source_location": "L254",
+      "weight": 1.0,
+      "source": "plugins_engram_engram",
+      "target": "plugins_engram_engramfetch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engram.ts",
+      "source_location": "L237",
+      "weight": 1.0,
+      "source": "plugins_engram_engram",
+      "target": "plugins_engram_isengramrunning",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engram.ts",
+      "source_location": "L201",
+      "weight": 1.0,
+      "source": "plugins_engram_engram",
+      "target": "plugins_engram_extractprojectname",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".config/opencode/AGENTS.md",
+      "source_location": 11,
+      "weight": 1.0,
+      "source": "AGENTS_claude_mem_context",
+      "target": "AGENTS_context7_mcp"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "plugins/engram.ts",
+      "source_location": 45,
+      "weight": 1.0,
+      "source": "MEMORY_INSTRUCTIONS_block",
+      "target": "AGENTS_claude_mem_context"
+    },
+    {
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".config/opencode/AGENTS.md",
+      "source_location": 12,
+      "weight": 1.0,
+      "source": "AGENTS_context7_mcp",
+      "target": "AGENTS_library_doc_workflow"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "plugins/engram.ts",
+      "source_location": 4,
+      "weight": 1.0,
+      "source": "engram_plugin",
+      "target": "engram_go_backend"
+    },
+    {
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "plugins/engram.ts",
+      "source_location": 279,
+      "weight": 1.0,
+      "source": "engram_plugin",
+      "target": "opencode_event_system"
+    },
+    {
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "plugins/engram.ts",
+      "source_location": 221,
+      "weight": 1.0,
+      "source": "engram_plugin",
+      "target": "session_on_demand_pattern"
+    },
+    {
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "plugins/engram.ts",
+      "source_location": 210,
+      "weight": 1.0,
+      "source": "engram_plugin",
+      "target": "sub_agent_filtering_pattern"
+    },
+    {
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "plugins/engram.ts",
+      "source_location": 380,
+      "weight": 1.0,
+      "source": "engram_plugin",
+      "target": "passive_learning_capture"
+    },
+    {
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "plugins/engram.ts",
+      "source_location": 423,
+      "weight": 1.0,
+      "source": "engram_plugin",
+      "target": "compaction_hooks"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "plugins/engram.ts",
+      "source_location": 409,
+      "weight": 1.0,
+      "source": "engram_plugin",
+      "target": "MEMORY_INSTRUCTIONS_block"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "plugins/engram.ts",
+      "source_location": 371,
+      "weight": 1.0,
+      "source": "ENGRAM_TOOLS_set",
+      "target": "engram_plugin"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "plugins/engram.ts",
+      "source_location": 131,
+      "weight": 1.0,
+      "source": "engram_fetch_http",
+      "target": "engram_go_backend"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "plugins/engram.ts",
+      "source_location": 226,
+      "weight": 1.0,
+      "source": "ensure_session_fn",
+      "target": "engram_fetch_http"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "plugins/engram.ts",
+      "source_location": 384,
+      "weight": 1.0,
+      "source": "passive_learning_capture",
+      "target": "engram_fetch_http"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "plugins/engram.ts",
+      "source_location": 221,
+      "weight": 1.0,
+      "source": "session_on_demand_pattern",
+      "target": "ensure_session_fn"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "plugins/engram.ts",
+      "source_location": 224,
+      "weight": 1.0,
+      "source": "sub_agent_filtering_pattern",
+      "target": "ensure_session_fn"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "plugins/engram.ts",
+      "source_location": 439,
+      "weight": 1.0,
+      "source": "compaction_hooks",
+      "target": "MEMORY_INSTRUCTIONS_block"
+    }
+  ],
+  "hyperedges": [],
+  "built_at_commit": "8e475ee220c36db7cc0c90c03f7c0b17019c50bb"
+}
