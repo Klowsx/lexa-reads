@@ -1,501 +1,1150 @@
 {
   "directed": false,
   "multigraph": false,
-  "graph": {},
+  "graph": {
+    "hyperedges": [
+      {
+        "id": "moddatetime_tables",
+        "label": "Tables using moddatetime trigger for updated_at",
+        "nodes": [
+          "001_users",
+          "001_books",
+          "001_user_books",
+          "001_reviews",
+          "001_lists",
+          "001_book_notes",
+          "001_reading_clubs",
+          "001_buddy_reads"
+        ],
+        "relation": "implement",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0,
+        "source_file": "supabase/migrations/001_initial_schema.sql"
+      },
+      {
+        "id": "social_activity_cluster",
+        "label": "Social Activity Feed Cluster",
+        "nodes": [
+          "001_activity_feed",
+          "001_activity_likes",
+          "001_follows",
+          "001_notifications",
+          "001_book_recommendations"
+        ],
+        "relation": "participate_in",
+        "confidence": "INFERRED",
+        "confidence_score": 0.9,
+        "source_file": "supabase/migrations/001_initial_schema.sql"
+      },
+      {
+        "id": "compliance_missing_tables",
+        "label": "Compliance-Critical Missing Tables",
+        "nodes": [
+          "001_ambiguous_user_blocks",
+          "001_ambiguous_content_reports",
+          "001_ambiguous_account_deletion"
+        ],
+        "relation": "form",
+        "confidence": "INFERRED",
+        "confidence_score": 0.95,
+        "source_file": "supabase/migrations/001_initial_schema.sql"
+      },
+      {
+        "id": "user_library_cluster",
+        "label": "User Library Reading Tracking Cluster",
+        "nodes": [
+          "001_user_books",
+          "001_reading_sessions",
+          "001_book_notes",
+          "001_reviews"
+        ],
+        "relation": "participate_in",
+        "confidence": "INFERRED",
+        "confidence_score": 0.9,
+        "source_file": "supabase/migrations/001_initial_schema.sql"
+      },
+      {
+        "id": "denormalized_counter_triggers",
+        "label": "Denormalized Counter Trigger Functions",
+        "nodes": [
+          "001_fn_update_follow_counts",
+          "001_fn_update_books_read_count",
+          "001_fn_update_reviews_count",
+          "001_fn_update_activity_likes_count",
+          "001_fn_update_list_books_count"
+        ],
+        "relation": "implement",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0,
+        "source_file": "supabase/migrations/001_initial_schema.sql"
+      }
+    ]
+  },
   "nodes": [
     {
-      "label": "engram.ts",
+      "label": "users table",
       "file_type": "code",
-      "source_file": "engram.ts",
-      "source_location": "L1",
-      "id": "engram_ts",
-      "community": 0,
-      "norm_label": "engram.ts"
-    },
-    {
-      "label": "ENGRAM_PORT",
-      "file_type": "code",
-      "source_file": "engram.ts",
-      "source_location": "L21",
-      "id": "plugins_engram_engram_port",
-      "community": 0,
-      "norm_label": "engram_port"
-    },
-    {
-      "label": "ENGRAM_TOOLS",
-      "file_type": "code",
-      "source_file": "engram.ts",
-      "source_location": "L26",
-      "id": "plugins_engram_engram_tools",
-      "community": 0,
-      "norm_label": "engram_tools"
-    },
-    {
-      "label": "engramFetch()",
-      "file_type": "code",
-      "source_file": "engram.ts",
-      "source_location": "L126",
-      "id": "plugins_engram_engramfetch",
-      "community": 0,
-      "norm_label": "engramfetch()"
-    },
-    {
-      "label": "isEngramRunning()",
-      "file_type": "code",
-      "source_file": "engram.ts",
-      "source_location": "L143",
-      "id": "plugins_engram_isengramrunning",
-      "community": 0,
-      "norm_label": "isengramrunning()"
-    },
-    {
-      "label": "extractProjectName()",
-      "file_type": "code",
-      "source_file": "engram.ts",
-      "source_location": "L156",
-      "id": "plugins_engram_extractprojectname",
-      "community": 0,
-      "norm_label": "extractprojectname()"
-    },
-    {
-      "label": "truncate()",
-      "file_type": "code",
-      "source_file": "engram.ts",
-      "source_location": "L182",
-      "id": "plugins_engram_truncate",
-      "community": 0,
-      "norm_label": "truncate()"
-    },
-    {
-      "label": "stripPrivateTags()",
-      "file_type": "code",
-      "source_file": "engram.ts",
-      "source_location": "L192",
-      "id": "plugins_engram_stripprivatetags",
-      "community": 0,
-      "norm_label": "stripprivatetags()"
-    },
-    {
-      "label": "Engram()",
-      "file_type": "code",
-      "source_file": "engram.ts",
-      "source_location": "L199",
-      "id": "plugins_engram_engram",
-      "community": 0,
-      "norm_label": "engram()"
-    },
-    {
-      "label": "Claude-Mem Memory Context",
-      "file_type": "document",
-      "source_file": ".config/opencode/AGENTS.md",
-      "source_location": null,
-      "id": "AGENTS_claude_mem_context",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 43",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_users",
       "community": 2,
-      "norm_label": "claude-mem memory context"
+      "norm_label": "users table"
     },
     {
-      "label": "Context7 MCP",
-      "file_type": "document",
-      "source_file": ".config/opencode/AGENTS.md",
-      "source_location": null,
-      "id": "AGENTS_context7_mcp",
+      "label": "books table",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 69",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_books",
+      "community": 3,
+      "norm_label": "books table"
+    },
+    {
+      "label": "follows table",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 98",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_follows",
+      "community": 6,
+      "norm_label": "follows table"
+    },
+    {
+      "label": "user_books table",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 114",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_user_books",
+      "community": 1,
+      "norm_label": "user_books table"
+    },
+    {
+      "label": "reviews table",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 144",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_reviews",
+      "community": 5,
+      "norm_label": "reviews table"
+    },
+    {
+      "label": "lists table",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 168",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_lists",
+      "community": 0,
+      "norm_label": "lists table"
+    },
+    {
+      "label": "list_books table",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 190",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_list_books",
+      "community": 0,
+      "norm_label": "list_books table"
+    },
+    {
+      "label": "activity_feed table",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 206",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_activity_feed",
+      "community": 4,
+      "norm_label": "activity_feed table"
+    },
+    {
+      "label": "activity_likes table",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 225",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_activity_likes",
+      "community": 4,
+      "norm_label": "activity_likes table"
+    },
+    {
+      "label": "notifications table (Phase 2)",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 241",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_notifications",
+      "community": 7,
+      "norm_label": "notifications table (phase 2)"
+    },
+    {
+      "label": "book_recommendations table (Phase 2)",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 258",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_book_recommendations",
+      "community": 3,
+      "norm_label": "book_recommendations table (phase 2)"
+    },
+    {
+      "label": "reading_sessions table (Phase 2)",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 272",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_reading_sessions",
+      "community": 1,
+      "norm_label": "reading_sessions table (phase 2)"
+    },
+    {
+      "label": "book_notes table (Phase 2)",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 287",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_book_notes",
+      "community": 1,
+      "norm_label": "book_notes table (phase 2)"
+    },
+    {
+      "label": "reading_clubs table (Phase 3)",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 305",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_reading_clubs",
+      "community": 0,
+      "norm_label": "reading_clubs table (phase 3)"
+    },
+    {
+      "label": "buddy_reads table (Phase 3)",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 324",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_buddy_reads",
+      "community": 3,
+      "norm_label": "buddy_reads table (phase 3)"
+    },
+    {
+      "label": "follow_status ENUM",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 16",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_enum_follow_status",
+      "community": 6,
+      "norm_label": "follow_status enum"
+    },
+    {
+      "label": "user_book_status ENUM",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 17",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_enum_user_book_status",
+      "community": 1,
+      "norm_label": "user_book_status enum"
+    },
+    {
+      "label": "list_visibility ENUM",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 18",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_enum_list_visibility",
+      "community": 0,
+      "norm_label": "list_visibility enum"
+    },
+    {
+      "label": "activity_type ENUM",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 19",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_enum_activity_type",
+      "community": 4,
+      "norm_label": "activity_type enum"
+    },
+    {
+      "label": "notification_type ENUM",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 27",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_enum_notification_type",
+      "community": 7,
+      "norm_label": "notification_type enum"
+    },
+    {
+      "label": "book_note_type ENUM",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 36",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_enum_book_note_type",
+      "community": 1,
+      "norm_label": "book_note_type enum"
+    },
+    {
+      "label": "buddy_read_status ENUM",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 37",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_enum_buddy_read_status",
+      "community": 3,
+      "norm_label": "buddy_read_status enum"
+    },
+    {
+      "label": "update_follow_counts() trigger function",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 343",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_fn_update_follow_counts",
+      "community": 6,
+      "norm_label": "update_follow_counts() trigger function"
+    },
+    {
+      "label": "update_books_read_count() trigger function",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 363",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_fn_update_books_read_count",
+      "community": 1,
+      "norm_label": "update_books_read_count() trigger function"
+    },
+    {
+      "label": "update_reviews_count() trigger function",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 387",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_fn_update_reviews_count",
+      "community": 5,
+      "norm_label": "update_reviews_count() trigger function"
+    },
+    {
+      "label": "update_activity_likes_count() trigger function",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 415",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_fn_update_activity_likes_count",
+      "community": 4,
+      "norm_label": "update_activity_likes_count() trigger function"
+    },
+    {
+      "label": "update_list_books_count() trigger function",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 433",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_fn_update_list_books_count",
+      "community": 0,
+      "norm_label": "update_list_books_count() trigger function"
+    },
+    {
+      "label": "handle_new_user() trigger function",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 592",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_fn_handle_new_user",
       "community": 2,
-      "norm_label": "context7 mcp"
+      "norm_label": "handle_new_user() trigger function"
     },
     {
-      "label": "Library Documentation Workflow",
+      "label": "MISSING: user_blocks table (compliance-critical)",
       "file_type": "rationale",
-      "source_file": ".config/opencode/AGENTS.md",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
       "source_location": null,
-      "id": "AGENTS_library_doc_workflow",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_ambiguous_user_blocks",
       "community": 2,
-      "norm_label": "library documentation workflow"
+      "norm_label": "missing: user_blocks table (compliance-critical)"
     },
     {
-      "label": "Engram Plugin",
-      "file_type": "code",
-      "source_file": "plugins/engram.ts",
+      "label": "MISSING: content_reports table (compliance-critical)",
+      "file_type": "rationale",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
       "source_location": null,
-      "id": "engram_plugin",
-      "community": 1,
-      "norm_label": "engram plugin"
-    },
-    {
-      "label": "Engram Go Binary (Backend)",
-      "file_type": "code",
-      "source_file": "plugins/engram.ts",
-      "source_location": null,
-      "id": "engram_go_backend",
-      "community": 1,
-      "norm_label": "engram go binary (backend)"
-    },
-    {
-      "label": "engramFetch (HTTP Client)",
-      "file_type": "code",
-      "source_file": "plugins/engram.ts",
-      "source_location": null,
-      "id": "engram_fetch_http",
-      "community": 1,
-      "norm_label": "engramfetch (http client)"
-    },
-    {
-      "label": "ensureSession",
-      "file_type": "code",
-      "source_file": "plugins/engram.ts",
-      "source_location": null,
-      "id": "ensure_session_fn",
-      "community": 1,
-      "norm_label": "ensuresession"
-    },
-    {
-      "label": "ENGRAM_TOOLS (Set)",
-      "file_type": "code",
-      "source_file": "plugins/engram.ts",
-      "source_location": null,
-      "id": "ENGRAM_TOOLS_set",
-      "community": 1,
-      "norm_label": "engram_tools (set)"
-    },
-    {
-      "label": "MEMORY_INSTRUCTIONS",
-      "file_type": "code",
-      "source_file": "plugins/engram.ts",
-      "source_location": null,
-      "id": "MEMORY_INSTRUCTIONS_block",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_ambiguous_content_reports",
       "community": 2,
-      "norm_label": "memory_instructions"
+      "norm_label": "missing: content_reports table (compliance-critical)"
     },
     {
-      "label": "OpenCode Event System",
+      "label": "MISSING: account_deletion_requests table (compliance-critical, 30-day deferred hard-delete)",
       "file_type": "rationale",
-      "source_file": "plugins/engram.ts",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
       "source_location": null,
-      "id": "opencode_event_system",
-      "community": 1,
-      "norm_label": "opencode event system"
-    },
-    {
-      "label": "Session On-Demand Creation",
-      "file_type": "rationale",
-      "source_file": "plugins/engram.ts",
-      "source_location": null,
-      "id": "session_on_demand_pattern",
-      "community": 1,
-      "norm_label": "session on-demand creation"
-    },
-    {
-      "label": "Sub-Agent Session Filtering",
-      "file_type": "rationale",
-      "source_file": "plugins/engram.ts",
-      "source_location": null,
-      "id": "sub_agent_filtering_pattern",
-      "community": 1,
-      "norm_label": "sub-agent session filtering"
-    },
-    {
-      "label": "Passive Learning Capture",
-      "file_type": "rationale",
-      "source_file": "plugins/engram.ts",
-      "source_location": null,
-      "id": "passive_learning_capture",
-      "community": 1,
-      "norm_label": "passive learning capture"
-    },
-    {
-      "label": "Compaction Persistence Hooks",
-      "file_type": "rationale",
-      "source_file": "plugins/engram.ts",
-      "source_location": null,
-      "id": "compaction_hooks",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_ambiguous_account_deletion",
       "community": 2,
-      "norm_label": "compaction persistence hooks"
+      "norm_label": "missing: account_deletion_requests table (compliance-critical, 30-day deferred hard-delete)"
+    },
+    {
+      "label": "MISSING: reading_club_members join table (implied by members_count in reading_clubs)",
+      "file_type": "rationale",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_ambiguous_reading_clubs_members",
+      "community": 0,
+      "norm_label": "missing: reading_club_members join table (implied by members_count in reading_clubs)"
+    },
+    {
+      "label": "MISSING: review_likes table (reviews.likes_count has no maintaining trigger)",
+      "file_type": "rationale",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_ambiguous_review_likes",
+      "community": 5,
+      "norm_label": "missing: review_likes table (reviews.likes_count has no maintaining trigger)"
+    },
+    {
+      "label": "MISSING: list_likes table (lists.likes_count has no maintaining trigger)",
+      "file_type": "rationale",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_ambiguous_list_likes",
+      "community": 0,
+      "norm_label": "missing: list_likes table (lists.likes_count has no maintaining trigger)"
+    },
+    {
+      "label": "auth.users (Supabase Auth built-in)",
+      "file_type": "code",
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 44",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "001_auth_users",
+      "community": 2,
+      "norm_label": "auth.users (supabase auth built-in)"
     }
   ],
   "links": [
     {
-      "relation": "contains",
+      "relation": "references",
       "confidence": "EXTRACTED",
-      "source_file": "engram.ts",
-      "source_location": "L21",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 44",
       "weight": 1.0,
-      "source": "engram_ts",
-      "target": "plugins_engram_engram_port",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "engram.ts",
-      "source_location": "L26",
-      "weight": 1.0,
-      "source": "engram_ts",
-      "target": "plugins_engram_engram_tools",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "engram.ts",
-      "source_location": "L126",
-      "weight": 1.0,
-      "source": "engram_ts",
-      "target": "plugins_engram_engramfetch",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "engram.ts",
-      "source_location": "L143",
-      "weight": 1.0,
-      "source": "engram_ts",
-      "target": "plugins_engram_isengramrunning",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "engram.ts",
-      "source_location": "L156",
-      "weight": 1.0,
-      "source": "engram_ts",
-      "target": "plugins_engram_extractprojectname",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "engram.ts",
-      "source_location": "L182",
-      "weight": 1.0,
-      "source": "engram_ts",
-      "target": "plugins_engram_truncate",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "engram.ts",
-      "source_location": "L192",
-      "weight": 1.0,
-      "source": "engram_ts",
-      "target": "plugins_engram_stripprivatetags",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "engram.ts",
-      "source_location": "L199",
-      "weight": 1.0,
-      "source": "engram_ts",
-      "target": "plugins_engram_engram",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "engram.ts",
-      "source_location": "L254",
-      "weight": 1.0,
-      "source": "plugins_engram_engram",
-      "target": "plugins_engram_engramfetch",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "engram.ts",
-      "source_location": "L237",
-      "weight": 1.0,
-      "source": "plugins_engram_engram",
-      "target": "plugins_engram_isengramrunning",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "engram.ts",
-      "source_location": "L201",
-      "weight": 1.0,
-      "source": "plugins_engram_engram",
-      "target": "plugins_engram_extractprojectname",
-      "confidence_score": 1.0
+      "source": "001_users",
+      "target": "001_auth_users"
     },
     {
       "relation": "references",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": ".config/opencode/AGENTS.md",
-      "source_location": 11,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 100",
       "weight": 1.0,
-      "source": "AGENTS_claude_mem_context",
-      "target": "AGENTS_context7_mcp"
+      "source": "001_follows",
+      "target": "001_users"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 116",
+      "weight": 1.0,
+      "source": "001_user_books",
+      "target": "001_users"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 147",
+      "weight": 1.0,
+      "source": "001_reviews",
+      "target": "001_users"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 170",
+      "weight": 1.0,
+      "source": "001_lists",
+      "target": "001_users"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 208",
+      "weight": 1.0,
+      "source": "001_activity_feed",
+      "target": "001_users"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 228",
+      "weight": 1.0,
+      "source": "001_activity_likes",
+      "target": "001_users"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 243",
+      "weight": 1.0,
+      "source": "001_notifications",
+      "target": "001_users"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 260",
+      "weight": 1.0,
+      "source": "001_book_recommendations",
+      "target": "001_users"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 274",
+      "weight": 1.0,
+      "source": "001_reading_sessions",
+      "target": "001_users"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 289",
+      "weight": 1.0,
+      "source": "001_book_notes",
+      "target": "001_users"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 309",
+      "weight": 1.0,
+      "source": "001_reading_clubs",
+      "target": "001_users"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 327",
+      "weight": 1.0,
+      "source": "001_buddy_reads",
+      "target": "001_users"
+    },
+    {
+      "relation": "maintains_count_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 347",
+      "weight": 1.0,
+      "source": "001_fn_update_follow_counts",
+      "target": "001_users"
+    },
+    {
+      "relation": "maintains_count_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 367",
+      "weight": 1.0,
+      "source": "001_fn_update_books_read_count",
+      "target": "001_users"
+    },
+    {
+      "relation": "maintains_count_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 391",
+      "weight": 1.0,
+      "source": "001_fn_update_reviews_count",
+      "target": "001_users"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 595",
+      "weight": 1.0,
+      "source": "001_fn_handle_new_user",
+      "target": "001_users"
     },
     {
       "relation": "conceptually_related_to",
-      "confidence": "INFERRED",
-      "confidence_score": 0.75,
-      "source_file": "plugins/engram.ts",
-      "source_location": 45,
-      "weight": 1.0,
-      "source": "MEMORY_INSTRUCTIONS_block",
-      "target": "AGENTS_claude_mem_context"
+      "confidence": "AMBIGUOUS",
+      "confidence_score": 0.15,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": null,
+      "weight": 0.15,
+      "source": "001_ambiguous_user_blocks",
+      "target": "001_users"
     },
     {
-      "relation": "implements",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": ".config/opencode/AGENTS.md",
-      "source_location": 12,
-      "weight": 1.0,
-      "source": "AGENTS_context7_mcp",
-      "target": "AGENTS_library_doc_workflow"
+      "relation": "conceptually_related_to",
+      "confidence": "AMBIGUOUS",
+      "confidence_score": 0.15,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": null,
+      "weight": 0.15,
+      "source": "001_ambiguous_content_reports",
+      "target": "001_users"
     },
     {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "plugins/engram.ts",
-      "source_location": 4,
-      "weight": 1.0,
-      "source": "engram_plugin",
-      "target": "engram_go_backend"
-    },
-    {
-      "relation": "implements",
-      "confidence": "INFERRED",
-      "confidence_score": 0.95,
-      "source_file": "plugins/engram.ts",
-      "source_location": 279,
-      "weight": 1.0,
-      "source": "engram_plugin",
-      "target": "opencode_event_system"
-    },
-    {
-      "relation": "implements",
-      "confidence": "INFERRED",
-      "confidence_score": 0.85,
-      "source_file": "plugins/engram.ts",
-      "source_location": 221,
-      "weight": 1.0,
-      "source": "engram_plugin",
-      "target": "session_on_demand_pattern"
-    },
-    {
-      "relation": "implements",
-      "confidence": "INFERRED",
-      "confidence_score": 0.85,
-      "source_file": "plugins/engram.ts",
-      "source_location": 210,
-      "weight": 1.0,
-      "source": "engram_plugin",
-      "target": "sub_agent_filtering_pattern"
-    },
-    {
-      "relation": "implements",
-      "confidence": "INFERRED",
-      "confidence_score": 0.85,
-      "source_file": "plugins/engram.ts",
-      "source_location": 380,
-      "weight": 1.0,
-      "source": "engram_plugin",
-      "target": "passive_learning_capture"
-    },
-    {
-      "relation": "implements",
-      "confidence": "INFERRED",
-      "confidence_score": 0.85,
-      "source_file": "plugins/engram.ts",
-      "source_location": 423,
-      "weight": 1.0,
-      "source": "engram_plugin",
-      "target": "compaction_hooks"
+      "relation": "conceptually_related_to",
+      "confidence": "AMBIGUOUS",
+      "confidence_score": 0.15,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": null,
+      "weight": 0.15,
+      "source": "001_ambiguous_account_deletion",
+      "target": "001_users"
     },
     {
       "relation": "references",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "plugins/engram.ts",
-      "source_location": 409,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 117",
       "weight": 1.0,
-      "source": "engram_plugin",
-      "target": "MEMORY_INSTRUCTIONS_block"
+      "source": "001_user_books",
+      "target": "001_books"
     },
     {
       "relation": "references",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "plugins/engram.ts",
-      "source_location": 371,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 148",
       "weight": 1.0,
-      "source": "ENGRAM_TOOLS_set",
-      "target": "engram_plugin"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "plugins/engram.ts",
-      "source_location": 131,
-      "weight": 1.0,
-      "source": "engram_fetch_http",
-      "target": "engram_go_backend"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "plugins/engram.ts",
-      "source_location": 226,
-      "weight": 1.0,
-      "source": "ensure_session_fn",
-      "target": "engram_fetch_http"
-    },
-    {
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.95,
-      "source_file": "plugins/engram.ts",
-      "source_location": 384,
-      "weight": 1.0,
-      "source": "passive_learning_capture",
-      "target": "engram_fetch_http"
-    },
-    {
-      "relation": "references",
-      "confidence": "INFERRED",
-      "confidence_score": 0.95,
-      "source_file": "plugins/engram.ts",
-      "source_location": 221,
-      "weight": 1.0,
-      "source": "session_on_demand_pattern",
-      "target": "ensure_session_fn"
+      "source": "001_reviews",
+      "target": "001_books"
     },
     {
       "relation": "references",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "plugins/engram.ts",
-      "source_location": 224,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 193",
       "weight": 1.0,
-      "source": "sub_agent_filtering_pattern",
-      "target": "ensure_session_fn"
+      "source": "001_list_books",
+      "target": "001_books"
     },
     {
       "relation": "references",
-      "confidence": "INFERRED",
-      "confidence_score": 0.85,
-      "source_file": "plugins/engram.ts",
-      "source_location": 439,
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 210",
       "weight": 1.0,
-      "source": "compaction_hooks",
-      "target": "MEMORY_INSTRUCTIONS_block"
+      "source": "001_activity_feed",
+      "target": "001_books"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 262",
+      "weight": 1.0,
+      "source": "001_book_recommendations",
+      "target": "001_books"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 311",
+      "weight": 1.0,
+      "source": "001_reading_clubs",
+      "target": "001_books"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 326",
+      "weight": 1.0,
+      "source": "001_buddy_reads",
+      "target": "001_books"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 102",
+      "weight": 1.0,
+      "source": "001_follows",
+      "target": "001_enum_follow_status"
+    },
+    {
+      "relation": "triggers",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 357",
+      "weight": 1.0,
+      "source": "001_follows",
+      "target": "001_fn_update_follow_counts"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 149",
+      "weight": 1.0,
+      "source": "001_reviews",
+      "target": "001_user_books"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 275",
+      "weight": 1.0,
+      "source": "001_reading_sessions",
+      "target": "001_user_books"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 290",
+      "weight": 1.0,
+      "source": "001_book_notes",
+      "target": "001_user_books"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 118",
+      "weight": 1.0,
+      "source": "001_user_books",
+      "target": "001_enum_user_book_status"
+    },
+    {
+      "relation": "triggers",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 381",
+      "weight": 1.0,
+      "source": "001_user_books",
+      "target": "001_fn_update_books_read_count"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 211",
+      "weight": 1.0,
+      "source": "001_activity_feed",
+      "target": "001_reviews"
+    },
+    {
+      "relation": "triggers",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 409",
+      "weight": 1.0,
+      "source": "001_reviews",
+      "target": "001_fn_update_reviews_count"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "AMBIGUOUS",
+      "confidence_score": 0.2,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 152",
+      "weight": 0.2,
+      "source": "001_reviews",
+      "target": "001_ambiguous_review_likes"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 192",
+      "weight": 1.0,
+      "source": "001_list_books",
+      "target": "001_lists"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 212",
+      "weight": 1.0,
+      "source": "001_activity_feed",
+      "target": "001_lists"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 173",
+      "weight": 1.0,
+      "source": "001_lists",
+      "target": "001_enum_list_visibility"
+    },
+    {
+      "relation": "maintains_count_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 437",
+      "weight": 1.0,
+      "source": "001_fn_update_list_books_count",
+      "target": "001_lists"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "AMBIGUOUS",
+      "confidence_score": 0.2,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 177",
+      "weight": 0.2,
+      "source": "001_lists",
+      "target": "001_ambiguous_list_likes"
+    },
+    {
+      "relation": "triggers",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 445",
+      "weight": 1.0,
+      "source": "001_list_books",
+      "target": "001_fn_update_list_books_count"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 227",
+      "weight": 1.0,
+      "source": "001_activity_likes",
+      "target": "001_activity_feed"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 209",
+      "weight": 1.0,
+      "source": "001_activity_feed",
+      "target": "001_enum_activity_type"
+    },
+    {
+      "relation": "maintains_count_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 419",
+      "weight": 1.0,
+      "source": "001_fn_update_activity_likes_count",
+      "target": "001_activity_feed"
+    },
+    {
+      "relation": "triggers",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 427",
+      "weight": 1.0,
+      "source": "001_activity_likes",
+      "target": "001_fn_update_activity_likes_count"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 245",
+      "weight": 1.0,
+      "source": "001_notifications",
+      "target": "001_enum_notification_type"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 293",
+      "weight": 1.0,
+      "source": "001_book_notes",
+      "target": "001_enum_book_note_type"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 310",
+      "weight": 1.0,
+      "source": "001_reading_clubs",
+      "target": "001_enum_list_visibility"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "AMBIGUOUS",
+      "confidence_score": 0.25,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 312",
+      "weight": 0.25,
+      "source": "001_reading_clubs",
+      "target": "001_ambiguous_reading_clubs_members"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 329",
+      "weight": 1.0,
+      "source": "001_buddy_reads",
+      "target": "001_enum_buddy_read_status"
+    },
+    {
+      "relation": "triggers",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql",
+      "source_location": "line 607",
+      "weight": 1.0,
+      "source": "001_auth_users",
+      "target": "001_fn_handle_new_user"
     }
   ],
-  "hyperedges": [],
-  "built_at_commit": "8e475ee220c36db7cc0c90c03f7c0b17019c50bb"
+  "hyperedges": [
+    {
+      "id": "moddatetime_tables",
+      "label": "Tables using moddatetime trigger for updated_at",
+      "nodes": [
+        "001_users",
+        "001_books",
+        "001_user_books",
+        "001_reviews",
+        "001_lists",
+        "001_book_notes",
+        "001_reading_clubs",
+        "001_buddy_reads"
+      ],
+      "relation": "implement",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql"
+    },
+    {
+      "id": "social_activity_cluster",
+      "label": "Social Activity Feed Cluster",
+      "nodes": [
+        "001_activity_feed",
+        "001_activity_likes",
+        "001_follows",
+        "001_notifications",
+        "001_book_recommendations"
+      ],
+      "relation": "participate_in",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "supabase/migrations/001_initial_schema.sql"
+    },
+    {
+      "id": "compliance_missing_tables",
+      "label": "Compliance-Critical Missing Tables",
+      "nodes": [
+        "001_ambiguous_user_blocks",
+        "001_ambiguous_content_reports",
+        "001_ambiguous_account_deletion"
+      ],
+      "relation": "form",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "supabase/migrations/001_initial_schema.sql"
+    },
+    {
+      "id": "user_library_cluster",
+      "label": "User Library Reading Tracking Cluster",
+      "nodes": [
+        "001_user_books",
+        "001_reading_sessions",
+        "001_book_notes",
+        "001_reviews"
+      ],
+      "relation": "participate_in",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "supabase/migrations/001_initial_schema.sql"
+    },
+    {
+      "id": "denormalized_counter_triggers",
+      "label": "Denormalized Counter Trigger Functions",
+      "nodes": [
+        "001_fn_update_follow_counts",
+        "001_fn_update_books_read_count",
+        "001_fn_update_reviews_count",
+        "001_fn_update_activity_likes_count",
+        "001_fn_update_list_books_count"
+      ],
+      "relation": "implement",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/migrations/001_initial_schema.sql"
+    }
+  ],
+  "built_at_commit": "f39406b1fe9bd68f4cea15cbd8dbe37e01c3a02a"
 }

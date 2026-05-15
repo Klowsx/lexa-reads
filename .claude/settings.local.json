@@ -35,7 +35,12 @@
       "WebFetch(domain:shopify.github.io)",
       "WebFetch(domain:www.nativewind.dev)",
       "WebSearch",
-      "WebFetch(domain:www.unistyl.es)"
+      "WebFetch(domain:www.unistyl.es)",
+      "Skill(graphify)",
+      "PowerShell(py *)",
+      "PowerShell(Get-Item \"graphify-out/.graphify_chunk_01.json\" | Select-Object Length; \\(Get-Content \"graphify-out/.graphify_chunk_01.json\" -Raw\\).Substring\\(0,100\\))",
+      "Bash(python3 -c ' *)",
+      "Bash(py -c ' *)"
     ]
   }
 }
