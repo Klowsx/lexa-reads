@@ -10,3 +10,5 @@ export type {
 
 export type { AppErrorCode, AppError } from "./errors";
 export { toAppError } from "./errors";
+
+export type { UserProfile } from "./user";

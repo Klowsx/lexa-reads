@@ -49,7 +49,12 @@
       "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\\\\assets\" -Recurse | ForEach-Object { $_.FullName.Replace\\(\"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\", \"\"\\) })",
       "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\\\\supabase\" -Recurse | ForEach-Object { $_.FullName.Replace\\(\"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\", \"\"\\) })",
       "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\\\\src\\\\features\" -Recurse | ForEach-Object { if \\($_.PSIsContainer\\) { $_.FullName.Replace\\(\"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\", \"\"\\) } })",
-      "PowerShell(Get-Item *)"
+      "PowerShell(Get-Item *)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\" -Recurse -File | Where-Object { $_.Name -match \"\\(jest|babel|package\\\\.json|STACK\\\\.md\\)\" } | Select-Object -ExpandProperty FullName)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\\\\src\" -Recurse -File)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(pnpm jest *)",
+      "Bash(pnpm test *)"
     ]
   }
 }

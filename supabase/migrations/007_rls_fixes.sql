@@ -7,7 +7,8 @@
 -- ------------------------------------------------------------
 -- 9. users: SELECT debe excluir usuarios que te bloquearon
 -- ------------------------------------------------------------
-DROP POLICY "Perfiles públicos visibles para todos" ON users;
+DROP POLICY IF EXISTS "Perfiles públicos visibles para todos" ON users;
+DROP POLICY IF EXISTS "Perfiles públicos visibles para todos (sin bloqueos)" ON users;
 
 CREATE POLICY "Perfiles públicos visibles para todos"
   ON users FOR SELECT
@@ -25,8 +26,13 @@ CREATE POLICY "Perfiles públicos visibles para todos"
 --     El FOR ALL de 001 + SELECT de 002 se solapaban — se reemplaza
 --     por 4 policies independientes y explícitas
 -- ------------------------------------------------------------
-DROP POLICY "Usuario gestiona sus propios user_books"   ON user_books;
-DROP POLICY "user_books visibles respetando privacidad" ON user_books;
+DROP POLICY IF EXISTS "Usuario gestiona sus propios user_books"   ON user_books;
+DROP POLICY IF EXISTS "user_books visibles para todos (perfiles públicos)" ON user_books;
+DROP POLICY IF EXISTS "user_books visibles respetando privacidad" ON user_books;
+DROP POLICY IF EXISTS "user_books SELECT respetando privacidad"   ON user_books;
+DROP POLICY IF EXISTS "user_books INSERT propio"                  ON user_books;
+DROP POLICY IF EXISTS "user_books UPDATE propio"                  ON user_books;
+DROP POLICY IF EXISTS "user_books DELETE propio"                  ON user_books;
 
 -- SELECT: libros visibles si el dueño no es privado, o eres el dueño
 CREATE POLICY "user_books SELECT respetando privacidad"
@@ -56,7 +62,7 @@ CREATE POLICY "user_books DELETE propio"
 -- Extra: reviews y activity_feed también deben respetar user_blocks
 -- (STACK.md los define así; las policies actuales no lo chequean)
 -- ------------------------------------------------------------
-DROP POLICY "Reseñas publicadas visibles para todos" ON reviews;
+DROP POLICY IF EXISTS "Reseñas publicadas visibles para todos" ON reviews;
 
 CREATE POLICY "Reseñas publicadas visibles para todos"
   ON reviews FOR SELECT
@@ -70,7 +76,7 @@ CREATE POLICY "Reseñas publicadas visibles para todos"
   );
 
 
-DROP POLICY "Feed visible respetando privacidad" ON activity_feed;
+DROP POLICY IF EXISTS "Feed visible respetando privacidad" ON activity_feed;
 
 -- El feed solo muestra actividad propia + de usuarios que sigues (fan-in MVP)
 CREATE POLICY "Feed visible respetando privacidad"
