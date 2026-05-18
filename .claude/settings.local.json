@@ -40,7 +40,16 @@
       "PowerShell(py *)",
       "PowerShell(Get-Item \"graphify-out/.graphify_chunk_01.json\" | Select-Object Length; \\(Get-Content \"graphify-out/.graphify_chunk_01.json\" -Raw\\).Substring\\(0,100\\))",
       "Bash(python3 -c ' *)",
-      "Bash(py -c ' *)"
+      "Bash(py -c ' *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\" -Force)",
+      "Bash(Select-Object Name, FullName)",
+      "Bash(Format-Table -AutoSize)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\\\\app\" -Recurse | ForEach-Object { $_.FullName.Replace\\(\"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\", \"\"\\) })",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\\\\src\" -Recurse | ForEach-Object { $_.FullName.Replace\\(\"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\", \"\"\\) })",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\\\\assets\" -Recurse | ForEach-Object { $_.FullName.Replace\\(\"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\", \"\"\\) })",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\\\\supabase\" -Recurse | ForEach-Object { $_.FullName.Replace\\(\"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\", \"\"\\) })",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\\\\src\\\\features\" -Recurse | ForEach-Object { if \\($_.PSIsContainer\\) { $_.FullName.Replace\\(\"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\", \"\"\\) } })",
+      "PowerShell(Get-Item *)"
     ]
   }
 }
