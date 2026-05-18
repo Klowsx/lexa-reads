@@ -1,0 +1,42 @@
+{
+  "auth": {
+    "login": "Sign in",
+    "register": "Sign up",
+    "logout": "Sign out",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot your password?",
+    "noAccount": "Don't have an account?",
+    "alreadyHaveAccount": "Already have an account?"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "save": "Save",
+    "back": "Back",
+    "done": "Done",
+    "search": "Search",
+    "noResults": "No results"
+  },
+  "book": {
+    "status": {
+      "reading": "Reading",
+      "read": "Read",
+      "want_to_read": "Want to read",
+      "abandoned": "Abandoned"
+    },
+    "rating": "Rating",
+    "review": "Review",
+    "spoilers": "Contains spoilers"
+  },
+  "feed": {
+    "empty": "No activity yet. Follow other readers to see their activity.",
+    "finished": "finished",
+    "started": "started reading",
+    "reviewed": "reviewed",
+    "wantsToRead": "wants to read",
+    "abandoned": "abandoned"
+  }
+}

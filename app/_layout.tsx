@@ -1,8 +1,10 @@
 import "../global.css";
+import "~/lib/i18n";
 import { useEffect } from "react";
 import { AppState, Platform } from "react-native";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { QueryClientProvider, focusManager } from "@tanstack/react-query";
+import { I18nextProvider } from "react-i18next";
 import { useFonts } from "expo-font";
 import {
   PlayfairDisplay_400Regular,
@@ -19,6 +21,7 @@ import {
 import { supabase } from "~/lib/supabase";
 import { useAuthStore } from "~/stores/auth.store";
 import { queryClient } from "~/lib/query-client";
+import i18n from "~/lib/i18n";
 
 function AuthGate() {
   const session = useAuthStore((s) => s.session);
@@ -51,8 +54,6 @@ export default function RootLayout() {
     DMSans_600SemiBold,
   });
 
-  if (!fontsLoaded) return null;
-
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
 
@@ -72,10 +73,14 @@ export default function RootLayout() {
     return () => sub.remove();
   }, []);
 
+  if (!fontsLoaded) return null;
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthGate />
-      <Stack screenOptions={{ headerShown: false }} />
-    </QueryClientProvider>
+    <I18nextProvider i18n={i18n}>
+      <QueryClientProvider client={queryClient}>
+        <AuthGate />
+        <Stack screenOptions={{ headerShown: false }} />
+      </QueryClientProvider>
+    </I18nextProvider>
   );
 }

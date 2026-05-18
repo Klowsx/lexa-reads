@@ -1,0 +1,42 @@
+{
+  "auth": {
+    "login": "Iniciar sesión",
+    "register": "Registrarse",
+    "logout": "Cerrar sesión",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "noAccount": "¿No tienes cuenta?",
+    "alreadyHaveAccount": "¿Ya tienes cuenta?"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Ocurrió un error",
+    "retry": "Reintentar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "back": "Volver",
+    "done": "Listo",
+    "search": "Buscar",
+    "noResults": "Sin resultados"
+  },
+  "book": {
+    "status": {
+      "reading": "Leyendo",
+      "read": "Leído",
+      "want_to_read": "Quiero leer",
+      "abandoned": "Abandonado"
+    },
+    "rating": "Calificación",
+    "review": "Reseña",
+    "spoilers": "Contiene spoilers"
+  },
+  "feed": {
+    "empty": "Aún no hay actividad. Sigue a otros lectores para ver su actividad.",
+    "finished": "terminó",
+    "started": "empezó a leer",
+    "reviewed": "reseñó",
+    "wantsToRead": "quiere leer",
+    "abandoned": "abandonó"
+  }
+}
