@@ -60,16 +60,16 @@ Sin este archivo `eas build` falla. Define los perfiles de build (development / 
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
     },
-    "production": {}
+    "production": {},
   },
   "submit": {
-    "production": {}
-  }
+    "production": {},
+  },
 }
 ```
 
@@ -88,6 +88,7 @@ Sin este archivo `eas build` falla. Define los perfiles de build (development / 
 ~~`i18next` y `expo-localization` instalados pero sin nada cableado.~~
 
 **Resuelto:**
+
 - `src/lib/i18n.ts` — inicialización con locale del dispositivo, fallback ES
 - `src/locales/es.json` y `en.json` — keys para auth, common, book, feed
 - `import "~/lib/i18n"` + `<I18nextProvider>` en `app/_layout.tsx`
@@ -99,6 +100,7 @@ Sin este archivo `eas build` falla. Define los perfiles de build (development / 
 ~~`expect()`, `describe()`, `it()` pasaban typecheck en archivos de producción.~~
 
 **Resuelto:**
+
 - Eliminado `"types": ["jest"]` de `tsconfig.json`
 - Creado `tsconfig.test.json` con los tipos de Jest aislados
 - `@testing-library/jest-native` (deprecado) eliminado; migrado a matchers built-in de `@testing-library/react-native` v13
@@ -108,6 +110,7 @@ Sin este archivo `eas build` falla. Define los perfiles de build (development / 
 ### ✅ 0.8 Scaffold de `src/features/` y `src/components/ui/`
 
 **Parcialmente resuelto:** Creada la feature de auth con placeholders:
+
 - `src/features/auth/hooks/index.ts` — comentarios de los hooks a implementar
 - `src/features/auth/components/index.ts` — comentarios de los componentes a implementar
 
@@ -130,15 +133,16 @@ Funcionalidad prometida que hay que cablear antes de que los primeros usuarios t
 
 ---
 
-### ⬜ 1.1 Sentry — instalado, no inicializado
+### ✅ 1.1 Sentry — instalado, no inicializado
 
-`@sentry/react-native` está en `package.json` pero no hay `Sentry.init()` en ningún lado. Sin esto los crashes en producción son invisibles. STACK.md lo marca como obligatorio en builds de TestFlight/internal.
+~~`@sentry/react-native` estaba sin `Sentry.init()` en ningún lado.~~
 
-**Lo que falta:**
+**Resuelto:**
 
-- `Sentry.init()` al inicio de `app/_layout.tsx`
-- DSN en variable de entorno (`EXPO_PUBLIC_SENTRY_DSN`)
-- Configuración de `sourceMaps` en `eas.json` para que los stack traces sean legibles
+- `Sentry.init()` en `app/_layout.tsx` antes del componente (desactivado en dev)
+- `export default Sentry.wrap(RootLayout)` para capturar crashes del árbol de navegación
+- `EXPO_PUBLIC_SENTRY_DSN` agregado a `.env.example`
+- Pendiente: agregar `sourceMaps: true` al perfil production de `eas.json` cuando se cree
 
 ---
 
@@ -166,64 +170,20 @@ Funcionalidad prometida que hay que cablear antes de que los primeros usuarios t
 
 ---
 
-## FASE 2 — Antes del submit a stores (al final)
-
-Se pueden implementar con la app ya funcionando. No bloquean el desarrollo pero sí el lanzamiento.
-
----
-
-### ⬜ 2.1 PostHog — instalado, no inicializado
-
-`posthog-react-native` instalado pero sin `PostHogProvider` ni flujo de consentimiento. Las tiendas requieren que analytics sea opt-in.
-
-**Lo que falta:**
-
-- `PostHogProvider` en root layout
-- Pantalla/modal de consentimiento granular (GDPR/LGPD)
-- PostHog solo se inicializa después de que el usuario acepta
-
----
-
-### ⬜ 2.2 Checklist de compliance de stores
-
-Estos son bloqueantes para App Store / Play Store pero se implementan sobre features ya existentes:
-
-- [ ] Reporte de contenido in-app con acuse ≤24h (App Store 1.2 / Play UGC)
-- [ ] Borrado de cuenta in-app con anonimización diferida 30 días (Apple lo exige desde 2022)
-- [ ] Política de privacidad pública con URL accesible
-- [ ] Export de datos del usuario (Edge Function)
-- [ ] Push opt-in contextual — no al primer launch
-- [ ] App Store Connect: privacy nutrition labels
-- [ ] Play Console: data safety form
-
----
-
-### ⬜ 2.3 `eas.json` — configuración de sourcemaps y submit
-
-El `eas.json` mínimo de Fase 0 alcanza para hacer builds. Antes del submit final hay que configurar:
-
-- `sourceMaps: true` en el perfil production (para Sentry)
-- `submit` con credenciales de App Store Connect y Google Play
-
----
-
 ## Resumen visual
 
-| #   | Item                                            | Fase            | Estado | Impacto si se omite                |
-| --- | ----------------------------------------------- | --------------- | ------ | ---------------------------------- |
-| 0.1 | Fix hooks order en `_layout.tsx`                | Antes de código | ✅     | Crash al abrir                     |
-| 0.2 | Crear rutas mínimas                             | Antes de código | ✅     | Crash al abrir                     |
-| 0.3 | `app.json` bundle IDs + scheme                  | Antes de código | ⬜     | No se puede subir a stores         |
-| 0.4 | `eas.json`                                      | Antes de código | ⬜     | No hay builds                      |
-| 0.5 | `react-native-reanimated` + babel plugin        | Antes de código | ✅     | Crash en runtime                   |
-| 0.6 | Setup i18n                                      | Antes de código | ✅     | Refactor global después            |
-| 0.7 | `tsconfig.json` types aislados                  | Antes de código | ✅     | Typechecking sucio                 |
-| 0.8 | Scaffold `src/features/auth/` (parcial)         | Antes de código | 🔶     | Sin estructura para features       |
-| 0.9 | `query-options.ts` + `google-books.ts`          | Antes de código | ⬜     | Rompe arquitectura desde feature 1 |
-| 1.1 | Sentry inicializado                             | Durante dev     | ⬜     | Crashes invisibles en prod         |
-| 1.2 | `app/+not-found.tsx`                            | Durante dev     | ✅     | Error poco claro en rutas rotas    |
-| 1.3 | `userInterfaceStyle: "automatic"`               | Durante dev     | ✅     | Dark mode no funciona              |
-| 1.4 | Migrar de `expo-barcode-scanner`                | Durante dev     | ✅     | Build roto en SDK futuro           |
-| 2.1 | PostHog + consentimiento                        | Antes de submit | ⬜     | Rechazo de stores                  |
-| 2.2 | Compliance stores (reporte, borrado, etc.)      | Antes de submit | ⬜     | Rechazo de stores                  |
-| 2.3 | `eas.json` sourcemaps + submit config           | Antes de submit | ⬜     | Stack traces ilegibles             |
+| #   | Item                                     | Fase            | Estado | Impacto si se omite                |
+| --- | ---------------------------------------- | --------------- | ------ | ---------------------------------- |
+| 0.1 | Fix hooks order en `_layout.tsx`         | Antes de código | ✅     | Crash al abrir                     |
+| 0.2 | Crear rutas mínimas                      | Antes de código | ✅     | Crash al abrir                     |
+| 0.3 | `app.json` bundle IDs + scheme           | Antes de código | ⬜     | No se puede subir a stores         |
+| 0.4 | `eas.json`                               | Antes de código | ⬜     | No hay builds                      |
+| 0.5 | `react-native-reanimated` + babel plugin | Antes de código | ✅     | Crash en runtime                   |
+| 0.6 | Setup i18n                               | Antes de código | ✅     | Refactor global después            |
+| 0.7 | `tsconfig.json` types aislados           | Antes de código | ✅     | Typechecking sucio                 |
+| 0.8 | Scaffold `src/features/auth/` (parcial)  | Antes de código | 🔶     | Sin estructura para features       |
+| 0.9 | `query-options.ts` + `google-books.ts`   | Antes de código | ⬜     | Rompe arquitectura desde feature 1 |
+| 1.1 | Sentry inicializado                      | Durante dev     | ✅     | Crashes invisibles en prod         |
+| 1.2 | `app/+not-found.tsx`                     | Durante dev     | ✅     | Error poco claro en rutas rotas    |
+| 1.3 | `userInterfaceStyle: "automatic"`        | Durante dev     | ✅     | Dark mode no funciona              |
+| 1.4 | Migrar de `expo-barcode-scanner`         | Durante dev     | ✅     | Build roto en SDK futuro           |

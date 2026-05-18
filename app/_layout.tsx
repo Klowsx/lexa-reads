@@ -1,11 +1,6 @@
 import "../global.css";
 import "~/lib/i18n";
-import { useEffect } from "react";
-import { AppState, Platform } from "react-native";
-import { Stack, useRouter, useSegments } from "expo-router";
-import { QueryClientProvider, focusManager } from "@tanstack/react-query";
-import { I18nextProvider } from "react-i18next";
-import { useFonts } from "expo-font";
+import * as Sentry from "@sentry/react-native";
 import {
   PlayfairDisplay_400Regular,
   PlayfairDisplay_400Regular_Italic,
@@ -18,10 +13,22 @@ import {
   DMSans_500Medium,
   DMSans_600SemiBold,
 } from "@expo-google-fonts/dm-sans";
+import { useEffect } from "react";
+import { AppState, Platform } from "react-native";
+import { Stack, useRouter, useSegments } from "expo-router";
+import { QueryClientProvider, focusManager } from "@tanstack/react-query";
+import { I18nextProvider } from "react-i18next";
+import { useFonts } from "expo-font";
 import { supabase } from "~/lib/supabase";
 import { useAuthStore } from "~/stores/auth.store";
 import { queryClient } from "~/lib/query-client";
 import i18n from "~/lib/i18n";
+
+Sentry.init({
+  dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
+  enabled: !__DEV__,
+  tracesSampleRate: 0.2,
+});
 
 function AuthGate() {
   const session = useAuthStore((s) => s.session);
@@ -40,7 +47,7 @@ function AuthGate() {
   return null;
 }
 
-export default function RootLayout() {
+function RootLayout() {
   const setSession = useAuthStore((s) => s.setSession);
 
   const [fontsLoaded] = useFonts({
@@ -84,3 +91,5 @@ export default function RootLayout() {
     </I18nextProvider>
   );
 }
+
+export default Sentry.wrap(RootLayout);
