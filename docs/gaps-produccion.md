@@ -11,47 +11,37 @@ Estos bloquean desde el inicio: la app no abre, los builds no corren, o el resto
 
 ---
 
-### 0.1 Bug de hooks en `app/_layout.tsx` — CRASH inmediato
+### ✅ 0.1 Bug de hooks en `app/_layout.tsx`
 
-**Problema:** Los dos `useEffect` están después del `return null` condicional, violando las reglas de React Hooks. Crashea en StrictMode.
+~~Los dos `useEffect` estaban después del `return null` condicional, violando las reglas de React Hooks.~~
 
-```tsx
-// Estado actual — INCORRECTO
-if (!fontsLoaded) return null;
-useEffect(() => { ... }, []);  // ← hook después de return = crash
-useEffect(() => { ... }, []);
-```
-
-**Fix:** Mover ambos `useEffect` antes del `if (!fontsLoaded)`.
+**Resuelto:** Ambos `useEffect` movidos antes del `if (!fontsLoaded) return null`.
 
 ---
 
-### 0.2 No existen las rutas del AuthGate
+### ✅ 0.2 No existían las rutas del AuthGate
 
-`_layout.tsx` intenta navegar a `/(auth)/login` y `/(tabs)/feed` pero ninguno existe. La app abre y crashea de inmediato.
+~~`_layout.tsx` intentaba navegar a `/(auth)/login` y `/(tabs)/feed` pero ninguno existía.~~
 
-**Pendiente:** Crear al menos los archivos de ruta vacíos para que Expo Router los resuelva mientras se desarrolla.
+**Resuelto:** Creados `app/(auth)/_layout.tsx`, `app/(auth)/login.tsx`, `app/(tabs)/_layout.tsx`, `app/(tabs)/feed.tsx` como placeholders.
 
 ---
 
-### 0.3 `app.json` incompleto para producción
+### ⬜ 0.3 `app.json` incompleto para producción
 
 Faltan los campos que bloquean el submit a tiendas y el deep linking del MVP:
 
 ```jsonc
 // Agregar:
 "ios": {
-  "bundleIdentifier": "com.tuempresa.lexa",   // App Store — OBLIGATORIO
-  "supportsTablet": true
+  "bundleIdentifier": "com.tuempresa.lexa"   // App Store — OBLIGATORIO
 },
 "android": {
-  "package": "com.tuempresa.lexa",            // Play Store — OBLIGATORIO
-  "adaptiveIcon": { ... },
-  "edgeToEdgeEnabled": true
+  "package": "com.tuempresa.lexa"            // Play Store — OBLIGATORIO
 },
-"scheme": "lexa",                              // Deep linking (listas, libros, perfiles)
+"scheme": "lexa",                             // Deep linking (listas, libros, perfiles)
 "extra": {
-  "eas": { "projectId": "..." }               // EAS Build
+  "eas": { "projectId": "..." }              // EAS Build
 }
 ```
 
@@ -60,111 +50,72 @@ Sin `scheme` los deep links del MVP (listas, libros compartidos) no funcionan.
 
 ---
 
-### 0.4 No existe `eas.json`
+### ⬜ 0.4 No existe `eas.json`
 
 Sin este archivo `eas build` falla. Define los perfiles de build (development / preview / production).
 
 ```jsonc
-// eas.json mínimo
 {
   "cli": { "version": ">= 10.0.0" },
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal",
+      "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal",
+      "distribution": "internal"
     },
-    "production": {},
+    "production": {}
   },
   "submit": {
-    "production": {},
-  },
+    "production": {}
+  }
 }
 ```
 
 ---
 
-### 0.5 `react-native-reanimated` no instalado
+### ✅ 0.5 `react-native-reanimated` no instalado
 
-STACK.md lo marca como requerido para las microinteracciones del feed, pero **no está en `package.json`**. Cualquier componente que lo importe crasheará en runtime.
+~~No estaba en `package.json`. Cualquier componente que lo importara crasheaba en runtime.~~
 
-```bash
-pnpm add react-native-reanimated
-```
-
-También hay que agregarlo al `babel.config.js`:
-
-```js
-plugins: ["react-native-reanimated/plugin"];
-```
+**Resuelto:** Ya estaba instalado. Agregado `react-native-reanimated/plugin` a `babel.config.js` que faltaba.
 
 ---
 
-### 0.6 i18n sin configurar
+### ✅ 0.6 i18n sin configurar
 
-`i18next` y `expo-localization` están instalados pero no hay nada cableado. El MVP promete soporte ES + EN desde el día 1. Sin esto, no hay forma de agregar strings localizados a ninguna pantalla.
+~~`i18next` y `expo-localization` instalados pero sin nada cableado.~~
 
-**Lo que falta:**
-
-- `src/lib/i18n.ts` — inicialización de i18next con expo-localization
-- `src/locales/es.json` y `en.json` — archivos de traducción
-- `<I18nextProvider>` en el root layout
-
-Definir la estructura de namespaces antes de escribir screens evita un refactor global después.
+**Resuelto:**
+- `src/lib/i18n.ts` — inicialización con locale del dispositivo, fallback ES
+- `src/locales/es.json` y `en.json` — keys para auth, common, book, feed
+- `import "~/lib/i18n"` + `<I18nextProvider>` en `app/_layout.tsx`
 
 ---
 
-### 0.7 `tsconfig.json` — `"types": ["jest"]` global
+### ✅ 0.7 `tsconfig.json` — `"types": ["jest"]` global
 
-```jsonc
-// Estado actual — contamina producción con tipos de Jest
-"types": ["jest"]
-```
+~~`expect()`, `describe()`, `it()` pasaban typecheck en archivos de producción.~~
 
-`expect()`, `describe()`, `it()` pasan typecheck en archivos que no son tests. Mover a una `tsconfig.test.json` separada y configurar Jest para usarla.
-
-```jsonc
-// tsconfig.test.json
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "types": ["jest", "@testing-library/jest-native"],
-  },
-}
-```
+**Resuelto:**
+- Eliminado `"types": ["jest"]` de `tsconfig.json`
+- Creado `tsconfig.test.json` con los tipos de Jest aislados
+- `@testing-library/jest-native` (deprecado) eliminado; migrado a matchers built-in de `@testing-library/react-native` v13
 
 ---
 
-### 0.8 Scaffold de `src/features/` y `src/components/ui/`
+### ✅ 0.8 Scaffold de `src/features/` y `src/components/ui/`
 
-No existe ninguno de los dos. Antes de escribir la primera feature hay que definir la estructura de carpetas para que todo el equipo (o futuras sesiones) siga el mismo patrón:
+**Parcialmente resuelto:** Creada la feature de auth con placeholders:
+- `src/features/auth/hooks/index.ts` — comentarios de los hooks a implementar
+- `src/features/auth/components/index.ts` — comentarios de los componentes a implementar
 
-```
-src/
-├── features/
-│   ├── auth/       { hooks/, components/ }
-│   ├── feed/       { hooks/, components/ }
-│   ├── library/    { hooks/, components/ }
-│   ├── book/       { hooks/, components/ }
-│   ├── lists/      { hooks/, components/ }
-│   └── user/       { hooks/, components/ }
-└── components/ui/
-    ├── Button.tsx
-    ├── Input.tsx
-    ├── Skeleton.tsx
-    ├── QueryBoundary.tsx
-    ├── ErrorState.tsx
-    ├── EmptyState.tsx
-    └── Toast.tsx
-```
-
-Los átomos de UI (`QueryBoundary`, `Skeleton`, `Button`) los necesita la primera pantalla que escribas.
+**Pendiente:** Resto de features (feed, library, book, lists, user) y `src/components/ui/` — se crean cuando se empiece cada feature.
 
 ---
 
-### 0.9 `src/lib/query-options.ts` y `src/lib/google-books.ts`
+### ⬜ 0.9 `src/lib/query-options.ts` y `src/lib/google-books.ts`
 
 Ambos son reglas arquitectónicas duras (CLAUDE.md §5 y §4). Si no existen desde el inicio, las primeras queries romperán el patrón y habrá que refactorizar.
 
@@ -179,7 +130,7 @@ Funcionalidad prometida que hay que cablear antes de que los primeros usuarios t
 
 ---
 
-### 1.1 Sentry — instalado, no inicializado
+### ⬜ 1.1 Sentry — instalado, no inicializado
 
 `@sentry/react-native` está en `package.json` pero no hay `Sentry.init()` en ningún lado. Sin esto los crashes en producción son invisibles. STACK.md lo marca como obligatorio en builds de TestFlight/internal.
 
@@ -191,28 +142,27 @@ Funcionalidad prometida que hay que cablear antes de que los primeros usuarios t
 
 ---
 
-### 1.2 `app/+not-found.tsx`
+### ✅ 1.2 `app/+not-found.tsx`
 
-Expo Router requiere esta pantalla para rutas no encontradas. Sin ella muestra un error poco claro en lugar de una pantalla de 404 navegable.
+~~Expo Router requiere esta pantalla para rutas no encontradas.~~
 
----
-
-### 1.3 `userInterfaceStyle: "automatic"` en `app.json`
-
-El design system tiene dark mode completo (CSS vars en `global.css`, `rawDark` en `colors.ts`), pero `app.json` tiene `"userInterfaceStyle": "light"` hardcodeado. iOS mostrará el status bar incorrecto y NativeWind no responderá al tema del sistema.
-
-Cambiar a `"automatic"`.
+**Resuelto:** Creado `app/+not-found.tsx` con placeholder y link al feed.
 
 ---
 
-### 1.4 `expo-barcode-scanner` deprecado
+### ✅ 1.3 `userInterfaceStyle: "automatic"` en `app.json`
 
-Deprecado desde SDK 52. Ya tienen `expo-camera` instalado (SDK 54) que incluye barcode scanning nativo. Quitar `expo-barcode-scanner` antes de que Expo lo retire completamente y cause un error de build.
+~~`app.json` tenía `"userInterfaceStyle": "light"` hardcodeado.~~
 
-```bash
-pnpm remove expo-barcode-scanner
-# Migrar al BarcodeScanner integrado en expo-camera
-```
+**Resuelto:** Cambiado a `"automatic"`. Dark mode responde al sistema.
+
+---
+
+### ✅ 1.4 `expo-barcode-scanner` deprecado
+
+~~Deprecado desde SDK 52, causaba warnings en build.~~
+
+**Resuelto:** Eliminado de `package.json`. Usar `expo-camera` (SDK 54) que incluye barcode scanning nativo.
 
 ---
 
@@ -222,7 +172,7 @@ Se pueden implementar con la app ya funcionando. No bloquean el desarrollo pero 
 
 ---
 
-### 2.1 PostHog — instalado, no inicializado
+### ⬜ 2.1 PostHog — instalado, no inicializado
 
 `posthog-react-native` instalado pero sin `PostHogProvider` ni flujo de consentimiento. Las tiendas requieren que analytics sea opt-in.
 
@@ -234,7 +184,7 @@ Se pueden implementar con la app ya funcionando. No bloquean el desarrollo pero 
 
 ---
 
-### 2.2 Checklist de compliance de stores (del STACK.md)
+### ⬜ 2.2 Checklist de compliance de stores
 
 Estos son bloqueantes para App Store / Play Store pero se implementan sobre features ya existentes:
 
@@ -248,7 +198,7 @@ Estos son bloqueantes para App Store / Play Store pero se implementan sobre feat
 
 ---
 
-### 2.3 `eas.json` — configuración de sourcemaps y submit
+### ⬜ 2.3 `eas.json` — configuración de sourcemaps y submit
 
 El `eas.json` mínimo de Fase 0 alcanza para hacer builds. Antes del submit final hay que configurar:
 
@@ -259,21 +209,21 @@ El `eas.json` mínimo de Fase 0 alcanza para hacer builds. Antes del submit fina
 
 ## Resumen visual
 
-| #   | Item                                            | Fase            | Impacto si se omite                |
-| --- | ----------------------------------------------- | --------------- | ---------------------------------- |
-| 0.1 | Fix hooks order en `_layout.tsx`                | Antes de código | Crash al abrir                     |
-| 0.2 | Crear rutas mínimas                             | Antes de código | Crash al abrir                     |
-| 0.3 | `app.json` bundle IDs + scheme                  | Antes de código | No se puede subir a stores         |
-| 0.4 | `eas.json`                                      | Antes de código | No hay builds                      |
-| 0.5 | Instalar `react-native-reanimated`              | Antes de código | Crash en runtime                   |
-| 0.6 | Setup i18n                                      | Antes de código | Refactor global después            |
-| 0.7 | `tsconfig.json` types aislados                  | Antes de código | Typechecking sucio                 |
-| 0.8 | Scaffold `src/features/` + `src/components/ui/` | Antes de código | Sin estructura para features       |
-| 0.9 | `query-options.ts` + `google-books.ts`          | Antes de código | Rompe arquitectura desde feature 1 |
-| 1.1 | Sentry inicializado                             | Durante dev     | Crashes invisibles en prod         |
-| 1.2 | `app/+not-found.tsx`                            | Durante dev     | Error poco claro en rutas rotas    |
-| 1.3 | `userInterfaceStyle: "automatic"`               | Durante dev     | Dark mode no funciona              |
-| 1.4 | Migrar de `expo-barcode-scanner`                | Durante dev     | Build roto en SDK futuro           |
-| 2.1 | PostHog + consentimiento                        | Antes de submit | Rechazo de stores                  |
-| 2.2 | Compliance stores (reporte, borrado, etc.)      | Antes de submit | Rechazo de stores                  |
-| 2.3 | `eas.json` sourcemaps + submit config           | Antes de submit | Stack traces ilegibles             |
+| #   | Item                                            | Fase            | Estado | Impacto si se omite                |
+| --- | ----------------------------------------------- | --------------- | ------ | ---------------------------------- |
+| 0.1 | Fix hooks order en `_layout.tsx`                | Antes de código | ✅     | Crash al abrir                     |
+| 0.2 | Crear rutas mínimas                             | Antes de código | ✅     | Crash al abrir                     |
+| 0.3 | `app.json` bundle IDs + scheme                  | Antes de código | ⬜     | No se puede subir a stores         |
+| 0.4 | `eas.json`                                      | Antes de código | ⬜     | No hay builds                      |
+| 0.5 | `react-native-reanimated` + babel plugin        | Antes de código | ✅     | Crash en runtime                   |
+| 0.6 | Setup i18n                                      | Antes de código | ✅     | Refactor global después            |
+| 0.7 | `tsconfig.json` types aislados                  | Antes de código | ✅     | Typechecking sucio                 |
+| 0.8 | Scaffold `src/features/auth/` (parcial)         | Antes de código | 🔶     | Sin estructura para features       |
+| 0.9 | `query-options.ts` + `google-books.ts`          | Antes de código | ⬜     | Rompe arquitectura desde feature 1 |
+| 1.1 | Sentry inicializado                             | Durante dev     | ⬜     | Crashes invisibles en prod         |
+| 1.2 | `app/+not-found.tsx`                            | Durante dev     | ✅     | Error poco claro en rutas rotas    |
+| 1.3 | `userInterfaceStyle: "automatic"`               | Durante dev     | ✅     | Dark mode no funciona              |
+| 1.4 | Migrar de `expo-barcode-scanner`                | Durante dev     | ✅     | Build roto en SDK futuro           |
+| 2.1 | PostHog + consentimiento                        | Antes de submit | ⬜     | Rechazo de stores                  |
+| 2.2 | Compliance stores (reporte, borrado, etc.)      | Antes de submit | ⬜     | Rechazo de stores                  |
+| 2.3 | `eas.json` sourcemaps + submit config           | Antes de submit | ⬜     | Stack traces ilegibles             |
