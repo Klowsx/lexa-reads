@@ -1,49 +1,67 @@
-import { Check, Eye, EyeOff, Lock, Mail, User } from 'lucide-react-native';
-import { Link, useRouter } from 'expo-router';
-import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Check, Eye, EyeOff, Lock, Mail, User } from "lucide-react-native";
+import { Link, useRouter } from "expo-router";
+import { useState } from "react";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   AUTH,
   AuthField,
   BackBar,
   PrimaryButton,
   alpha,
-} from '../../src/features/auth/components';
+} from "../../src/features/auth/components";
+import { useRegister } from "@/src/features/auth/hooks/useRegister";
+import { AppError } from "@/src/types";
 
 const STRENGTH_LEVELS = [
-  { label: 'Débil', color: '#C43A3A' },
-  { label: 'Buena', color: '#C49A20' },
-  { label: 'Fuerte', color: '#5CAF7E' },
+  { label: "Débil", color: "#C43A3A" },
+  { label: "Buena", color: "#C49A20" },
+  { label: "Fuerte", color: "#5CAF7E" },
 ];
 
 export default function RegisterScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const [name, setName] = useState('Javier Martínez');
-  const [email, setEmail] = useState('javier@email.com');
-  const [password, setPassword] = useState('LectorEterno24');
-  const [showPw, setShowPw] = useState(true);
-  const [terms, setTerms] = useState(true);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [terms, setTerms] = useState(false);
+
+  const { mutate: register, isPending, error } = useRegister();
 
   const strengthIdx = password.length < 6 ? 0 : password.length < 10 ? 1 : 2;
   const strengthFill = Math.min(password.length / 12, 1) * 3;
-  const { label: strengthLabel, color: strengthColor } = STRENGTH_LEVELS[strengthIdx];
+  const { label: strengthLabel, color: strengthColor } =
+    STRENGTH_LEVELS[strengthIdx];
 
   return (
     <KeyboardAvoidingView
       style={[styles.root, { paddingTop: insets.top }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <BackBar onBack={() => router.back()} />
       <ScrollView
-        contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 24 }]}
+        contentContainerStyle={[
+          styles.scroll,
+          { paddingBottom: insets.bottom + 24 },
+        ]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
           <Text style={styles.title}>Crea tu cuenta</Text>
-          <Text style={styles.subtitle}>Empieza a construir tu biblioteca.</Text>
+          <Text style={styles.subtitle}>
+            Empieza a construir tu biblioteca.
+          </Text>
         </View>
 
         <AuthField
@@ -66,12 +84,19 @@ export default function RegisterScreen() {
           label="Contraseña"
           value={password}
           onChangeText={setPassword}
-          secureTextEntry={!showPw}
+          secureTextEntry={!showPassword}
           autoCapitalize="none"
           icon={<Lock size={16} color={AUTH.t3} />}
           trailing={
-            <Pressable onPress={() => setShowPw(!showPw)} hitSlop={8}>
-              {showPw ? <EyeOff size={16} color={AUTH.t3} /> : <Eye size={16} color={AUTH.t3} />}
+            <Pressable
+              onPress={() => setShowPassword(!showPassword)}
+              hitSlop={8}
+            >
+              {showPassword ? (
+                <EyeOff size={16} color={AUTH.t3} />
+              ) : (
+                <Eye size={16} color={AUTH.t3} />
+              )}
             </Pressable>
           }
         />
@@ -90,7 +115,7 @@ export default function RegisterScreen() {
             ))}
           </View>
           <Text style={styles.strengthLabel}>
-            Seguridad:{' '}
+            Seguridad:{" "}
             <Text style={[styles.strengthValue, { color: strengthColor }]}>
               {strengthLabel}
             </Text>
@@ -103,20 +128,29 @@ export default function RegisterScreen() {
             {terms && <Check size={11} color="#fff" />}
           </View>
           <Text style={styles.termsText}>
-            Acepto los{' '}
-            <Text style={styles.termsLink}>Términos</Text>
-            {' '}y la{' '}
-            <Text style={styles.termsLink}>Política de privacidad</Text>
-            {' '}de Lexa.
+            Acepto los <Text style={styles.termsLink}>Términos</Text> y la{" "}
+            <Text style={styles.termsLink}>Política de privacidad</Text> de
+            Lexa.
           </Text>
         </Pressable>
 
-        <PrimaryButton disabled={!terms}>Crear cuenta</PrimaryButton>
+        {error && (
+          <Text className="text-red-600 text-sm mb-12 items-center">
+            {(error as AppError).message}
+          </Text>
+        )}
+
+        <PrimaryButton
+          disabled={!terms || isPending}
+          onPress={() => register({ email, displayName: name, password })}
+        >
+          {isPending ? "Creando cuenta" : "Crear cuenta"}
+        </PrimaryButton>
 
         <Link href="/(auth)/login" asChild>
           <Pressable style={styles.loginBtn}>
             <Text style={styles.loginText}>
-              ¿Ya tienes cuenta?{' '}
+              ¿Ya tienes cuenta?{" "}
               <Text style={styles.loginAccent}>Iniciar sesión</Text>
             </Text>
           </Pressable>
@@ -140,7 +174,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   title: {
-    fontFamily: 'PlayfairDisplay_600SemiBold',
+    fontFamily: "PlayfairDisplay_600SemiBold",
     fontSize: 28,
     color: AUTH.text,
     lineHeight: 34,
@@ -150,14 +184,14 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: AUTH.t2,
     marginTop: 8,
-    fontFamily: 'DMSans_400Regular',
+    fontFamily: "DMSans_400Regular",
   },
   strengthMeter: {
     marginTop: -6,
     marginBottom: 18,
   },
   strengthBars: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 4,
     marginBottom: 5,
   },
@@ -170,14 +204,14 @@ const styles = StyleSheet.create({
   strengthLabel: {
     fontSize: 11,
     color: AUTH.t3,
-    fontFamily: 'DMSans_400Regular',
+    fontFamily: "DMSans_400Regular",
   },
   strengthValue: {
-    fontFamily: 'DMSans_600SemiBold',
+    fontFamily: "DMSans_600SemiBold",
   },
   termsRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
     gap: 10,
     marginBottom: 22,
   },
@@ -188,8 +222,8 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: AUTH.border,
     marginTop: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   checkboxChecked: {
     backgroundColor: AUTH.accent,
@@ -200,22 +234,22 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: AUTH.t2,
     lineHeight: 18,
-    fontFamily: 'DMSans_400Regular',
+    fontFamily: "DMSans_400Regular",
   },
   termsLink: {
     color: AUTH.accent,
   },
   loginBtn: {
     paddingTop: 18,
-    alignItems: 'center',
+    alignItems: "center",
   },
   loginText: {
     fontSize: 13,
     color: AUTH.t2,
-    fontFamily: 'DMSans_400Regular',
+    fontFamily: "DMSans_400Regular",
   },
   loginAccent: {
     color: AUTH.accent,
-    fontFamily: 'DMSans_600SemiBold',
+    fontFamily: "DMSans_600SemiBold",
   },
 });

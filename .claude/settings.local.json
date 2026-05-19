@@ -59,7 +59,11 @@
       "Bash(claude doctor *)",
       "Bash(pnpm tsc *)",
       "Bash(pnpm list *)",
-      "Bash(ln -s \"$\\(pwd\\)/node_modules/.pnpm/lucide-react-native@1.16.0__552c5830732eb57a6248be19b1fb16da/node_modules/lucide-react-native\" node_modules/lucide-react-native)"
+      "Bash(ln -s \"$\\(pwd\\)/node_modules/.pnpm/lucide-react-native@1.16.0__552c5830732eb57a6248be19b1fb16da/node_modules/lucide-react-native\" node_modules/lucide-react-native)",
+      "mcp__engram__mem_current_project",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\" -Recurse -Directory | Select-Object -ExpandProperty FullName | Where-Object { $_ -match \"\\(auth|src\\)\" })",
+      "mcp__engram__mem_save",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\" -Exclude node_modules | Where-Object { $_.Name -ne \"node_modules\" } | Select-Object Name, PSIsContainer)"
     ]
   }
 }
