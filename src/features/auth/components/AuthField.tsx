@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import { Text, TextInput, View } from 'react-native';
-import type { LucideProps } from 'lucide-react-native';
+import type { LucideIcon } from 'lucide-react-native';
 import { useColors } from '@/src/lib/colors';
-
-type IconComponent = React.ComponentType<LucideProps>;
 
 type Props = {
   label?: string;
@@ -13,7 +11,7 @@ type Props = {
   secureTextEntry?: boolean;
   keyboardType?: 'default' | 'email-address';
   autoCapitalize?: 'none' | 'words' | 'sentences';
-  icon?: IconComponent;
+  icon?: LucideIcon;
   trailing?: React.ReactNode;
   error?: string;
 };

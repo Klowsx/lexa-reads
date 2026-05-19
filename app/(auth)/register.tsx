@@ -31,14 +31,15 @@ export default function RegisterScreen() {
   const c = useColors();
 
   const strengthLevels = [
-    { label: "Débil",  color: c.error   },
-    { label: "Buena",  color: c.warning },
+    { label: "Débil", color: c.error },
+    { label: "Buena", color: c.warning },
     { label: "Fuerte", color: c.success },
   ];
 
   const strengthIdx = password.length < 6 ? 0 : password.length < 10 ? 1 : 2;
   const strengthFill = Math.min(password.length / 12, 1) * 3;
-  const { label: strengthLabel, color: strengthColor } = strengthLevels[strengthIdx];
+  const { label: strengthLabel, color: strengthColor } =
+    strengthLevels[strengthIdx];
 
   return (
     <KeyboardAvoidingView
