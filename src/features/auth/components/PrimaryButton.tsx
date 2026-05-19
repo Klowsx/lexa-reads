@@ -1,5 +1,4 @@
-import { Pressable, StyleSheet, Text } from 'react-native';
-import { AUTH } from './tokens';
+import { Pressable, Text } from 'react-native';
 
 type Props = {
   children: React.ReactNode;
@@ -12,29 +11,11 @@ export function PrimaryButton({ children, onPress, disabled }: Props) {
     <Pressable
       onPress={onPress}
       disabled={disabled}
-      style={[styles.btn, disabled && styles.disabled]}
+      className={`w-full items-center rounded-md py-[15px] bg-accent ${disabled ? 'opacity-35' : ''}`}
     >
-      <Text style={styles.label}>{children}</Text>
+      <Text className="text-white text-sm font-sans-sb tracking-wide">
+        {children}
+      </Text>
     </Pressable>
   );
 }
-
-const styles = StyleSheet.create({
-  btn: {
-    width: '100%',
-    alignItems: 'center',
-    borderRadius: 12,
-    paddingVertical: 15,
-    backgroundColor: AUTH.accent,
-  },
-  disabled: {
-    opacity: 0.35,
-  },
-  label: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-    fontFamily: 'DMSans_600SemiBold',
-    letterSpacing: 0.1,
-  },
-});

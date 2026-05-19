@@ -1,6 +1,9 @@
 import { useState } from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
-import { AUTH, alpha } from './tokens';
+import { Text, TextInput, View } from 'react-native';
+import type { LucideProps } from 'lucide-react-native';
+import { useColors } from '@/src/lib/colors';
+
+type IconComponent = React.ComponentType<LucideProps>;
 
 type Props = {
   label?: string;
@@ -10,7 +13,7 @@ type Props = {
   secureTextEntry?: boolean;
   keyboardType?: 'default' | 'email-address';
   autoCapitalize?: 'none' | 'words' | 'sentences';
-  icon?: React.ReactNode;
+  icon?: IconComponent;
   trailing?: React.ReactNode;
   error?: string;
 };
@@ -23,84 +26,49 @@ export function AuthField({
   secureTextEntry,
   keyboardType = 'default',
   autoCapitalize = 'sentences',
-  icon,
+  icon: Icon,
   trailing,
   error,
 }: Props) {
   const [focused, setFocused] = useState(false);
+  const c = useColors();
+
+  const focusedBorder = `rgba(${parseInt(c.accent.slice(1,3),16)},${parseInt(c.accent.slice(3,5),16)},${parseInt(c.accent.slice(5,7),16)},0.55)`;
+  const borderColor = error ? c.error : focused ? focusedBorder : undefined;
 
   return (
-    <View style={styles.wrapper}>
-      {label && <Text style={styles.label}>{label}</Text>}
+    <View className="mb-[14px]">
+      {label && (
+        <Text className="text-xs text-t2 font-sans-sb tracking-wide uppercase mb-1.5">
+          {label}
+        </Text>
+      )}
       <View
-        style={[
-          styles.row,
-          focused && { borderColor: alpha(AUTH.accent, 0.55) },
-          error ? { borderColor: AUTH.red } : undefined,
-        ]}
+        className="flex-row items-center gap-2.5 bg-surface rounded-md px-3.5 py-[13px] border border-border"
+        style={borderColor ? { borderColor } : undefined}
       >
-        {icon && <View style={[styles.icon, focused && { opacity: 1 }]}>{icon}</View>}
+        {Icon && (
+          <View className={`shrink-0 ${focused ? 'opacity-100' : 'opacity-60'}`}>
+            <Icon size={16} color={c.t3} />
+          </View>
+        )}
         <TextInput
-          style={styles.input}
+          className="flex-1 text-text text-[14px] font-sans min-w-0"
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor={AUTH.t3}
+          placeholderTextColor={c.t3}
           secureTextEntry={secureTextEntry}
           keyboardType={keyboardType}
           autoCapitalize={autoCapitalize}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
         />
-        {trailing && <View style={styles.trailing}>{trailing}</View>}
+        {trailing && <View className="shrink-0">{trailing}</View>}
       </View>
-      {error && <Text style={styles.error}>{error}</Text>}
+      {error && (
+        <Text className="text-xs text-error mt-1 ml-0.5 font-sans">{error}</Text>
+      )}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  wrapper: {
-    marginBottom: 14,
-  },
-  label: {
-    fontSize: 11,
-    color: AUTH.t2,
-    fontFamily: 'DMSans_600SemiBold',
-    letterSpacing: 0.7,
-    textTransform: 'uppercase',
-    marginBottom: 6,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    backgroundColor: AUTH.surface,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 13,
-    borderWidth: 1,
-    borderColor: AUTH.border,
-  },
-  icon: {
-    opacity: 0.6,
-    flexShrink: 0,
-  },
-  input: {
-    flex: 1,
-    color: AUTH.text,
-    fontSize: 14,
-    fontFamily: 'DMSans_400Regular',
-    minWidth: 0,
-  },
-  trailing: {
-    flexShrink: 0,
-  },
-  error: {
-    fontSize: 11,
-    color: AUTH.red,
-    marginTop: 5,
-    marginLeft: 2,
-    fontFamily: 'DMSans_400Regular',
-  },
-});

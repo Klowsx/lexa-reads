@@ -19,6 +19,11 @@ module.exports = {
         accent:  'rgb(var(--color-accent)  / <alpha-value>)',
         star:    'rgb(var(--color-star)    / <alpha-value>)',
 
+        // Feedback — fijos, no cambian con el tema
+        success: '#5CAF7E',
+        error:   '#C43A3A',
+        warning: '#C49A20',
+
         // Status — fijos, no cambian con el tema
         status: {
           reading:   '#4A96B8',

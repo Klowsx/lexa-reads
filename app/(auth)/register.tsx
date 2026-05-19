@@ -6,26 +6,17 @@ import {
   Platform,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
-  AUTH,
   AuthField,
   BackBar,
   PrimaryButton,
-  alpha,
 } from "../../src/features/auth/components";
 import { useRegister } from "@/src/features/auth/hooks/useRegister";
-import { AppError } from "@/src/types";
-
-const STRENGTH_LEVELS = [
-  { label: "Débil", color: "#C43A3A" },
-  { label: "Buena", color: "#C49A20" },
-  { label: "Fuerte", color: "#5CAF7E" },
-];
+import { useColors } from "@/src/lib/colors";
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -37,29 +28,40 @@ export default function RegisterScreen() {
   const [terms, setTerms] = useState(false);
 
   const { mutate: register, isPending, error } = useRegister();
+  const c = useColors();
+
+  const strengthLevels = [
+    { label: "Débil",  color: c.error   },
+    { label: "Buena",  color: c.warning },
+    { label: "Fuerte", color: c.success },
+  ];
 
   const strengthIdx = password.length < 6 ? 0 : password.length < 10 ? 1 : 2;
   const strengthFill = Math.min(password.length / 12, 1) * 3;
-  const { label: strengthLabel, color: strengthColor } =
-    STRENGTH_LEVELS[strengthIdx];
+  const { label: strengthLabel, color: strengthColor } = strengthLevels[strengthIdx];
 
   return (
     <KeyboardAvoidingView
-      style={[styles.root, { paddingTop: insets.top }]}
+      className="flex-1 bg-bg"
+      style={{ paddingTop: insets.top }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <BackBar onBack={() => router.back()} />
       <ScrollView
-        contentContainerStyle={[
-          styles.scroll,
-          { paddingBottom: insets.bottom + 24 },
-        ]}
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingHorizontal: 24,
+          paddingTop: 12,
+          paddingBottom: insets.bottom + 24,
+        }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.header}>
-          <Text style={styles.title}>Crea tu cuenta</Text>
-          <Text style={styles.subtitle}>
+        <View className="mb-6">
+          <Text className="font-serif-sb text-2xl text-text tracking-tight">
+            Crea tu cuenta
+          </Text>
+          <Text className="font-sans text-sm text-t2 mt-2">
             Empieza a construir tu biblioteca.
           </Text>
         </View>
@@ -69,7 +71,7 @@ export default function RegisterScreen() {
           value={name}
           onChangeText={setName}
           autoCapitalize="words"
-          icon={<User size={16} color={AUTH.t3} />}
+          icon={User}
         />
         <AuthField
           label="Correo"
@@ -78,7 +80,7 @@ export default function RegisterScreen() {
           placeholder="tu@correo.com"
           keyboardType="email-address"
           autoCapitalize="none"
-          icon={<Mail size={16} color={AUTH.t3} />}
+          icon={Mail}
         />
         <AuthField
           label="Contraseña"
@@ -86,57 +88,63 @@ export default function RegisterScreen() {
           onChangeText={setPassword}
           secureTextEntry={!showPassword}
           autoCapitalize="none"
-          icon={<Lock size={16} color={AUTH.t3} />}
+          icon={Lock}
           trailing={
             <Pressable
               onPress={() => setShowPassword(!showPassword)}
               hitSlop={8}
             >
               {showPassword ? (
-                <EyeOff size={16} color={AUTH.t3} />
+                <EyeOff size={16} color={c.t3} />
               ) : (
-                <Eye size={16} color={AUTH.t3} />
+                <Eye size={16} color={c.t3} />
               )}
             </Pressable>
           }
         />
 
         {/* Strength meter */}
-        <View style={styles.strengthMeter}>
-          <View style={styles.strengthBars}>
+        <View className="-mt-1.5 mb-[18px]">
+          <View className="flex-row gap-1 mb-1">
             {[0, 1, 2].map((i) => (
               <View
                 key={i}
-                style={[
-                  styles.strengthBar,
-                  strengthFill > i && { backgroundColor: strengthColor },
-                ]}
+                className="flex-1 h-[3px] rounded-full bg-sh"
+                style={
+                  strengthFill > i
+                    ? { backgroundColor: strengthColor }
+                    : undefined
+                }
               />
             ))}
           </View>
-          <Text style={styles.strengthLabel}>
+          <Text className="text-xs text-t3 font-sans">
             Seguridad:{" "}
-            <Text style={[styles.strengthValue, { color: strengthColor }]}>
+            <Text className="font-sans-sb" style={{ color: strengthColor }}>
               {strengthLabel}
             </Text>
           </Text>
         </View>
 
         {/* Terms */}
-        <Pressable style={styles.termsRow} onPress={() => setTerms(!terms)}>
-          <View style={[styles.checkbox, terms && styles.checkboxChecked]}>
+        <Pressable
+          className="flex-row items-start gap-2.5 mb-[22px]"
+          onPress={() => setTerms(!terms)}
+        >
+          <View
+            className={`w-[18px] h-[18px] rounded-sm border-[1.5px] mt-0.5 items-center justify-center ${terms ? "bg-accent border-accent" : "border-border"}`}
+          >
             {terms && <Check size={11} color="#fff" />}
           </View>
-          <Text style={styles.termsText}>
-            Acepto los <Text style={styles.termsLink}>Términos</Text> y la{" "}
-            <Text style={styles.termsLink}>Política de privacidad</Text> de
-            Lexa.
+          <Text className="flex-1 text-xs text-t2 leading-[18px] font-sans">
+            Acepto los <Text className="text-accent">Términos</Text> y la{" "}
+            <Text className="text-accent">Política de privacidad</Text> de Lexa.
           </Text>
         </Pressable>
 
         {error && (
-          <Text className="text-red-600 text-sm mb-12 items-center">
-            {(error as AppError).message}
+          <Text className="text-xs font-sans text-center mb-3 text-error">
+            {error.message}
           </Text>
         )}
 
@@ -144,14 +152,14 @@ export default function RegisterScreen() {
           disabled={!terms || isPending}
           onPress={() => register({ email, displayName: name, password })}
         >
-          {isPending ? "Creando cuenta" : "Crear cuenta"}
+          {isPending ? "Creando cuenta…" : "Crear cuenta"}
         </PrimaryButton>
 
         <Link href="/(auth)/login" asChild>
-          <Pressable style={styles.loginBtn}>
-            <Text style={styles.loginText}>
+          <Pressable className="pt-[18px] items-center">
+            <Text className="text-sm text-t2 font-sans">
               ¿Ya tienes cuenta?{" "}
-              <Text style={styles.loginAccent}>Iniciar sesión</Text>
+              <Text className="text-accent font-sans-sb">Iniciar sesión</Text>
             </Text>
           </Pressable>
         </Link>
@@ -159,97 +167,3 @@ export default function RegisterScreen() {
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: AUTH.bg,
-  },
-  scroll: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 12,
-  },
-  header: {
-    marginBottom: 24,
-  },
-  title: {
-    fontFamily: "PlayfairDisplay_600SemiBold",
-    fontSize: 28,
-    color: AUTH.text,
-    lineHeight: 34,
-    letterSpacing: -0.3,
-  },
-  subtitle: {
-    fontSize: 13,
-    color: AUTH.t2,
-    marginTop: 8,
-    fontFamily: "DMSans_400Regular",
-  },
-  strengthMeter: {
-    marginTop: -6,
-    marginBottom: 18,
-  },
-  strengthBars: {
-    flexDirection: "row",
-    gap: 4,
-    marginBottom: 5,
-  },
-  strengthBar: {
-    flex: 1,
-    height: 3,
-    borderRadius: 100,
-    backgroundColor: AUTH.sh,
-  },
-  strengthLabel: {
-    fontSize: 11,
-    color: AUTH.t3,
-    fontFamily: "DMSans_400Regular",
-  },
-  strengthValue: {
-    fontFamily: "DMSans_600SemiBold",
-  },
-  termsRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 10,
-    marginBottom: 22,
-  },
-  checkbox: {
-    width: 18,
-    height: 18,
-    borderRadius: 5,
-    borderWidth: 1.5,
-    borderColor: AUTH.border,
-    marginTop: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  checkboxChecked: {
-    backgroundColor: AUTH.accent,
-    borderColor: AUTH.accent,
-  },
-  termsText: {
-    flex: 1,
-    fontSize: 12,
-    color: AUTH.t2,
-    lineHeight: 18,
-    fontFamily: "DMSans_400Regular",
-  },
-  termsLink: {
-    color: AUTH.accent,
-  },
-  loginBtn: {
-    paddingTop: 18,
-    alignItems: "center",
-  },
-  loginText: {
-    fontSize: 13,
-    color: AUTH.t2,
-    fontFamily: "DMSans_400Regular",
-  },
-  loginAccent: {
-    color: AUTH.accent,
-    fontFamily: "DMSans_600SemiBold",
-  },
-});
