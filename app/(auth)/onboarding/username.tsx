@@ -1,4 +1,4 @@
-import { Check, Pencil } from 'lucide-react-native';
+﻿import { Check, Pencil } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -30,10 +30,10 @@ export default function OnboardUsernameScreen() {
       <StepBar step={3} total={3} />
 
       <View className="px-6 mb-6">
-        <Text className="font-serif-sb text-text" style={{ fontSize: 26, lineHeight: 32, letterSpacing: -0.3 }}>
+        <Text className="font-display-sb text-text" style={{ fontSize: 26, lineHeight: 32, letterSpacing: -0.3 }}>
           {'Elige tu nombre\nde lector'}
         </Text>
-        <Text className="font-sans text-t2 text-sm mt-2">
+        <Text className="font-body text-t2 text-sm mt-2">
           Así te encontrarán otros lectores en Lexa.
         </Text>
       </View>
@@ -48,7 +48,7 @@ export default function OnboardUsernameScreen() {
               borderColor: c.accent,
             }}
           >
-            <Text className="font-sans-sb text-[34px]" style={{ color: c.accent }}>
+            <Text className="font-body-sb text-[34px]" style={{ color: c.accent }}>
               {username.slice(0, 2).toUpperCase() || '··'}
             </Text>
           </View>
@@ -66,14 +66,14 @@ export default function OnboardUsernameScreen() {
           onChangeText={handleChange}
           autoCapitalize="none"
           icon={
-            <Text className="font-sans-medium text-t3" style={{ fontSize: 14 }}>@</Text>
+            <Text className="font-body-md text-t3" style={{ fontSize: 14 }}>@</Text>
           }
           trailing={
             available ? <Check size={16} color={c.success} /> : undefined
           }
         />
 
-        <Text className="font-sans text-t3 -mt-2 ml-0.5" style={{ fontSize: 11 }}>
+        <Text className="font-body text-t3 -mt-2 ml-0.5" style={{ fontSize: 11 }}>
           lexa.app/@
           <Text className="text-text">{username || 'tu_nombre'}</Text>
         </Text>

@@ -1,4 +1,4 @@
-import { Eye, EyeOff, Lock, Mail } from "lucide-react-native";
+﻿import { Eye, EyeOff, Lock, Mail } from "lucide-react-native";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -48,13 +48,10 @@ export default function LoginScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View className="mb-7">
-          <Text
-            className="font-serif-sb text-text text-2xl"
-            style={{ letterSpacing: -0.3 }}
-          >
+          <Text className="font-display-sb text-text text-2xl">
             {"Bienvenido\nde vuelta"}
           </Text>
-          <Text className="font-sans text-t2 text-sm mt-[10px]">
+          <Text className="font-body text-t2 text-sm mt-[10px]">
             Continúa donde lo dejaste.
           </Text>
         </View>
@@ -89,7 +86,7 @@ export default function LoginScreen() {
         <View className="items-end -mt-1 mb-[22px]">
           <Link href="/(auth)/forgot-password" asChild>
             <Pressable>
-              <Text className="font-sans-md text-xs text-accent">
+              <Text className="font-body-md text-xs text-accent">
                 ¿Olvidaste tu contraseña?
               </Text>
             </Pressable>
@@ -103,7 +100,7 @@ export default function LoginScreen() {
         <View className="flex-row items-center gap-[10px] my-[22px]">
           <View className="flex-1 h-px bg-border" />
           <Text
-            className="font-sans text-xs text-t3 uppercase"
+            className="font-body text-xs text-t3 uppercase"
             style={{ letterSpacing: 0.9 }}
           >
             o continúa con
@@ -115,7 +112,7 @@ export default function LoginScreen() {
           <View className="w-[10px]" />
           <GhostButton>
             <GoogleIcon />
-            <Text className="font-sans-md text-text text-sm">Google</Text>
+            <Text className="font-body-md text-text text-sm">Google</Text>
           </GhostButton>
         </View>
 
@@ -123,9 +120,9 @@ export default function LoginScreen() {
 
         <Link href="/(auth)/register" asChild>
           <Pressable className="pt-[18px] items-center">
-            <Text className="font-sans text-t2 text-sm">
+            <Text className="font-body text-t2 text-sm">
               ¿No tienes cuenta?{" "}
-              <Text className="font-sans-sb text-accent">Crear una</Text>
+              <Text className="font-body-sb text-accent">Crear una</Text>
             </Text>
           </Pressable>
         </Link>

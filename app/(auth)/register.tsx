@@ -1,4 +1,4 @@
-import { Check, Eye, EyeOff, Lock, Mail, User } from "lucide-react-native";
+﻿import { Check, Eye, EyeOff, Lock, Mail, User } from "lucide-react-native";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -59,10 +59,10 @@ export default function RegisterScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View className="mb-6">
-          <Text className="font-serif-sb text-2xl text-text tracking-tight">
+          <Text className="font-display-sb text-2xl text-text tracking-tight">
             Crea tu cuenta
           </Text>
-          <Text className="font-sans text-sm text-t2 mt-2">
+          <Text className="font-body text-sm text-t2 mt-2">
             Empieza a construir tu biblioteca.
           </Text>
         </View>
@@ -119,9 +119,9 @@ export default function RegisterScreen() {
               />
             ))}
           </View>
-          <Text className="text-xs text-t3 font-sans">
+          <Text className="text-xs text-t3 font-body">
             Seguridad:{" "}
-            <Text className="font-sans-sb" style={{ color: strengthColor }}>
+            <Text className="font-body-sb" style={{ color: strengthColor }}>
               {strengthLabel}
             </Text>
           </Text>
@@ -137,14 +137,14 @@ export default function RegisterScreen() {
           >
             {terms && <Check size={11} color="#fff" />}
           </View>
-          <Text className="flex-1 text-xs text-t2 leading-[18px] font-sans">
+          <Text className="flex-1 text-xs text-t2 leading-[18px] font-body">
             Acepto los <Text className="text-accent">Términos</Text> y la{" "}
             <Text className="text-accent">Política de privacidad</Text> de Lexa.
           </Text>
         </Pressable>
 
         {error && (
-          <Text className="text-xs font-sans text-center mb-3 text-error">
+          <Text className="text-xs font-body text-center mb-3 text-error">
             {error.message}
           </Text>
         )}
@@ -158,9 +158,9 @@ export default function RegisterScreen() {
 
         <Link href="/(auth)/login" asChild>
           <Pressable className="pt-[18px] items-center">
-            <Text className="text-sm text-t2 font-sans">
+            <Text className="text-sm text-t2 font-body">
               ¿Ya tienes cuenta?{" "}
-              <Text className="text-accent font-sans-sb">Iniciar sesión</Text>
+              <Text className="text-accent font-body-sb">Iniciar sesión</Text>
             </Text>
           </Pressable>
         </Link>

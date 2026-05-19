@@ -1,4 +1,4 @@
-import { Link } from 'expo-router';
+﻿import { Link } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BookFan, PrimaryButton, Wordmark } from '../../src/features/auth/components';
@@ -19,10 +19,10 @@ export default function WelcomeScreen() {
         style={{ paddingBottom: insets.bottom + 24 }}
       >
         <Wordmark size={36} />
-        <Text className="font-serif-italic text-text mt-2 mb-[10px]" style={{ fontSize: 22, lineHeight: 28 }}>
+        <Text className="font-display-i text-text mt-2 mb-[10px]" style={{ fontSize: 22, lineHeight: 28 }}>
           {'Tu vida lectora,\nen un solo lugar.'}
         </Text>
-        <Text className="font-sans text-t2 text-sm mb-7" style={{ lineHeight: 20 }}>
+        <Text className="font-body text-t2 text-sm mb-7" style={{ lineHeight: 20 }}>
           Registra lo que lees, descubre tu próxima historia y compártela con otros lectores.
         </Text>
 
@@ -32,9 +32,9 @@ export default function WelcomeScreen() {
 
         <Link href="/(auth)/login" asChild>
           <Pressable className="w-full py-[14px] items-center">
-            <Text className="font-sans text-t2 text-sm">
+            <Text className="font-body text-t2 text-sm">
               ¿Ya tienes cuenta?{' '}
-              <Text className="font-sans-sb" style={{ color: c.accent }}>Iniciar sesión</Text>
+              <Text className="font-body-sb" style={{ color: c.accent }}>Iniciar sesión</Text>
             </Text>
           </Pressable>
         </Link>

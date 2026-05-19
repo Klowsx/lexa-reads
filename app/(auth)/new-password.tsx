@@ -1,4 +1,4 @@
-import { Check, Eye, EyeOff, Lock } from 'lucide-react-native';
+﻿import { Check, Eye, EyeOff, Lock } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -40,10 +40,10 @@ export default function NewPasswordScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View className="mb-7">
-          <Text className="font-serif-sb text-text text-2xl" style={{ lineHeight: 34, letterSpacing: -0.3 }}>
+          <Text className="font-display-sb text-text text-2xl" style={{ lineHeight: 34, letterSpacing: -0.3 }}>
             Nueva contraseña
           </Text>
-          <Text className="font-sans text-t2 text-sm mt-[10px]">Elige una contraseña fuerte y única.</Text>
+          <Text className="font-body text-t2 text-sm mt-[10px]">Elige una contraseña fuerte y única.</Text>
         </View>
 
         <AuthField
@@ -91,7 +91,7 @@ export default function NewPasswordScreen() {
                     <View className="w-1 h-1 rounded-full bg-t3" />
                   </View>
                 )}
-                <Text className={`font-sans text-xs ${ok ? 'text-text' : 'text-t2'}`}>
+                <Text className={`font-body text-xs ${ok ? 'text-text' : 'text-t2'}`}>
                   {label}
                 </Text>
               </View>

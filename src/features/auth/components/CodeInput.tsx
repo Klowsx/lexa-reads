@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+﻿import { StyleSheet, Text, View } from 'react-native';
 import { useColors } from '@/src/lib/colors';
 import { alpha } from './tokens';
 
@@ -25,7 +25,7 @@ export function CodeInput({ value, length = 6 }: Props) {
             ]}
           >
             {filled ? (
-              <Text className="font-serif-sb text-text" style={styles.digitSize}>{d}</Text>
+              <Text className="font-display-sb text-text" style={styles.digitSize}>{d}</Text>
             ) : isActive ? (
               <View style={[styles.cursor, { backgroundColor: c.accent }]} />
             ) : null}

@@ -34,14 +34,17 @@ module.exports = {
       },
 
       fontFamily: {
-        serif:       ['PlayfairDisplay_400Regular',    'serif'],
-        'serif-i':   ['PlayfairDisplay_400Regular_Italic', 'serif'],
-        'serif-sb':  ['PlayfairDisplay_600SemiBold',   'serif'],
-        'serif-bold':['PlayfairDisplay_700Bold',       'serif'],
-        sans:        ['DMSans_400Regular',             'sans-serif'],
-        'sans-light':['DMSans_300Light',               'sans-serif'],
-        'sans-md':   ['DMSans_500Medium',              'sans-serif'],
-        'sans-sb':   ['DMSans_600SemiBold',            'sans-serif'],
+        // Display — fuente de títulos y headings 
+        'display':      ['PlayfairDisplay_400Regular',         'serif'],
+        'display-i':    ['PlayfairDisplay_400Regular_Italic',  'serif'],
+        'display-sb':   ['PlayfairDisplay_600SemiBold',        'serif'],
+        'display-bold': ['PlayfairDisplay_700Bold',            'serif'],
+
+        // Body — fuente de texto corriente 
+        'body':         ['DMSans_400Regular',   'sans-serif'],
+        'body-light':   ['DMSans_300Light',     'sans-serif'],
+        'body-md':      ['DMSans_500Medium',    'sans-serif'],
+        'body-sb':      ['DMSans_600SemiBold',  'sans-serif'],
       },
 
       fontSize: {

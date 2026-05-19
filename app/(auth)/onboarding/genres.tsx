@@ -1,4 +1,4 @@
-import { Link, useRouter } from 'expo-router';
+﻿import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -43,10 +43,10 @@ export default function OnboardGenresScreen() {
       <StepBar step={1} total={3} />
 
       <View className="px-6 mb-4">
-        <Text className="font-serif-sb text-text" style={{ fontSize: 26, lineHeight: 32, letterSpacing: -0.3 }}>
+        <Text className="font-display-sb text-text" style={{ fontSize: 26, lineHeight: 32, letterSpacing: -0.3 }}>
           ¿Qué te gusta leer?
         </Text>
-        <Text className="font-sans text-t2 text-sm mt-2">
+        <Text className="font-body text-t2 text-sm mt-2">
           Elige al menos 3 géneros. Personalizaremos tus recomendaciones.
         </Text>
       </View>
@@ -65,7 +65,7 @@ export default function OnboardGenresScreen() {
               style={on ? { borderColor: c.accent, backgroundColor: alpha(c.accent, 0.14), borderWidth: 1.5 } : { borderWidth: 1.5 }}
             >
               <Text
-                className={`font-sans-medium text-sm ${on ? 'text-text' : 'text-t2'}`}
+                className={`font-body-md text-sm ${on ? 'text-text' : 'text-t2'}`}
                 style={on ? { color: c.accent } : undefined}
               >
                 {g.label}
@@ -79,7 +79,7 @@ export default function OnboardGenresScreen() {
         className="px-6 pt-5 border-t border-border/50"
         style={{ paddingBottom: insets.bottom + 24 }}
       >
-        <Text className="font-sans text-t3 text-center mb-3 text-xs">
+        <Text className="font-body text-t3 text-center mb-3 text-xs">
           {selected.length} de 3 mínimo seleccionados
         </Text>
         <Link href="/(auth)/onboarding/goal" asChild>

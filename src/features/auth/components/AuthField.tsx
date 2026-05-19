@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Text, TextInput, View } from 'react-native';
 import type { LucideIcon } from 'lucide-react-native';
 import { useColors } from '@/src/lib/colors';
@@ -37,7 +37,7 @@ export function AuthField({
   return (
     <View className="mb-[14px]">
       {label && (
-        <Text className="text-xs text-t2 font-sans-sb tracking-wide uppercase mb-1.5">
+        <Text className="text-xs text-t2 font-body-sb tracking-wide uppercase mb-1.5">
           {label}
         </Text>
       )}
@@ -51,7 +51,7 @@ export function AuthField({
           </View>
         )}
         <TextInput
-          className="flex-1 text-text text-[14px] font-sans min-w-0"
+          className="flex-1 text-text text-[14px] font-body min-w-0"
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
@@ -65,7 +65,7 @@ export function AuthField({
         {trailing && <View className="shrink-0">{trailing}</View>}
       </View>
       {error && (
-        <Text className="text-xs text-error mt-1 ml-0.5 font-sans">{error}</Text>
+        <Text className="text-xs text-error mt-1 ml-0.5 font-body">{error}</Text>
       )}
     </View>
   );

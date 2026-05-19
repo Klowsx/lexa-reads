@@ -1,4 +1,4 @@
-import { Pressable, Text } from 'react-native';
+﻿import { Pressable, Text } from 'react-native';
 
 type Props = {
   children: React.ReactNode;
@@ -13,7 +13,7 @@ export function PrimaryButton({ children, onPress, disabled }: Props) {
       disabled={disabled}
       className={`w-full items-center rounded-md py-[15px] bg-accent ${disabled ? 'opacity-35' : ''}`}
     >
-      <Text className="text-white text-sm font-sans-sb tracking-wide">
+      <Text className="text-white text-sm font-body-sb tracking-wide">
         {children}
       </Text>
     </Pressable>

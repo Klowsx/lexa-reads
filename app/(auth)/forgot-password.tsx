@@ -1,4 +1,4 @@
-import { KeyRound, Mail } from 'lucide-react-native';
+﻿import { KeyRound, Mail } from 'lucide-react-native';
 import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -30,10 +30,10 @@ export default function ForgotPasswordScreen() {
         </View>
 
         <View className="items-center mb-7 px-2">
-          <Text className="font-serif-sb text-text text-center" style={{ fontSize: 24, lineHeight: 30, letterSpacing: -0.3 }}>
+          <Text className="font-display-sb text-text text-center" style={{ fontSize: 24, lineHeight: 30, letterSpacing: -0.3 }}>
             Recupera tu cuenta
           </Text>
-          <Text className="font-sans text-t2 text-sm mt-[10px] text-center" style={{ lineHeight: 20 }}>
+          <Text className="font-body text-t2 text-sm mt-[10px] text-center" style={{ lineHeight: 20 }}>
             Ingresa tu correo y te enviaremos un código para restablecer tu contraseña.
           </Text>
         </View>
@@ -54,9 +54,9 @@ export default function ForgotPasswordScreen() {
 
         <Link href="/(auth)/login" asChild>
           <Pressable className="pt-[18px] items-center">
-            <Text className="font-sans text-t2 text-sm">
+            <Text className="font-body text-t2 text-sm">
               ¿Lo recordaste?{' '}
-              <Text className="font-sans-sb" style={{ color: c.accent }}>Iniciar sesión</Text>
+              <Text className="font-body-sb" style={{ color: c.accent }}>Iniciar sesión</Text>
             </Text>
           </Pressable>
         </Link>

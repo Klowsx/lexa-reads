@@ -1,4 +1,4 @@
-import { Link, useRouter } from 'expo-router';
+﻿import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -35,10 +35,10 @@ export default function OnboardGoalScreen() {
       <StepBar step={2} total={3} />
 
       <View className="px-6 mb-4">
-        <Text className="font-serif-sb text-text" style={{ fontSize: 26, lineHeight: 32, letterSpacing: -0.3 }}>
+        <Text className="font-display-sb text-text" style={{ fontSize: 26, lineHeight: 32, letterSpacing: -0.3 }}>
           Tu meta para 2026
         </Text>
-        <Text className="font-sans text-t2 text-sm mt-2">
+        <Text className="font-body text-t2 text-sm mt-2">
           ¿Cuántos libros quieres leer este año? Puedes cambiarla cuando quieras.
         </Text>
       </View>
@@ -48,14 +48,14 @@ export default function OnboardGoalScreen() {
           onPress={() => setGoal((g) => Math.max(1, g - 1))}
           className="w-12 h-12 rounded-full bg-surface border border-border items-center justify-center"
         >
-          <Text className="font-sans-light text-text" style={{ fontSize: 22, lineHeight: 28 }}>−</Text>
+          <Text className="font-body-light text-text" style={{ fontSize: 22, lineHeight: 28 }}>−</Text>
         </Pressable>
 
         <View className="items-center min-w-[120px]">
-          <Text className="font-serif-sb" style={{ fontSize: 88, lineHeight: 88, letterSpacing: -4, color: c.accent }}>
+          <Text className="font-display-sb" style={{ fontSize: 88, lineHeight: 88, letterSpacing: -4, color: c.accent }}>
             {goal}
           </Text>
-          <Text className="font-sans text-t3 uppercase mt-1.5" style={{ fontSize: 12, letterSpacing: 0.7 }}>
+          <Text className="font-body text-t3 uppercase mt-1.5" style={{ fontSize: 12, letterSpacing: 0.7 }}>
             libros
           </Text>
         </View>
@@ -64,7 +64,7 @@ export default function OnboardGoalScreen() {
           onPress={() => setGoal((g) => Math.min(365, g + 1))}
           className="w-12 h-12 rounded-full bg-surface border border-border items-center justify-center"
         >
-          <Text className="font-sans-light text-text" style={{ fontSize: 22, lineHeight: 28 }}>+</Text>
+          <Text className="font-body-light text-text" style={{ fontSize: 22, lineHeight: 28 }}>+</Text>
         </Pressable>
       </View>
 
@@ -79,7 +79,7 @@ export default function OnboardGoalScreen() {
               style={on ? { borderColor: c.accent, backgroundColor: alpha(c.accent, 0.14) } : undefined}
             >
               <Text
-                className="font-sans-medium text-t2"
+                className="font-body-md text-t2"
                 style={[{ fontSize: 12 }, on && { color: c.accent }]}
               >
                 {n}
@@ -89,7 +89,7 @@ export default function OnboardGoalScreen() {
         })}
       </View>
 
-      <Text className="font-sans text-t3 text-center mt-7 px-8" style={{ fontSize: 12, lineHeight: 19 }}>
+      <Text className="font-body text-t3 text-center mt-7 px-8" style={{ fontSize: 12, lineHeight: 19 }}>
         {getLabel(goal)}
       </Text>
 

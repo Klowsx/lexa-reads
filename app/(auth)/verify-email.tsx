@@ -1,4 +1,4 @@
-import { Mail } from 'lucide-react-native';
+﻿import { Mail } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
@@ -30,20 +30,20 @@ export default function VerifyEmailScreen() {
         </View>
 
         <View className="items-center mb-7 px-2">
-          <Text className="font-serif-sb text-text text-center" style={{ fontSize: 24, lineHeight: 30, letterSpacing: -0.3 }}>
+          <Text className="font-display-sb text-text text-center" style={{ fontSize: 24, lineHeight: 30, letterSpacing: -0.3 }}>
             Revisa tu correo
           </Text>
-          <Text className="font-sans text-t2 text-sm mt-[10px] text-center" style={{ lineHeight: 20 }}>
+          <Text className="font-body text-t2 text-sm mt-[10px] text-center" style={{ lineHeight: 20 }}>
             {'Enviamos un código de 6 dígitos a\n'}
-            <Text className="font-sans-medium text-text">javier@email.com</Text>
+            <Text className="font-body-md text-text">javier@email.com</Text>
           </Text>
         </View>
 
         <CodeInput value={code} />
 
-        <Text className="font-sans text-t3 text-center mt-[22px] mb-6" style={{ fontSize: 12 }}>
+        <Text className="font-body text-t3 text-center mt-[22px] mb-6" style={{ fontSize: 12 }}>
           ¿No recibiste el código? Reenviar en{' '}
-          <Text className="font-sans-medium text-text">00:42</Text>
+          <Text className="font-body-md text-text">00:42</Text>
         </Text>
 
         <PrimaryButton disabled={code.length < 6}>Verificar</PrimaryButton>

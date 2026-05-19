@@ -1,4 +1,4 @@
-import { Link } from 'expo-router';
+﻿import { Link } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PrimaryButton, alpha } from '../../src/features/auth/components';
@@ -27,13 +27,13 @@ export default function SuccessScreen() {
         </View>
 
         <Text
-          className="font-serif-sb text-text text-center mb-3 text-2xl"
+          className="font-display-sb text-text text-center mb-3 text-2xl"
           style={{ lineHeight: 34, letterSpacing: -0.3 }}
         >
           ¡Todo listo!
         </Text>
         <Text
-          className="font-sans text-t2 text-center mb-9"
+          className="font-body text-t2 text-center mb-9"
           style={{ fontSize: 14, lineHeight: 22, maxWidth: 280 }}
         >
           Tu contraseña ha sido actualizada. Ya puedes volver a iniciar sesión.
