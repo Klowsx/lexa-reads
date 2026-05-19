@@ -93,6 +93,12 @@ export default function LoginScreen() {
           </Link>
         </View>
 
+        {error && (
+          <Text className="text-xs font-body text-center mb-3 text-error">
+            {error.message}
+          </Text>
+        )}
+
         <PrimaryButton onPress={() => login({ email, password })}>
           {isPending ? "Iniciando sesion" : "Iniciar sesión"}
         </PrimaryButton>
