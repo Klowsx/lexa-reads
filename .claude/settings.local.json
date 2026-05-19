@@ -54,7 +54,12 @@
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\\\\src\" -Recurse -File)",
       "Bash(Select-Object -ExpandProperty FullName)",
       "Bash(pnpm jest *)",
-      "Bash(pnpm test *)"
+      "Bash(pnpm test *)",
+      "PowerShell($content = Get-Content \"C:\\\\Users\\\\javie\\\\.claude\\\\projects\\\\C--Users-javie-Desktop-projects-lexa-reads\\\\1be1d614-e9c0-49da-a472-d40d59e654e2\\\\tool-results\\\\lexa-auth.html\" -Raw; $lines = $content -split \"`n\"; $startLine = 0; for\\($i=0; $i -lt $lines.Length; $i++\\) { if\\($lines[$i] -match \"lexa/project/lexa-auth-screens.jsx\"\\) { $startLine = $i; break } }; Write-Host \"Starts at line: $startLine\"; $lines[\\($startLine\\)..\\($startLine+50\\)] -join \"`n\")",
+      "Bash(claude doctor *)",
+      "Bash(pnpm tsc *)",
+      "Bash(pnpm list *)",
+      "Bash(ln -s \"$\\(pwd\\)/node_modules/.pnpm/lucide-react-native@1.16.0__552c5830732eb57a6248be19b1fb16da/node_modules/lucide-react-native\" node_modules/lucide-react-native)"
     ]
   }
 }
