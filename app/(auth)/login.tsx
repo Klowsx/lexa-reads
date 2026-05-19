@@ -4,24 +4,25 @@ import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
-  AUTH,
   AuthField,
   BackBar,
   GhostButton,
   PrimaryButton,
-  alpha,
 } from '../../src/features/auth/components';
+import { useColors } from '@/src/lib/colors';
 
 export default function LoginScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const c = useColors();
   const [email, setEmail] = useState('javier@email.com');
   const [password, setPassword] = useState('••••••••');
   const [showPw, setShowPw] = useState(false);
 
   return (
     <KeyboardAvoidingView
-      style={[styles.root, { paddingTop: insets.top }]}
+      className="flex-1 bg-bg"
+      style={{ paddingTop: insets.top }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <BackBar onBack={() => router.back()} />
@@ -30,13 +31,13 @@ export default function LoginScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>{'Bienvenido\nde vuelta'}</Text>
-          <Text style={styles.subtitle}>Continúa donde lo dejaste.</Text>
+        <View className="mb-7">
+          <Text className="font-serif-sb text-text text-2xl" style={{ lineHeight: 34, letterSpacing: -0.3 }}>
+            {'Bienvenido\nde vuelta'}
+          </Text>
+          <Text className="font-sans text-t2 text-sm mt-[10px]">Continúa donde lo dejaste.</Text>
         </View>
 
-        {/* Fields */}
         <AuthField
           label="Correo"
           value={email}
@@ -44,7 +45,7 @@ export default function LoginScreen() {
           placeholder="tu@correo.com"
           keyboardType="email-address"
           autoCapitalize="none"
-          icon={<Mail size={16} color={AUTH.t3} />}
+          icon={<Mail size={16} color={c.t3} />}
         />
         <AuthField
           label="Contraseña"
@@ -52,51 +53,49 @@ export default function LoginScreen() {
           onChangeText={setPassword}
           placeholder="••••••••"
           secureTextEntry={!showPw}
-          icon={<Lock size={16} color={AUTH.t3} />}
+          icon={<Lock size={16} color={c.t3} />}
           trailing={
             <Pressable onPress={() => setShowPw(!showPw)} hitSlop={8}>
-              {showPw ? <EyeOff size={16} color={AUTH.t3} /> : <Eye size={16} color={AUTH.t3} />}
+              {showPw ? <EyeOff size={16} color={c.t3} /> : <Eye size={16} color={c.t3} />}
             </Pressable>
           }
         />
 
-        <View style={styles.forgotRow}>
+        <View className="items-end -mt-1 mb-[22px]">
           <Link href="/(auth)/forgot-password" asChild>
             <Pressable>
-              <Text style={styles.forgotText}>¿Olvidaste tu contraseña?</Text>
+              <Text className="font-sans-medium text-xs" style={{ color: c.accent }}>¿Olvidaste tu contraseña?</Text>
             </Pressable>
           </Link>
         </View>
 
         <PrimaryButton>Iniciar sesión</PrimaryButton>
 
-        {/* Divider */}
-        <View style={styles.divider}>
-          <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>o continúa con</Text>
-          <View style={styles.dividerLine} />
+        <View className="flex-row items-center gap-[10px] my-[22px]">
+          <View className="flex-1 h-px bg-border" />
+          <Text className="font-sans text-t3 uppercase" style={{ fontSize: 11, letterSpacing: 0.9 }}>o continúa con</Text>
+          <View className="flex-1 h-px bg-border" />
         </View>
 
-        {/* Social */}
-        <View style={styles.socialRow}>
+        <View className="flex-row mb-2">
           <GhostButton>
-            <Text style={styles.socialIcon}></Text>
-            <Text style={styles.socialLabel}>Apple</Text>
+            <Text style={{ fontSize: 16 }}></Text>
+            <Text className="font-sans-medium text-text text-sm">Apple</Text>
           </GhostButton>
           <View style={{ width: 10 }} />
           <GhostButton>
             <GoogleIcon />
-            <Text style={styles.socialLabel}>Google</Text>
+            <Text className="font-sans-medium text-text text-sm">Google</Text>
           </GhostButton>
         </View>
 
         <View style={{ flex: 1 }} />
 
         <Link href="/(auth)/register" asChild>
-          <Pressable style={styles.registerBtn}>
-            <Text style={styles.registerText}>
+          <Pressable className="pt-[18px] items-center">
+            <Text className="font-sans text-t2 text-sm">
               ¿No tienes cuenta?{' '}
-              <Text style={styles.registerAccent}>Crear una</Text>
+              <Text className="font-sans-sb" style={{ color: c.accent }}>Crear una</Text>
             </Text>
           </Pressable>
         </Link>
@@ -112,7 +111,7 @@ function GoogleIcon() {
       <View style={[googleStyles.quarter, { backgroundColor: '#34A853', bottom: 0, left: '50%' }]} />
       <View style={[googleStyles.quarter, { backgroundColor: '#FBBC04', bottom: 0, left: 0 }]} />
       <View style={[googleStyles.quarter, { backgroundColor: '#EA4335', top: 0, left: 0 }]} />
-      <View style={googleStyles.hole} />
+      <View className="bg-surface absolute rounded-[3.5px]" style={googleStyles.hole} />
     </View>
   );
 }
@@ -131,93 +130,17 @@ const googleStyles = StyleSheet.create({
     height: '50%',
   },
   hole: {
-    position: 'absolute',
     width: 7,
     height: 7,
-    borderRadius: 3.5,
-    backgroundColor: AUTH.surface,
     top: 3.5,
     left: 3.5,
   },
 });
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: AUTH.bg,
-  },
   scroll: {
     flexGrow: 1,
     paddingHorizontal: 24,
     paddingTop: 12,
-  },
-  header: {
-    marginBottom: 28,
-  },
-  title: {
-    fontFamily: 'PlayfairDisplay_600SemiBold',
-    fontSize: 28,
-    color: AUTH.text,
-    lineHeight: 34,
-    letterSpacing: -0.3,
-  },
-  subtitle: {
-    fontSize: 13,
-    color: AUTH.t2,
-    marginTop: 10,
-    fontFamily: 'DMSans_400Regular',
-  },
-  forgotRow: {
-    alignItems: 'flex-end',
-    marginTop: -4,
-    marginBottom: 22,
-  },
-  forgotText: {
-    color: AUTH.accent,
-    fontSize: 12,
-    fontFamily: 'DMSans_500Medium',
-  },
-  divider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginVertical: 22,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: AUTH.border,
-  },
-  dividerText: {
-    fontSize: 11,
-    color: AUTH.t3,
-    letterSpacing: 0.9,
-    textTransform: 'uppercase',
-    fontFamily: 'DMSans_400Regular',
-  },
-  socialRow: {
-    flexDirection: 'row',
-    marginBottom: 8,
-  },
-  socialIcon: {
-    fontSize: 16,
-  },
-  socialLabel: {
-    fontSize: 14,
-    color: AUTH.text,
-    fontFamily: 'DMSans_500Medium',
-  },
-  registerBtn: {
-    paddingTop: 18,
-    alignItems: 'center',
-  },
-  registerText: {
-    fontSize: 13,
-    color: AUTH.t2,
-    fontFamily: 'DMSans_400Regular',
-  },
-  registerAccent: {
-    color: AUTH.accent,
-    fontFamily: 'DMSans_600SemiBold',
   },
 });

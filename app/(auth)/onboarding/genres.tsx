@@ -3,12 +3,12 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
-  AUTH,
   OnboardHeader,
   PrimaryButton,
   StepBar,
   alpha,
 } from '../../../src/features/auth/components';
+import { useColors } from '@/src/lib/colors';
 
 const GENRES = [
   { id: 'fantasia',  label: 'Fantasía' },
@@ -28,6 +28,7 @@ const GENRES = [
 export default function OnboardGenresScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const c = useColors();
   const [selected, setSelected] = useState(['fantasia', 'realismo', 'dark', 'memorias']);
 
   const toggle = (id: string) =>
@@ -36,14 +37,16 @@ export default function OnboardGenresScreen() {
   const enough = selected.length >= 3;
 
   return (
-    <View style={[styles.root, { paddingTop: insets.top }]}>
+    <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
       <OnboardHeader step={1} total={3} />
       <View style={{ height: 12 }} />
       <StepBar step={1} total={3} />
 
-      <View style={styles.header}>
-        <Text style={styles.title}>¿Qué te gusta leer?</Text>
-        <Text style={styles.subtitle}>
+      <View className="px-6 mb-4">
+        <Text className="font-serif-sb text-text" style={{ fontSize: 26, lineHeight: 32, letterSpacing: -0.3 }}>
+          ¿Qué te gusta leer?
+        </Text>
+        <Text className="font-sans text-t2 text-sm mt-2">
           Elige al menos 3 géneros. Personalizaremos tus recomendaciones.
         </Text>
       </View>
@@ -58,15 +61,13 @@ export default function OnboardGenresScreen() {
             <Pressable
               key={g.id}
               onPress={() => toggle(g.id)}
-              style={[
-                styles.chip,
-                on && {
-                  borderColor: AUTH.accent,
-                  backgroundColor: alpha(AUTH.accent, 0.14),
-                },
-              ]}
+              className="py-[10px] px-[14px] rounded-full bg-surface border border-border"
+              style={on ? { borderColor: c.accent, backgroundColor: alpha(c.accent, 0.14), borderWidth: 1.5 } : { borderWidth: 1.5 }}
             >
-              <Text style={[styles.chipLabel, on && styles.chipLabelOn]}>
+              <Text
+                className={`font-sans-medium text-sm ${on ? 'text-text' : 'text-t2'}`}
+                style={on ? { color: c.accent } : undefined}
+              >
                 {g.label}
               </Text>
             </Pressable>
@@ -74,8 +75,11 @@ export default function OnboardGenresScreen() {
         })}
       </ScrollView>
 
-      <View style={[styles.footer, { paddingBottom: insets.bottom + 24 }]}>
-        <Text style={styles.counter}>
+      <View
+        className="px-6 pt-5 border-t border-border/50"
+        style={{ paddingBottom: insets.bottom + 24 }}
+      >
+        <Text className="font-sans text-t3 text-center mb-3 text-xs">
           {selected.length} de 3 mínimo seleccionados
         </Text>
         <Link href="/(auth)/onboarding/goal" asChild>
@@ -87,62 +91,11 @@ export default function OnboardGenresScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: AUTH.bg,
-  },
-  header: {
-    paddingHorizontal: 24,
-    marginBottom: 16,
-  },
-  title: {
-    fontFamily: 'PlayfairDisplay_600SemiBold',
-    fontSize: 26,
-    color: AUTH.text,
-    lineHeight: 32,
-    letterSpacing: -0.3,
-  },
-  subtitle: {
-    fontSize: 13,
-    color: AUTH.t2,
-    marginTop: 8,
-    fontFamily: 'DMSans_400Regular',
-  },
   chips: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
     paddingHorizontal: 20,
     paddingBottom: 16,
-  },
-  chip: {
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 100,
-    backgroundColor: AUTH.surface,
-    borderWidth: 1.5,
-    borderColor: AUTH.border,
-  },
-  chipLabel: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: AUTH.t2,
-    fontFamily: 'DMSans_500Medium',
-  },
-  chipLabelOn: {
-    color: AUTH.text,
-  },
-  footer: {
-    paddingHorizontal: 24,
-    paddingTop: 20,
-    borderTopWidth: 1,
-    borderTopColor: alpha(AUTH.border, 0.5),
-  },
-  counter: {
-    fontSize: 12,
-    color: AUTH.t3,
-    textAlign: 'center',
-    marginBottom: 12,
-    fontFamily: 'DMSans_400Regular',
   },
 });

@@ -1,35 +1,19 @@
 import { StyleSheet, View } from 'react-native';
-import { AUTH } from './tokens';
+import { useColors } from '@/src/lib/colors';
 
 type Props = { step: number; total: number };
 
 export function StepBar({ step, total }: Props) {
+  const c = useColors();
   return (
-    <View style={styles.row}>
+    <View className="flex-row gap-[5px] px-6 mb-6">
       {Array.from({ length: total }).map((_, i) => (
         <View
           key={i}
-          style={[styles.seg, i < step && styles.active]}
+          className="flex-1 h-[3px] rounded-full bg-sh"
+          style={i < step ? { backgroundColor: c.accent } : undefined}
         />
       ))}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    gap: 5,
-    paddingHorizontal: 24,
-    marginBottom: 24,
-  },
-  seg: {
-    flex: 1,
-    height: 3,
-    borderRadius: 100,
-    backgroundColor: AUTH.sh,
-  },
-  active: {
-    backgroundColor: AUTH.accent,
-  },
-});

@@ -1,5 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { AUTH } from './tokens';
+import { Pressable, Text, View } from 'react-native';
 
 type Props = {
   step: number;
@@ -11,60 +10,24 @@ type Props = {
 
 export function OnboardHeader({ step, total, onBack, allowSkip = true, onSkip }: Props) {
   return (
-    <View style={styles.row}>
+    <View className="flex-row items-center justify-between px-4 py-2 flex-shrink-0">
       {onBack ? (
-        <Pressable onPress={onBack} style={styles.backBtn} hitSlop={8}>
-          <Text style={styles.arrow}>‹</Text>
+        <Pressable onPress={onBack} hitSlop={8} className="p-1.5 -ml-1.5 w-8">
+          <Text className="font-sans-light text-text" style={{ fontSize: 26, lineHeight: 26 }}>‹</Text>
         </Pressable>
       ) : (
-        <View style={styles.placeholder} />
+        <View style={{ width: 32 }} />
       )}
-      <Text style={styles.stepLabel}>Paso {step} de {total}</Text>
+      <Text className="font-sans-sb text-t3 uppercase" style={{ fontSize: 11, letterSpacing: 0.9 }}>
+        Paso {step} de {total}
+      </Text>
       {allowSkip ? (
         <Pressable onPress={onSkip} hitSlop={8}>
-          <Text style={styles.skip}>Saltar</Text>
+          <Text className="font-sans-medium text-t2 text-sm">Saltar</Text>
         </Pressable>
       ) : (
-        <View style={styles.placeholder} />
+        <View style={{ width: 32 }} />
       )}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    flexShrink: 0,
-  },
-  backBtn: {
-    padding: 6,
-    marginLeft: -6,
-    width: 32,
-  },
-  arrow: {
-    fontSize: 26,
-    color: AUTH.text,
-    lineHeight: 26,
-    fontFamily: 'DMSans_300Light',
-  },
-  stepLabel: {
-    fontSize: 11,
-    color: AUTH.t3,
-    fontFamily: 'DMSans_600SemiBold',
-    letterSpacing: 0.9,
-    textTransform: 'uppercase',
-  },
-  skip: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: AUTH.t2,
-    fontFamily: 'DMSans_500Medium',
-  },
-  placeholder: {
-    width: 32,
-  },
-});

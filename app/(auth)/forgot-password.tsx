@@ -4,33 +4,36 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
-  AUTH,
   AuthField,
   BackBar,
   PrimaryButton,
   alpha,
 } from '../../src/features/auth/components';
+import { useColors } from '@/src/lib/colors';
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const c = useColors();
   const [email, setEmail] = useState('javier@email.com');
 
   return (
-    <View style={[styles.root, { paddingTop: insets.top }]}>
+    <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
       <BackBar onBack={() => router.back()} />
-      <View style={[styles.content, { paddingBottom: insets.bottom + 24 }]}>
-        {/* Lock icon */}
-        <View style={styles.iconWrap}>
-          <View style={[styles.iconBg, { backgroundColor: alpha(AUTH.accent, 0.12) }]}>
-            <KeyRound size={32} color={AUTH.accent} />
+      <View className="flex-1 px-6 pt-3" style={{ paddingBottom: insets.bottom + 24 }}>
+        <View className="items-center mt-4 mb-[22px]">
+          <View
+            style={[styles.iconBg, { backgroundColor: alpha(c.accent, 0.12), borderColor: alpha(c.accent, 0.3) }]}
+          >
+            <KeyRound size={32} color={c.accent} />
           </View>
         </View>
 
-        {/* Title */}
-        <View style={styles.textBlock}>
-          <Text style={styles.title}>Recupera tu cuenta</Text>
-          <Text style={styles.subtitle}>
+        <View className="items-center mb-7 px-2">
+          <Text className="font-serif-sb text-text text-center" style={{ fontSize: 24, lineHeight: 30, letterSpacing: -0.3 }}>
+            Recupera tu cuenta
+          </Text>
+          <Text className="font-sans text-t2 text-sm mt-[10px] text-center" style={{ lineHeight: 20 }}>
             Ingresa tu correo y te enviaremos un código para restablecer tu contraseña.
           </Text>
         </View>
@@ -42,18 +45,18 @@ export default function ForgotPasswordScreen() {
           placeholder="tu@correo.com"
           keyboardType="email-address"
           autoCapitalize="none"
-          icon={<Mail size={16} color={AUTH.t3} />}
+          icon={<Mail size={16} color={c.t3} />}
         />
 
-        <View style={styles.btnWrapper}>
+        <View className="mt-[14px]">
           <PrimaryButton>Enviar código</PrimaryButton>
         </View>
 
         <Link href="/(auth)/login" asChild>
-          <Pressable style={styles.loginBtn}>
-            <Text style={styles.loginText}>
+          <Pressable className="pt-[18px] items-center">
+            <Text className="font-sans text-t2 text-sm">
               ¿Lo recordaste?{' '}
-              <Text style={styles.loginAccent}>Iniciar sesión</Text>
+              <Text className="font-sans-sb" style={{ color: c.accent }}>Iniciar sesión</Text>
             </Text>
           </Pressable>
         </Link>
@@ -63,20 +66,6 @@ export default function ForgotPasswordScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: AUTH.bg,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 12,
-  },
-  iconWrap: {
-    alignItems: 'center',
-    marginTop: 16,
-    marginBottom: 22,
-  },
   iconBg: {
     width: 72,
     height: 72,
@@ -84,43 +73,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: alpha(AUTH.accent, 0.3),
-  },
-  textBlock: {
-    alignItems: 'center',
-    marginBottom: 28,
-    paddingHorizontal: 8,
-  },
-  title: {
-    fontFamily: 'PlayfairDisplay_600SemiBold',
-    fontSize: 24,
-    color: AUTH.text,
-    lineHeight: 30,
-    letterSpacing: -0.3,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 13,
-    color: AUTH.t2,
-    marginTop: 10,
-    lineHeight: 20,
-    textAlign: 'center',
-    fontFamily: 'DMSans_400Regular',
-  },
-  btnWrapper: {
-    marginTop: 14,
-  },
-  loginBtn: {
-    paddingTop: 18,
-    alignItems: 'center',
-  },
-  loginText: {
-    fontSize: 13,
-    color: AUTH.t2,
-    fontFamily: 'DMSans_400Regular',
-  },
-  loginAccent: {
-    color: AUTH.accent,
-    fontFamily: 'DMSans_600SemiBold',
   },
 });

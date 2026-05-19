@@ -1,33 +1,17 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { AUTH } from './tokens';
+import { Pressable, View } from 'react-native';
 
 type Props = {
   children: React.ReactNode;
   onPress?: () => void;
-  style?: object;
 };
 
-export function GhostButton({ children, onPress, style }: Props) {
+export function GhostButton({ children, onPress }: Props) {
   return (
-    <Pressable onPress={onPress} style={[styles.btn, style]}>
-      <View style={styles.inner}>{children}</View>
+    <Pressable
+      onPress={onPress}
+      className="flex-1 rounded-xl py-[14px] bg-transparent border border-border"
+    >
+      <View className="flex-row items-center justify-center gap-2">{children}</View>
     </Pressable>
   );
 }
-
-const styles = StyleSheet.create({
-  btn: {
-    flex: 1,
-    borderRadius: 12,
-    paddingVertical: 14,
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: AUTH.border,
-  },
-  inner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-  },
-});

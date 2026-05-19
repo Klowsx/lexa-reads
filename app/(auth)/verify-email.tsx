@@ -4,43 +4,46 @@ import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
-  AUTH,
   BackBar,
   CodeInput,
   PrimaryButton,
   alpha,
 } from '../../src/features/auth/components';
+import { useColors } from '@/src/lib/colors';
 
 export default function VerifyEmailScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const c = useColors();
   const [code] = useState('4729');
 
   return (
-    <View style={[styles.root, { paddingTop: insets.top }]}>
+    <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
       <BackBar onBack={() => router.back()} />
-      <View style={[styles.content, { paddingBottom: insets.bottom + 24 }]}>
-        {/* Mail icon */}
-        <View style={styles.iconWrap}>
-          <View style={[styles.iconBg, { backgroundColor: alpha(AUTH.accent, 0.12) }]}>
-            <Mail size={32} color={AUTH.accent} />
+      <View className="flex-1 px-6 pt-3" style={{ paddingBottom: insets.bottom + 24 }}>
+        <View className="items-center mt-4 mb-[22px]">
+          <View
+            style={[styles.iconBg, { backgroundColor: alpha(c.accent, 0.12), borderColor: alpha(c.accent, 0.3) }]}
+          >
+            <Mail size={32} color={c.accent} />
           </View>
         </View>
 
-        {/* Title */}
-        <View style={styles.textBlock}>
-          <Text style={styles.title}>Revisa tu correo</Text>
-          <Text style={styles.subtitle}>
+        <View className="items-center mb-7 px-2">
+          <Text className="font-serif-sb text-text text-center" style={{ fontSize: 24, lineHeight: 30, letterSpacing: -0.3 }}>
+            Revisa tu correo
+          </Text>
+          <Text className="font-sans text-t2 text-sm mt-[10px] text-center" style={{ lineHeight: 20 }}>
             {'Enviamos un código de 6 dígitos a\n'}
-            <Text style={styles.emailHighlight}>javier@email.com</Text>
+            <Text className="font-sans-medium text-text">javier@email.com</Text>
           </Text>
         </View>
 
         <CodeInput value={code} />
 
-        <Text style={styles.resend}>
+        <Text className="font-sans text-t3 text-center mt-[22px] mb-6" style={{ fontSize: 12 }}>
           ¿No recibiste el código? Reenviar en{' '}
-          <Text style={styles.resendTimer}>00:42</Text>
+          <Text className="font-sans-medium text-text">00:42</Text>
         </Text>
 
         <PrimaryButton disabled={code.length < 6}>Verificar</PrimaryButton>
@@ -50,20 +53,6 @@ export default function VerifyEmailScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: AUTH.bg,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 12,
-  },
-  iconWrap: {
-    alignItems: 'center',
-    marginTop: 16,
-    marginBottom: 22,
-  },
   iconBg: {
     width: 72,
     height: 72,
@@ -71,43 +60,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: alpha(AUTH.accent, 0.3),
-  },
-  textBlock: {
-    alignItems: 'center',
-    marginBottom: 28,
-    paddingHorizontal: 8,
-  },
-  title: {
-    fontFamily: 'PlayfairDisplay_600SemiBold',
-    fontSize: 24,
-    color: AUTH.text,
-    lineHeight: 30,
-    letterSpacing: -0.3,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 13,
-    color: AUTH.t2,
-    marginTop: 10,
-    lineHeight: 20,
-    textAlign: 'center',
-    fontFamily: 'DMSans_400Regular',
-  },
-  emailHighlight: {
-    color: AUTH.text,
-    fontFamily: 'DMSans_500Medium',
-  },
-  resend: {
-    fontSize: 12,
-    color: AUTH.t3,
-    textAlign: 'center',
-    marginTop: 22,
-    marginBottom: 24,
-    fontFamily: 'DMSans_400Regular',
-  },
-  resendTimer: {
-    color: AUTH.text,
-    fontFamily: 'DMSans_500Medium',
   },
 });

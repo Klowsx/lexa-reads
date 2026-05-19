@@ -4,17 +4,18 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
-  AUTH,
   AuthField,
   OnboardHeader,
   PrimaryButton,
   StepBar,
   alpha,
 } from '../../../src/features/auth/components';
+import { useColors } from '@/src/lib/colors';
 
 export default function OnboardUsernameScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const c = useColors();
   const [username, setUsername] = useState('javierml');
 
   const available = username.length >= 3;
@@ -23,28 +24,39 @@ export default function OnboardUsernameScreen() {
     setUsername(v.toLowerCase().replace(/\s/g, ''));
 
   return (
-    <View style={[styles.root, { paddingTop: insets.top }]}>
+    <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
       <OnboardHeader step={3} total={3} onBack={() => router.back()} allowSkip={false} />
       <View style={{ height: 12 }} />
       <StepBar step={3} total={3} />
 
-      <View style={styles.header}>
-        <Text style={styles.title}>{'Elige tu nombre\nde lector'}</Text>
-        <Text style={styles.subtitle}>
+      <View className="px-6 mb-6">
+        <Text className="font-serif-sb text-text" style={{ fontSize: 26, lineHeight: 32, letterSpacing: -0.3 }}>
+          {'Elige tu nombre\nde lector'}
+        </Text>
+        <Text className="font-sans text-t2 text-sm mt-2">
           Así te encontrarán otros lectores en Lexa.
         </Text>
       </View>
 
-      <View style={styles.content}>
-        {/* Avatar */}
-        <View style={styles.avatarWrap}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>
+      <View className="px-6">
+        <View className="self-center mb-7 relative">
+          <View
+            className="w-[92px] h-[92px] rounded-full items-center justify-center"
+            style={{
+              backgroundColor: alpha(c.accent, 0.18),
+              borderWidth: 2,
+              borderColor: c.accent,
+            }}
+          >
+            <Text className="font-sans-sb text-[34px]" style={{ color: c.accent }}>
               {username.slice(0, 2).toUpperCase() || '··'}
             </Text>
           </View>
-          <Pressable style={styles.editBtn}>
-            <Pencil size={12} color={AUTH.text} />
+          <Pressable
+            className="absolute -bottom-0.5 -right-0.5 w-[30px] h-[30px] rounded-full bg-surface border border-border items-center justify-center"
+            style={{ borderWidth: 1.5 }}
+          >
+            <Pencil size={12} color={undefined} className="text-text" />
           </Pressable>
         </View>
 
@@ -54,100 +66,26 @@ export default function OnboardUsernameScreen() {
           onChangeText={handleChange}
           autoCapitalize="none"
           icon={
-            <Text style={styles.atSign}>@</Text>
+            <Text className="font-sans-medium text-t3" style={{ fontSize: 14 }}>@</Text>
           }
           trailing={
-            available ? <Check size={16} color="#5CAF7E" /> : undefined
+            available ? <Check size={16} color={c.success} /> : undefined
           }
         />
 
-        <Text style={styles.handle}>
+        <Text className="font-sans text-t3 -mt-2 ml-0.5" style={{ fontSize: 11 }}>
           lexa.app/@
-          <Text style={{ color: AUTH.text }}>{username || 'tu_nombre'}</Text>
+          <Text className="text-text">{username || 'tu_nombre'}</Text>
         </Text>
       </View>
 
       <View style={{ flex: 1 }} />
-      <View style={[styles.footer, { paddingBottom: insets.bottom + 24 }]}>
+      <View
+        className="px-6 pt-5"
+        style={{ paddingBottom: insets.bottom + 24 }}
+      >
         <PrimaryButton disabled={!available}>Entrar a Lexa</PrimaryButton>
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: AUTH.bg,
-  },
-  header: {
-    paddingHorizontal: 24,
-    marginBottom: 24,
-  },
-  title: {
-    fontFamily: 'PlayfairDisplay_600SemiBold',
-    fontSize: 26,
-    color: AUTH.text,
-    lineHeight: 32,
-    letterSpacing: -0.3,
-  },
-  subtitle: {
-    fontSize: 13,
-    color: AUTH.t2,
-    marginTop: 8,
-    fontFamily: 'DMSans_400Regular',
-  },
-  content: {
-    paddingHorizontal: 24,
-  },
-  avatarWrap: {
-    alignSelf: 'center',
-    marginBottom: 28,
-    position: 'relative',
-  },
-  avatar: {
-    width: 92,
-    height: 92,
-    borderRadius: 46,
-    backgroundColor: alpha(AUTH.accent, 0.18),
-    borderWidth: 2,
-    borderColor: AUTH.accent,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarText: {
-    fontSize: 34,
-    fontWeight: '700',
-    color: AUTH.accent,
-    fontFamily: 'DMSans_600SemiBold',
-  },
-  editBtn: {
-    position: 'absolute',
-    bottom: -2,
-    right: -2,
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: AUTH.surface,
-    borderWidth: 1.5,
-    borderColor: AUTH.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  atSign: {
-    color: AUTH.t3,
-    fontSize: 14,
-    fontFamily: 'DMSans_500Medium',
-  },
-  handle: {
-    fontSize: 11,
-    color: AUTH.t3,
-    marginTop: -8,
-    marginLeft: 2,
-    fontFamily: 'DMSans_400Regular',
-  },
-  footer: {
-    paddingHorizontal: 24,
-    paddingTop: 20,
-  },
-});

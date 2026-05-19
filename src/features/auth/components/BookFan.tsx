@@ -1,5 +1,6 @@
 import { StyleSheet, View } from 'react-native';
-import { AUTH, alpha } from './tokens';
+import { useColors } from '@/src/lib/colors';
+import { alpha } from './tokens';
 
 const BOOKS = [
   { c1: '#1E0808', c2: '#C43A3A' }, // Babel
@@ -12,11 +13,11 @@ const W = 120;
 const H = 180;
 
 export function BookFan() {
+  const c = useColors();
   const count = BOOKS.length;
   return (
     <View style={styles.container}>
-      {/* Radial glow behind the fan */}
-      <View style={styles.glow} />
+      <View style={[styles.glow, { backgroundColor: alpha(c.accent, 0.12) }]} />
       <View style={{ width: W * 2, height: H + 40 }}>
         {BOOKS.map((b, i) => {
           const offset = i - (count - 1) / 2;
@@ -39,9 +40,7 @@ export function BookFan() {
               ]}
             >
               <View style={[styles.cover, { backgroundColor: b.c1 }]}>
-                {/* Colored spine stripe */}
                 <View style={[styles.spine, { backgroundColor: b.c2 }]} />
-                {/* Subtle top gradient overlay */}
                 <View style={[styles.sheen, { backgroundColor: alpha(b.c2, 0.15) }]} />
               </View>
             </View>
@@ -62,7 +61,6 @@ const styles = StyleSheet.create({
     width: 300,
     height: 300,
     borderRadius: 150,
-    backgroundColor: alpha(AUTH.accent, 0.12),
   },
   bookWrap: {
     position: 'absolute',

@@ -1,28 +1,45 @@
 import { Link } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { AUTH, PrimaryButton, alpha } from '../../src/features/auth/components';
+import { PrimaryButton, alpha } from '../../src/features/auth/components';
+import { useColors } from '@/src/lib/colors';
 
 export default function SuccessScreen() {
   const insets = useSafeAreaInsets();
+  const c = useColors();
 
   return (
-    <View style={[styles.root, { paddingTop: insets.top, paddingBottom: insets.bottom + 24 }]}>
-      <View style={styles.center}>
-        {/* Success icon with glow */}
+    <View
+      className="flex-1 bg-bg"
+      style={{ paddingTop: insets.top, paddingBottom: insets.bottom + 24 }}
+    >
+      <View className="flex-1 items-center justify-center px-8">
         <View style={styles.iconContainer}>
-          <View style={styles.glow} />
-          <View style={styles.iconCircle}>
-            <Text style={styles.checkmark}>✓</Text>
+          <View style={[styles.glow, { backgroundColor: alpha(c.success, 0.18) }]} />
+          <View
+            style={[
+              styles.iconCircle,
+              { backgroundColor: alpha(c.success, 0.15), borderColor: c.success },
+            ]}
+          >
+            <Text style={[styles.checkmark, { color: c.success }]}>✓</Text>
           </View>
         </View>
 
-        <Text style={styles.title}>¡Todo listo!</Text>
-        <Text style={styles.subtitle}>
+        <Text
+          className="font-serif-sb text-text text-center mb-3 text-2xl"
+          style={{ lineHeight: 34, letterSpacing: -0.3 }}
+        >
+          ¡Todo listo!
+        </Text>
+        <Text
+          className="font-sans text-t2 text-center mb-9"
+          style={{ fontSize: 14, lineHeight: 22, maxWidth: 280 }}
+        >
           Tu contraseña ha sido actualizada. Ya puedes volver a iniciar sesión.
         </Text>
 
-        <View style={styles.btnWrapper}>
+        <View className="w-full">
           <Link href="/(auth)/login" asChild>
             <PrimaryButton>Iniciar sesión</PrimaryButton>
           </Link>
@@ -33,16 +50,6 @@ export default function SuccessScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: AUTH.bg,
-  },
-  center: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 32,
-  },
   iconContainer: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -55,42 +62,17 @@ const styles = StyleSheet.create({
     width: 136,
     height: 136,
     borderRadius: 68,
-    backgroundColor: alpha('#5CAF7E', 0.18),
   },
   iconCircle: {
     width: 96,
     height: 96,
     borderRadius: 48,
-    backgroundColor: alpha('#5CAF7E', 0.15),
     borderWidth: 1.5,
-    borderColor: '#5CAF7E',
     alignItems: 'center',
     justifyContent: 'center',
   },
   checkmark: {
     fontSize: 40,
-    color: '#5CAF7E',
     lineHeight: 48,
-  },
-  title: {
-    fontFamily: 'PlayfairDisplay_600SemiBold',
-    fontSize: 28,
-    color: AUTH.text,
-    lineHeight: 34,
-    letterSpacing: -0.3,
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 14,
-    color: AUTH.t2,
-    lineHeight: 22,
-    textAlign: 'center',
-    marginBottom: 36,
-    maxWidth: 280,
-    fontFamily: 'DMSans_400Regular',
-  },
-  btnWrapper: {
-    width: '100%',
   },
 });
