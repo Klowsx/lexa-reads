@@ -1,6 +1,7 @@
 ﻿import { useState } from "react";
 import { Text, TextInput, TextInputProps, View } from "react-native";
 import type { LucideIcon } from "lucide-react-native";
+import { isValidElement } from "react";
 import type { ReactNode } from "react";
 import { useColors } from "@/src/lib/colors";
 
@@ -41,8 +42,12 @@ export function AuthField({
   const focusedBorder = `rgba(${parseInt(c.accent.slice(1, 3), 16)},${parseInt(c.accent.slice(3, 5), 16)},${parseInt(c.accent.slice(5, 7), 16)},0.55)`;
   const borderColor = error ? c.error : focused ? focusedBorder : undefined;
 
-  const IconComponent = typeof icon === "function" ? (icon as LucideIcon) : null;
-  const iconNode = IconComponent ? null : (icon as ReactNode);
+  // forwardRef components (como LucideIcon) son objetos, no funciones
+  const isComponentType =
+    typeof icon === "function" ||
+    (icon != null && typeof icon === "object" && !isValidElement(icon));
+  const IconComponent = isComponentType ? (icon as LucideIcon) : null;
+  const iconNode = isComponentType ? null : (icon as ReactNode);
 
   return (
     <View className="mb-[14px]">
