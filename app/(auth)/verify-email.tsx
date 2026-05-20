@@ -59,7 +59,7 @@ export default function VerifyEmailScreen() {
       >
         <View className="items-center mt-4 mb-[22px]">
           <View
-            className="w-[72px] h-[72px] rounded-[20px] items-center justify-center border"
+            className="w-18 h-18 rounded-lg items-center justify-center border"
             style={{
               backgroundColor: alpha(c.accent, 0.12),
               borderColor: alpha(c.accent, 0.3),
@@ -70,10 +70,10 @@ export default function VerifyEmailScreen() {
         </View>
 
         <View className="items-center mb-7 px-2">
-          <Text className="font-display-sb text-text text-center text-2xl leading-[30px] tracking-[-0.3px]">
+          <Text className="font-display-sb text-text text-center text-2xl tracking-[-0.3px]">
             Revisa tu correo
           </Text>
-          <Text className="font-body text-t2 text-sm mt-[10px] text-center leading-5">
+          <Text className="font-body text-t2 text-sm mt-2.5 text-center leading-5">
             {"Enviamos un código de 6 dígitos a\n"}
             <Text className="font-body-md text-text">{email}</Text>
           </Text>

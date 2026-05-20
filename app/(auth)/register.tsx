@@ -150,10 +150,11 @@ export default function RegisterScreen() {
         )}
 
         <PrimaryButton
-          disabled={!terms || isPending}
+          disabled={!terms}
+          loading={isPending}
           onPress={() => register({ email, displayName: name, password })}
         >
-          {isPending ? "Creando cuenta…" : "Crear cuenta"}
+          Crear cuenta
         </PrimaryButton>
 
         <Link href="/(auth)/login" asChild>

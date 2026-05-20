@@ -7,7 +7,6 @@ import {
   Platform,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   View,
 } from "react-native";
@@ -49,21 +48,20 @@ export default function NewPasswordScreen() {
     >
       <BackBar onBack={() => router.back()} />
       <ScrollView
-        contentContainerStyle={[
-          styles.scroll,
-          { paddingBottom: insets.bottom + 24 },
-        ]}
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingHorizontal: 24,
+          paddingTop: 12,
+          paddingBottom: insets.bottom + 24,
+        }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
         <View className="mb-7">
-          <Text
-            className="font-display-sb text-text text-2xl"
-            style={{ lineHeight: 34, letterSpacing: -0.3 }}
-          >
+          <Text className="font-display-sb text-text text-2xl tracking-[-0.3px]">
             Nueva contraseña
           </Text>
-          <Text className="font-body text-t2 text-sm mt-[10px]">
+          <Text className="font-body text-t2 text-sm mt-2.5">
             Elige una contraseña fuerte y única.
           </Text>
         </View>
@@ -144,10 +142,3 @@ export default function NewPasswordScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  scroll: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 12,
-  },
-});
