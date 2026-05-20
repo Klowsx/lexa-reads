@@ -68,7 +68,9 @@
       "Bash(grep -v \"^$\")",
       "Bash(Get-Content \"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\\\\supabase\\\\migrations\\\\002_gaps_and_fixes.sql\")",
       "Bash(Select-Object -First 60)",
-      "Bash(python3 *)"
+      "Bash(python3 *)",
+      "Bash(Get-ChildItem -Path . -Name)",
+      "Bash(grep -E \"\\\\.\\(test|spec|md\\)$\")"
     ]
   }
 }

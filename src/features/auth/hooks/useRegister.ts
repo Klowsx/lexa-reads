@@ -15,6 +15,7 @@ interface RegisterParams {
 export function useRegister() {
   const router = useRouter();
   const setSession = useAuthStore((state) => state.setSession);
+  const setOnboardingStarted = useAuthStore((state) => state.setOnboardingStarted);
   const addToast = useUIStore((s) => s.addToast);
 
   return useMutation<AuthResponse["data"], AppError, RegisterParams>({
@@ -33,8 +34,9 @@ export function useRegister() {
     },
     onSuccess: (data) => {
       if (data.session) {
-        // TODO: Confirmación de email desactivada (dev)
+        setOnboardingStarted(true);
         setSession(data.session);
+        router.replace("/(auth)/onboarding/genres");
       } else {
         addToast("Revisa tu correo para confirmar tu cuenta", "info");
         router.push("/(auth)/login");

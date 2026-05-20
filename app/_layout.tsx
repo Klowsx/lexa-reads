@@ -26,6 +26,7 @@ import i18n from "~/lib/i18n";
 function AuthGate() {
   const session = useAuthStore((s) => s.session);
   const isLoading = useAuthStore((s) => s.isLoading);
+  const onboardingStarted = useAuthStore((s) => s.onboardingStarted);
   const segments = useSegments();
   const router = useRouter();
 
@@ -33,12 +34,18 @@ function AuthGate() {
     if (isLoading) return;
 
     const inAuthGroup = segments[0] === "(auth)";
+
+    // Las recovery sessions deben quedarse en (auth) para completar new-password
+    const isRecoverySession = (session?.user as any)?.amr?.some(
+      (e: { method: string }) => e.method === "recovery"
+    );
+
     if (!session && !inAuthGroup) {
       router.replace("/(auth)/login");
-    } else if (session && inAuthGroup) {
+    } else if (session && inAuthGroup && !isRecoverySession && !onboardingStarted) {
       router.replace("/(tabs)/feed");
     }
-  }, [session, segments, isLoading]);
+  }, [session, segments, isLoading, onboardingStarted]);
 
   return null;
 }
