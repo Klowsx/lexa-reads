@@ -72,6 +72,8 @@ export default function RegisterScreen() {
           value={name}
           onChangeText={setName}
           autoCapitalize="words"
+          textContentType="name"
+          autoComplete="name"
           icon={User}
         />
         <AuthField
@@ -81,6 +83,8 @@ export default function RegisterScreen() {
           placeholder="tu@correo.com"
           keyboardType="email-address"
           autoCapitalize="none"
+          textContentType="emailAddress"
+          autoComplete="email"
           icon={Mail}
         />
         <AuthField
@@ -89,6 +93,8 @@ export default function RegisterScreen() {
           onChangeText={setPassword}
           secureTextEntry={!showPassword}
           autoCapitalize="none"
+          textContentType="newPassword"
+          autoComplete="new-password"
           icon={Lock}
           trailing={
             <Pressable

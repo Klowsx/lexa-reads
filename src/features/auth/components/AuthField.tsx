@@ -1,5 +1,5 @@
 ﻿import { useState } from "react";
-import { Text, TextInput, View } from "react-native";
+import { Text, TextInput, TextInputProps, View } from "react-native";
 import type { LucideIcon } from "lucide-react-native";
 import type { ReactNode } from "react";
 import { useColors } from "@/src/lib/colors";
@@ -15,6 +15,10 @@ type Props = {
   icon?: LucideIcon | ReactNode;
   trailing?: ReactNode;
   error?: string;
+  // Estos dos props activan el autofill nativo y la integración con gestores de contraseñas.
+  // textContentType es solo para iOS; autoComplete cubre Android y web.
+  textContentType?: TextInputProps["textContentType"];
+  autoComplete?: TextInputProps["autoComplete"];
 };
 
 export function AuthField({
@@ -28,6 +32,8 @@ export function AuthField({
   icon,
   trailing,
   error,
+  textContentType,
+  autoComplete,
 }: Props) {
   const [focused, setFocused] = useState(false);
   const c = useColors();
@@ -65,6 +71,8 @@ export function AuthField({
           secureTextEntry={secureTextEntry}
           keyboardType={keyboardType}
           autoCapitalize={autoCapitalize}
+          textContentType={textContentType}
+          autoComplete={autoComplete}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
         />

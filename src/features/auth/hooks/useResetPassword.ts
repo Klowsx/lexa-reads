@@ -48,12 +48,10 @@ export function useUpdatePassword() {
   return useMutation<void, AppError, { password: string }>({
     mutationFn: async ({ password }) => {
       const { error } = await supabase.auth.updateUser({ password });
-
       if (error) throw toAppError(error);
-
-      await supabase.auth.signOut();
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      await supabase.auth.signOut();
       router.replace("/(auth)/success");
     },
   });

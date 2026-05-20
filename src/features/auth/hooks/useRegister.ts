@@ -1,5 +1,6 @@
 import { supabase } from "@/src/lib/supabase";
 import { useAuthStore } from "@/src/stores/auth.store";
+import { useUIStore } from "@/src/stores/ui.store";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { toAppError, AppError } from "@/src/types";
@@ -14,8 +15,9 @@ interface RegisterParams {
 export function useRegister() {
   const router = useRouter();
   const setSession = useAuthStore((state) => state.setSession);
+  const addToast = useUIStore((s) => s.addToast);
 
-  return useMutation<AuthResponse['data'], AppError, RegisterParams>({
+  return useMutation<AuthResponse["data"], AppError, RegisterParams>({
     mutationFn: async ({ email, password, displayName }: RegisterParams) => {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -30,8 +32,13 @@ export function useRegister() {
       return data;
     },
     onSuccess: (data) => {
-      if (data.session) setSession(data.session);
-      router.push("/(auth)/login");
+      if (data.session) {
+        // TODO: Confirmación de email desactivada (dev)
+        setSession(data.session);
+      } else {
+        addToast("Revisa tu correo para confirmar tu cuenta", "info");
+        router.push("/(auth)/login");
+      }
     },
   });
 }

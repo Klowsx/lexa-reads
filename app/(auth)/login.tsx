@@ -63,6 +63,8 @@ export default function LoginScreen() {
           placeholder="tu@correo.com"
           keyboardType="email-address"
           autoCapitalize="none"
+          textContentType="username"
+          autoComplete="email"
           icon={Mail}
         />
         <AuthField
@@ -71,6 +73,8 @@ export default function LoginScreen() {
           onChangeText={setPassword}
           placeholder="••••••••"
           secureTextEntry={!showPw}
+          textContentType="password"
+          autoComplete="current-password"
           icon={Lock}
           trailing={
             <Pressable onPress={() => setShowPw(!showPw)} hitSlop={8}>
@@ -99,7 +103,10 @@ export default function LoginScreen() {
           </Text>
         )}
 
-        <PrimaryButton loading={isPending} onPress={() => login({ email, password })}>
+        <PrimaryButton
+          loading={isPending}
+          onPress={() => login({ email, password })}
+        >
           Iniciar sesión
         </PrimaryButton>
 
