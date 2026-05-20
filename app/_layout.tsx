@@ -1,6 +1,5 @@
 import "../global.css";
 import "~/lib/i18n";
-import * as Sentry from "@sentry/react-native";
 import {
   PlayfairDisplay_400Regular,
   PlayfairDisplay_400Regular_Italic,
@@ -24,31 +23,30 @@ import { useAuthStore } from "~/stores/auth.store";
 import { queryClient } from "~/lib/query-client";
 import i18n from "~/lib/i18n";
 
-Sentry.init({
-  dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
-  enabled: !__DEV__,
-  tracesSampleRate: 0.2,
-});
-
 function AuthGate() {
   const session = useAuthStore((s) => s.session);
+  const isLoading = useAuthStore((s) => s.isLoading);
   const segments = useSegments();
   const router = useRouter();
 
   useEffect(() => {
+    if (isLoading) return;
+
     const inAuthGroup = segments[0] === "(auth)";
     if (!session && !inAuthGroup) {
       router.replace("/(auth)/login");
     } else if (session && inAuthGroup) {
       router.replace("/(tabs)/feed");
     }
-  }, [session, segments]);
+  }, [session, segments, isLoading]);
 
   return null;
 }
 
 function RootLayout() {
   const setSession = useAuthStore((s) => s.setSession);
+  const setLoading = useAuthStore((s) => s.setLoading);
+  const isAuthLoading = useAuthStore((s) => s.isLoading);
 
   const [fontsLoaded] = useFonts({
     PlayfairDisplay_400Regular,
@@ -62,7 +60,10 @@ function RootLayout() {
   });
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSession(data.session));
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setLoading(false);
+    });
 
     const {
       data: { subscription },
@@ -80,7 +81,7 @@ function RootLayout() {
     return () => sub.remove();
   }, []);
 
-  if (!fontsLoaded) return null;
+  if (!fontsLoaded || isAuthLoading) return null;
 
   return (
     <I18nextProvider i18n={i18n}>
@@ -92,4 +93,4 @@ function RootLayout() {
   );
 }
 
-export default Sentry.wrap(RootLayout);
+export default RootLayout;
