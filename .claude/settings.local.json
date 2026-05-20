@@ -64,7 +64,8 @@
       "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\" -Recurse -Directory | Select-Object -ExpandProperty FullName | Where-Object { $_ -match \"\\(auth|src\\)\" })",
       "mcp__engram__mem_save",
       "PowerShell(Get-ChildItem \"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\" -Exclude node_modules | Where-Object { $_.Name -ne \"node_modules\" } | Select-Object Name, PSIsContainer)",
-      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\" -Recurse -Directory | Where-Object { $_.Name -match \"^\\(auth|components|theme|src\\)\" } | Select-Object -ExpandProperty FullName)"
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\" -Recurse -Directory | Where-Object { $_.Name -match \"^\\(auth|components|theme|src\\)\" } | Select-Object -ExpandProperty FullName)",
+      "Bash(grep -v \"^$\")"
     ]
   }
 }
