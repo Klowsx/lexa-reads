@@ -5,25 +5,7 @@
 
 ---
 
-## FASE 0 — Resolver ANTES de escribir cualquier feature
-
-Estos bloquean desde el inicio: la app no abre, los builds no corren, o el resto del código se construye sobre una base rota.
-
----
-
-### ✅ 0.1 Bug de hooks en `app/_layout.tsx`
-
-~~Los dos `useEffect` estaban después del `return null` condicional, violando las reglas de React Hooks.~~
-
-**Resuelto:** Ambos `useEffect` movidos antes del `if (!fontsLoaded) return null`.
-
----
-
-### ✅ 0.2 No existían las rutas del AuthGate
-
-~~`_layout.tsx` intentaba navegar a `/(auth)/login` y `/(tabs)/feed` pero ninguno existía.~~
-
-**Resuelto:** Creados `app/(auth)/_layout.tsx`, `app/(auth)/login.tsx`, `app/(tabs)/_layout.tsx`, `app/(tabs)/feed.tsx` como placeholders.
+## PENDIENTES
 
 ---
 
@@ -75,6 +57,41 @@ Sin este archivo `eas build` falla. Define los perfiles de build (development / 
 
 ---
 
+### ⬜ 0.8 Scaffold de `src/features/` — parcial
+
+**Pendiente:** Features de feed, library, book, lists y user + `src/components/ui/` — se crean cuando se empiece cada feature. Auth ya tiene scaffold.
+
+---
+
+### ⬜ 0.9 `src/lib/query-options.ts` y `src/lib/google-books.ts`
+
+Ambos son reglas arquitectónicas duras (CLAUDE.md §5 y §4). Si no existen desde el inicio, las primeras queries romperán el patrón y habrá que refactorizar.
+
+- `query-options.ts` — factory de `queryOptions` (TanStack v5)
+- `google-books.ts` — wrapper DB-first: busca en tabla `books` primero, si no existe llama la API y guarda
+
+---
+
+## COMPLETADOS
+
+---
+
+### ✅ 0.1 Bug de hooks en `app/_layout.tsx`
+
+~~Los dos `useEffect` estaban después del `return null` condicional, violando las reglas de React Hooks.~~
+
+**Resuelto:** Ambos `useEffect` movidos antes del `if (!fontsLoaded) return null`.
+
+---
+
+### ✅ 0.2 No existían las rutas del AuthGate
+
+~~`_layout.tsx` intentaba navegar a `/(auth)/login` y `/(tabs)/feed` pero ninguno existía.~~
+
+**Resuelto:** Creados `app/(auth)/_layout.tsx`, `app/(auth)/login.tsx`, `app/(tabs)/_layout.tsx`, `app/(tabs)/feed.tsx` como placeholders.
+
+---
+
 ### ✅ 0.5 `react-native-reanimated` no instalado
 
 ~~No estaba en `package.json`. Cualquier componente que lo importara crasheaba en runtime.~~
@@ -104,32 +121,6 @@ Sin este archivo `eas build` falla. Define los perfiles de build (development / 
 - Eliminado `"types": ["jest"]` de `tsconfig.json`
 - Creado `tsconfig.test.json` con los tipos de Jest aislados
 - `@testing-library/jest-native` (deprecado) eliminado; migrado a matchers built-in de `@testing-library/react-native` v13
-
----
-
-### ✅ 0.8 Scaffold de `src/features/` y `src/components/ui/`
-
-**Parcialmente resuelto:** Creada la feature de auth con placeholders:
-
-- `src/features/auth/hooks/index.ts` — comentarios de los hooks a implementar
-- `src/features/auth/components/index.ts` — comentarios de los componentes a implementar
-
-**Pendiente:** Resto de features (feed, library, book, lists, user) y `src/components/ui/` — se crean cuando se empiece cada feature.
-
----
-
-### ⬜ 0.9 `src/lib/query-options.ts` y `src/lib/google-books.ts`
-
-Ambos son reglas arquitectónicas duras (CLAUDE.md §5 y §4). Si no existen desde el inicio, las primeras queries romperán el patrón y habrá que refactorizar.
-
-- `query-options.ts` — factory de `queryOptions` (TanStack v5)
-- `google-books.ts` — wrapper DB-first: busca en tabla `books` primero, si no existe llama la API y guarda
-
----
-
-## FASE 1 — Durante el desarrollo (antes del primer build de TestFlight)
-
-Funcionalidad prometida que hay que cablear antes de que los primeros usuarios toquen la app.
 
 ---
 
@@ -172,18 +163,18 @@ Funcionalidad prometida que hay que cablear antes de que los primeros usuarios t
 
 ## Resumen visual
 
-| #   | Item                                     | Fase            | Estado | Impacto si se omite                |
-| --- | ---------------------------------------- | --------------- | ------ | ---------------------------------- |
-| 0.1 | Fix hooks order en `_layout.tsx`         | Antes de código | ✅     | Crash al abrir                     |
-| 0.2 | Crear rutas mínimas                      | Antes de código | ✅     | Crash al abrir                     |
-| 0.3 | `app.json` bundle IDs + scheme           | Antes de código | ⬜     | No se puede subir a stores         |
-| 0.4 | `eas.json`                               | Antes de código | ⬜     | No hay builds                      |
-| 0.5 | `react-native-reanimated` + babel plugin | Antes de código | ✅     | Crash en runtime                   |
-| 0.6 | Setup i18n                               | Antes de código | ✅     | Refactor global después            |
-| 0.7 | `tsconfig.json` types aislados           | Antes de código | ✅     | Typechecking sucio                 |
-| 0.8 | Scaffold `src/features/auth/` (parcial)  | Antes de código | 🔶     | Sin estructura para features       |
-| 0.9 | `query-options.ts` + `google-books.ts`   | Antes de código | ⬜     | Rompe arquitectura desde feature 1 |
-| 1.1 | Sentry inicializado                      | Durante dev     | ✅     | Crashes invisibles en prod         |
-| 1.2 | `app/+not-found.tsx`                     | Durante dev     | ✅     | Error poco claro en rutas rotas    |
-| 1.3 | `userInterfaceStyle: "automatic"`        | Durante dev     | ✅     | Dark mode no funciona              |
-| 1.4 | Migrar de `expo-barcode-scanner`         | Durante dev     | ✅     | Build roto en SDK futuro           |
+| #   | Item                                     | Fase            | Estado |
+| --- | ---------------------------------------- | --------------- | ------ |
+| 0.3 | `app.json` bundle IDs + scheme           | Antes de código | ⬜     |
+| 0.4 | `eas.json`                               | Antes de código | ⬜     |
+| 0.8 | Scaffold `src/features/` (parcial)       | Antes de código | ⬜     |
+| 0.9 | `query-options.ts` + `google-books.ts`   | Antes de código | ⬜     |
+| 0.1 | Fix hooks order en `_layout.tsx`         | Antes de código | ✅     |
+| 0.2 | Crear rutas mínimas                      | Antes de código | ✅     |
+| 0.5 | `react-native-reanimated` + babel plugin | Antes de código | ✅     |
+| 0.6 | Setup i18n                               | Antes de código | ✅     |
+| 0.7 | `tsconfig.json` types aislados           | Antes de código | ✅     |
+| 1.1 | Sentry inicializado                      | Durante dev     | ✅     |
+| 1.2 | `app/+not-found.tsx`                     | Durante dev     | ✅     |
+| 1.3 | `userInterfaceStyle: "automatic"`        | Durante dev     | ✅     |
+| 1.4 | Migrar de `expo-barcode-scanner`         | Durante dev     | ✅     |
