@@ -1,6 +1,6 @@
-﻿import { Mail } from "lucide-react-native";
+import { Mail } from "lucide-react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
@@ -10,21 +10,45 @@ import {
   alpha,
 } from "../../src/features/auth/components";
 import { useColors } from "@/src/lib/colors";
-import { useVerifyPasswordResetCode } from "@/src/features/auth/hooks/useResetPassword";
+import {
+  useVerifyPasswordResetCode,
+  useRequestResetPassword,
+} from "@/src/features/auth/hooks/useResetPassword";
+
+const RESEND_SECONDS = 60;
 
 export default function VerifyEmailScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const c = useColors();
   const [code, setCode] = useState("");
+  const [countdown, setCountdown] = useState(RESEND_SECONDS);
 
   const { email } = useLocalSearchParams<{ email: string }>();
   const inputRef = useRef<TextInput>(null);
+
   const {
-    mutate: verifiyCode,
+    mutate: verifyCode,
     isPending,
     error,
   } = useVerifyPasswordResetCode();
+
+  const { mutate: resend, isPending: isResending } = useRequestResetPassword();
+
+  useEffect(() => {
+    if (countdown <= 0) return;
+    const id = setInterval(() => setCountdown((s) => s - 1), 1000);
+    return () => clearInterval(id);
+  }, [countdown]);
+
+  const handleResend = () => {
+    resend({ email });
+    setCode("");
+    setCountdown(RESEND_SECONDS);
+  };
+
+  const mm = String(Math.floor(countdown / 60)).padStart(2, "0");
+  const ss = String(countdown % 60).padStart(2, "0");
 
   return (
     <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
@@ -67,16 +91,35 @@ export default function VerifyEmailScreen() {
           />
         </Pressable>
 
+        {error && (
+          <Text className="font-body text-error text-xs text-center mt-3">
+            {error.message}
+          </Text>
+        )}
+
         <Text className="font-body text-t3 text-center mt-[22px] mb-6 text-xs">
-          ¿No recibiste el código? Reenviar en{" "}
-          <Text className="font-body-md text-text">00:42</Text>
+          {countdown > 0 ? (
+            <>
+              {"¿No recibiste el código? Reenviar en "}
+              <Text className="font-body-md text-text">
+                {mm}:{ss}
+              </Text>
+            </>
+          ) : (
+            <Pressable onPress={handleResend} disabled={isResending}>
+              <Text className="font-body-sb text-accent text-xs">
+                {isResending ? "Reenviando…" : "Reenviar código"}
+              </Text>
+            </Pressable>
+          )}
         </Text>
 
         <PrimaryButton
-          disabled={code.length < 6 || isPending}
-          onPress={() => verifiyCode({ email, token: code })}
+          disabled={code.length < 6}
+          loading={isPending}
+          onPress={() => verifyCode({ email, token: code })}
         >
-          {isPending ? "Verificando" : "Verificar"}
+          Verificar
         </PrimaryButton>
       </View>
     </View>

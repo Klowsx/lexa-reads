@@ -1,7 +1,8 @@
-﻿import { useState } from 'react';
-import { Text, TextInput, View } from 'react-native';
-import type { LucideIcon } from 'lucide-react-native';
-import { useColors } from '@/src/lib/colors';
+﻿import { useState } from "react";
+import { Text, TextInput, View } from "react-native";
+import type { LucideIcon } from "lucide-react-native";
+import type { ReactNode } from "react";
+import { useColors } from "@/src/lib/colors";
 
 type Props = {
   label?: string;
@@ -9,10 +10,10 @@ type Props = {
   onChangeText: (v: string) => void;
   placeholder?: string;
   secureTextEntry?: boolean;
-  keyboardType?: 'default' | 'email-address';
-  autoCapitalize?: 'none' | 'words' | 'sentences';
-  icon?: LucideIcon;
-  trailing?: React.ReactNode;
+  keyboardType?: "default" | "email-address";
+  autoCapitalize?: "none" | "words" | "sentences";
+  icon?: LucideIcon | ReactNode;
+  trailing?: ReactNode;
   error?: string;
 };
 
@@ -22,17 +23,20 @@ export function AuthField({
   onChangeText,
   placeholder,
   secureTextEntry,
-  keyboardType = 'default',
-  autoCapitalize = 'sentences',
-  icon: Icon,
+  keyboardType = "default",
+  autoCapitalize = "sentences",
+  icon,
   trailing,
   error,
 }: Props) {
   const [focused, setFocused] = useState(false);
   const c = useColors();
 
-  const focusedBorder = `rgba(${parseInt(c.accent.slice(1,3),16)},${parseInt(c.accent.slice(3,5),16)},${parseInt(c.accent.slice(5,7),16)},0.55)`;
+  const focusedBorder = `rgba(${parseInt(c.accent.slice(1, 3), 16)},${parseInt(c.accent.slice(3, 5), 16)},${parseInt(c.accent.slice(5, 7), 16)},0.55)`;
   const borderColor = error ? c.error : focused ? focusedBorder : undefined;
+
+  const IconComponent = typeof icon === "function" ? (icon as LucideIcon) : null;
+  const iconNode = IconComponent ? null : (icon as ReactNode);
 
   return (
     <View className="mb-[14px]">
@@ -45,9 +49,11 @@ export function AuthField({
         className="flex-row items-center gap-2.5 bg-surface rounded-md px-3.5 py-[13px] border border-border"
         style={borderColor ? { borderColor } : undefined}
       >
-        {Icon && (
-          <View className={`shrink-0 ${focused ? 'opacity-100' : 'opacity-60'}`}>
-            <Icon size={16} color={c.t3} />
+        {(IconComponent || iconNode) && (
+          <View
+            className={`shrink-0 ${focused ? "opacity-100" : "opacity-60"}`}
+          >
+            {IconComponent ? <IconComponent size={16} color={c.t3} /> : iconNode}
           </View>
         )}
         <TextInput
@@ -65,7 +71,9 @@ export function AuthField({
         {trailing && <View className="shrink-0">{trailing}</View>}
       </View>
       {error && (
-        <Text className="text-xs text-error mt-1 ml-0.5 font-body">{error}</Text>
+        <Text className="text-xs text-error mt-1 ml-0.5 font-body">
+          {error}
+        </Text>
       )}
     </View>
   );

@@ -64,10 +64,10 @@ export default function ForgotPasswordScreen() {
         )}
         <View className="mt-[14px]">
           <PrimaryButton
-            disabled={isPending}
+            loading={isPending}
             onPress={() => request({ email })}
           >
-            {isPending ? "Enviando" : "Enviar código"}
+            Enviar código
           </PrimaryButton>
         </View>
 

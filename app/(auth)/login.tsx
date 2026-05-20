@@ -99,8 +99,8 @@ export default function LoginScreen() {
           </Text>
         )}
 
-        <PrimaryButton onPress={() => login({ email, password })}>
-          {isPending ? "Iniciando sesion" : "Iniciar sesión"}
+        <PrimaryButton loading={isPending} onPress={() => login({ email, password })}>
+          Iniciar sesión
         </PrimaryButton>
 
         <View className="flex-row items-center gap-[10px] my-[22px]">

@@ -15,7 +15,7 @@ export function useRequestResetPassword() {
     },
 
     onSuccess: (_, { email }) => {
-      router.push({ pathname: "/(auth)/veryfy-email", params: { email } });
+      router.push({ pathname: "/(auth)/verify-email", params: { email } });
     },
   });
 }

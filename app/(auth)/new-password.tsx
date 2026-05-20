@@ -1,29 +1,43 @@
-﻿import { Check, Eye, EyeOff, Lock } from 'lucide-react-native';
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+﻿import { Check, Eye, EyeOff, Lock } from "lucide-react-native";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import { useUpdatePassword } from "@/src/features/auth/hooks/useResetPassword";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   AuthField,
   BackBar,
   PrimaryButton,
   alpha,
-} from '../../src/features/auth/components';
-import { useColors } from '@/src/lib/colors';
+} from "../../src/features/auth/components";
+import { useColors } from "@/src/lib/colors";
 
 const REQUIREMENTS = [
-  { label: 'Al menos 8 caracteres', test: (pw: string) => pw.length >= 8 },
-  { label: 'Contiene un número', test: (pw: string) => /\d/.test(pw) },
-  { label: 'Las contraseñas coinciden', test: (_: string, pw2: string) => _ !== '' && _ === pw2 },
+  { label: "Al menos 8 caracteres", test: (pw: string) => pw.length >= 8 },
+  { label: "Contiene un número", test: (pw: string) => /\d/.test(pw) },
+  {
+    label: "Las contraseñas coinciden",
+    test: (_: string, pw2: string) => _ !== "" && _ === pw2,
+  },
 ];
 
 export default function NewPasswordScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const c = useColors();
-  const [password, setPassword] = useState('NuevaContrasena24');
-  const [confirm, setConfirm] = useState('NuevaContrasena24');
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [show, setShow] = useState(false);
+
+  const { mutate: updatePassword, isPending, error } = useUpdatePassword();
 
   const allMet = REQUIREMENTS.every(({ test }) => test(password, confirm));
 
@@ -31,19 +45,27 @@ export default function NewPasswordScreen() {
     <KeyboardAvoidingView
       className="flex-1 bg-bg"
       style={{ paddingTop: insets.top }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <BackBar onBack={() => router.back()} />
       <ScrollView
-        contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 24 }]}
+        contentContainerStyle={[
+          styles.scroll,
+          { paddingBottom: insets.bottom + 24 },
+        ]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
         <View className="mb-7">
-          <Text className="font-display-sb text-text text-2xl" style={{ lineHeight: 34, letterSpacing: -0.3 }}>
+          <Text
+            className="font-display-sb text-text text-2xl"
+            style={{ lineHeight: 34, letterSpacing: -0.3 }}
+          >
             Nueva contraseña
           </Text>
-          <Text className="font-body text-t2 text-sm mt-[10px]">Elige una contraseña fuerte y única.</Text>
+          <Text className="font-body text-t2 text-sm mt-[10px]">
+            Elige una contraseña fuerte y única.
+          </Text>
         </View>
 
         <AuthField
@@ -52,10 +74,14 @@ export default function NewPasswordScreen() {
           onChangeText={setPassword}
           secureTextEntry={!show}
           autoCapitalize="none"
-          icon={<Lock size={16} color={c.t3} />}
+          icon={Lock}
           trailing={
             <Pressable onPress={() => setShow(!show)} hitSlop={8}>
-              {show ? <EyeOff size={16} color={c.t3} /> : <Eye size={16} color={c.t3} />}
+              {show ? (
+                <EyeOff size={16} color={c.t3} />
+              ) : (
+                <Eye size={16} color={c.t3} />
+              )}
             </Pressable>
           }
         />
@@ -66,7 +92,7 @@ export default function NewPasswordScreen() {
           onChangeText={setConfirm}
           secureTextEntry={!show}
           autoCapitalize="none"
-          icon={<Lock size={16} color={c.t3} />}
+          icon={Lock}
           trailing={
             password && password === confirm ? (
               <Check size={16} color={c.success} />
@@ -91,7 +117,9 @@ export default function NewPasswordScreen() {
                     <View className="w-1 h-1 rounded-full bg-t3" />
                   </View>
                 )}
-                <Text className={`font-body text-xs ${ok ? 'text-text' : 'text-t2'}`}>
+                <Text
+                  className={`font-body text-xs ${ok ? "text-text" : "text-t2"}`}
+                >
                   {label}
                 </Text>
               </View>
@@ -99,7 +127,18 @@ export default function NewPasswordScreen() {
           })}
         </View>
 
-        <PrimaryButton disabled={!allMet}>Guardar contraseña</PrimaryButton>
+        {error && (
+          <Text className="font-body text-error text-xs text-center mb-3">
+            {error.message}
+          </Text>
+        )}
+        <PrimaryButton
+          disabled={!allMet}
+          loading={isPending}
+          onPress={() => updatePassword({ password })}
+        >
+          Guardar contraseña
+        </PrimaryButton>
       </ScrollView>
     </KeyboardAvoidingView>
   );
