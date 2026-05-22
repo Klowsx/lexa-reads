@@ -6,9 +6,11 @@ interface AuthState {
   user: User | null;
   isLoading: boolean;
   onboardingStarted: boolean;
+  isRecoveryMode: boolean;
   setSession: (session: Session | null) => void;
   setLoading: (v: boolean) => void;
   setOnboardingStarted: (v: boolean) => void;
+  setRecoveryMode: (v: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -16,12 +18,15 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isLoading: true,
   onboardingStarted: false,
+  isRecoveryMode: false,
   setSession: (session) =>
     set((s) => ({
       session,
       user: session?.user ?? null,
       onboardingStarted: session ? s.onboardingStarted : false,
+      isRecoveryMode: session ? s.isRecoveryMode : false,
     })),
   setLoading: (v) => set({ isLoading: v }),
   setOnboardingStarted: (v) => set({ onboardingStarted: v }),
+  setRecoveryMode: (v) => set({ isRecoveryMode: v }),
 }));

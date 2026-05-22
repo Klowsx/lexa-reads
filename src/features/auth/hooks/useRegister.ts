@@ -1,9 +1,9 @@
-import { supabase } from "@/src/lib/supabase";
-import { useAuthStore } from "@/src/stores/auth.store";
-import { useUIStore } from "@/src/stores/ui.store";
+import { supabase } from "~/lib/supabase";
+import { useAuthStore } from "~/stores/auth.store";
+import { useUIStore } from "~/stores/ui.store";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { toAppError, AppError } from "@/src/types";
+import { toAppError, AppError } from "~/types";
 import type { AuthResponse } from "@supabase/supabase-js";
 
 interface RegisterParams {

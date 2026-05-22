@@ -36,8 +36,11 @@ export default function RegisterScreen() {
     { label: "Fuerte", color: c.success },
   ];
 
-  const strengthIdx = password.length < 6 ? 0 : password.length < 10 ? 1 : 2;
-  const strengthFill = Math.min(password.length / 12, 1) * 3;
+  const hasMinLength = password.length >= 8;
+  const hasNumber = /\d/.test(password);
+  const strengthScore = [hasMinLength, hasNumber, password.length >= 12].filter(Boolean).length;
+  const strengthIdx = password.length === 0 ? 0 : Math.max(0, strengthScore - 1);
+  const strengthFill = password.length === 0 ? 0 : strengthScore;
   const { label: strengthLabel, color: strengthColor } =
     strengthLevels[strengthIdx];
 

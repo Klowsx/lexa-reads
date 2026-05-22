@@ -27,6 +27,7 @@ function AuthGate() {
   const session = useAuthStore((s) => s.session);
   const isLoading = useAuthStore((s) => s.isLoading);
   const onboardingStarted = useAuthStore((s) => s.onboardingStarted);
+  const isRecoveryMode = useAuthStore((s) => s.isRecoveryMode);
   const segments = useSegments();
   const router = useRouter();
 
@@ -35,17 +36,12 @@ function AuthGate() {
 
     const inAuthGroup = segments[0] === "(auth)";
 
-    // Las recovery sessions deben quedarse en (auth) para completar new-password
-    const isRecoverySession = (session?.user as any)?.amr?.some(
-      (e: { method: string }) => e.method === "recovery"
-    );
-
     if (!session && !inAuthGroup) {
       router.replace("/(auth)/login");
-    } else if (session && inAuthGroup && !isRecoverySession && !onboardingStarted) {
+    } else if (session && inAuthGroup && !isRecoveryMode && !onboardingStarted) {
       router.replace("/(tabs)/feed");
     }
-  }, [session, segments, isLoading, onboardingStarted]);
+  }, [session, segments, isLoading, onboardingStarted, isRecoveryMode]);
 
   return null;
 }
@@ -53,6 +49,7 @@ function AuthGate() {
 function RootLayout() {
   const setSession = useAuthStore((s) => s.setSession);
   const setLoading = useAuthStore((s) => s.setLoading);
+  const setRecoveryMode = useAuthStore((s) => s.setRecoveryMode);
   const isAuthLoading = useAuthStore((s) => s.isLoading);
 
   const [fontsLoaded] = useFonts({
@@ -74,7 +71,9 @@ function RootLayout() {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY") setRecoveryMode(true);
+      else setRecoveryMode(false);
       setSession(session);
     });
 

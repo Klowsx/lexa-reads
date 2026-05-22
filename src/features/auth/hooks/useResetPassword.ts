@@ -1,5 +1,5 @@
-import { supabase } from "@/src/lib/supabase";
-import { AppError, toAppError } from "@/src/types";
+import { supabase } from "~/lib/supabase";
+import { AppError, toAppError } from "~/types";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 

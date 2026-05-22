@@ -1,19 +1,16 @@
-import { supabase } from "@/src/lib/supabase";
-import { useAuthStore } from "@/src/stores/auth.store";
-import { AppError, toAppError } from "@/src/types";
+import { supabase } from "~/lib/supabase";
+import { AppError, toAppError } from "~/types";
 import { AuthResponse } from "@supabase/supabase-js";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 
 interface LoginParams {
   email: string;
-  //   username: string; para usar username como opcion tambien
   password: string;
 }
 
 export function useLogin() {
   const router = useRouter();
-  const setSession = useAuthStore((state) => state.setSession);
 
   return useMutation<AuthResponse["data"], AppError, LoginParams>({
     mutationFn: async ({ email, password }: LoginParams) => {
@@ -25,9 +22,8 @@ export function useLogin() {
       if (error) throw toAppError(error);
       return data;
     },
-    onSuccess: (data) => {
-      if (data.session) setSession(data.session);
-      router.replace("/(tabs)");
+    onSuccess: () => {
+      router.replace("/(tabs)/feed");
     },
   });
 }
