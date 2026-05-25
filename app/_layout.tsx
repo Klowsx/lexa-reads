@@ -20,6 +20,7 @@ import { I18nextProvider } from "react-i18next";
 import { useFonts } from "expo-font";
 import { supabase } from "~/lib/supabase";
 import { useAuthStore } from "~/stores/auth.store";
+import "~/stores/theme.store";
 import { queryClient } from "~/lib/query-client";
 import i18n from "~/lib/i18n";
 

@@ -3,7 +3,7 @@ import { Text, TextInput, TextInputProps, View } from "react-native";
 import type { LucideIcon } from "lucide-react-native";
 import { isValidElement } from "react";
 import type { ReactNode } from "react";
-import { useColors } from "@/src/lib/colors";
+import { useColors } from "~/theme/colors";
 
 type Props = {
   label?: string;

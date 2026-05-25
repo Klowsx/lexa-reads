@@ -17,7 +17,7 @@ import {
   GhostButton,
   PrimaryButton,
 } from "../../src/features/auth/components";
-import { useColors } from "@/src/lib/colors";
+import { useColors } from "~/theme/colors";
 import { useLogin } from "@/src/features/auth/hooks/useLogin";
 
 export default function LoginScreen() {

@@ -17,7 +17,7 @@ import {
   PrimaryButton,
   alpha,
 } from "../../src/features/auth/components";
-import { useColors } from "@/src/lib/colors";
+import { useColors } from "~/theme/colors";
 
 const REQUIREMENTS = [
   { label: "Al menos 8 caracteres", test: (pw: string) => pw.length >= 8 },

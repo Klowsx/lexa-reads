@@ -16,7 +16,7 @@ import {
   PrimaryButton,
 } from "../../src/features/auth/components";
 import { useRegister } from "@/src/features/auth/hooks/useRegister";
-import { useColors } from "@/src/lib/colors";
+import { useColors } from "~/theme/colors";
 
 export default function RegisterScreen() {
   const router = useRouter();

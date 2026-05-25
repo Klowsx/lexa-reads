@@ -8,7 +8,7 @@ import {
   StepBar,
   alpha,
 } from '../../../src/features/auth/components';
-import { useColors } from '@/src/lib/colors';
+import { useColors } from '~/theme/colors';
 
 const QUICK_GOALS = [12, 24, 50, 100];
 

@@ -10,7 +10,7 @@ import {
   StepBar,
   alpha,
 } from '../../../src/features/auth/components';
-import { useColors } from '@/src/lib/colors';
+import { useColors } from '~/theme/colors';
 
 export default function OnboardUsernameScreen() {
   const router = useRouter();

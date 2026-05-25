@@ -1,8 +1,8 @@
-import { Link } from 'expo-router';
+﻿import { Link } from 'expo-router';
 import { Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PrimaryButton, alpha } from '../../src/features/auth/components';
-import { useColors } from '@/src/lib/colors';
+import { useColors } from '~/theme/colors';
 
 export default function SuccessScreen() {
   const insets = useSafeAreaInsets();

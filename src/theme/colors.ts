@@ -1,5 +1,4 @@
-// Colores semánticos (dark/light) — definidos como CSS variables en global.css
-// En componentes, usa clases Tailwind: bg-bg, bg-surface, text-text, text-t2, etc.
+import { useColorScheme } from 'react-native';
 
 // Valores raw para uso en StyleSheet.create() o cuando no hay acceso a clases Tailwind
 export const rawDark = {
@@ -29,6 +28,9 @@ export const fixed = {
   accent:    '#C4783A',
   accentAlt: { blue: '#3A8AB8', green: '#5B9A6A', rose: '#B8445A' },
   star:      '#E8C05A',
+  error:     '#C43A3A',
+  warning:   '#C49A20',
+  success:   '#5CAF7E',
   status: {
     reading:   '#4A96B8',
     read:      '#5CAF7E',
@@ -36,3 +38,12 @@ export const fixed = {
     abandoned: '#787068',
   },
 } as const;
+
+export type AppColors = typeof rawDark & typeof fixed;
+
+// Hook — devuelve colores del tema activo + colores fijos
+export function useColors(): AppColors {
+  const scheme = useColorScheme() ?? 'light';
+  const raw = scheme === 'dark' ? rawDark : rawLight;
+  return { ...raw, ...fixed } as AppColors;
+}

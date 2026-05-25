@@ -1,8 +1,8 @@
-import { Tabs } from 'expo-router';
+﻿import { Tabs } from 'expo-router';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
-import { useColors } from '~/lib/colors';
+import { useColors } from '~/theme/colors';
 
 // ─── Tab icons (ported from design prototype) ─────────────────
 

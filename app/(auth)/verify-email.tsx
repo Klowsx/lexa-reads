@@ -1,4 +1,4 @@
-import { Mail } from "lucide-react-native";
+﻿import { Mail } from "lucide-react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
@@ -9,7 +9,7 @@ import {
   PrimaryButton,
   alpha,
 } from "../../src/features/auth/components";
-import { useColors } from "@/src/lib/colors";
+import { useColors } from "~/theme/colors";
 import {
   useVerifyPasswordResetCode,
   useRequestResetPassword,

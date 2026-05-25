@@ -9,7 +9,7 @@ import {
   PrimaryButton,
   alpha,
 } from "../../src/features/auth/components";
-import { useColors } from "@/src/lib/colors";
+import { useColors } from "~/theme/colors";
 import { useRequestResetPassword } from "@/src/features/auth/hooks/useResetPassword";
 
 export default function ForgotPasswordScreen() {

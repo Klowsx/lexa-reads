@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import {
   Modal,
   Pressable,
@@ -14,7 +14,7 @@ import { StarRating } from '~/components/ui/StarRating';
 import type { BookStatus, MockBook, MockUserBook } from '~/mock';
 import { STATUS_META } from '~/mock';
 import { fixed, rawDark, rawLight } from '~/theme/colors';
-import { useColors } from '~/lib/colors';
+import { useColors } from '~/theme/colors';
 import { Tables } from '@/src/types';
 
 const STAR = fixed.star;
