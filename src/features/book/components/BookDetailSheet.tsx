@@ -15,6 +15,7 @@ import type { BookStatus, MockBook, MockUserBook } from '~/mock';
 import { STATUS_META } from '~/mock';
 import { fixed, rawDark, rawLight } from '~/theme/colors';
 import { useColors } from '~/lib/colors';
+import { Tables } from '@/src/types';
 
 const STAR = fixed.star;
 
@@ -24,7 +25,7 @@ const alpha = (hex: string, op: number) => {
 };
 
 interface BookDetailSheetProps {
-  book: MockBook;
+  book: Tables<"books">;
   initialUserBook?: MockUserBook | null;
   onClose: () => void;
 }
@@ -72,15 +73,15 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
                 <Text className="font-display-sb text-md text-text leading-tight mb-1" numberOfLines={3}>
                   {book.title}
                 </Text>
-                <Text className="font-body text-sm text-t2 mb-2">{book.author}</Text>
+                <Text className="font-body text-sm text-t2 mb-2">{book.authors?.join(', ')}</Text>
                 <View className="flex-row items-center gap-1.5 mb-1.5">
-                  <StarRating rating={book.avg} size={13} />
+                  <StarRating rating={111} size={13} />
                   <Text style={{ fontSize: 13, fontFamily: 'DMSans_600SemiBold', color: STAR }}>
-                    {book.avg}
+                    {111}
                   </Text>
                 </View>
                 <Text className="font-body text-xs text-t3">
-                  {book.pages} páginas · {book.year}
+                  {book.page_count} páginas · {book.published_year}
                 </Text>
               </View>
             </View>
@@ -170,7 +171,7 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
             </View>
 
             {/* Synopsis */}
-            {book.desc ? (
+            {book.description ? (
               <View className="px-5 pb-3.5">
                 <Text
                   className="text-xs text-t3 tracking-wider mb-1.5"
@@ -178,13 +179,13 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
                 >
                   Sinopsis
                 </Text>
-                <Text className="font-body text-sm text-t2 leading-relaxed">{book.desc}</Text>
+                <Text className="font-body text-sm text-t2 leading-relaxed">{book.description}</Text>
               </View>
             ) : null}
 
             {/* Genres */}
             <View className="flex-row flex-wrap gap-1.5 px-5 pb-4">
-              {book.genres.map(g => (
+              {book.genres?.map(g => (
                 <Text
                   key={g}
                   className="text-xs font-body text-t3 px-2.5 py-1 rounded-sm"
