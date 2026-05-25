@@ -139,6 +139,36 @@ async function upsertBooks(volumes: GBVolume[]): Promise<BookRow[]> {
   return data ?? [];
 }
 
+// ── Deduplicación de ediciones ───────────────────────────────
+
+function normalize(str: string): string {
+  return str.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim();
+}
+
+function scoreBook(book: BookRow): number {
+  return (
+    (book.cover_url ? 3 : 0) +
+    (book.description ? 2 : 0) +
+    (book.page_count ? 1 : 0) +
+    ((book.genres?.length ?? 0) > 0 ? 1 : 0)
+  );
+}
+
+// Por cada combinación (título + primer autor) conserva la edición
+// con más datos completos. Esto evita duplicados por edición ilustrada,
+// bolsillo, ebook, etc.
+function deduplicateBooks(books: BookRow[]): BookRow[] {
+  const best = new Map<string, BookRow>();
+  for (const book of books) {
+    const key = `${normalize(book.title)}|${normalize(book.authors?.[0] ?? '')}`;
+    const current = best.get(key);
+    if (!current || scoreBook(book) > scoreBook(current)) {
+      best.set(key, book);
+    }
+  }
+  return Array.from(best.values());
+}
+
 // ── API pública del módulo ────────────────────────────────────
 
 /**
@@ -180,9 +210,9 @@ export async function searchBooks(
   // Paso 4: guardar los libros nuevos en la DB
   const newRows = await upsertBooks(newVolumes);
 
-  // Paso 5: combinar resultados locales y nuevos, sin duplicados
+  // Paso 5: combinar, deduplicar por obra y limitar
   const combined = [...(localResults ?? []), ...newRows];
-  return combined.slice(0, maxResults);
+  return deduplicateBooks(combined).slice(0, maxResults);
 }
 
 /**
