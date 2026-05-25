@@ -1,4 +1,4 @@
-import { searchBooks } from "@/src/lib/google-books";
+import { searchBooks } from "~/lib/google-books";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 
 export const searchBookQueryOptions = (query: string) =>
