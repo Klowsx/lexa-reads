@@ -186,12 +186,13 @@ export async function searchBooks(
     minLocalResults = 3,
   }: { maxResults?: number; minLocalResults?: number } = {},
 ): Promise<BookRow[]> {
-  // Paso 1: buscar en la DB local usando búsqueda de texto completo
-  // La columna title tiene un índice GIN con pg_trgm que hace esto rápido.
+  // Paso 1: buscar en la DB local por título usando el índice GIN pg_trgm.
+  // No filtramos por authors porque `cs` es containment exacto y no sirve
+  // para búsquedas parciales; la API de Google Books cubre ese caso.
   const { data: localResults } = await supabase
     .from("books")
     .select("*")
-    .or(`title.ilike.%${query}%,authors.cs.{${query}}`)
+    .ilike("title", `%${query}%`)
     .limit(maxResults);
 
   // Si ya tenemos suficientes resultados locales, los retornamos
