@@ -1,6 +1,8 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ChevronLeft } from 'lucide-react-native';
-import { useState } from 'react';
+import { useDeleteUserBook } from "~/features/library/hooks/useDeleteUserBook";
+import { useUpsertUserBook } from "~/features/library/hooks/useUpsertUserBook";
+import { useUserBook } from "~/features/library/hooks/useUserBook";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { ChevronLeft } from "lucide-react-native";
 import {
   ActivityIndicator,
   Pressable,
@@ -9,17 +11,17 @@ import {
   TouchableOpacity,
   useColorScheme,
   View,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BookCover } from '~/components/ui/BookCover';
-import { useBook } from '~/features/book/hooks/useBook';
-import { type BookStatus, STATUS_META, STATUS_ORDER } from '~/lib/book-status';
-import { fixed, rawDark, rawLight } from '~/theme/colors';
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { BookCover } from "~/components/ui/BookCover";
+import { useBook } from "~/features/book/hooks/useBook";
+import { type BookStatus, STATUS_META, STATUS_ORDER } from "~/lib/book-status";
+import { fixed, rawDark, rawLight } from "~/theme/colors";
 
 const STAR = fixed.star;
 
 const alpha = (hex: string, op: number) => {
-  const n = parseInt(hex.replace('#', ''), 16);
+  const n = parseInt(hex.replace("#", ""), 16);
   return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})`;
 };
 
@@ -27,13 +29,37 @@ export default function BookDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const scheme = useColorScheme();
-  const raw = scheme === 'dark' ? rawDark : rawLight;
+  const raw = scheme === "dark" ? rawDark : rawLight;
   const insets = useSafeAreaInsets();
 
   const { data: book, isLoading } = useBook(id);
 
-  const [status, setStatus] = useState<BookStatus | null>(null);
-  const [rating, setRating] = useState<number | null>(null);
+  const { data: userBook } = useUserBook(book?.id ?? "");
+  const upsertMutation = useUpsertUserBook(book?.id ?? "");
+  const deleteMutation = useDeleteUserBook(book?.id ?? "");
+
+  const status = (userBook?.status as BookStatus) ?? null;
+  const rating = userBook?.rating ?? null;
+
+  function handleStatusClick(s: BookStatus) {
+    if (!book) return;
+    if (status === s) {
+      deleteMutation.mutate();
+    } else {
+      upsertMutation.mutate({ bookId: book.id, status: s, rating });
+    }
+  }
+
+  function handleRatingClick(i: number) {
+    if (!book) return;
+    // Estrella llena → baja a media; cualquier otro caso → sube/baja a i completa
+    const newRating = rating === i ? i - 0.5 : i;
+    upsertMutation.mutate({
+      bookId: book.id,
+      status: status ?? "read",
+      rating: newRating,
+    });
+  }
 
   if (isLoading) {
     return (
@@ -46,9 +72,16 @@ export default function BookDetailScreen() {
   if (!book) {
     return (
       <View className="flex-1 bg-bg items-center justify-center px-8">
-        <Text className="font-body text-t2 text-center">No se encontró el libro.</Text>
+        <Text className="font-body text-t2 text-center">
+          No se encontró el libro.
+        </Text>
         <Pressable onPress={() => router.back()} className="mt-4">
-          <Text className="font-body-sb text-sm" style={{ color: fixed.accent }}>Volver</Text>
+          <Text
+            className="font-body-sb text-sm"
+            style={{ color: fixed.accent }}
+          >
+            Volver
+          </Text>
         </Pressable>
       </View>
     );
@@ -82,11 +115,13 @@ export default function BookDetailScreen() {
             {book.title}
           </Text>
           <Text className="font-body text-base text-t2 text-center mt-1.5">
-            {book.authors?.join(', ')}
+            {book.authors?.join(", ")}
           </Text>
-          {(book.page_count || year) ? (
+          {book.page_count || year ? (
             <Text className="font-body text-sm text-t3 mt-1">
-              {[book.page_count ? `${book.page_count} págs` : null, year].filter(Boolean).join(' · ')}
+              {[book.page_count ? `${book.page_count} págs` : null, year]
+                .filter(Boolean)
+                .join(" · ")}
             </Text>
           ) : null}
         </View>
@@ -95,7 +130,10 @@ export default function BookDetailScreen() {
         <View className="px-5 mb-4">
           <Text
             className="text-xs text-t3 mb-2.5 tracking-widest"
-            style={{ fontFamily: 'DMSans_600SemiBold', textTransform: 'uppercase' }}
+            style={{
+              fontFamily: "DMSans_600SemiBold",
+              textTransform: "uppercase",
+            }}
           >
             Estado
           </Text>
@@ -106,7 +144,10 @@ export default function BookDetailScreen() {
               return (
                 <Pressable
                   key={s}
-                  onPress={() => setStatus(active ? null : s)}
+                  onPress={() => handleStatusClick(s)}
+                  disabled={
+                    upsertMutation.isPending || deleteMutation.isPending
+                  }
                   style={{
                     paddingHorizontal: 14,
                     paddingVertical: 7,
@@ -119,7 +160,9 @@ export default function BookDetailScreen() {
                   <Text
                     style={{
                       fontSize: 13,
-                      fontFamily: active ? 'DMSans_500Medium' : 'DMSans_400Regular',
+                      fontFamily: active
+                        ? "DMSans_500Medium"
+                        : "DMSans_400Regular",
                       color: active ? meta.color : raw.t2,
                     }}
                   >
@@ -134,11 +177,18 @@ export default function BookDetailScreen() {
         {/* Rating */}
         <View
           className="mx-5 mb-4 rounded-md p-3.5"
-          style={{ backgroundColor: raw.sr, borderWidth: 1, borderColor: raw.border }}
+          style={{
+            backgroundColor: raw.sr,
+            borderWidth: 1,
+            borderColor: raw.border,
+          }}
         >
           <Text
             className="text-xs text-t3 tracking-wider mb-2"
-            style={{ fontFamily: 'DMSans_600SemiBold', textTransform: 'uppercase' }}
+            style={{
+              fontFamily: "DMSans_600SemiBold",
+              textTransform: "uppercase",
+            }}
           >
             Mi rating
           </Text>
@@ -147,15 +197,26 @@ export default function BookDetailScreen() {
               {[1, 2, 3, 4, 5].map((i) => (
                 <TouchableOpacity
                   key={i}
-                  onPress={() => setRating((prev) => (prev === i ? null : i))}
+                  onPress={() => handleRatingClick(i)}
+                  disabled={
+                    upsertMutation.isPending || deleteMutation.isPending
+                  }
                   hitSlop={4}
                 >
-                  <View style={{ position: 'relative', width: 34, height: 32 }}>
-                    <Text style={{ position: 'absolute', fontSize: 30, lineHeight: 32, color: alpha(STAR, 0.2) }}>
+                  <View style={{ position: "relative", width: 34, height: 32 }}>
+                    {/* estrella vacía de fondo */}
+                    <Text style={{ position: "absolute", fontSize: 30, lineHeight: 32, color: alpha(STAR, 0.2) }}>
                       ★
                     </Text>
+                    {/* media estrella */}
+                    {rating != null && rating === i - 0.5 && (
+                      <View style={{ position: "absolute", width: 17, overflow: "hidden" }}>
+                        <Text style={{ fontSize: 30, lineHeight: 32, color: STAR }}>★</Text>
+                      </View>
+                    )}
+                    {/* estrella completa */}
                     {rating != null && rating >= i && (
-                      <Text style={{ position: 'absolute', fontSize: 30, lineHeight: 32, color: STAR }}>
+                      <Text style={{ position: "absolute", fontSize: 30, lineHeight: 32, color: STAR }}>
                         ★
                       </Text>
                     )}
@@ -164,7 +225,13 @@ export default function BookDetailScreen() {
               ))}
             </View>
             {rating != null && (
-              <Text style={{ fontSize: 22, fontFamily: 'DMSans_600SemiBold', color: STAR }}>
+              <Text
+                style={{
+                  fontSize: 22,
+                  fontFamily: "DMSans_600SemiBold",
+                  color: STAR,
+                }}
+              >
                 {rating}
               </Text>
             )}
@@ -178,7 +245,7 @@ export default function BookDetailScreen() {
             style={{ backgroundColor: fixed.accent }}
             activeOpacity={0.85}
           >
-            <Text className="text-sm font-body-sb" style={{ color: '#fff' }}>
+            <Text className="text-sm font-body-sb" style={{ color: "#fff" }}>
               Escribir reseña
             </Text>
           </TouchableOpacity>
@@ -189,11 +256,16 @@ export default function BookDetailScreen() {
           <View className="px-5 mb-5">
             <Text
               className="text-xs text-t3 tracking-wider mb-2"
-              style={{ fontFamily: 'DMSans_600SemiBold', textTransform: 'uppercase' }}
+              style={{
+                fontFamily: "DMSans_600SemiBold",
+                textTransform: "uppercase",
+              }}
             >
               Sinopsis
             </Text>
-            <Text className="font-body text-sm text-t2 leading-relaxed">{book.description}</Text>
+            <Text className="font-body text-sm text-t2 leading-relaxed">
+              {book.description}
+            </Text>
           </View>
         ) : null}
 
@@ -202,7 +274,10 @@ export default function BookDetailScreen() {
           <View className="px-5 mb-5">
             <Text
               className="text-xs text-t3 tracking-wider mb-2"
-              style={{ fontFamily: 'DMSans_600SemiBold', textTransform: 'uppercase' }}
+              style={{
+                fontFamily: "DMSans_600SemiBold",
+                textTransform: "uppercase",
+              }}
             >
               Géneros
             </Text>
@@ -211,7 +286,11 @@ export default function BookDetailScreen() {
                 <Text
                   key={g}
                   className="text-xs font-body text-t3 px-2.5 py-1 rounded-sm"
-                  style={{ backgroundColor: raw.sh, borderWidth: 1, borderColor: raw.border }}
+                  style={{
+                    backgroundColor: raw.sh,
+                    borderWidth: 1,
+                    borderColor: raw.border,
+                  }}
                 >
                   {g}
                 </Text>
@@ -224,7 +303,10 @@ export default function BookDetailScreen() {
         <View className="px-5 mb-5">
           <Text
             className="text-xs text-t3 tracking-wider mb-2"
-            style={{ fontFamily: 'DMSans_600SemiBold', textTransform: 'uppercase' }}
+            style={{
+              fontFamily: "DMSans_600SemiBold",
+              textTransform: "uppercase",
+            }}
           >
             Detalles
           </Text>
@@ -233,10 +315,10 @@ export default function BookDetailScreen() {
             style={{ borderWidth: 1, borderColor: raw.border }}
           >
             {[
-              { label: 'Editorial', value: book.publisher },
-              { label: 'Publicado', value: book.published_date },
-              { label: 'Idioma', value: book.language?.toUpperCase() },
-              { label: 'ISBN-13', value: book.isbn_13 },
+              { label: "Editorial", value: book.publisher },
+              { label: "Publicado", value: book.published_date },
+              { label: "Idioma", value: book.language?.toUpperCase() },
+              { label: "ISBN-13", value: book.isbn_13 },
             ]
               .filter((row) => row.value)
               .map((row, i, arr) => (
@@ -244,7 +326,7 @@ export default function BookDetailScreen() {
                   key={row.label}
                   className="flex-row justify-between px-3.5 py-2.5"
                   style={{
-                    backgroundColor: i % 2 === 0 ? raw.sr : 'transparent',
+                    backgroundColor: i % 2 === 0 ? raw.sr : "transparent",
                     borderBottomWidth: i < arr.length - 1 ? 1 : 0,
                     borderColor: raw.border,
                   }}
@@ -260,16 +342,27 @@ export default function BookDetailScreen() {
         <View className="px-5">
           <Text
             className="text-xs text-t3 tracking-wider mb-3"
-            style={{ fontFamily: 'DMSans_600SemiBold', textTransform: 'uppercase' }}
+            style={{
+              fontFamily: "DMSans_600SemiBold",
+              textTransform: "uppercase",
+            }}
           >
             Reseñas
           </Text>
           <View
             className="rounded-md items-center py-8"
-            style={{ backgroundColor: raw.sr, borderWidth: 1, borderColor: raw.border }}
+            style={{
+              backgroundColor: raw.sr,
+              borderWidth: 1,
+              borderColor: raw.border,
+            }}
           >
-            <Text className="font-body text-sm text-t3">Todavía no hay reseñas.</Text>
-            <Text className="font-body text-xs text-t3 mt-1">¡Sé el primero en escribir una!</Text>
+            <Text className="font-body text-sm text-t3">
+              Todavía no hay reseñas.
+            </Text>
+            <Text className="font-body text-xs text-t3 mt-1">
+              ¡Sé el primero en escribir una!
+            </Text>
           </View>
         </View>
       </ScrollView>
