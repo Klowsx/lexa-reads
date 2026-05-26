@@ -24,7 +24,10 @@ export function useDeleteUserBook(bookId: string) {
     },
 
     onSettled: () => {
+      // Refresca la fila específica de user_books
       queryClient.invalidateQueries({ queryKey: qKey });
+      // Refresca lista y contadores de biblioteca (prefijo compartido)
+      queryClient.invalidateQueries({ queryKey: ["library", userId] });
     },
   });
 }
