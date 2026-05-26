@@ -1,8 +1,8 @@
-import { supabase } from "@/src/lib/supabase";
-import { useAuthStore } from "@/src/stores/auth.store";
-import { AppError, toAppError } from "@/src/types";
+import { useAuthStore } from "~/stores/auth.store";
+import { AppError } from "~/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
+import { logoutFn } from "../auth.queries";
 
 export function useLogout() {
   const router = useRouter();
@@ -10,10 +10,7 @@ export function useLogout() {
   const queryClient = useQueryClient();
 
   return useMutation<void, AppError, void>({
-    mutationFn: async () => {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw toAppError(error);
-    },
+    mutationFn: logoutFn,
     onSuccess: () => {
       queryClient.clear();
       setSession(null);

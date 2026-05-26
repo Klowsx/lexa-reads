@@ -1,13 +1,6 @@
-import { searchBooks } from "~/lib/google-books";
-import { queryOptions, useQuery } from "@tanstack/react-query";
-
-export const searchBookQueryOptions = (query: string) =>
-  queryOptions({
-    queryKey: ["books", "search", query],
-    queryFn: () => searchBooks(query),
-    enabled: query.length > 2, // No buscar menos de 3 chars
-  });
+import { useQuery } from "@tanstack/react-query";
+import { searchBooksQueryOptions } from "../book.queries";
 
 export function useSearchBooks(query: string) {
-  return useQuery(searchBookQueryOptions(query));
+  return useQuery(searchBooksQueryOptions(query));
 }
