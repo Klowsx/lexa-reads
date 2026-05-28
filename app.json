@@ -29,8 +29,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "YOUR_EAS_PROJECT_ID"
+        "projectId": "837bca0d-13c4-4553-b886-a21d10a05aa6"
       }
-    }
+    },
+    "owner": "javierhr"
   }
 }

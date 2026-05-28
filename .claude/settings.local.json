@@ -76,7 +76,12 @@
       "Bash(node *)",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\jhernandez\\\\Desktop\\\\Yo\\\\lexa\" -Recurse -Directory)",
       "Bash(Select-Object -First 30)",
-      "Bash(Get-ChildItem *)"
+      "Bash(Get-ChildItem *)",
+      "Bash(eas build:view 2609a290-0266-4b47-98e4-df7a49d2eb7f)",
+      "Bash(eas build:logs 2609a290-0266-4b47-98e4-df7a49d2eb7f)",
+      "Bash(eas --help)",
+      "Bash(git rm *)",
+      "mcp__plugin_engram_engram__mem_search"
     ]
   }
 }

@@ -1,11 +1,16 @@
 {
   "cli": {
-    "version": ">= 16.0.0"
+    "version": ">= 16.0.0",
+    "appVersionSource": "local"
   },
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "node": "20.18.0",
+      "env": {
+        "COREPACK_ENABLE_DOWNLOAD_PROMPT": "0"
+      }
     },
     "preview": {
       "distribution": "internal"
