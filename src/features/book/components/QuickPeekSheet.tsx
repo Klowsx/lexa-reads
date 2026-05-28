@@ -87,9 +87,8 @@ export function QuickPeekSheet({ book, onClose }: Props) {
                     }}
                   >
                     <Text
+                      className={active ? 'font-body-md text-xs' : 'font-body text-xs'}
                       style={{
-                        fontSize: 12,
-                        fontFamily: active ? 'DMSans_500Medium' : 'DMSans_400Regular',
                         color: active ? meta.color : raw.t2,
                       }}
                     >
@@ -106,8 +105,8 @@ export function QuickPeekSheet({ book, onClose }: Props) {
               style={{ backgroundColor: raw.sr, borderWidth: 1, borderColor: raw.border }}
             >
               <Text
-                className="text-xs text-t3 tracking-wider mb-2"
-                style={{ fontFamily: 'DMSans_600SemiBold', textTransform: 'uppercase' }}
+                className="font-body-sb text-xs text-t3 tracking-wider mb-2"
+                style={{ textTransform: 'uppercase' }}
               >
                 Mi rating
               </Text>
@@ -120,11 +119,11 @@ export function QuickPeekSheet({ book, onClose }: Props) {
                       hitSlop={4}
                     >
                       <View style={{ position: 'relative', width: 34, height: 32 }}>
-                        <Text style={{ position: 'absolute', fontSize: 30, lineHeight: 32, color: alpha(STAR, 0.2) }}>
+                        <Text className="text-xl" style={{ position: 'absolute', lineHeight: 32, color: alpha(STAR, 0.2) }}>
                           ★
                         </Text>
                         {rating != null && rating >= i && (
-                          <Text style={{ position: 'absolute', fontSize: 30, lineHeight: 32, color: STAR }}>
+                          <Text className="text-xl" style={{ position: 'absolute', lineHeight: 32, color: STAR }}>
                             ★
                           </Text>
                         )}
@@ -133,7 +132,7 @@ export function QuickPeekSheet({ book, onClose }: Props) {
                   ))}
                 </View>
                 {rating != null && (
-                  <Text style={{ fontSize: 22, fontFamily: 'DMSans_600SemiBold', color: STAR }}>
+                  <Text className="font-body-sb text-md" style={{ color: STAR }}>
                     {rating}
                   </Text>
                 )}

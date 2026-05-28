@@ -15,14 +15,12 @@ const STAR = fixed.star;
 function SectionLabel({ children }: { children: string }) {
   return (
     <Text
+      className="font-body-sb text-xs text-t3"
       style={{
-        fontFamily: "DMSans_600SemiBold",
-        fontSize: 10,
         textTransform: "uppercase",
         letterSpacing: 1.4,
         marginBottom: 10,
       }}
-      className="text-t3"
     >
       {children}
     </Text>
@@ -94,11 +92,8 @@ export function BookSummaryTab({
                 }}
               >
                 <Text
+                  className={active ? "font-body-sb text-xs" : "font-body text-xs"}
                   style={{
-                    fontFamily: active
-                      ? "DMSans_600SemiBold"
-                      : "DMSans_400Regular",
-                    fontSize: 11.5,
                     color: active ? meta.color : raw.t3,
                   }}
                 >
@@ -124,9 +119,8 @@ export function BookSummaryTab({
             {book.genres.map((g) => (
               <Text
                 key={g}
+                className="font-body text-xs"
                 style={{
-                  fontFamily: "DMSans_400Regular",
-                  fontSize: 12,
                   color: raw.t3,
                   paddingHorizontal: 12,
                   paddingVertical: 5,
@@ -155,9 +149,8 @@ export function BookSummaryTab({
         >
           <SectionLabel>Sinopsis</SectionLabel>
           <Text
+            className="font-body text-xs"
             style={{
-              fontFamily: "DMSans_400Regular",
-              fontSize: 13.5,
               color: raw.t2,
               lineHeight: 13.5 * 1.76,
               marginBottom: 8,
@@ -168,9 +161,8 @@ export function BookSummaryTab({
           </Text>
           <Pressable onPress={() => setExpanded((e) => !e)}>
             <Text
+              className="font-body-md text-xs"
               style={{
-                fontFamily: "DMSans_500Medium",
-                fontSize: 12.5,
                 color: fixed.accent,
               }}
             >
@@ -214,18 +206,16 @@ export function BookSummaryTab({
                 }}
               >
                 <Text
+                  className="font-body text-xs"
                   style={{
-                    fontFamily: "DMSans_400Regular",
-                    fontSize: 13,
                     color: raw.t3,
                   }}
                 >
                   {row.label}
                 </Text>
                 <Text
+                  className="font-body-md text-xs"
                   style={{
-                    fontFamily: "DMSans_500Medium",
-                    fontSize: 13,
                     color: raw.text,
                   }}
                 >
@@ -285,9 +275,9 @@ export function BookSummaryTab({
                   >
                     {/* Empty star background */}
                     <Text
+                      className="text-2xl"
                       style={{
                         position: "absolute",
-                        fontSize: 32,
                         lineHeight: 36,
                         color: alpha(STAR, 0.22),
                       }}
@@ -305,8 +295,8 @@ export function BookSummaryTab({
                         }}
                       >
                         <Text
+                          className="text-2xl"
                           style={{
-                            fontSize: 32,
                             lineHeight: 36,
                             color: STAR,
                           }}
@@ -318,9 +308,9 @@ export function BookSummaryTab({
                     {/* Full star */}
                     {on && (
                       <Text
+                        className="text-2xl"
                         style={{
                           position: "absolute",
-                          fontSize: 32,
                           lineHeight: 36,
                           color: STAR,
                         }}
@@ -334,9 +324,8 @@ export function BookSummaryTab({
             })}
           </View>
           <Text
+            className="font-body text-xs"
             style={{
-              fontFamily: "DMSans_400Regular",
-              fontSize: 11,
               color: raw.t3,
               textAlign: "center",
             }}
@@ -359,9 +348,8 @@ export function BookSummaryTab({
           }}
         >
           <Text
+            className="font-body-sb text-sm"
             style={{
-              fontFamily: "DMSans_600SemiBold",
-              fontSize: 14,
               color: "#fff",
               letterSpacing: 0.1,
             }}

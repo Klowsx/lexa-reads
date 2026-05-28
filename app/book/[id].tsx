@@ -129,43 +129,46 @@ export default function BookDetailScreen() {
         paddingTop: insets.top,
       }}
     >
-      {/* Hero — fixed height, immersive */}
-      <BookHero book={book} onBack={() => router.back()} />
-
-      {/* CTA bar — sticky below hero */}
-      <BookCtaBar
-        book={book}
-        status={status}
-        rating={rating}
-        userBook={userBook ?? null}
-        isPending={isPending}
-        onStatusPress={handleCtaStatusPress}
-        onRatingPress={handleRatingButtonPress}
-      />
-
-      {/* Tab bar — sticky */}
-      <BookTabBar activeTab={activeTab} onChange={setActiveTab} />
-
-      {/* Tab content — scrollable */}
       <ScrollView
         style={{ flex: 1 }}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
+        stickyHeaderIndices={[2]}
       >
-        {activeTab === 0 && (
-          <BookSummaryTab
-            book={book}
-            status={status}
-            rating={rating}
-            isPending={isPending}
-            onStatusClick={handleStatusClick}
-            onRatingClick={handleRatingClick}
-            onWriteReview={() => setActiveTab(1)}
-          />
-        )}
-        {activeTab === 1 && <BookReviewsTab />}
-        {activeTab === 2 && <BookCommunityTab />}
-        {activeTab === 3 && <BookSimilarTab />}
+        {/* 0 — scrolls away */}
+        <BookHero book={book} onBack={() => router.back()} />
+
+        {/* 1 — scrolls away */}
+        <BookCtaBar
+          book={book}
+          status={status}
+          rating={rating}
+          userBook={userBook ?? null}
+          isPending={isPending}
+          onStatusPress={handleCtaStatusPress}
+          onRatingPress={handleRatingButtonPress}
+        />
+
+        {/* 2 — sticks to top */}
+        <BookTabBar activeTab={activeTab} onChange={setActiveTab} />
+
+        {/* 3 — tab content */}
+        <View>
+          {activeTab === 0 && (
+            <BookSummaryTab
+              book={book}
+              status={status}
+              rating={rating}
+              isPending={isPending}
+              onStatusClick={handleStatusClick}
+              onRatingClick={handleRatingClick}
+              onWriteReview={() => setActiveTab(1)}
+            />
+          )}
+          {activeTab === 1 && <BookReviewsTab onWriteReview={() => {}} />}
+          {activeTab === 2 && <BookCommunityTab />}
+          {activeTab === 3 && <BookSimilarTab />}
+        </View>
       </ScrollView>
     </View>
   );

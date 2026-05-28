@@ -13,8 +13,8 @@ export function ProfileLists({ lists }: Props) {
   return (
     <View className="px-4">
       <Text
-        className="text-xs text-t3 tracking-widest mb-2.5"
-        style={{ fontFamily: 'DMSans_600SemiBold', textTransform: 'uppercase' }}
+        className="font-body-sb text-xs text-t3 tracking-widest mb-2.5"
+        style={{ textTransform: 'uppercase' }}
       >
         Mis listas
       </Text>

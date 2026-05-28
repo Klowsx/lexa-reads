@@ -77,9 +77,8 @@ export function BookCtaBar({
           }}
         >
           <Text
+            className="font-body-sb text-sm"
             style={{
-              fontFamily: "DMSans_600SemiBold",
-              fontSize: 14,
               color: status ? statusColor : "#fff",
             }}
           >
@@ -112,8 +111,8 @@ export function BookCtaBar({
           {rating != null ? (
             <>
               <Text
+                className="text-sm"
                 style={{
-                  fontSize: 15,
                   color: fixed.star,
                   lineHeight: 15,
                 }}
@@ -121,9 +120,8 @@ export function BookCtaBar({
                 ★
               </Text>
               <Text
+                className="font-body-sb text-sm"
                 style={{
-                  fontFamily: "DMSans_600SemiBold",
-                  fontSize: 14,
                   color: raw.text,
                 }}
               >
@@ -133,14 +131,14 @@ export function BookCtaBar({
           ) : (
             <>
               <Text
-                style={{ fontSize: 15, color: raw.t3, lineHeight: 15 }}
+                className="text-sm"
+                style={{ color: raw.t3, lineHeight: 15 }}
               >
                 ☆
               </Text>
               <Text
+                className="font-body text-xs"
                 style={{
-                  fontFamily: "DMSans_400Regular",
-                  fontSize: 13,
                   color: raw.t2,
                 }}
               >
@@ -162,18 +160,16 @@ export function BookCtaBar({
             }}
           >
             <Text
+              className="font-body text-xs"
               style={{
-                fontFamily: "DMSans_400Regular",
-                fontSize: 11,
                 color: raw.t3,
               }}
             >
               Pág. {currentPage} de {pageCount}
             </Text>
             <Text
+              className="font-body-sb text-xs"
               style={{
-                fontFamily: "DMSans_600SemiBold",
-                fontSize: 11,
                 color: fixed.status.reading,
               }}
             >

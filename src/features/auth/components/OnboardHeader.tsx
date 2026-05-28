@@ -13,12 +13,12 @@ export function OnboardHeader({ step, total, onBack, allowSkip = true, onSkip }:
     <View className="flex-row items-center justify-between px-4 py-2 flex-shrink-0">
       {onBack ? (
         <Pressable onPress={onBack} hitSlop={8} className="p-1.5 -ml-1.5 w-8">
-          <Text className="font-body-light text-text" style={{ fontSize: 26, lineHeight: 26 }}>‹</Text>
+          <Text className="font-body-light text-lg text-text" style={{ lineHeight: 26 }}>‹</Text>
         </Pressable>
       ) : (
         <View style={{ width: 32 }} />
       )}
-      <Text className="font-body-sb text-t3 uppercase" style={{ fontSize: 11, letterSpacing: 0.9 }}>
+      <Text className="font-body-sb text-xs text-t3 uppercase" style={{ letterSpacing: 0.9 }}>
         Paso {step} de {total}
       </Text>
       {allowSkip ? (

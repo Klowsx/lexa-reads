@@ -46,9 +46,8 @@ export function BookHero({ book, onBack }: BookHeroProps) {
         }}
       >
         <Text
+          className="font-display-bold text-3xl"
           style={{
-            fontFamily: "PlayfairDisplay_700Bold",
-            fontSize: 108,
             color: alpha(ACCENT, 0.06),
             lineHeight: 108 * 0.88,
             transform: [{ rotate: "-7deg" }],
@@ -145,9 +144,8 @@ export function BookHero({ book, onBack }: BookHeroProps) {
         }}
       >
         <Text
+          className="font-display-sb text-md"
           style={{
-            fontFamily: "PlayfairDisplay_600SemiBold",
-            fontSize: 22,
             color: raw.text,
             lineHeight: 22 * 1.2,
             letterSpacing: -0.33,
@@ -160,9 +158,8 @@ export function BookHero({ book, onBack }: BookHeroProps) {
         </Text>
         {book.authors && book.authors.length > 0 && (
           <Text
+            className="font-body text-sm"
             style={{
-              fontFamily: "DMSans_400Regular",
-              fontSize: 14,
               color: raw.t2,
               marginBottom: 3,
             }}
@@ -200,9 +197,8 @@ export function BookHero({ book, onBack }: BookHeroProps) {
                 }}
               >
                 <Text
+                  className="font-body-bold text-sm"
                   style={{
-                    fontFamily: "DMSans_700Bold",
-                    fontSize: 15,
                     color: raw.text,
                     lineHeight: 15,
                   }}
@@ -210,9 +206,8 @@ export function BookHero({ book, onBack }: BookHeroProps) {
                   {value}
                 </Text>
                 <Text
+                  className="font-body text-xs"
                   style={{
-                    fontFamily: "DMSans_400Regular",
-                    fontSize: 9,
                     color: raw.t3,
                     marginTop: 4,
                     letterSpacing: 0.7,

@@ -12,8 +12,8 @@ export function RecentReads({ books, onPress }: Props) {
   return (
     <View className="mb-5">
       <Text
-        className="text-xs text-t3 tracking-widest mb-2.5 px-4"
-        style={{ fontFamily: 'DMSans_600SemiBold', textTransform: 'uppercase' }}
+        className="font-body-sb text-xs text-t3 tracking-widest mb-2.5 px-4"
+        style={{ textTransform: 'uppercase' }}
       >
         Leídos recientemente
       </Text>

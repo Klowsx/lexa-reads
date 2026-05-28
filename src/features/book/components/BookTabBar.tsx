@@ -38,9 +38,8 @@ export function BookTabBar({ activeTab, onChange }: BookTabBarProps) {
             }}
           >
             <Text
+              className={active ? "font-body-sb text-xs" : "font-body text-xs"}
               style={{
-                fontFamily: active ? "DMSans_600SemiBold" : "DMSans_400Regular",
-                fontSize: 12,
                 color: active ? raw.text : raw.t3,
               }}
             >

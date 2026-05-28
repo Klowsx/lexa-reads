@@ -48,14 +48,14 @@ module.exports = {
       },
 
       fontSize: {
-        xs:   [11, { lineHeight: '14px' }],
-        sm:   [13, { lineHeight: '18px' }],
-        base: [15, { lineHeight: '22px' }],
-        md:   [17, { lineHeight: '24px' }],
-        lg:   [20, { lineHeight: '26px' }],
-        xl:   [22, { lineHeight: '28px' }],
-        '2xl':[28, { lineHeight: '34px' }],
-        '3xl':[34, { lineHeight: '40px' }],
+        xs:   [16, { lineHeight: '20px' }],
+        sm:   [18, { lineHeight: '24px' }],
+        base: [20, { lineHeight: '28px' }],
+        md:   [22, { lineHeight: '30px' }],
+        lg:   [26, { lineHeight: '32px' }],
+        xl:   [30, { lineHeight: '38px' }],
+        '2xl':[36, { lineHeight: '44px' }],
+        '3xl':[44, { lineHeight: '52px' }],
       },
 
       letterSpacing: {

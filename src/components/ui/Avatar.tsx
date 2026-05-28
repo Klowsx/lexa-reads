@@ -27,9 +27,9 @@ export function Avatar({ user, size = 34 }: AvatarProps) {
       }}
     >
       <Text
+        className="font-body-sb"
         style={{
           fontSize: size * 0.33,
-          fontFamily: 'DMSans_600SemiBold',
           color: user.avC,
         }}
       >
