@@ -68,6 +68,11 @@
     "typescript": "~5.9.2"
   },
   "private": true,
+  "overrides": {
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "react-test-renderer": "19.2.6"
+  },
   "pnpm": {
     "overrides": {
       "@expo/metro-runtime": "~6.1.2"
