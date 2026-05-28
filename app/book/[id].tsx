@@ -1,29 +1,21 @@
+import { useState } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useBook } from "~/features/book/hooks/useBook";
+import { BookCommunityTab } from "~/features/book/components/BookCommunityTab";
+import { BookCtaBar } from "~/features/book/components/BookCtaBar";
+import { BookHero } from "~/features/book/components/BookHero";
+import { BookReviewsTab } from "~/features/book/components/BookReviewsTab";
+import { BookSimilarTab } from "~/features/book/components/BookSimilarTab";
+import { BookSummaryTab } from "~/features/book/components/BookSummaryTab";
+import { BookTabBar, type BookTab } from "~/features/book/components/BookTabBar";
 import { useDeleteUserBook } from "~/features/library/hooks/useDeleteUserBook";
 import { useUpsertUserBook } from "~/features/library/hooks/useUpsertUserBook";
 import { useUserBook } from "~/features/library/hooks/useUserBook";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { ChevronLeft } from "lucide-react-native";
-import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  useColorScheme,
-  View,
-} from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { BookCover } from "~/components/ui/BookCover";
-import { useBook } from "~/features/book/hooks/useBook";
-import { type BookStatus, STATUS_META, STATUS_ORDER } from "~/lib/book-status";
+import { type BookStatus } from "~/lib/book-status";
 import { fixed, rawDark, rawLight } from "~/theme/colors";
-
-const STAR = fixed.star;
-
-const alpha = (hex: string, op: number) => {
-  const n = parseInt(hex.replace("#", ""), 16);
-  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})`;
-};
+import { useColorScheme } from "react-native";
 
 export default function BookDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -32,14 +24,16 @@ export default function BookDetailScreen() {
   const raw = scheme === "dark" ? rawDark : rawLight;
   const insets = useSafeAreaInsets();
 
-  const { data: book, isLoading } = useBook(id);
+  const [activeTab, setActiveTab] = useState<BookTab>(0);
 
+  const { data: book, isLoading } = useBook(id);
   const { data: userBook } = useUserBook(book?.id ?? "");
   const upsertMutation = useUpsertUserBook(book?.id ?? "");
   const deleteMutation = useDeleteUserBook(book?.id ?? "");
 
   const status = (userBook?.status as BookStatus) ?? null;
   const rating = userBook?.rating ?? null;
+  const isPending = upsertMutation.isPending || deleteMutation.isPending;
 
   function handleStatusClick(s: BookStatus) {
     if (!book) return;
@@ -50,9 +44,18 @@ export default function BookDetailScreen() {
     }
   }
 
+  function handleCtaStatusPress() {
+    if (!book) return;
+    if (!status) {
+      upsertMutation.mutate({ bookId: book.id, status: "want_to_read", rating });
+    } else {
+      // Navigate to Resumen tab where user can change status
+      setActiveTab(0);
+    }
+  }
+
   function handleRatingClick(i: number) {
     if (!book) return;
-    // Estrella llena → baja a media; cualquier otro caso → sube/baja a i completa
     const newRating = rating === i ? i - 0.5 : i;
     upsertMutation.mutate({
       bookId: book.id,
@@ -61,9 +64,21 @@ export default function BookDetailScreen() {
     });
   }
 
+  function handleRatingButtonPress() {
+    setActiveTab(0);
+  }
+
   if (isLoading) {
     return (
-      <View className="flex-1 bg-bg items-center justify-center">
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: raw.bg,
+          alignItems: "center",
+          justifyContent: "center",
+          paddingTop: insets.top,
+        }}
+      >
         <ActivityIndicator color={fixed.accent} />
       </View>
     );
@@ -71,14 +86,33 @@ export default function BookDetailScreen() {
 
   if (!book) {
     return (
-      <View className="flex-1 bg-bg items-center justify-center px-8">
-        <Text className="font-body text-t2 text-center">
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: raw.bg,
+          alignItems: "center",
+          justifyContent: "center",
+          paddingHorizontal: 32,
+          paddingTop: insets.top,
+        }}
+      >
+        <Text
+          style={{
+            fontFamily: "DMSans_400Regular",
+            fontSize: 15,
+            color: raw.t2,
+            textAlign: "center",
+          }}
+        >
           No se encontró el libro.
         </Text>
-        <Pressable onPress={() => router.back()} className="mt-4">
+        <Pressable onPress={() => router.back()} style={{ marginTop: 16 }}>
           <Text
-            className="font-body-sb text-sm"
-            style={{ color: fixed.accent }}
+            style={{
+              fontFamily: "DMSans_600SemiBold",
+              fontSize: 14,
+              color: fixed.accent,
+            }}
           >
             Volver
           </Text>
@@ -87,284 +121,51 @@ export default function BookDetailScreen() {
     );
   }
 
-  const year = book.published_date?.slice(0, 4);
-
   return (
-    <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
-      {/* Back button */}
-      <Pressable
-        onPress={() => router.back()}
-        hitSlop={8}
-        className="flex-row items-center gap-1 px-4 py-3"
-      >
-        <ChevronLeft size={20} color={raw.t3} strokeWidth={1.6} />
-        <Text className="font-body text-sm text-t2">Volver</Text>
-      </Pressable>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: raw.bg,
+        paddingTop: insets.top,
+      }}
+    >
+      {/* Hero — fixed height, immersive */}
+      <BookHero book={book} onBack={() => router.back()} />
 
+      {/* CTA bar — sticky below hero */}
+      <BookCtaBar
+        book={book}
+        status={status}
+        rating={rating}
+        userBook={userBook ?? null}
+        isPending={isPending}
+        onStatusPress={handleCtaStatusPress}
+        onRatingPress={handleRatingButtonPress}
+      />
+
+      {/* Tab bar — sticky */}
+      <BookTabBar activeTab={activeTab} onChange={setActiveTab} />
+
+      {/* Tab content — scrollable */}
       <ScrollView
+        style={{ flex: 1 }}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
       >
-        {/* Hero */}
-        <View className="items-center px-6 pt-2 pb-6">
-          <BookCover book={book} width={120} height={180} />
-          <Text
-            className="font-display-sb text-xl text-text text-center mt-5 leading-tight"
-            numberOfLines={4}
-          >
-            {book.title}
-          </Text>
-          <Text className="font-body text-base text-t2 text-center mt-1.5">
-            {book.authors?.join(", ")}
-          </Text>
-          {book.page_count || year ? (
-            <Text className="font-body text-sm text-t3 mt-1">
-              {[book.page_count ? `${book.page_count} págs` : null, year]
-                .filter(Boolean)
-                .join(" · ")}
-            </Text>
-          ) : null}
-        </View>
-
-        {/* Status buttons */}
-        <View className="px-5 mb-4">
-          <Text
-            className="text-xs text-t3 mb-2.5 tracking-widest"
-            style={{
-              fontFamily: "DMSans_600SemiBold",
-              textTransform: "uppercase",
-            }}
-          >
-            Estado
-          </Text>
-          <View className="flex-row flex-wrap gap-1.5">
-            {STATUS_ORDER.map((s) => {
-              const meta = STATUS_META[s];
-              const active = status === s;
-              return (
-                <Pressable
-                  key={s}
-                  onPress={() => handleStatusClick(s)}
-                  disabled={
-                    upsertMutation.isPending || deleteMutation.isPending
-                  }
-                  style={{
-                    paddingHorizontal: 14,
-                    paddingVertical: 7,
-                    borderRadius: 100,
-                    backgroundColor: active ? alpha(meta.color, 0.15) : raw.sh,
-                    borderWidth: 1.5,
-                    borderColor: active ? meta.color : raw.border,
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 13,
-                      fontFamily: active
-                        ? "DMSans_500Medium"
-                        : "DMSans_400Regular",
-                      color: active ? meta.color : raw.t2,
-                    }}
-                  >
-                    {meta.label}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
-        </View>
-
-        {/* Rating */}
-        <View
-          className="mx-5 mb-4 rounded-md p-3.5"
-          style={{
-            backgroundColor: raw.sr,
-            borderWidth: 1,
-            borderColor: raw.border,
-          }}
-        >
-          <Text
-            className="text-xs text-t3 tracking-wider mb-2"
-            style={{
-              fontFamily: "DMSans_600SemiBold",
-              textTransform: "uppercase",
-            }}
-          >
-            Mi rating
-          </Text>
-          <View className="flex-row items-center gap-2.5">
-            <View className="flex-row">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <TouchableOpacity
-                  key={i}
-                  onPress={() => handleRatingClick(i)}
-                  disabled={
-                    upsertMutation.isPending || deleteMutation.isPending
-                  }
-                  hitSlop={4}
-                >
-                  <View style={{ position: "relative", width: 34, height: 32 }}>
-                    {/* estrella vacía de fondo */}
-                    <Text style={{ position: "absolute", fontSize: 30, lineHeight: 32, color: alpha(STAR, 0.2) }}>
-                      ★
-                    </Text>
-                    {/* media estrella */}
-                    {rating != null && rating === i - 0.5 && (
-                      <View style={{ position: "absolute", width: 17, overflow: "hidden" }}>
-                        <Text style={{ fontSize: 30, lineHeight: 32, color: STAR }}>★</Text>
-                      </View>
-                    )}
-                    {/* estrella completa */}
-                    {rating != null && rating >= i && (
-                      <Text style={{ position: "absolute", fontSize: 30, lineHeight: 32, color: STAR }}>
-                        ★
-                      </Text>
-                    )}
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </View>
-            {rating != null && (
-              <Text
-                style={{
-                  fontSize: 22,
-                  fontFamily: "DMSans_600SemiBold",
-                  color: STAR,
-                }}
-              >
-                {rating}
-              </Text>
-            )}
-          </View>
-        </View>
-
-        {/* CTA: escribir reseña */}
-        <View className="px-5 mb-5">
-          <TouchableOpacity
-            className="rounded-md items-center py-3.5"
-            style={{ backgroundColor: fixed.accent }}
-            activeOpacity={0.85}
-          >
-            <Text className="text-sm font-body-sb" style={{ color: "#fff" }}>
-              Escribir reseña
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Sinopsis */}
-        {book.description ? (
-          <View className="px-5 mb-5">
-            <Text
-              className="text-xs text-t3 tracking-wider mb-2"
-              style={{
-                fontFamily: "DMSans_600SemiBold",
-                textTransform: "uppercase",
-              }}
-            >
-              Sinopsis
-            </Text>
-            <Text className="font-body text-sm text-t2 leading-relaxed">
-              {book.description}
-            </Text>
-          </View>
-        ) : null}
-
-        {/* Géneros */}
-        {book.genres && book.genres.length > 0 ? (
-          <View className="px-5 mb-5">
-            <Text
-              className="text-xs text-t3 tracking-wider mb-2"
-              style={{
-                fontFamily: "DMSans_600SemiBold",
-                textTransform: "uppercase",
-              }}
-            >
-              Géneros
-            </Text>
-            <View className="flex-row flex-wrap gap-1.5">
-              {book.genres.map((g) => (
-                <Text
-                  key={g}
-                  className="text-xs font-body text-t3 px-2.5 py-1 rounded-sm"
-                  style={{
-                    backgroundColor: raw.sh,
-                    borderWidth: 1,
-                    borderColor: raw.border,
-                  }}
-                >
-                  {g}
-                </Text>
-              ))}
-            </View>
-          </View>
-        ) : null}
-
-        {/* Detalles */}
-        <View className="px-5 mb-5">
-          <Text
-            className="text-xs text-t3 tracking-wider mb-2"
-            style={{
-              fontFamily: "DMSans_600SemiBold",
-              textTransform: "uppercase",
-            }}
-          >
-            Detalles
-          </Text>
-          <View
-            className="rounded-md overflow-hidden"
-            style={{ borderWidth: 1, borderColor: raw.border }}
-          >
-            {[
-              { label: "Editorial", value: book.publisher },
-              { label: "Publicado", value: book.published_date },
-              { label: "Idioma", value: book.language?.toUpperCase() },
-              { label: "ISBN-13", value: book.isbn_13 },
-            ]
-              .filter((row) => row.value)
-              .map((row, i, arr) => (
-                <View
-                  key={row.label}
-                  className="flex-row justify-between px-3.5 py-2.5"
-                  style={{
-                    backgroundColor: i % 2 === 0 ? raw.sr : "transparent",
-                    borderBottomWidth: i < arr.length - 1 ? 1 : 0,
-                    borderColor: raw.border,
-                  }}
-                >
-                  <Text className="font-body text-sm text-t3">{row.label}</Text>
-                  <Text className="font-body text-sm text-t2">{row.value}</Text>
-                </View>
-              ))}
-          </View>
-        </View>
-
-        {/* Reseñas — placeholder */}
-        <View className="px-5">
-          <Text
-            className="text-xs text-t3 tracking-wider mb-3"
-            style={{
-              fontFamily: "DMSans_600SemiBold",
-              textTransform: "uppercase",
-            }}
-          >
-            Reseñas
-          </Text>
-          <View
-            className="rounded-md items-center py-8"
-            style={{
-              backgroundColor: raw.sr,
-              borderWidth: 1,
-              borderColor: raw.border,
-            }}
-          >
-            <Text className="font-body text-sm text-t3">
-              Todavía no hay reseñas.
-            </Text>
-            <Text className="font-body text-xs text-t3 mt-1">
-              ¡Sé el primero en escribir una!
-            </Text>
-          </View>
-        </View>
+        {activeTab === 0 && (
+          <BookSummaryTab
+            book={book}
+            status={status}
+            rating={rating}
+            isPending={isPending}
+            onStatusClick={handleStatusClick}
+            onRatingClick={handleRatingClick}
+            onWriteReview={() => setActiveTab(1)}
+          />
+        )}
+        {activeTab === 1 && <BookReviewsTab />}
+        {activeTab === 2 && <BookCommunityTab />}
+        {activeTab === 3 && <BookSimilarTab />}
       </ScrollView>
     </View>
   );
