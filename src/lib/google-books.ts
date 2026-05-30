@@ -118,24 +118,56 @@ async function fetchSearchFromApi(
   query: string,
   maxResults = 10,
 ): Promise<GBVolume[]> {
-  const params = buildParams({ q: query, maxResults });
+  // printType=books excluye revistas y documentos; orderBy=relevance pone los más
+  // relevantes primero. Pedimos el doble para compensar el post-filtro de basura.
+  const params = buildParams({
+    q: query,
+    maxResults: Math.min(maxResults * 2, 40),
+    printType: "books",
+    orderBy: "relevance",
+  });
   const url = `${BASE_URL}/volumes?${params}`;
   const res = await fetch(url);
   if (!res.ok) return [];
   const json = (await res.json()) as GBSearchResponse;
-  return json.items ?? [];
+
+  // Conservar solo libros reales: deben tener autor Y (portada o ISBN).
+  // Encuestas, informes y documentos internos raramente tienen portada o ISBN en GB.
+  const items = (json.items ?? []).filter((v) => {
+    const info = v.volumeInfo;
+    if (!info.title || (info.authors?.length ?? 0) === 0) return false;
+    const hasCover = !!(info.imageLinks?.thumbnail ?? info.imageLinks?.smallThumbnail);
+    const hasIsbn = info.industryIdentifiers?.some(
+      (id) => id.type === "ISBN_10" || id.type === "ISBN_13",
+    );
+    return hasCover || hasIsbn;
+  });
+  return items.slice(0, maxResults);
 }
 
 // Paso interno: guarda un array de volúmenes en la tabla local.
-// Usa upsert para no fallar si el libro ya existe (race condition).
+// Usa INSERT ... ON CONFLICT DO NOTHING (ignoreDuplicates) para evitar requerir
+// una política RLS de UPDATE en la tabla books (los datos del catálogo son inmutables).
+// Luego refetch por google_books_id para devolver tanto los recién insertados
+// como los que ya existían (que el DO NOTHING omite del select del upsert).
 async function upsertBooks(volumes: GBVolume[]): Promise<BookRow[]> {
   if (volumes.length === 0) return [];
   const rows = volumes.map(mapVolumeToRow);
-  const { data, error } = await supabase
+
+  const { error } = await supabase
     .from("books")
-    .upsert(rows, { onConflict: "google_books_id" })
-    .select();
+    .upsert(rows, { onConflict: "google_books_id", ignoreDuplicates: true });
   if (error) throw error;
+
+  const ids = rows
+    .map((r) => r.google_books_id)
+    .filter((id): id is string => id != null);
+  if (ids.length === 0) return [];
+
+  const { data } = await supabase
+    .from("books")
+    .select("*")
+    .in("google_books_id", ids);
   return data ?? [];
 }
 
@@ -183,25 +215,24 @@ export async function searchBooks(
   query: string,
   {
     maxResults = 10,
-    minLocalResults = 3,
+    minLocalResults = 1,
   }: { maxResults?: number; minLocalResults?: number } = {},
 ): Promise<BookRow[]> {
   // Paso 1: buscar en la DB local por título usando el índice GIN pg_trgm.
-  // No filtramos por authors porque `cs` es containment exacto y no sirve
-  // para búsquedas parciales; la API de Google Books cubre ese caso.
   const { data: localResults } = await supabase
     .from("books")
     .select("*")
     .ilike("title", `%${query}%`)
     .limit(maxResults);
 
-  // Si ya tenemos suficientes resultados locales, los retornamos
-  // sin gastar quota de la API externa.
-  if ((localResults?.length ?? 0) >= minLocalResults) {
-    return localResults ?? [];
+  // Si ya hay resultados locales, los deduplicamos y retornamos sin gastar
+  // quota de la API. minLocalResults=1: cualquier hit en caché es suficiente.
+  const localDeduped = deduplicateBooks(localResults ?? []);
+  if (localDeduped.length >= minLocalResults) {
+    return localDeduped.slice(0, maxResults);
   }
 
-  // Paso 2: complementar con la API de Google Books
+  // Paso 2: sin resultados locales → ir a la API de Google Books
   const apiVolumes = await fetchSearchFromApi(query, maxResults);
 
   // Paso 3: filtrar solo los que no están ya en la DB local

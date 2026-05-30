@@ -1,10 +1,12 @@
-﻿import { useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { Settings } from 'lucide-react-native';
 import { useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Avatar } from '~/components/ui/Avatar';
 import { BookDetailSheet } from '~/features/book/components/BookDetailSheet';
+import { CurrentlyReading } from '~/features/user/components/CurrentlyReading';
+import { EditProfileSheet } from '~/features/user/components/EditProfileSheet';
+import { IdentityCard } from '~/features/user/components/IdentityCard';
 import { ProfileLists } from '~/features/user/components/ProfileLists';
 import { ProfileStats } from '~/features/user/components/ProfileStats';
 import { ReadingGoal } from '~/features/user/components/ReadingGoal';
@@ -17,7 +19,9 @@ export default function ProfileScreen() {
   const router = useRouter();
   const c = useColors();
   const [selectedBook, setSelectedBook] = useState<MockBook | null>(null);
+  const [showEdit, setShowEdit] = useState(false);
 
+  const readingBooks = MY_BOOKS.filter((b) => b.status === 'reading');
   const booksRead = MY_BOOKS.filter((b) => b.status === 'read').length;
   const recentReads = MY_BOOKS.filter((b) => b.status === 'read').slice(0, 4);
 
@@ -34,15 +38,7 @@ export default function ProfileScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 72 }}
       >
-        {/* Avatar + info */}
-        <View className="flex-row gap-4 items-center px-4 pb-5">
-          <Avatar user={ME} size={72} />
-          <View className="flex-1">
-            <Text className="text-md font-body-sb text-text">{ME.name}</Text>
-            <Text className="text-sm font-body text-t2 mt-0.5">@{ME.username}</Text>
-            <Text className="text-xs font-body text-t3 mt-1.5">{ME.bio}</Text>
-          </View>
-        </View>
+        <IdentityCard user={ME} onEditPress={() => setShowEdit(true)} />
 
         <ProfileStats
           books={ME.books}
@@ -51,10 +47,13 @@ export default function ProfileScreen() {
           following={ME.following}
         />
 
+        <CurrentlyReading books={readingBooks} onPress={setSelectedBook} />
+
         <ReadingGoal
           booksRead={booksRead}
           goal={ME.goal}
           goalYear={ME.goalYear}
+          onEditGoal={() => router.push('/settings')}
         />
 
         <RecentReads books={recentReads} onPress={setSelectedBook} />
@@ -62,8 +61,12 @@ export default function ProfileScreen() {
         <ProfileLists lists={MOCK_LISTS} />
       </ScrollView>
 
+      {showEdit && (
+        <EditProfileSheet user={ME} onClose={() => setShowEdit(false)} />
+      )}
+
       {selectedBook && (
-        <BookDetailSheet book={selectedBook} onClose={() => setSelectedBook(null)} />
+        <BookDetailSheet book={selectedBook as any} onClose={() => setSelectedBook(null)} />
       )}
     </View>
   );

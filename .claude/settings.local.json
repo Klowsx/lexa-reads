@@ -83,7 +83,8 @@
       "Bash(git rm *)",
       "mcp__plugin_engram_engram__mem_search",
       "Bash(Select-Object FullName)",
-      "PowerShell(pnpm tsc *)"
+      "PowerShell(pnpm tsc *)",
+      "mcp__plugin_engram_engram__mem_save"
     ]
   }
 }

@@ -134,7 +134,20 @@ export const FEED_INIT: MockFeedItem[] = [
   { id: 'f6', user: USERS[1], type: 'finished_book',  book: BOOKS[6], rating: 4.5,  time: '2d',   preview: 'Absolutamente fascinante. Clarke construye un mundo que parece imposible pero se siente inevitable. Un logro extraordinario.', likes: 19, comments: 5, liked: false },
 ];
 
-export const MOCK_LISTS = [
-  { name: 'Lista de verano',   count: 4, visibility: 'Pública' },
-  { name: 'Dark Academia 2026', count: 7, visibility: 'Pública' },
+export type MockList = {
+  name: string;
+  count: number;
+  visibility: string;
+  col: string;
+};
+
+export const MOCK_LISTS: MockList[] = [
+  { name: 'Lista de verano',    count: 4,  visibility: 'Pública', col: '#4A96B8' },
+  { name: 'Dark Academia 2026', count: 7,  visibility: 'Pública', col: '#8A6CD8' },
+  { name: 'Pendientes',         count: 12, visibility: 'Privada', col: '#6A635C' },
 ];
+
+export const READING_PROGRESS: Record<number, { current: number; total: number }> = {
+  1: { current: 287, total: 662 },
+  6: { current: 102, total: 545 },
+};
