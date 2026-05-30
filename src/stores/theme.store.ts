@@ -1,17 +1,11 @@
 import { create } from "zustand";
-import { createMMKV } from "react-native-mmkv";
 import { Appearance, Platform } from "react-native";
+import * as SecureStore from "expo-secure-store";
 
 export type ThemeMode = "light" | "dark" | "system";
 type Scheme = "light" | "dark";
 
-const storage = createMMKV({ id: "lexa.prefs" });
 const KEY = "theme.mode";
-
-function load(): ThemeMode {
-  const v = storage.getString(KEY);
-  return v === "light" || v === "dark" || v === "system" ? v : "system";
-}
 
 function resolve(mode: ThemeMode): Scheme {
   if (mode === "system") return Appearance.getColorScheme() ?? "light";
@@ -26,7 +20,6 @@ function apply(scheme: Scheme, mode: ThemeMode) {
     el?.classList.toggle("dark", scheme === "dark");
     return;
   }
-  // En native: liberar override en "system", forzar en los otros.
   Appearance.setColorScheme(mode === "system" ? null : scheme);
 }
 
@@ -36,10 +29,23 @@ interface ThemeState {
   setMode: (mode: ThemeMode) => void;
 }
 
+async function loadMode(): Promise<ThemeMode> {
+  try {
+    const v = await SecureStore.getItemAsync(KEY);
+    if (v === "light" || v === "dark" || v === "system") return v;
+  } catch {}
+  return "system";
+}
+
 export const useThemeStore = create<ThemeState>((set, get) => {
-  const initialMode = load();
-  const initialScheme = resolve(initialMode);
-  apply(initialScheme, initialMode);
+  const initialScheme = resolve("system");
+  apply(initialScheme, "system");
+
+  loadMode().then((mode) => {
+    const scheme = resolve(mode);
+    apply(scheme, mode);
+    set({ mode, scheme });
+  });
 
   Appearance.addChangeListener(() => {
     if (get().mode !== "system") return;
@@ -49,10 +55,10 @@ export const useThemeStore = create<ThemeState>((set, get) => {
   });
 
   return {
-    mode: initialMode,
+    mode: "system",
     scheme: initialScheme,
-    setMode: (mode) => {
-      storage.set(KEY, mode);
+    setMode: async (mode) => {
+      await SecureStore.setItemAsync(KEY, mode);
       const s = resolve(mode);
       apply(s, mode);
       set({ mode, scheme: s });

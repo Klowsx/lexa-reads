@@ -65,16 +65,16 @@ export function FeedCard({ item, onLike }: FeedCardProps) {
 
           <View style={{ flex: 1, minWidth: 0 }}>
             <Text numberOfLines={1}>
-              <Text style={{ fontFamily: 'DMSans_600SemiBold', fontSize: 14, color: raw.text }}>
+              <Text className="font-body-sb text-sm" style={{ color: raw.text }}>
                 {item.user.name}
               </Text>
-              <Text style={{ fontFamily: 'DMSans_400Regular', fontSize: 13, color: raw.t3 }}>
+              <Text className="font-body text-xs" style={{ color: raw.t3 }}>
                 {'  @'}{item.user.username}
               </Text>
             </Text>
           </View>
 
-          <Text style={{ fontFamily: 'DMSans_400Regular', fontSize: 12, color: raw.t3, flexShrink: 0 }}>
+          <Text className="font-body text-xs" style={{ color: raw.t3, flexShrink: 0 }}>
             {item.time}
           </Text>
 
@@ -115,10 +115,9 @@ export function FeedCard({ item, onLike }: FeedCardProps) {
             {/* Text content */}
             <View style={{ flex: 1, justifyContent: 'flex-end', paddingLeft: 12, paddingRight: 8, paddingBottom: 12 }}>
               <Text
+                className="font-display text-xs"
                 style={{
-                  fontSize: 11,
                   lineHeight: 15,
-                  fontFamily: 'PlayfairDisplay_400Regular',
                   color: 'rgba(240,234,226,0.92)',
                 }}
                 numberOfLines={6}
@@ -126,9 +125,8 @@ export function FeedCard({ item, onLike }: FeedCardProps) {
                 {item.book.title}
               </Text>
               <Text
+                className="font-body text-xs"
                 style={{
-                  fontSize: 9,
-                  fontFamily: 'DMSans_400Regular',
                   color: 'rgba(240,234,226,0.45)',
                   marginTop: 5,
                 }}
@@ -151,7 +149,7 @@ export function FeedCard({ item, onLike }: FeedCardProps) {
             paddingHorizontal: 10,
             paddingVertical: 5,
           }}>
-            <Text style={{ fontFamily: 'DMSans_500Medium', fontSize: 11, color: activityColor }}>
+            <Text className="font-body-md text-xs" style={{ color: activityColor }}>
               {ACTIVITY_LABEL[item.type]}
             </Text>
           </View>
@@ -169,7 +167,7 @@ export function FeedCard({ item, onLike }: FeedCardProps) {
               paddingHorizontal: 8,
               paddingVertical: 4,
             }}>
-              <Text style={{ fontFamily: 'DMSans_400Regular', fontSize: 10, color: raw.t2 }} numberOfLines={1}>
+              <Text className="font-body text-xs" style={{ color: raw.t2 }} numberOfLines={1}>
                 {item.listName}
               </Text>
             </View>
@@ -193,7 +191,7 @@ export function FeedCard({ item, onLike }: FeedCardProps) {
               fill={item.liked ? fixed.accent : 'none'}
               strokeWidth={1.7}
             />
-            <Text style={{ fontFamily: 'DMSans_500Medium', fontSize: 13, color: item.liked ? fixed.accent : raw.t2 }}>
+            <Text className="font-body-md text-xs" style={{ color: item.liked ? fixed.accent : raw.t2 }}>
               {item.likes}
             </Text>
           </Pressable>
@@ -201,7 +199,7 @@ export function FeedCard({ item, onLike }: FeedCardProps) {
           {/* Comment */}
           <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }} hitSlop={8}>
             <MessageCircle size={21} color={raw.t2} strokeWidth={1.7} />
-            <Text style={{ fontFamily: 'DMSans_400Regular', fontSize: 13, color: raw.t2 }}>
+            <Text className="font-body text-xs" style={{ color: raw.t2 }}>
               {item.comments}
             </Text>
           </Pressable>
@@ -229,7 +227,7 @@ export function FeedCard({ item, onLike }: FeedCardProps) {
             hitSlop={8}
           >
             <BookOpen size={13} color={fixed.accent} strokeWidth={2} />
-            <Text style={{ fontFamily: 'DMSans_500Medium', fontSize: 12, color: fixed.accent }}>
+            <Text className="font-body-md text-xs" style={{ color: fixed.accent }}>
               Vistazo
             </Text>
           </Pressable>
@@ -241,21 +239,21 @@ export function FeedCard({ item, onLike }: FeedCardProps) {
           {item.rating != null ? (
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
               <StarRating rating={item.rating} size={13} />
-              <Text style={{ fontFamily: 'DMSans_600SemiBold', fontSize: 13, color: fixed.star }}>
+              <Text className="font-body-sb text-xs" style={{ color: fixed.star }}>
                 {item.rating}
               </Text>
             </View>
           ) : null}
 
           {/* Activity summary */}
-          <Text style={{ fontFamily: 'DMSans_400Regular', fontSize: 13, color: raw.t2, lineHeight: 19 }}>
-            <Text style={{ fontFamily: 'DMSans_600SemiBold', color: raw.text }}>
+          <Text className="font-body text-xs" style={{ color: raw.t2, lineHeight: 19 }}>
+            <Text className="font-body-sb" style={{ color: raw.text }}>
               {item.user.username}
             </Text>
             {'  '}
             <Text style={{ color: raw.t2 }}>{ACT_LABEL[item.type]}</Text>
             {'  '}
-            <Text style={{ fontFamily: 'PlayfairDisplay_400Regular_Italic', color: raw.text }}>
+            <Text className="font-display-i" style={{ color: raw.text }}>
               &ldquo;{item.book.title}&rdquo;
             </Text>
             {item.type === 'added_to_list' && item.listName ? (
@@ -271,7 +269,8 @@ export function FeedCard({ item, onLike }: FeedCardProps) {
           {/* Review preview */}
           {item.preview ? (
             <Text
-              style={{ fontFamily: 'DMSans_400Regular', fontSize: 13, color: raw.t2, lineHeight: 19 }}
+              className="font-body text-xs"
+              style={{ color: raw.t2, lineHeight: 19 }}
               numberOfLines={3}
             >
               {item.preview}

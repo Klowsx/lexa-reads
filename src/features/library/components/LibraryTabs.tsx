@@ -32,22 +32,18 @@ export function LibraryTabs({ activeTab, countByStatus, onTabChange }: Props) {
             }}
           >
             <Text
+              className={active ? 'font-body-sb text-sm' : 'font-body-sb text-sm text-t3'}
               style={{
-                fontSize: 16,
-                fontFamily: 'DMSans_600SemiBold',
                 color: active ? meta.color : undefined,
               }}
-              className={active ? '' : 'text-t3'}
             >
               {countByStatus[status]}
             </Text>
             <Text
+              className={active ? 'font-body-sb text-xs' : 'font-body text-xs text-t3'}
               style={{
-                fontSize: 10,
-                fontFamily: active ? 'DMSans_600SemiBold' : 'DMSans_400Regular',
                 color: active ? meta.color : undefined,
               }}
-              className={active ? '' : 'text-t3'}
             >
               {shortLabel}
             </Text>

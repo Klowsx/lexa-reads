@@ -81,7 +81,9 @@
       "Bash(eas build:logs 2609a290-0266-4b47-98e4-df7a49d2eb7f)",
       "Bash(eas --help)",
       "Bash(git rm *)",
-      "mcp__plugin_engram_engram__mem_search"
+      "mcp__plugin_engram_engram__mem_search",
+      "Bash(Select-Object FullName)",
+      "PowerShell(pnpm tsc *)"
     ]
   }
 }

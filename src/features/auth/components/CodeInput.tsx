@@ -25,7 +25,7 @@ export function CodeInput({ value, length = 6 }: Props) {
             ]}
           >
             {filled ? (
-              <Text className="font-display-sb text-text" style={styles.digitSize}>{d}</Text>
+              <Text className="font-display-sb text-lg text-text">{d}</Text>
             ) : isActive ? (
               <View style={[styles.cursor, { backgroundColor: c.accent }]} />
             ) : null}
@@ -40,9 +40,6 @@ const styles = StyleSheet.create({
   cellBorder: {
     borderWidth: 1.5,
     borderColor: 'transparent',
-  },
-  digitSize: {
-    fontSize: 24,
   },
   cursor: {
     width: 1.5,

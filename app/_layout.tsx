@@ -13,14 +13,14 @@ import {
   DMSans_600SemiBold,
 } from "@expo-google-fonts/dm-sans";
 import { useEffect } from "react";
-import { AppState, Platform } from "react-native";
+import { AppState, Platform, View } from "react-native";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { QueryClientProvider, focusManager } from "@tanstack/react-query";
 import { I18nextProvider } from "react-i18next";
 import { useFonts } from "expo-font";
 import { supabase } from "~/lib/supabase";
 import { useAuthStore } from "~/stores/auth.store";
-import "~/stores/theme.store";
+import { useThemeStore } from "~/stores/theme.store";
 import { queryClient } from "~/lib/query-client";
 import i18n from "~/lib/i18n";
 
@@ -52,6 +52,7 @@ function RootLayout() {
   const setLoading = useAuthStore((s) => s.setLoading);
   const setRecoveryMode = useAuthStore((s) => s.setRecoveryMode);
   const isAuthLoading = useAuthStore((s) => s.isLoading);
+  const scheme = useThemeStore((s) => s.scheme);
 
   const [fontsLoaded] = useFonts({
     PlayfairDisplay_400Regular,
@@ -91,12 +92,14 @@ function RootLayout() {
   if (!fontsLoaded || isAuthLoading) return null;
 
   return (
-    <I18nextProvider i18n={i18n}>
-      <QueryClientProvider client={queryClient}>
-        <AuthGate />
-        <Stack screenOptions={{ headerShown: false }} />
-      </QueryClientProvider>
-    </I18nextProvider>
+    <View className={`flex-1${scheme === "dark" ? " dark" : ""}`}>
+      <I18nextProvider i18n={i18n}>
+        <QueryClientProvider client={queryClient}>
+          <AuthGate />
+          <Stack screenOptions={{ headerShown: false }} />
+        </QueryClientProvider>
+      </I18nextProvider>
+    </View>
   );
 }
 

@@ -76,7 +76,7 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
                 <Text className="font-body text-sm text-t2 mb-2">{book.authors?.join(', ')}</Text>
                 <View className="flex-row items-center gap-1.5 mb-1.5">
                   <StarRating rating={111} size={13} />
-                  <Text style={{ fontSize: 13, fontFamily: 'DMSans_600SemiBold', color: STAR }}>
+                  <Text className="font-body-sb text-xs" style={{ color: STAR }}>
                     {111}
                   </Text>
                 </View>
@@ -105,9 +105,8 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
                     }}
                   >
                     <Text
+                      className={active ? 'font-body-md text-xs' : 'font-body text-xs'}
                       style={{
-                        fontSize: 12,
-                        fontFamily: active ? 'DMSans_500Medium' : 'DMSans_400Regular',
                         color: active ? meta.color : raw.t2,
                       }}
                     >
@@ -124,8 +123,8 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
               style={{ backgroundColor: raw.sr, borderWidth: 1, borderColor: raw.border }}
             >
               <Text
-                className="text-xs text-t3 tracking-wider mb-2"
-                style={{ fontFamily: 'DMSans_600SemiBold', textTransform: 'uppercase' }}
+                className="font-body-sb text-xs text-t3 tracking-wider mb-2"
+                style={{ textTransform: 'uppercase' }}
               >
                 Mi rating
               </Text>
@@ -139,9 +138,9 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
                     >
                       <View style={{ position: 'relative', width: 34, height: 32 }}>
                         <Text
+                          className="text-xl"
                           style={{
                             position: 'absolute',
-                            fontSize: 30,
                             lineHeight: 32,
                             color: alpha(STAR, 0.2),
                           }}
@@ -150,7 +149,8 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
                         </Text>
                         {rating != null && rating >= i && (
                           <Text
-                            style={{ position: 'absolute', fontSize: 30, lineHeight: 32, color: STAR }}
+                            className="text-xl"
+                            style={{ position: 'absolute', lineHeight: 32, color: STAR }}
                           >
                             ★
                           </Text>
@@ -160,7 +160,7 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
                   ))}
                 </View>
                 {rating != null && (
-                  <Text style={{ fontSize: 22, fontFamily: 'DMSans_600SemiBold', color: STAR }}>
+                  <Text className="font-body-sb text-md" style={{ color: STAR }}>
                     {rating}
                   </Text>
                 )}
@@ -174,8 +174,8 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
             {book.description ? (
               <View className="px-5 pb-3.5">
                 <Text
-                  className="text-xs text-t3 tracking-wider mb-1.5"
-                  style={{ fontFamily: 'DMSans_600SemiBold', textTransform: 'uppercase' }}
+                  className="font-body-sb text-xs text-t3 tracking-wider mb-1.5"
+                  style={{ textTransform: 'uppercase' }}
                 >
                   Sinopsis
                 </Text>
