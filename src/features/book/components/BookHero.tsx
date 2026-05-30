@@ -26,24 +26,18 @@ export function BookHero({ book, onBack }: BookHeroProps) {
   const coverW = Math.round(coverH * 0.667);
 
   return (
-    <View style={{ position: "relative", paddingBottom: 18 }}>
+    <View className="relative pb-container">
       {/* Full-bleed gradient */}
       <LinearGradient
         colors={[ACCENT, alpha(ACCENT, 0.65), alpha(ACCENT, 0.14), raw.bg]}
         locations={[0, 0.5, 0.82, 1]}
-        style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}
+        className="absolute inset-0"
       />
 
       {/* Watermark title */}
       <View
-        style={{
-          position: "absolute",
-          inset: 0,
-          alignItems: "center",
-          justifyContent: "center",
-          overflow: "hidden",
-          pointerEvents: "none",
-        }}
+        className="absolute inset-0 items-center justify-center overflow-hidden"
+        pointerEvents="none"
       >
         <Text
           className="font-display-bold text-3xl"
@@ -63,55 +57,28 @@ export function BookHero({ book, onBack }: BookHeroProps) {
       </View>
 
       {/* Nav row */}
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          paddingHorizontal: 18,
-          paddingTop: 14,
-          zIndex: 4,
-        }}
-      >
+      <View className="flex-row justify-between items-center px-container pt-[14px] z-[4]">
         <Pressable
           onPress={onBack}
           hitSlop={10}
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: 18,
-            backgroundColor: "rgba(0,0,0,0.42)",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+          className="w-9 h-9 rounded-full items-center justify-center"
+          style={{ backgroundColor: "rgba(0,0,0,0.42)" }}
         >
           <ChevronLeft size={18} color="#fff" strokeWidth={1.9} />
         </Pressable>
 
-        <View style={{ flexDirection: "row", gap: 8 }}>
+        <View className="flex-row gap-2">
           <Pressable
             hitSlop={10}
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 18,
-              backgroundColor: "rgba(0,0,0,0.42)",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+            className="w-9 h-9 rounded-full items-center justify-center"
+            style={{ backgroundColor: "rgba(0,0,0,0.42)" }}
           >
             <Share2 size={15} color="#fff" strokeWidth={1.5} />
           </Pressable>
           <Pressable
             hitSlop={10}
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 18,
-              backgroundColor: "rgba(0,0,0,0.42)",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+            className="w-9 h-9 rounded-full items-center justify-center"
+            style={{ backgroundColor: "rgba(0,0,0,0.42)" }}
           >
             <MoreHorizontal size={15} color="#fff" strokeWidth={1.5} />
           </Pressable>
@@ -120,10 +87,8 @@ export function BookHero({ book, onBack }: BookHeroProps) {
 
       {/* Cover centered */}
       <View
+        className="items-center mt-5 z-[4]"
         style={{
-          alignItems: "center",
-          marginTop: 20,
-          zIndex: 4,
           shadowColor: "#000",
           shadowOffset: { width: 0, height: 24 },
           shadowOpacity: 0.93,
@@ -135,35 +100,16 @@ export function BookHero({ book, onBack }: BookHeroProps) {
       </View>
 
       {/* Title + author */}
-      <View
-        style={{
-          alignItems: "center",
-          paddingHorizontal: 36,
-          paddingTop: 18,
-          zIndex: 4,
-        }}
-      >
+      <View className="items-center px-9 pt-container z-[4]">
         <Text
-          className="font-display-sb text-md"
-          style={{
-            color: raw.text,
-            lineHeight: 22 * 1.2,
-            letterSpacing: -0.33,
-            textAlign: "center",
-            marginBottom: 6,
-          }}
+          className="font-display-sb text-md text-text text-center mb-1.5"
+          style={{ lineHeight: 26, letterSpacing: -0.33 }}
           numberOfLines={3}
         >
           {book.title}
         </Text>
         {book.authors && book.authors.length > 0 && (
-          <Text
-            className="font-body text-sm"
-            style={{
-              color: raw.t2,
-              marginBottom: 3,
-            }}
-          >
+          <Text className="font-body text-sm text-t2 mb-[3px]">
             {book.authors.join(", ")}
           </Text>
         )}
@@ -171,14 +117,7 @@ export function BookHero({ book, onBack }: BookHeroProps) {
 
       {/* Stats row */}
       {(book.page_count || book.published_year) && (
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            marginTop: 16,
-            zIndex: 4,
-          }}
-        >
+        <View className="flex-row justify-center mt-4 z-[4]">
           {(
             [
               book.page_count ? [`${book.page_count}p`, "páginas"] : null,
@@ -187,37 +126,25 @@ export function BookHero({ book, onBack }: BookHeroProps) {
                 : null,
             ].filter((x): x is [string, string] => x != null)
           ).map(([value, label], i, arr) => (
-              <View
-                key={label}
-                style={{
-                  alignItems: "center",
-                  paddingHorizontal: 18,
-                  borderRightWidth: i < arr.length - 1 ? 1 : 0,
-                  borderRightColor: alpha(raw.border, 0.28),
-                }}
+            <View
+              key={label}
+              className="items-center px-container"
+              style={{
+                borderRightWidth: i < arr.length - 1 ? 1 : 0,
+                borderRightColor: alpha(raw.border, 0.28),
+              }}
+            >
+              <Text
+                className="font-body-bold text-sm text-text"
+                style={{ lineHeight: 15 }}
               >
-                <Text
-                  className="font-body-bold text-sm"
-                  style={{
-                    color: raw.text,
-                    lineHeight: 15,
-                  }}
-                >
-                  {value}
-                </Text>
-                <Text
-                  className="font-body text-xs"
-                  style={{
-                    color: raw.t3,
-                    marginTop: 4,
-                    letterSpacing: 0.7,
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {label}
-                </Text>
-              </View>
-            ))}
+                {value}
+              </Text>
+              <Text className="font-body text-xs text-t3 mt-1 tracking-wide uppercase">
+                {label}
+              </Text>
+            </View>
+          ))}
         </View>
       )}
     </View>

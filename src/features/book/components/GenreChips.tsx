@@ -13,10 +13,7 @@ const GENRES = [
 export function GenreChips() {
   return (
     <View className="mb-4">
-      <Text
-        className="font-body-sb text-xs text-t3 mb-2 tracking-widest"
-        style={{ textTransform: 'uppercase' }}
-      >
+      <Text className="font-body-sb text-xs text-t3 mb-2 tracking-widest uppercase">
         Géneros
       </Text>
       <View className="flex-row flex-wrap gap-1.5">

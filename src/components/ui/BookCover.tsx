@@ -52,10 +52,10 @@ export function BookCover({ book, width = 60, height = 90 }: BookCoverProps) {
     >
       <View className="flex-1 justify-end p-1">
         <Text
+          className="font-display"
           style={{
             fontSize,
             color: "rgba(240,234,226,0.82)",
-            fontFamily: "PlayfairDisplay_400Regular",
             lineHeight: fontSize * 1.25,
           }}
           numberOfLines={3}

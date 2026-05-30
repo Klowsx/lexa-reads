@@ -33,18 +33,16 @@ export function ProfileStats({
         <Pressable
           key={label}
           onPress={onPress}
+          className="flex-1 items-center py-3.5"
           style={{
-            flex: 1,
-            alignItems: 'center',
-            paddingVertical: 14,
             borderRightWidth: i < 3 ? 1 : 0,
             borderRightColor: c.border,
           }}
         >
-          <Text className="text-lg font-body-sb text-text" style={{ lineHeight: 26 }}>
+          <Text className="text-lg font-body-sb text-text leading-[26px]">
             {value}
           </Text>
-          <Text className="text-xs font-body text-t3" style={{ marginTop: 4, letterSpacing: 0.2 }}>
+          <Text className="text-xs font-body text-t3 mt-1 tracking-wide">
             {label}
           </Text>
         </Pressable>

@@ -1,8 +1,7 @@
 import { View, Text } from "react-native";
 import { Avatar } from "~/components/ui/Avatar";
 import { StarRating } from "~/components/ui/StarRating";
-import { fixed, rawDark, rawLight } from "~/theme/colors";
-import { useColorScheme } from "react-native";
+import { fixed, useColors } from "~/theme/colors";
 import { USERS } from "~/mock";
 
 const alpha = (hex: string, op: number) => {
@@ -46,73 +45,80 @@ const STATS = [
 ];
 
 function RatingBar({ star, pct }: { star: number; pct: number }) {
-  const scheme = useColorScheme();
-  const raw = scheme === "dark" ? rawDark : rawLight;
+  const c = useColors();
 
   return (
-    <View style={{ flexDirection: "row", alignItems: "center", gap: 7, paddingVertical: 2 }}>
-      <Text className="font-body text-xs" style={{ color: raw.t3, width: 8, textAlign: "right" }}>{star}</Text>
-      <View style={{ flex: 1, height: 4, backgroundColor: raw.sh, borderRadius: 100, overflow: "hidden" }}>
-        <View style={{ height: "100%", width: `${pct}%`, backgroundColor: fixed.star, borderRadius: 100 }} />
+    <View className="flex-row items-center gap-[7px] py-[2px]">
+      <Text className="font-body text-xs text-t3" style={{ width: 8, textAlign: "right" }}>{star}</Text>
+      <View className="flex-1 h-1 bg-sh rounded-full overflow-hidden">
+        <View
+          className="h-full rounded-full"
+          style={{ width: `${pct}%`, backgroundColor: fixed.star }}
+        />
       </View>
-      <Text className="font-body text-xs" style={{ color: raw.t3, width: 26, textAlign: "left" }}>{pct}%</Text>
+      <Text className="font-body text-xs text-t3" style={{ width: 26, textAlign: "left" }}>{pct}%</Text>
     </View>
   );
 }
 
 export function BookCommunityTab() {
-  const scheme = useColorScheme();
-  const raw = scheme === "dark" ? rawDark : rawLight;
+  const c = useColors();
 
   return (
-    <View style={{ paddingBottom: 24 }}>
+    <View className="pb-6">
       {/* Stats grid */}
-      <View style={{ margin: 18, marginBottom: 14, backgroundColor: raw.surface, borderRadius: 14, borderWidth: 1, borderColor: raw.border, overflow: "hidden" }}>
-        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+      <View className="m-container mb-3.5 bg-surface rounded-card border border-border overflow-hidden">
+        <View className="flex-row flex-wrap">
           {STATS.map(({ value, label, isRating }, i) => (
             <View
               key={label}
+              className="items-center py-4 px-2.5"
               style={{
                 width: "50%",
-                alignItems: "center",
-                paddingVertical: 16,
-                paddingHorizontal: 10,
                 borderRightWidth:  i % 2 === 0 ? 1 : 0,
                 borderBottomWidth: i < 2       ? 1 : 0,
-                borderColor: raw.border,
+                borderColor: c.border,
               }}
             >
-              <Text className="font-body-bold text-md" style={{ color: isRating ? fixed.star : raw.text }}>
+              <Text className="font-body-bold text-md" style={{ color: isRating ? fixed.star : c.text }}>
                 {value}
               </Text>
-              <Text className="font-body text-xs" style={{ color: raw.t3, marginTop: 3 }}>
-                {label}
-              </Text>
+              <Text className="font-body text-xs text-t3 mt-[3px]">{label}</Text>
             </View>
           ))}
         </View>
       </View>
 
       {/* Friends activity */}
-      <View style={{ marginHorizontal: 18, marginBottom: 14, backgroundColor: raw.surface, borderRadius: 14, padding: 16, borderWidth: 1, borderColor: raw.border }}>
-        <Text className="font-body-sb text-xs" style={{ textTransform: "uppercase", letterSpacing: 1.4, color: raw.t3, marginBottom: 12 }}>
+      <View className="mx-container mb-3.5 bg-surface rounded-card p-4 border border-border">
+        <Text className="font-body-sb text-xs text-t3 uppercase tracking-wider mb-3">
           Actividad de amigos
         </Text>
         {FRIENDS.map(({ user, status, progress, detail }) => {
           const sc = STATUS_COLOR[status];
           return (
-            <View key={user.id} style={{ flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 12 }}>
+            <View key={user.id} className="flex-row items-center gap-2.5 mb-3">
               <Avatar user={user} size={30} />
-              <View style={{ flex: 1, minWidth: 0 }}>
-                <Text className="font-body-md text-xs" style={{ color: raw.text }}>{user.name}</Text>
-                <Text className="font-body text-xs" style={{ color: raw.t3, marginTop: 1 }}>{detail}</Text>
+              <View className="flex-1 min-w-0">
+                <Text className="font-body-md text-xs text-text">{user.name}</Text>
+                <Text className="font-body text-xs text-t3 mt-[1px]">{detail}</Text>
                 {status === "reading" && progress != null && (
-                  <View style={{ marginTop: 5, height: 3, backgroundColor: raw.sh, borderRadius: 100, overflow: "hidden" }}>
-                    <View style={{ height: "100%", width: `${progress * 100}%`, backgroundColor: fixed.status.reading, borderRadius: 100 }} />
+                  <View className="mt-[5px] h-[3px] bg-sh rounded-full overflow-hidden">
+                    <View
+                      className="h-full rounded-full"
+                      style={{ width: `${progress * 100}%`, backgroundColor: fixed.status.reading }}
+                    />
                   </View>
                 )}
               </View>
-              <View style={{ paddingHorizontal: 9, paddingVertical: 3, borderRadius: 100, backgroundColor: alpha(sc, 0.11) }}>
+              <View
+                className="rounded-full"
+                style={{
+                  paddingHorizontal: 9,
+                  paddingVertical: 3,
+                  backgroundColor: alpha(sc, 0.11),
+                }}
+              >
                 <Text className="font-body-md text-xs" style={{ color: sc }}>
                   {STATUS_LABEL[status]}
                 </Text>
@@ -123,17 +129,17 @@ export function BookCommunityTab() {
       </View>
 
       {/* Rating distribution */}
-      <View style={{ marginHorizontal: 18, backgroundColor: raw.surface, borderRadius: 14, padding: 16, borderWidth: 1, borderColor: raw.border }}>
-        <Text className="font-body-sb text-xs" style={{ textTransform: "uppercase", letterSpacing: 1.4, color: raw.t3, marginBottom: 12 }}>
+      <View className="mx-container bg-surface rounded-card p-4 border border-border">
+        <Text className="font-body-sb text-xs text-t3 uppercase tracking-wider mb-3">
           Distribución de ratings
         </Text>
-        <View style={{ flexDirection: "row", gap: 18, alignItems: "flex-start" }}>
-          <View style={{ alignItems: "center", flexShrink: 0 }}>
+        <View className="flex-row gap-container items-start">
+          <View className="items-center shrink-0">
             <Text className="font-display-bold text-3xl" style={{ color: fixed.star, lineHeight: 46 }}>4.5</Text>
-            <View style={{ marginTop: 4 }}><StarRating rating={4.5} size={12} /></View>
-            <Text className="font-body text-xs" style={{ color: raw.t3, marginTop: 4 }}>1,234</Text>
+            <View className="mt-1"><StarRating rating={4.5} size={12} /></View>
+            <Text className="font-body text-xs text-t3 mt-1">1,234</Text>
           </View>
-          <View style={{ flex: 1, paddingTop: 4 }}>
+          <View className="flex-1 pt-1">
             {DIST.map(({ star, pct }) => <RatingBar key={star} star={star} pct={pct} />)}
           </View>
         </View>

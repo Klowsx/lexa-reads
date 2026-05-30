@@ -1,7 +1,6 @@
 import { ChevronDown } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
-import { fixed, rawDark, rawLight } from "~/theme/colors";
-import { useColorScheme } from "react-native";
+import { fixed, useColors } from "~/theme/colors";
 import { type BookStatus, STATUS_META } from "~/lib/book-status";
 import type { Tables } from "~/types/database";
 
@@ -29,8 +28,7 @@ export function BookCtaBar({
   onStatusPress,
   onRatingPress,
 }: BookCtaBarProps) {
-  const scheme = useColorScheme();
-  const raw = scheme === "dark" ? rawDark : rawLight;
+  const c = useColors();
 
   const isReading = status === "reading";
   const statusMeta = status ? STATUS_META[status] : null;
@@ -45,105 +43,59 @@ export function BookCtaBar({
 
   return (
     <View
-      style={{
-        paddingHorizontal: 18,
-        paddingTop: 12,
-        paddingBottom: progressPct != null ? 12 : 12,
-        borderBottomWidth: 1,
-        borderBottomColor: alpha(raw.border, 0.55),
-        backgroundColor: raw.bg,
-      }}
+      className="px-container py-3 border-b bg-bg"
+      style={{ borderBottomColor: alpha(c.border, 0.55) }}
     >
       {/* Buttons row */}
-      <View style={{ flexDirection: "row", gap: 8 }}>
+      <View className="flex-row gap-2">
         {/* Main status button */}
         <Pressable
           onPress={onStatusPress}
           disabled={isPending}
+          className="flex-1 flex-row items-center justify-center gap-2 rounded-card"
           style={{
-            flex: 1,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 8,
             paddingVertical: 12,
             paddingHorizontal: 16,
-            borderRadius: 14,
-            backgroundColor: status
-              ? alpha(statusColor, 0.13)
-              : fixed.accent,
+            backgroundColor: status ? alpha(statusColor, 0.13) : fixed.accent,
             borderWidth: 1.5,
             borderColor: status ? statusColor : "transparent",
           }}
         >
           <Text
             className="font-body-sb text-sm"
-            style={{
-              color: status ? statusColor : "#fff",
-            }}
+            style={{ color: status ? statusColor : "#fff" }}
           >
             {status ? STATUS_META[status].label : "+ Quiero leer"}
           </Text>
           {status && (
-            <ChevronDown
-              size={12}
-              color={statusColor}
-              strokeWidth={2}
-            />
+            <ChevronDown size={12} color={statusColor} strokeWidth={2} />
           )}
         </Pressable>
 
         {/* Rating button */}
         <Pressable
           onPress={onRatingPress}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 6,
-            paddingVertical: 12,
-            paddingHorizontal: 16,
-            borderRadius: 14,
-            backgroundColor: raw.surface,
-            borderWidth: 1,
-            borderColor: raw.border,
-          }}
+          className="flex-row items-center gap-1.5 py-3 px-4 rounded-card bg-surface border border-border"
         >
           {rating != null ? (
             <>
               <Text
                 className="text-sm"
-                style={{
-                  color: fixed.star,
-                  lineHeight: 15,
-                }}
+                style={{ color: fixed.star, lineHeight: 15 }}
               >
                 ★
               </Text>
-              <Text
-                className="font-body-sb text-sm"
-                style={{
-                  color: raw.text,
-                }}
-              >
-                {rating}
-              </Text>
+              <Text className="font-body-sb text-sm text-text">{rating}</Text>
             </>
           ) : (
             <>
               <Text
-                className="text-sm"
-                style={{ color: raw.t3, lineHeight: 15 }}
+                className="text-sm text-t3"
+                style={{ lineHeight: 15 }}
               >
                 ☆
               </Text>
-              <Text
-                className="font-body text-xs"
-                style={{
-                  color: raw.t2,
-                }}
-              >
-                Calificar
-              </Text>
+              <Text className="font-body text-xs text-t2">Calificar</Text>
             </>
           )}
         </Pressable>
@@ -151,45 +103,21 @@ export function BookCtaBar({
 
       {/* Reading progress bar */}
       {progressPct != null && (
-        <View style={{ marginTop: 10 }}>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginBottom: 5,
-            }}
-          >
-            <Text
-              className="font-body text-xs"
-              style={{
-                color: raw.t3,
-              }}
-            >
+        <View className="mt-2.5">
+          <View className="flex-row justify-between mb-[5px]">
+            <Text className="font-body text-xs text-t3">
               Pág. {currentPage} de {pageCount}
             </Text>
-            <Text
-              className="font-body-sb text-xs"
-              style={{
-                color: fixed.status.reading,
-              }}
-            >
+            <Text className="font-body-sb text-xs" style={{ color: fixed.status.reading }}>
               {Math.round(progressPct * 100)}%
             </Text>
           </View>
-          <View
-            style={{
-              height: 3,
-              backgroundColor: raw.sh,
-              borderRadius: 100,
-              overflow: "hidden",
-            }}
-          >
+          <View className="h-[3px] bg-sh rounded-full overflow-hidden">
             <View
+              className="h-full rounded-full"
               style={{
-                height: "100%",
                 width: `${progressPct * 100}%`,
                 backgroundColor: fixed.status.reading,
-                borderRadius: 100,
               }}
             />
           </View>

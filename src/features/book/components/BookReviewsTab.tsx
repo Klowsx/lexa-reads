@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { Pressable, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Pressable, Text, TouchableOpacity, View } from "react-native";
 import { Heart, MessageCircle } from "lucide-react-native";
 import { Avatar } from "~/components/ui/Avatar";
 import { StarRating } from "~/components/ui/StarRating";
-import { fixed, rawDark, rawLight } from "~/theme/colors";
-import { useColorScheme } from "react-native";
+import { fixed, useColors } from "~/theme/colors";
 import { USERS } from "~/mock";
 
 const alpha = (hex: string, op: number) => {
@@ -28,18 +27,26 @@ const REVIEWS = [
 ];
 
 function RatingBar({ star, pct, active, onPress }: { star: number; pct: number; active: boolean; onPress: () => void }) {
-  const scheme = useColorScheme();
-  const raw = scheme === "dark" ? rawDark : rawLight;
+  const c = useColors();
 
   return (
-    <Pressable onPress={onPress} style={{ flexDirection: "row", alignItems: "center", gap: 7, paddingVertical: 2 }}>
-      <Text className={active ? "font-body-bold text-xs" : "font-body text-xs"} style={{ color: active ? fixed.star : raw.t3, width: 8, textAlign: "right" }}>
+    <Pressable onPress={onPress} className="flex-row items-center gap-[7px] py-[2px]">
+      <Text
+        className={active ? "font-body-bold text-xs" : "font-body text-xs"}
+        style={{ color: active ? fixed.star : c.t3, width: 8, textAlign: "right" }}
+      >
         {star}
       </Text>
-      <View style={{ flex: 1, height: 4, backgroundColor: raw.sh, borderRadius: 100, overflow: "hidden" }}>
-        <View style={{ height: "100%", width: `${pct}%`, backgroundColor: active ? raw.text : fixed.star, borderRadius: 100 }} />
+      <View className="flex-1 h-1 bg-sh rounded-full overflow-hidden">
+        <View
+          className="h-full rounded-full"
+          style={{ width: `${pct}%`, backgroundColor: active ? c.text : fixed.star }}
+        />
       </View>
-      <Text className="font-body text-xs" style={{ color: active ? raw.text : raw.t3, width: 26, textAlign: "left" }}>
+      <Text
+        className="font-body text-xs"
+        style={{ color: active ? c.text : c.t3, width: 26, textAlign: "left" }}
+      >
         {pct}%
       </Text>
     </Pressable>
@@ -47,40 +54,45 @@ function RatingBar({ star, pct, active, onPress }: { star: number; pct: number; 
 }
 
 function ReviewCard({ review }: { review: typeof REVIEWS[number] }) {
-  const scheme = useColorScheme();
-  const raw = scheme === "dark" ? rawDark : rawLight;
+  const c = useColors();
   const [liked, setLiked] = useState(review.liked);
   const [likes, setLikes] = useState(review.likes);
 
   return (
-    <View style={{ backgroundColor: raw.surface, borderRadius: 14, padding: 16, borderWidth: 1, borderColor: raw.border, marginBottom: 10 }}>
+    <View className="bg-surface rounded-card p-4 border border-border mb-2.5">
       {/* Header */}
-      <View style={{ flexDirection: "row", alignItems: "flex-start", gap: 10, marginBottom: 10 }}>
+      <View className="flex-row items-start gap-2.5 mb-2.5">
         <Avatar user={review.user} size={30} />
-        <View style={{ flex: 1 }}>
-          <Text className="font-body-sb text-xs" style={{ color: raw.text }}>{review.user.name}</Text>
+        <View className="flex-1">
+          <Text className="font-body-sb text-xs text-text">{review.user.name}</Text>
           <StarRating rating={review.rating} size={11} />
         </View>
-        <Text className="font-body text-xs" style={{ color: raw.t3 }}>hace {review.time}</Text>
+        <Text className="font-body text-xs text-t3">hace {review.time}</Text>
       </View>
 
       {/* Body */}
-      <Text className="font-body text-xs" style={{ color: raw.t2, lineHeight: 13 * 1.7, marginBottom: 12 }}>
+      <Text
+        className="font-body text-xs text-t2 mb-3"
+        style={{ lineHeight: 13 * 1.7 }}
+      >
         {review.text}
       </Text>
 
       {/* Footer */}
-      <View style={{ flexDirection: "row", gap: 16, paddingTop: 10, borderTopWidth: 1, borderTopColor: alpha(raw.border, 0.5) }}>
+      <View
+        className="flex-row gap-4 pt-2.5 border-t"
+        style={{ borderTopColor: alpha(c.border, 0.5) }}
+      >
         <TouchableOpacity
           onPress={() => { setLiked((l) => !l); setLikes((n) => liked ? n - 1 : n + 1); }}
-          style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+          className="flex-row items-center gap-[5px]"
         >
-          <Heart size={14} color={liked ? fixed.accent : raw.t3} fill={liked ? fixed.accent : "transparent"} strokeWidth={1.8} />
-          <Text className="font-body text-xs" style={{ color: liked ? fixed.accent : raw.t3 }}>{likes}</Text>
+          <Heart size={14} color={liked ? fixed.accent : c.t3} fill={liked ? fixed.accent : "transparent"} strokeWidth={1.8} />
+          <Text className="font-body text-xs" style={{ color: liked ? fixed.accent : c.t3 }}>{likes}</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
-          <MessageCircle size={14} color={raw.t3} strokeWidth={1.8} />
-          <Text className="font-body text-xs" style={{ color: raw.t3 }}>Responder</Text>
+        <TouchableOpacity className="flex-row items-center gap-[5px]">
+          <MessageCircle size={14} color={c.t3} strokeWidth={1.8} />
+          <Text className="font-body text-xs text-t3">Responder</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -88,24 +100,23 @@ function ReviewCard({ review }: { review: typeof REVIEWS[number] }) {
 }
 
 export function BookReviewsTab({ onWriteReview }: { onWriteReview?: () => void }) {
-  const scheme = useColorScheme();
-  const raw = scheme === "dark" ? rawDark : rawLight;
+  const c = useColors();
   const [starFilter, setStarFilter] = useState<number | null>(null);
 
   const displayed = starFilter ? REVIEWS.filter((r) => r.rating === starFilter) : REVIEWS;
 
   return (
-    <View style={{ paddingBottom: 24 }}>
+    <View className="pb-6">
       {/* Rating summary */}
-      <View style={{ margin: 18, marginBottom: 0, backgroundColor: raw.surface, borderRadius: 14, padding: 16, borderWidth: 1, borderColor: raw.border, flexDirection: "row", gap: 18, alignItems: "flex-start" }}>
-        <View style={{ alignItems: "center", flexShrink: 0 }}>
+      <View className="m-container mb-0 bg-surface rounded-card p-4 border border-border flex-row gap-container items-start">
+        <View className="items-center shrink-0">
           <Text className="font-display-bold text-3xl" style={{ color: fixed.star, lineHeight: 48 }}>4.5</Text>
-          <View style={{ marginTop: 5 }}><StarRating rating={4.5} size={12} /></View>
-          <Text className="font-body text-xs" style={{ color: raw.t3, marginTop: 5, textAlign: "center", lineHeight: 14 }}>
+          <View className="mt-[5px]"><StarRating rating={4.5} size={12} /></View>
+          <Text className="font-body text-xs text-t3 mt-[5px] text-center" style={{ lineHeight: 14 }}>
             {"1,234\nreseñas"}
           </Text>
         </View>
-        <View style={{ flex: 1, paddingTop: 4 }}>
+        <View className="flex-1 pt-1">
           {DIST.map(({ star, pct }) => (
             <RatingBar
               key={star}
@@ -119,21 +130,20 @@ export function BookReviewsTab({ onWriteReview }: { onWriteReview?: () => void }
       </View>
 
       {/* Star filter pills */}
-      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6, paddingHorizontal: 18, paddingTop: 14 }}>
+      <View className="flex-row flex-wrap gap-1.5 px-container pt-3.5">
         {[null, 5, 4, 3, 2, 1].map((r) => (
           <Pressable
             key={r ?? "all"}
             onPress={() => setStarFilter(r)}
+            className="rounded-full border"
             style={{
               paddingHorizontal: 11,
               paddingVertical: 4,
-              borderRadius: 100,
-              backgroundColor: starFilter === r ? fixed.accent : raw.surface,
-              borderWidth: 1,
-              borderColor: starFilter === r ? fixed.accent : raw.border,
+              backgroundColor: starFilter === r ? fixed.accent : c.surface,
+              borderColor: starFilter === r ? fixed.accent : c.border,
             }}
           >
-            <Text className="font-body text-xs" style={{ color: starFilter === r ? "#fff" : raw.t3 }}>
+            <Text className="font-body text-xs" style={{ color: starFilter === r ? "#fff" : c.t3 }}>
               {r === null ? "Todas" : `${r} ★`}
             </Text>
           </Pressable>
@@ -141,21 +151,21 @@ export function BookReviewsTab({ onWriteReview }: { onWriteReview?: () => void }
       </View>
 
       {/* Write review CTA */}
-      <View style={{ paddingHorizontal: 18, paddingTop: 14, paddingBottom: 14 }}>
+      <View className="px-container pt-3.5 pb-3.5">
         <TouchableOpacity
           onPress={onWriteReview}
           activeOpacity={0.85}
-          style={{ paddingVertical: 14, borderRadius: 14, backgroundColor: fixed.accent, alignItems: "center" }}
+          className="py-3.5 rounded-card bg-accent items-center"
         >
-          <Text className="font-body-sb text-sm" style={{ color: "#fff" }}>Escribir mi reseña</Text>
+          <Text className="font-body-sb text-sm text-white">Escribir mi reseña</Text>
         </TouchableOpacity>
       </View>
 
       {/* Review cards */}
-      <View style={{ paddingHorizontal: 18 }}>
+      <View className="px-container">
         {displayed.length === 0 ? (
-          <View style={{ alignItems: "center", paddingVertical: 24 }}>
-            <Text className="font-body text-xs" style={{ color: raw.t3 }}>Sin reseñas para este rating</Text>
+          <View className="items-center py-6">
+            <Text className="font-body text-xs text-t3">Sin reseñas para este rating</Text>
           </View>
         ) : (
           displayed.map((r) => <ReviewCard key={r.id} review={r} />)

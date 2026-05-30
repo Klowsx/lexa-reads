@@ -1,8 +1,6 @@
 import { Pressable, Text, View } from "react-native";
 import { BookCover } from "~/components/ui/BookCover";
 import { StarRating } from "~/components/ui/StarRating";
-import { rawDark, rawLight } from "~/theme/colors";
-import { useColorScheme } from "react-native";
 import type { Tables } from "~/types/database";
 
 // Maps BOOKS mock data to the shape BookCover expects
@@ -22,39 +20,24 @@ const RATINGS: Record<string, number> = {
 };
 
 export function BookSimilarTab() {
-  const scheme = useColorScheme();
-  const raw = scheme === "dark" ? rawDark : rawLight;
-
   return (
-    <View style={{ paddingHorizontal: 18, paddingTop: 16, paddingBottom: 24 }}>
-      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 14 }}>
+    <View className="px-container pt-4 pb-6">
+      <View className="flex-row flex-wrap gap-3.5">
         {SIMILAR.map((book) => (
-          <Pressable
-            key={book.id}
-            style={{ width: "30%" }}
-          >
+          <Pressable key={book.id} style={{ width: "30%" }}>
             <BookCover book={book} height={128} />
-            <View style={{ marginTop: 6 }}>
+            <View className="mt-1.5">
               <Text
                 numberOfLines={2}
-                className="font-display text-xs"
-                style={{
-                  color: raw.text,
-                  lineHeight: 14,
-                }}
+                className="font-display text-xs text-text"
+                style={{ lineHeight: 14 }}
               >
                 {book.title}
               </Text>
-              <Text
-                className="font-body text-xs"
-                style={{
-                  color: raw.t3,
-                  marginTop: 2,
-                }}
-              >
+              <Text className="font-body text-xs text-t3 mt-0.5">
                 {book.authors?.[0]?.split(" ").pop()}
               </Text>
-              <View style={{ marginTop: 3 }}>
+              <View className="mt-[3px]">
                 <StarRating rating={RATINGS[book.id] ?? 4} size={9} />
               </View>
             </View>

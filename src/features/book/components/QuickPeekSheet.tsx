@@ -1,10 +1,10 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Modal, Pressable, ScrollView, Text, TouchableOpacity, useColorScheme, View } from 'react-native';
+import { Modal, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BookCover } from '~/components/ui/BookCover';
 import { type BookStatus, STATUS_META, STATUS_ORDER } from '~/lib/book-status';
-import { fixed, rawDark, rawLight } from '~/theme/colors';
+import { fixed, useColors } from '~/theme/colors';
 import type { Tables } from '~/types/database';
 
 const STAR = fixed.star;
@@ -21,8 +21,7 @@ interface Props {
 
 export function QuickPeekSheet({ book, onClose }: Props) {
   const router = useRouter();
-  const scheme = useColorScheme();
-  const raw = scheme === 'dark' ? rawDark : rawLight;
+  const c = useColors();
   const insets = useSafeAreaInsets();
 
   const [status, setStatus] = useState<BookStatus | null>(null);
@@ -43,8 +42,8 @@ export function QuickPeekSheet({ book, onClose }: Props) {
         />
 
         <View
-          className="rounded-t-lg overflow-hidden"
-          style={{ backgroundColor: raw.surface, paddingBottom: insets.bottom + 8 }}
+          className="rounded-t-lg overflow-hidden bg-surface"
+          style={{ paddingBottom: insets.bottom + 8 }}
         >
           {/* Drag handle */}
           <View className="items-center pt-3 pb-1">
@@ -77,20 +76,18 @@ export function QuickPeekSheet({ book, onClose }: Props) {
                   <Pressable
                     key={s}
                     onPress={() => setStatus(active ? null : s)}
+                    className="rounded-full"
                     style={{
                       paddingHorizontal: 14,
                       paddingVertical: 6,
-                      borderRadius: 100,
-                      backgroundColor: active ? alpha(meta.color, 0.15) : raw.sh,
+                      backgroundColor: active ? alpha(meta.color, 0.15) : c.sh,
                       borderWidth: 1.5,
-                      borderColor: active ? meta.color : raw.border,
+                      borderColor: active ? meta.color : c.border,
                     }}
                   >
                     <Text
                       className={active ? 'font-body-md text-xs' : 'font-body text-xs'}
-                      style={{
-                        color: active ? meta.color : raw.t2,
-                      }}
+                      style={{ color: active ? meta.color : c.t2 }}
                     >
                       {meta.label}
                     </Text>
@@ -100,14 +97,8 @@ export function QuickPeekSheet({ book, onClose }: Props) {
             </View>
 
             {/* Rating */}
-            <View
-              className="mx-4 mb-4 rounded-md p-3"
-              style={{ backgroundColor: raw.sr, borderWidth: 1, borderColor: raw.border }}
-            >
-              <Text
-                className="font-body-sb text-xs text-t3 tracking-wider mb-2"
-                style={{ textTransform: 'uppercase' }}
-              >
+            <View className="mx-4 mb-4 rounded-md p-3 bg-sr border border-border">
+              <Text className="font-body-sb text-xs text-t3 tracking-wider uppercase mb-2">
                 Mi rating
               </Text>
               <View className="flex-row items-center gap-2.5">
@@ -119,11 +110,11 @@ export function QuickPeekSheet({ book, onClose }: Props) {
                       hitSlop={4}
                     >
                       <View style={{ position: 'relative', width: 34, height: 32 }}>
-                        <Text className="text-xl" style={{ position: 'absolute', lineHeight: 32, color: alpha(STAR, 0.2) }}>
+                        <Text className="text-xl absolute" style={{ lineHeight: 32, color: alpha(STAR, 0.2) }}>
                           ★
                         </Text>
                         {rating != null && rating >= i && (
-                          <Text className="text-xl" style={{ position: 'absolute', lineHeight: 32, color: STAR }}>
+                          <Text className="text-xl absolute" style={{ lineHeight: 32, color: STAR }}>
                             ★
                           </Text>
                         )}
@@ -143,8 +134,7 @@ export function QuickPeekSheet({ book, onClose }: Props) {
             <View className="px-5 pb-2">
               <TouchableOpacity
                 onPress={goToDetail}
-                className="rounded-md items-center py-3.5 border border-border"
-                style={{ backgroundColor: raw.sh }}
+                className="rounded-md items-center py-3.5 border border-border bg-sh"
                 activeOpacity={0.85}
               >
                 <Text className="text-sm font-body-sb text-text">Ver libro completo</Text>

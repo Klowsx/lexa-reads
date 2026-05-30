@@ -25,14 +25,12 @@ export function IdentityCard({ user, onEditPress }: Props) {
         colors={[alpha(user.avC, 0.1), alpha(c.border, 0.3)]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        style={{ padding: 16 }}
+        className="p-4"
       >
         <View className="flex-row gap-3.5 items-start mb-4">
           <View
-            className="rounded-full items-center justify-center shrink-0"
+            className="rounded-full items-center justify-center shrink-0 w-[72px] h-[72px]"
             style={{
-              width: 72,
-              height: 72,
               backgroundColor: alpha(user.avC, 0.13),
               borderWidth: 2.5,
               borderColor: user.avC,
@@ -43,7 +41,7 @@ export function IdentityCard({ user, onEditPress }: Props) {
               elevation: 6,
             }}
           >
-            <Text style={{ fontSize: 26, color: user.avC, fontFamily: 'DMSans_600SemiBold' }}>
+            <Text className="text-lg font-body-sb" style={{ color: user.avC }}>
               {user.av}
             </Text>
           </View>

@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { Pressable, ScrollView, Text, TouchableOpacity, View } from "react-native";
-import { fixed, rawDark, rawLight } from "~/theme/colors";
-import { useColorScheme } from "react-native";
+import { Pressable, Text, TouchableOpacity, View } from "react-native";
+import { fixed, useColors } from "~/theme/colors";
 import { type BookStatus, STATUS_META, STATUS_ORDER } from "~/lib/book-status";
 import type { Tables } from "~/types/database";
 
@@ -15,12 +14,7 @@ const STAR = fixed.star;
 function SectionLabel({ children }: { children: string }) {
   return (
     <Text
-      className="font-body-sb text-xs text-t3"
-      style={{
-        textTransform: "uppercase",
-        letterSpacing: 1.4,
-        marginBottom: 10,
-      }}
+      className="font-body-sb text-xs text-t3 uppercase tracking-wider mb-2.5"
     >
       {children}
     </Text>
@@ -46,8 +40,7 @@ export function BookSummaryTab({
   onRatingClick,
   onWriteReview,
 }: BookSummaryTabProps) {
-  const scheme = useColorScheme();
-  const raw = scheme === "dark" ? rawDark : rawLight;
+  const c = useColors();
   const [expanded, setExpanded] = useState(false);
   const [rHover, setRHover] = useState<number | null>(null);
 
@@ -60,18 +53,13 @@ export function BookSummaryTab({
   ].filter((r) => r.value);
 
   return (
-    <View style={{ paddingBottom: 24 }}>
+    <View className="pb-6">
       {/* Status pills */}
       <View
-        style={{
-          paddingHorizontal: 18,
-          paddingTop: 16,
-          paddingBottom: 16,
-          borderBottomWidth: 1,
-          borderBottomColor: alpha(raw.border, 0.55),
-        }}
+        className="px-container py-4 border-b"
+        style={{ borderBottomColor: alpha(c.border, 0.55) }}
       >
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
+        <View className="flex-row flex-wrap gap-1.5">
           {STATUS_ORDER.map((s) => {
             const meta = STATUS_META[s];
             const active = status === s;
@@ -80,22 +68,18 @@ export function BookSummaryTab({
                 key={s}
                 onPress={() => onStatusClick(s)}
                 disabled={isPending}
+                className="rounded-full"
                 style={{
                   paddingHorizontal: 13,
                   paddingVertical: 6,
-                  borderRadius: 100,
-                  backgroundColor: active
-                    ? alpha(meta.color, 0.14)
-                    : raw.surface,
+                  backgroundColor: active ? alpha(meta.color, 0.14) : c.surface,
                   borderWidth: 1.5,
-                  borderColor: active ? meta.color : raw.border,
+                  borderColor: active ? meta.color : c.border,
                 }}
               >
                 <Text
                   className={active ? "font-body-sb text-xs" : "font-body text-xs"}
-                  style={{
-                    color: active ? meta.color : raw.t3,
-                  }}
+                  style={{ color: active ? meta.color : c.t3 }}
                 >
                   {meta.label}
                 </Text>
@@ -108,27 +92,15 @@ export function BookSummaryTab({
       {/* Genres */}
       {book.genres && book.genres.length > 0 && (
         <View
-          style={{
-            paddingHorizontal: 18,
-            paddingVertical: 16,
-            borderBottomWidth: 1,
-            borderBottomColor: alpha(raw.border, 0.55),
-          }}
+          className="px-container py-4 border-b"
+          style={{ borderBottomColor: alpha(c.border, 0.55) }}
         >
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
+          <View className="flex-row flex-wrap gap-1.5">
             {book.genres.map((g) => (
               <Text
                 key={g}
-                className="font-body text-xs"
-                style={{
-                  color: raw.t3,
-                  paddingHorizontal: 12,
-                  paddingVertical: 5,
-                  borderRadius: 8,
-                  backgroundColor: raw.surface,
-                  borderWidth: 1,
-                  borderColor: raw.border,
-                }}
+                className="font-body text-xs text-t3 bg-surface border border-border rounded-md"
+                style={{ paddingHorizontal: 12, paddingVertical: 5 }}
               >
                 {g}
               </Text>
@@ -140,32 +112,19 @@ export function BookSummaryTab({
       {/* Synopsis */}
       {book.description && (
         <View
-          style={{
-            paddingHorizontal: 18,
-            paddingVertical: 16,
-            borderBottomWidth: 1,
-            borderBottomColor: alpha(raw.border, 0.55),
-          }}
+          className="px-container py-4 border-b"
+          style={{ borderBottomColor: alpha(c.border, 0.55) }}
         >
           <SectionLabel>Sinopsis</SectionLabel>
           <Text
-            className="font-body text-xs"
-            style={{
-              color: raw.t2,
-              lineHeight: 13.5 * 1.76,
-              marginBottom: 8,
-            }}
+            className="font-body text-xs text-t2 mb-2"
+            style={{ lineHeight: 13.5 * 1.76 }}
             numberOfLines={expanded ? undefined : 5}
           >
             {book.description}
           </Text>
           <Pressable onPress={() => setExpanded((e) => !e)}>
-            <Text
-              className="font-body-md text-xs"
-              style={{
-                color: fixed.accent,
-              }}
-            >
+            <Text className="font-body-md text-xs text-accent">
               {expanded ? "Leer menos ↑" : "Leer más ↓"}
             </Text>
           </Pressable>
@@ -175,52 +134,22 @@ export function BookSummaryTab({
       {/* Details */}
       {detailRows.length > 0 && (
         <View
-          style={{
-            paddingHorizontal: 18,
-            paddingVertical: 16,
-            borderBottomWidth: 1,
-            borderBottomColor: alpha(raw.border, 0.55),
-          }}
+          className="px-container py-4 border-b"
+          style={{ borderBottomColor: alpha(c.border, 0.55) }}
         >
           <SectionLabel>Detalles</SectionLabel>
-          <View
-            style={{
-              borderRadius: 14,
-              overflow: "hidden",
-              borderWidth: 1,
-              borderColor: raw.border,
-              backgroundColor: raw.surface,
-            }}
-          >
+          <View className="rounded-card overflow-hidden border border-border bg-surface">
             {detailRows.map((row, i) => (
               <View
                 key={row.label}
+                className="flex-row justify-between items-center px-4 border-b border-border"
                 style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  paddingHorizontal: 16,
                   paddingVertical: 11,
                   borderBottomWidth: i < detailRows.length - 1 ? 1 : 0,
-                  borderBottomColor: raw.border,
                 }}
               >
-                <Text
-                  className="font-body text-xs"
-                  style={{
-                    color: raw.t3,
-                  }}
-                >
-                  {row.label}
-                </Text>
-                <Text
-                  className="font-body-md text-xs"
-                  style={{
-                    color: raw.text,
-                  }}
-                >
-                  {row.value}
-                </Text>
+                <Text className="font-body text-xs text-t3">{row.label}</Text>
+                <Text className="font-body-md text-xs text-text">{row.value}</Text>
               </View>
             ))}
           </View>
@@ -229,32 +158,12 @@ export function BookSummaryTab({
 
       {/* Mi calificación */}
       <View
-        style={{
-          paddingHorizontal: 18,
-          paddingVertical: 16,
-          borderBottomWidth: 1,
-          borderBottomColor: alpha(raw.border, 0.55),
-        }}
+        className="px-container py-4 border-b"
+        style={{ borderBottomColor: alpha(c.border, 0.55) }}
       >
         <SectionLabel>Mi calificación</SectionLabel>
-        <View
-          style={{
-            borderRadius: 14,
-            paddingVertical: 16,
-            paddingHorizontal: 16,
-            borderWidth: 1,
-            borderColor: raw.border,
-            backgroundColor: raw.surface,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
-              gap: 4,
-              marginBottom: 8,
-            }}
-          >
+        <View className="rounded-card p-4 border border-border bg-surface">
+          <View className="flex-row justify-center gap-1 mb-2">
             {[1, 2, 3, 4, 5].map((i) => {
               const on = (rHover ?? rating ?? 0) >= i;
               return (
@@ -265,41 +174,25 @@ export function BookSummaryTab({
                   hitSlop={4}
                 >
                   <View
-                    style={{
-                      width: 38,
-                      height: 36,
-                      position: "relative",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
+                    className="items-center justify-center"
+                    style={{ width: 38, height: 36, position: "relative" }}
                   >
                     {/* Empty star background */}
                     <Text
-                      className="text-2xl"
-                      style={{
-                        position: "absolute",
-                        lineHeight: 36,
-                        color: alpha(STAR, 0.22),
-                      }}
+                      className="text-2xl absolute"
+                      style={{ lineHeight: 36, color: alpha(STAR, 0.22) }}
                     >
                       ★
                     </Text>
                     {/* Half star (rating = i - 0.5) */}
                     {rating != null && rating === i - 0.5 && rHover == null && (
                       <View
-                        style={{
-                          position: "absolute",
-                          left: 0,
-                          width: 19,
-                          overflow: "hidden",
-                        }}
+                        className="absolute left-0 overflow-hidden"
+                        style={{ width: 19 }}
                       >
                         <Text
                           className="text-2xl"
-                          style={{
-                            lineHeight: 36,
-                            color: STAR,
-                          }}
+                          style={{ lineHeight: 36, color: STAR }}
                         >
                           ★
                         </Text>
@@ -308,12 +201,8 @@ export function BookSummaryTab({
                     {/* Full star */}
                     {on && (
                       <Text
-                        className="text-2xl"
-                        style={{
-                          position: "absolute",
-                          lineHeight: 36,
-                          color: STAR,
-                        }}
+                        className="text-2xl absolute"
+                        style={{ lineHeight: 36, color: STAR }}
                       >
                         ★
                       </Text>
@@ -323,37 +212,20 @@ export function BookSummaryTab({
               );
             })}
           </View>
-          <Text
-            className="font-body text-xs"
-            style={{
-              color: raw.t3,
-              textAlign: "center",
-            }}
-          >
+          <Text className="font-body text-xs text-t3 text-center">
             {rating != null ? `Tu calificación: ${rating} ★` : "Toca para calificar"}
           </Text>
         </View>
       </View>
 
       {/* Write review CTA */}
-      <View style={{ paddingHorizontal: 18, paddingTop: 16 }}>
+      <View className="px-container pt-4">
         <TouchableOpacity
           onPress={onWriteReview}
           activeOpacity={0.85}
-          style={{
-            paddingVertical: 14,
-            borderRadius: 14,
-            backgroundColor: fixed.accent,
-            alignItems: "center",
-          }}
+          className="py-3.5 rounded-card bg-accent items-center"
         >
-          <Text
-            className="font-body-sb text-sm"
-            style={{
-              color: "#fff",
-              letterSpacing: 0.1,
-            }}
-          >
+          <Text className="font-body-sb text-sm text-white tracking-tight">
             Escribir mi reseña
           </Text>
         </TouchableOpacity>

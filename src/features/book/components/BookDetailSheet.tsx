@@ -1,20 +1,18 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import {
   Modal,
   Pressable,
   ScrollView,
   Text,
   TouchableOpacity,
-  useColorScheme,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BookCover } from '~/components/ui/BookCover';
 import { StarRating } from '~/components/ui/StarRating';
-import type { BookStatus, MockBook, MockUserBook } from '~/mock';
+import type { BookStatus, MockUserBook } from '~/mock';
 import { STATUS_META } from '~/mock';
-import { fixed, rawDark, rawLight } from '~/theme/colors';
-import { useColors } from '~/theme/colors';
+import { fixed, useColors } from '~/theme/colors';
 import { Tables } from '@/src/types';
 
 const STAR = fixed.star;
@@ -31,8 +29,6 @@ interface BookDetailSheetProps {
 }
 
 export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSheetProps) {
-  const scheme = useColorScheme();
-  const raw = scheme === 'dark' ? rawDark : rawLight;
   const c = useColors();
   const insets = useSafeAreaInsets();
 
@@ -57,8 +53,8 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
         />
 
         <View
-          className="rounded-t-lg overflow-hidden"
-          style={{ backgroundColor: raw.surface, maxHeight: '87%', paddingBottom: insets.bottom + 8 }}
+          className="rounded-t-lg overflow-hidden bg-surface"
+          style={{ maxHeight: '87%', paddingBottom: insets.bottom + 8 }}
         >
           {/* Drag handle */}
           <View className="items-center pt-3 pb-1">
@@ -95,20 +91,18 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
                   <Pressable
                     key={s}
                     onPress={() => setStatus(active ? null : s)}
+                    className="rounded-full"
                     style={{
                       paddingHorizontal: 14,
                       paddingVertical: 6,
-                      borderRadius: 100,
-                      backgroundColor: active ? alpha(meta.color, 0.15) : raw.sh,
+                      backgroundColor: active ? alpha(meta.color, 0.15) : c.sh,
                       borderWidth: 1.5,
-                      borderColor: active ? meta.color : raw.border,
+                      borderColor: active ? meta.color : c.border,
                     }}
                   >
                     <Text
                       className={active ? 'font-body-md text-xs' : 'font-body text-xs'}
-                      style={{
-                        color: active ? meta.color : raw.t2,
-                      }}
+                      style={{ color: active ? meta.color : c.t2 }}
                     >
                       {meta.label}
                     </Text>
@@ -118,14 +112,8 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
             </View>
 
             {/* Rating */}
-            <View
-              className="mx-4 mb-3.5 rounded-md p-3"
-              style={{ backgroundColor: raw.sr, borderWidth: 1, borderColor: raw.border }}
-            >
-              <Text
-                className="font-body-sb text-xs text-t3 tracking-wider mb-2"
-                style={{ textTransform: 'uppercase' }}
-              >
+            <View className="mx-4 mb-3.5 rounded-md p-3 bg-sr border border-border">
+              <Text className="font-body-sb text-xs text-t3 tracking-wider uppercase mb-2">
                 Mi rating
               </Text>
               <View className="flex-row items-center gap-2.5">
@@ -138,19 +126,15 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
                     >
                       <View style={{ position: 'relative', width: 34, height: 32 }}>
                         <Text
-                          className="text-xl"
-                          style={{
-                            position: 'absolute',
-                            lineHeight: 32,
-                            color: alpha(STAR, 0.2),
-                          }}
+                          className="text-xl absolute"
+                          style={{ lineHeight: 32, color: alpha(STAR, 0.2) }}
                         >
                           ★
                         </Text>
                         {rating != null && rating >= i && (
                           <Text
-                            className="text-xl"
-                            style={{ position: 'absolute', lineHeight: 32, color: STAR }}
+                            className="text-xl absolute"
+                            style={{ lineHeight: 32, color: STAR }}
                           >
                             ★
                           </Text>
@@ -173,10 +157,7 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
             {/* Synopsis */}
             {book.description ? (
               <View className="px-5 pb-3.5">
-                <Text
-                  className="font-body-sb text-xs text-t3 tracking-wider mb-1.5"
-                  style={{ textTransform: 'uppercase' }}
-                >
+                <Text className="font-body-sb text-xs text-t3 tracking-wider uppercase mb-1.5">
                   Sinopsis
                 </Text>
                 <Text className="font-body text-sm text-t2 leading-relaxed">{book.description}</Text>
@@ -188,8 +169,7 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
               {book.genres?.map(g => (
                 <Text
                   key={g}
-                  className="text-xs font-body text-t3 px-2.5 py-1 rounded-sm"
-                  style={{ backgroundColor: raw.sh, borderWidth: 1, borderColor: raw.border }}
+                  className="text-xs font-body text-t3 px-2.5 py-1 rounded-sm bg-sh border border-border"
                 >
                   {g}
                 </Text>
@@ -199,11 +179,10 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
             {/* CTA */}
             <View className="px-5 pb-2">
               <TouchableOpacity
-                className="rounded-md items-center py-3.5"
-                style={{ backgroundColor: c.accent }}
+                className="rounded-md items-center py-3.5 bg-accent"
                 activeOpacity={0.85}
               >
-                <Text className="text-sm font-body-sb" style={{ color: '#fff' }}>
+                <Text className="text-sm font-body-sb text-white">
                   Escribir reseña
                 </Text>
               </TouchableOpacity>

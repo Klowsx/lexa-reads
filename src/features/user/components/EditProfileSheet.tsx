@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useColorScheme } from 'react-native';
 import {
   Modal,
   Pressable,
@@ -10,7 +9,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { MockMe } from '~/mock';
-import { rawDark, rawLight, useColors } from '~/theme/colors';
+import { useColors } from '~/theme/colors';
 
 const alpha = (hex: string, op: number) => {
   const n = parseInt(hex.replace('#', ''), 16);
@@ -30,8 +29,6 @@ interface Props {
 export function EditProfileSheet({ user, onClose }: Props) {
   const c = useColors();
   const insets = useSafeAreaInsets();
-  const scheme = useColorScheme();
-  const raw = scheme === 'dark' ? rawDark : rawLight;
 
   const [name, setName] = useState(user.name);
   const [bio, setBio] = useState(user.bio);
@@ -58,9 +55,8 @@ export function EditProfileSheet({ user, onClose }: Props) {
         />
 
         <View
-          className="rounded-t-xl overflow-hidden"
+          className="rounded-t-xl overflow-hidden bg-surface"
           style={{
-            backgroundColor: raw.surface,
             maxHeight: '90%',
             paddingBottom: insets.bottom + 12,
           }}
@@ -82,16 +78,14 @@ export function EditProfileSheet({ user, onClose }: Props) {
             {/* Avatar row */}
             <View className="flex-row items-center gap-4 px-5 pb-5">
               <View
-                className="rounded-full items-center justify-center shrink-0"
+                className="rounded-full items-center justify-center shrink-0 w-[66px] h-[66px]"
                 style={{
-                  width: 66,
-                  height: 66,
                   backgroundColor: alpha(user.avC, 0.14),
                   borderWidth: 2.5,
                   borderColor: user.avC,
                 }}
               >
-                <Text style={{ fontSize: 22, color: user.avC, fontFamily: 'DMSans_600SemiBold' }}>
+                <Text className="text-md font-body-sb" style={{ color: user.avC }}>
                   {user.av}
                 </Text>
               </View>
@@ -112,14 +106,14 @@ export function EditProfileSheet({ user, onClose }: Props) {
                 <TextInput
                   value={name}
                   onChangeText={setName}
-                  className="rounded-md bg-sr border border-border text-text"
-                  style={{ paddingHorizontal: 14, paddingVertical: 11, fontSize: 14, fontFamily: 'DMSans_400Regular' }}
+                  className="rounded-md bg-sr border border-border text-text font-body text-sm"
+                  style={{ paddingHorizontal: 14, paddingVertical: 11 }}
                   placeholderTextColor={c.t3}
                 />
               </View>
 
               {/* Bio */}
-              <View className="mb-4.5">
+              <View className="mb-[18px]">
                 <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-1.5">
                   Bio
                 </Text>
@@ -128,12 +122,10 @@ export function EditProfileSheet({ user, onClose }: Props) {
                   onChangeText={setBio}
                   multiline
                   numberOfLines={3}
-                  className="rounded-md bg-sr border border-border text-text"
+                  className="rounded-md bg-sr border border-border text-text font-body text-sm"
                   style={{
                     paddingHorizontal: 14,
                     paddingVertical: 11,
-                    fontSize: 14,
-                    fontFamily: 'DMSans_400Regular',
                     lineHeight: 22,
                     textAlignVertical: 'top',
                   }}
@@ -175,10 +167,9 @@ export function EditProfileSheet({ user, onClose }: Props) {
 
               <Pressable
                 onPress={onClose}
-                className="py-3 rounded-md items-center mb-1"
-                style={{ backgroundColor: c.accent }}
+                className="py-3 rounded-md items-center mb-1 bg-accent"
               >
-                <Text className="text-sm font-body-sb" style={{ color: '#fff' }}>
+                <Text className="text-sm font-body-sb text-white">
                   Guardar cambios
                 </Text>
               </Pressable>

@@ -69,8 +69,14 @@ module.exports = {
       borderRadius: {
         sm: '6px',
         md: '12px',
+        card: '14px',  // contenedores tipo card
         lg: '20px',
         xl: '28px',
+      },
+
+      spacing: {
+        // Padding horizontal de contenedor principal (18px)
+        container: '18px',
       },
     },
   },
