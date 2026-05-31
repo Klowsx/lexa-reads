@@ -223,6 +223,33 @@ export function extractInitials(name: string): string {
     .toUpperCase();
 }
 
+/*
+ * deriveAvatarColor — color determinista para un usuario a partir de su id/username.
+ *
+ * Usa un hash simple (djb2) para seleccionar un color de una paleta fija.
+ * El mismo string siempre devuelve el mismo color — sin randomness.
+ *
+ *   deriveAvatarColor("javierh3r") → "#C4783A" (siempre el mismo)
+ */
+const AVATAR_PALETTE = [
+  "#C4783A", // accent cálido
+  "#4A96B8", // azul
+  "#5CAF7E", // verde
+  "#8A6CD8", // púrpura
+  "#B8445A", // rosa oscuro
+  "#C49A20", // dorado
+  "#3A8AB8", // azul vivo
+  "#7E5CAF", // lavanda
+];
+
+export function deriveAvatarColor(seed: string): string {
+  let hash = 5381;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash * 33) ^ seed.charCodeAt(i);
+  }
+  return AVATAR_PALETTE[Math.abs(hash) % AVATAR_PALETTE.length];
+}
+
 /* ------------------------------------------------------------------ */
 /*  Arrays                                                             */
 /* ------------------------------------------------------------------ */

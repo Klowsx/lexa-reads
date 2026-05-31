@@ -72,10 +72,10 @@ Hoy todo el flujo de "yo lectora marca un libro" vive en mocks. Es el bloque que
 
 ### B3. Reseñas
 
-- [ ] Pantalla `app/review/new.tsx` (modal) — formulario con `react-hook-form` + `zod` (body, contains_spoilers).
-- [ ] Hook `useCreateReview` + `useUpdateReview` + `useDeleteReview` (soft delete).
-- [ ] CTA "Escribir reseña" del detalle del libro abre el modal y crea/edita.
-- [ ] Lista de reseñas en `book/[id].tsx`: hook `useBookReviews(bookId)` con `useInfiniteQuery` y cursor `(created_at, id)`.
+- [x] Pantalla `app/review/new.tsx` (modal) — formulario con `react-hook-form` + `zod` (body, contains_spoilers).
+- [x] Hook `useUpsertReview` + `useDeleteReview` (soft delete) + `useMyReview` + `useBookReviews`.
+- [x] CTA "Escribir reseña" del detalle del libro abre el modal y crea/edita.
+- [x] Lista de reseñas en `book/[id].tsx`: hook `useBookReviews(bookId)` con `useInfiniteQuery` y cursor `(created_at, id)`.
 
 ### B4. Reading goal real
 

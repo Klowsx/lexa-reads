@@ -14,14 +14,12 @@ import { useDeleteUserBook } from "~/features/library/hooks/useDeleteUserBook";
 import { useUpsertUserBook } from "~/features/library/hooks/useUpsertUserBook";
 import { useUserBook } from "~/features/library/hooks/useUserBook";
 import { type BookStatus } from "~/lib/book-status";
-import { fixed, rawDark, rawLight } from "~/theme/colors";
-import { useColorScheme } from "react-native";
+import { fixed, useColors } from "~/theme/colors";
 
 export default function BookDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const scheme = useColorScheme();
-  const raw = scheme === "dark" ? rawDark : rawLight;
+  const c = useColors();
   const insets = useSafeAreaInsets();
 
   const [activeTab, setActiveTab] = useState<BookTab>(0);
@@ -68,16 +66,18 @@ export default function BookDetailScreen() {
     setActiveTab(0);
   }
 
+  // Navega al modal de reseña pasando el id interno del libro (no el de Google Books).
+  // El modal usa bookId para crear/editar la reseña en la tabla reviews.
+  function handleWriteReview() {
+    if (!book) return;
+    router.push(`/review/new?bookId=${book.id}`);
+  }
+
   if (isLoading) {
     return (
       <View
-        style={{
-          flex: 1,
-          backgroundColor: raw.bg,
-          alignItems: "center",
-          justifyContent: "center",
-          paddingTop: insets.top,
-        }}
+        className="flex-1 bg-bg items-center justify-center"
+        style={{ paddingTop: insets.top }}
       >
         <ActivityIndicator color={fixed.accent} />
       </View>
@@ -87,35 +87,14 @@ export default function BookDetailScreen() {
   if (!book) {
     return (
       <View
-        style={{
-          flex: 1,
-          backgroundColor: raw.bg,
-          alignItems: "center",
-          justifyContent: "center",
-          paddingHorizontal: 32,
-          paddingTop: insets.top,
-        }}
+        className="flex-1 bg-bg items-center justify-center px-8"
+        style={{ paddingTop: insets.top }}
       >
-        <Text
-          style={{
-            fontFamily: "DMSans_400Regular",
-            fontSize: 15,
-            color: raw.t2,
-            textAlign: "center",
-          }}
-        >
+        <Text className="font-body text-sm text-t2 text-center">
           No se encontró el libro.
         </Text>
-        <Pressable onPress={() => router.back()} style={{ marginTop: 16 }}>
-          <Text
-            style={{
-              fontFamily: "DMSans_600SemiBold",
-              fontSize: 14,
-              color: fixed.accent,
-            }}
-          >
-            Volver
-          </Text>
+        <Pressable onPress={() => router.back()} className="mt-4">
+          <Text className="font-body-sb text-sm text-accent">Volver</Text>
         </Pressable>
       </View>
     );
@@ -123,11 +102,8 @@ export default function BookDetailScreen() {
 
   return (
     <View
-      style={{
-        flex: 1,
-        backgroundColor: raw.bg,
-        paddingTop: insets.top,
-      }}
+      className="flex-1 bg-bg"
+      style={{ paddingTop: insets.top }}
     >
       <ScrollView
         style={{ flex: 1 }}
@@ -162,10 +138,17 @@ export default function BookDetailScreen() {
               isPending={isPending}
               onStatusClick={handleStatusClick}
               onRatingClick={handleRatingClick}
-              onWriteReview={() => setActiveTab(1)}
+              // Desde Resumen: cambia al tab de Reseñas antes de abrir el modal
+              // para que el usuario vea su reseña en contexto al volver.
+              onWriteReview={() => { setActiveTab(1); handleWriteReview(); }}
             />
           )}
-          {activeTab === 1 && <BookReviewsTab onWriteReview={() => {}} />}
+          {activeTab === 1 && (
+            <BookReviewsTab
+              bookId={book.id}
+              onWriteReview={handleWriteReview}
+            />
+          )}
           {activeTab === 2 && <BookCommunityTab />}
           {activeTab === 3 && <BookSimilarTab />}
         </View>

@@ -1,32 +1,41 @@
 import { useState } from "react";
-import { Pressable, Text, TouchableOpacity, View } from "react-native";
-import { Heart, MessageCircle } from "lucide-react-native";
-import { Avatar } from "~/components/ui/Avatar";
+import {
+  ActivityIndicator,
+  Pressable,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { Heart, MessageCircle, Pencil, Trash2 } from "lucide-react-native";
 import { StarRating } from "~/components/ui/StarRating";
+import { UserAvatar } from "~/components/ui/UserAvatar";
+import { useBookReviews } from "../hooks/useBookReviews";
+import { useMyReview } from "../hooks/useMyReview";
+import { useDeleteReview } from "../hooks/useDeleteReview";
 import { fixed, useColors } from "~/theme/colors";
-import { USERS } from "~/mock";
+import { formatRelativeTime } from "~/lib/utils";
+import type { ReviewWithUser } from "../book.queries";
 
 const alpha = (hex: string, op: number) => {
   const n = parseInt(hex.replace("#", ""), 16);
   return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})` as const;
 };
 
-const DIST = [
-  { star: 5, pct: 62 },
-  { star: 4, pct: 22 },
-  { star: 3, pct: 10 },
-  { star: 2, pct: 4 },
-  { star: 1, pct: 2 },
-];
+// ─── Barra de distribución de rating ─────────────────────────
 
-const REVIEWS = [
-  { id: "r1", user: USERS[0], rating: 5,   text: "Una de las mejores obras de fantasía épica que he leído. La prosa es extraordinaria — cada página tiene una densidad poética que te obliga a leer despacio para saborear cada frase.", likes: 47, time: "2d",   liked: false },
-  { id: "r2", user: USERS[2], rating: 4,   text: "Mundo increíblemente construido. Algunos capítulos en el medio ralentizan bastante el ritmo, pero compensa con creces al final. El sistema de magia basado en simpatía es uno de los más originales del género.", likes: 31, time: "5d",   liked: true  },
-  { id: "r3", user: USERS[1], rating: 5,   text: "Comencé sin grandes expectativas y terminé completamente atrapado. El Alar y la simpatía como sistema mágico son los más originales que recuerdo haber encontrado.", likes: 28, time: "1sem", liked: false },
-  { id: "r4", user: USERS[3], rating: 3,   text: "Buena escritura, pero me cuesta conectar con el protagonista. Demasiado \"elegido\" para mi gusto. El mundo sí está muy bien construido y las escenas en la Universidad son lo mejor.", likes: 12, time: "2sem", liked: false },
-];
-
-function RatingBar({ star, pct, active, onPress }: { star: number; pct: number; active: boolean; onPress: () => void }) {
+// Muestra la barra de distribución para un número de estrellas.
+// El filtro activo resalta la barra correspondiente y cambia su color.
+function RatingBar({
+  star,
+  pct,
+  active,
+  onPress,
+}: {
+  star: number;
+  pct: number;
+  active: boolean;
+  onPress: () => void;
+}) {
   const c = useColors();
 
   return (
@@ -53,71 +62,179 @@ function RatingBar({ star, pct, active, onPress }: { star: number; pct: number; 
   );
 }
 
-function ReviewCard({ review }: { review: typeof REVIEWS[number] }) {
+// ─── Tarjeta individual de reseña ────────────────────────────
+
+// Muestra una reseña con header de usuario, cuerpo de texto y acciones.
+// Si isOwn = true se muestran botones de editar y borrar en lugar de like/comentar.
+function ReviewCard({
+  review,
+  isOwn = false,
+  onEdit,
+  onDelete,
+}: {
+  review: ReviewWithUser;
+  isOwn?: boolean;
+  onEdit?: () => void;
+  onDelete?: () => void;
+}) {
   const c = useColors();
-  const [liked, setLiked] = useState(review.liked);
-  const [likes, setLikes] = useState(review.likes);
+
+  // El usuario puede no estar disponible si la FK falla — fallback a datos básicos.
+  const user = review.users ?? {
+    id: review.user_id,
+    username: "usuario",
+    display_name: null,
+    avatar_url: null,
+  };
 
   return (
     <View className="bg-surface rounded-card p-4 border border-border mb-2.5">
-      {/* Header */}
+      {/* Header: avatar + nombre + tiempo */}
       <View className="flex-row items-start gap-2.5 mb-2.5">
-        <Avatar user={review.user} size={30} />
+        <UserAvatar user={user} size={30} />
         <View className="flex-1">
-          <Text className="font-body-sb text-xs text-text">{review.user.name}</Text>
-          <StarRating rating={review.rating} size={11} />
+          <Text className="font-body-sb text-xs text-text">
+            {user.display_name ?? user.username}
+          </Text>
+          <Text className="font-body text-xs text-t3">
+            @{user.username}
+          </Text>
         </View>
-        <Text className="font-body text-xs text-t3">hace {review.time}</Text>
+        <Text className="font-body text-xs text-t3">
+          {/* Tiempo relativo: "hace 3 días" */}
+          {formatRelativeTime(review.created_at)}
+          {/* Indica si fue editada */}
+          {review.edited_at ? " · editado" : ""}
+        </Text>
       </View>
 
-      {/* Body */}
+      {/* Aviso de spoiler — se muestra encima del cuerpo si aplica */}
+      {review.contains_spoilers && (
+        <View className="bg-warning/10 border border-warning/30 rounded-md px-2.5 py-1.5 mb-2">
+          <Text className="font-body-md text-xs" style={{ color: c.warning }}>
+            ⚠ Contiene spoilers
+          </Text>
+        </View>
+      )}
+
+      {/* Cuerpo de la reseña */}
       <Text
         className="font-body text-xs text-t2 mb-3"
         style={{ lineHeight: 13 * 1.7 }}
+        numberOfLines={isOwn ? undefined : 6}
       >
-        {review.text}
+        {review.body}
       </Text>
 
-      {/* Footer */}
+      {/* Footer: acciones */}
       <View
         className="flex-row gap-4 pt-2.5 border-t"
         style={{ borderTopColor: alpha(c.border, 0.5) }}
       >
-        <TouchableOpacity
-          onPress={() => { setLiked((l) => !l); setLikes((n) => liked ? n - 1 : n + 1); }}
-          className="flex-row items-center gap-[5px]"
-        >
-          <Heart size={14} color={liked ? fixed.accent : c.t3} fill={liked ? fixed.accent : "transparent"} strokeWidth={1.8} />
-          <Text className="font-body text-xs" style={{ color: liked ? fixed.accent : c.t3 }}>{likes}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className="flex-row items-center gap-[5px]">
-          <MessageCircle size={14} color={c.t3} strokeWidth={1.8} />
-          <Text className="font-body text-xs text-t3">Responder</Text>
-        </TouchableOpacity>
+        {isOwn ? (
+          // Reseña propia: mostrar editar y borrar
+          <>
+            <TouchableOpacity
+              onPress={onEdit}
+              className="flex-row items-center gap-[5px]"
+            >
+              <Pencil size={13} color={c.t3} strokeWidth={1.8} />
+              <Text className="font-body text-xs text-t3">Editar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={onDelete}
+              className="flex-row items-center gap-[5px]"
+            >
+              <Trash2 size={13} color={c.error} strokeWidth={1.8} />
+              <Text className="font-body text-xs" style={{ color: c.error }}>
+                Eliminar
+              </Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          // Reseña ajena: like y responder (likes/comentarios vendrán en C5/C6)
+          <>
+            <TouchableOpacity className="flex-row items-center gap-[5px]">
+              <Heart size={14} color={c.t3} fill="transparent" strokeWidth={1.8} />
+              <Text className="font-body text-xs text-t3">
+                {review.likes_count ?? 0}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity className="flex-row items-center gap-[5px]">
+              <MessageCircle size={14} color={c.t3} strokeWidth={1.8} />
+              <Text className="font-body text-xs text-t3">Responder</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
     </View>
   );
 }
 
-export function BookReviewsTab({ onWriteReview }: { onWriteReview?: () => void }) {
+// ─── Tab principal ────────────────────────────────────────────
+
+interface BookReviewsTabProps {
+  // bookId es necesario para cargar las reseñas reales.
+  bookId: string;
+  // Callback que abre el modal de crear/editar reseña.
+  onWriteReview: () => void;
+}
+
+// Distribución de ratings mock — en el futuro se puede obtener
+// con una query a user_books agregada por rating.
+const DIST_MOCK = [
+  { star: 5, pct: 62 },
+  { star: 4, pct: 22 },
+  { star: 3, pct: 10 },
+  { star: 2, pct: 4 },
+  { star: 1, pct: 2 },
+];
+
+export function BookReviewsTab({ bookId, onWriteReview }: BookReviewsTabProps) {
   const c = useColors();
   const [starFilter, setStarFilter] = useState<number | null>(null);
 
-  const displayed = starFilter ? REVIEWS.filter((r) => r.rating === starFilter) : REVIEWS;
+  // Reseñas paginadas del libro.
+  const {
+    reviews,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useBookReviews(bookId);
+
+  // Reseña del usuario actual (null si no ha escrito ninguna).
+  const { data: myReview } = useMyReview(bookId);
+
+  // Mutación de borrado — necesita reviewId al ejecutarse.
+  const deleteMutation = useDeleteReview(bookId);
+
+  // Las reseñas ajenas excluyen la mía (se muestra en su propia sección).
+  const otherReviews = reviews.filter((r) => r.id !== myReview?.id);
+
+  // Aplicamos el filtro de estrellas sobre el conteo visual (mock).
+  // El filtro real por rating requiere un JOIN con user_books — pendiente (C-feature).
+  const activeDist = starFilter
+    ? DIST_MOCK.filter((d) => d.star === starFilter)
+    : DIST_MOCK;
 
   return (
     <View className="pb-6">
-      {/* Rating summary */}
+      {/* ── Resumen de ratings (mock) ────────────────────── */}
       <View className="m-container mb-0 bg-surface rounded-card p-4 border border-border flex-row gap-container items-start">
         <View className="items-center shrink-0">
-          <Text className="font-display-bold text-3xl" style={{ color: fixed.star, lineHeight: 48 }}>4.5</Text>
-          <View className="mt-[5px]"><StarRating rating={4.5} size={12} /></View>
+          <Text className="font-display-bold text-3xl" style={{ color: fixed.star, lineHeight: 48 }}>
+            4.5
+          </Text>
+          <View className="mt-[5px]">
+            <StarRating rating={4.5} size={12} />
+          </View>
           <Text className="font-body text-xs text-t3 mt-[5px] text-center" style={{ lineHeight: 14 }}>
             {"1,234\nreseñas"}
           </Text>
         </View>
         <View className="flex-1 pt-1">
-          {DIST.map(({ star, pct }) => (
+          {DIST_MOCK.map(({ star, pct }) => (
             <RatingBar
               key={star}
               star={star}
@@ -129,7 +246,7 @@ export function BookReviewsTab({ onWriteReview }: { onWriteReview?: () => void }
         </View>
       </View>
 
-      {/* Star filter pills */}
+      {/* ── Filtros por estrellas ────────────────────────── */}
       <View className="flex-row flex-wrap gap-1.5 px-container pt-3.5">
         {[null, 5, 4, 3, 2, 1].map((r) => (
           <Pressable
@@ -143,32 +260,89 @@ export function BookReviewsTab({ onWriteReview }: { onWriteReview?: () => void }
               borderColor: starFilter === r ? fixed.accent : c.border,
             }}
           >
-            <Text className="font-body text-xs" style={{ color: starFilter === r ? "#fff" : c.t3 }}>
+            <Text
+              className="font-body text-xs"
+              style={{ color: starFilter === r ? "#fff" : c.t3 }}
+            >
               {r === null ? "Todas" : `${r} ★`}
             </Text>
           </Pressable>
         ))}
       </View>
 
-      {/* Write review CTA */}
+      {/* ── CTA escribir reseña ──────────────────────────── */}
       <View className="px-container pt-3.5 pb-3.5">
         <TouchableOpacity
           onPress={onWriteReview}
           activeOpacity={0.85}
           className="py-3.5 rounded-card bg-accent items-center"
         >
-          <Text className="font-body-sb text-sm text-white">Escribir mi reseña</Text>
+          <Text className="font-body-sb text-sm text-white">
+            {myReview ? "Editar mi reseña" : "Escribir mi reseña"}
+          </Text>
         </TouchableOpacity>
       </View>
 
-      {/* Review cards */}
+      {/* ── Mi reseña (si existe) ────────────────────────── */}
+      {myReview && (
+        <View className="px-container">
+          <Text className="font-body-sb text-xs text-t3 uppercase tracking-widest mb-2">
+            Mi reseña
+          </Text>
+          <ReviewCard
+            review={{ ...myReview, users: null }} // no necesitamos JOIN para la propia
+            isOwn
+            onEdit={onWriteReview}
+            onDelete={() => deleteMutation.mutate(myReview.id)}
+          />
+        </View>
+      )}
+
+      {/* ── Lista de reseñas ─────────────────────────────── */}
       <View className="px-container">
-        {displayed.length === 0 ? (
+        {/* Título de sección solo si hay reseñas de otros */}
+        {otherReviews.length > 0 && (
+          <Text className="font-body-sb text-xs text-t3 uppercase tracking-widest mb-2">
+            Reseñas de lectores
+          </Text>
+        )}
+
+        {/* Estado de carga inicial */}
+        {isLoading && (
           <View className="items-center py-6">
-            <Text className="font-body text-xs text-t3">Sin reseñas para este rating</Text>
+            <ActivityIndicator color={c.accent} />
           </View>
-        ) : (
-          displayed.map((r) => <ReviewCard key={r.id} review={r} />)
+        )}
+
+        {/* Estado vacío */}
+        {!isLoading && otherReviews.length === 0 && !myReview && (
+          <View className="items-center py-8">
+            <Text className="font-body text-xs text-t3 text-center">
+              Sé el primero en reseñar este libro.
+            </Text>
+          </View>
+        )}
+
+        {/* Lista de tarjetas de reseña */}
+        {otherReviews.map((review) => (
+          <ReviewCard key={review.id} review={review} />
+        ))}
+
+        {/* Botón "Cargar más" — visible solo si hay más páginas */}
+        {hasNextPage && (
+          <Pressable
+            onPress={() => fetchNextPage()}
+            disabled={isFetchingNextPage}
+            className="items-center py-3 mt-1"
+          >
+            {isFetchingNextPage ? (
+              <ActivityIndicator color={c.accent} size="small" />
+            ) : (
+              <Text className="font-body-md text-xs text-accent">
+                Cargar más reseñas
+              </Text>
+            )}
+          </Pressable>
         )}
       </View>
     </View>

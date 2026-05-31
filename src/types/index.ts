@@ -13,4 +13,4 @@ export { toAppError } from "./errors";
 
 export type { UserProfile } from "./user";
 export type { LoginParams, RegisterParams } from "./auth";
-export type { UpsertUserBookParams } from "./book";
+export type { UpsertUserBookParams, UpsertReviewParams } from "./book";
