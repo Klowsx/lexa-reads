@@ -63,10 +63,6 @@ export default function NewReviewScreen() {
     mode: "onChange",
   });
 
-  // Si la reseña existente carga después del primer render (TanStack Query
-  // trae los datos del servidor de forma async), precargamos el formulario.
-  // Usamos existingReview.id como dependencia para que no se dispare
-  // en cada render, solo cuando la reseña cambia.
   useEffect(() => {
     if (existingReview) {
       reset({
@@ -74,7 +70,7 @@ export default function NewReviewScreen() {
         containsSpoilers: existingReview.contains_spoilers ?? false,
       });
     }
-  }, [existingReview?.id]);
+  }, [existingReview?.id, existingReview?.body, existingReview?.contains_spoilers]);
 
   const bodyValue = watch("body");
   const charCount = bodyValue?.length ?? 0;

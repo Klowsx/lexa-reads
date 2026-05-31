@@ -11,6 +11,7 @@ import { ProfileLists } from '~/features/user/components/ProfileLists';
 import { ProfileStats } from '~/features/user/components/ProfileStats';
 import { ReadingGoal } from '~/features/user/components/ReadingGoal';
 import { RecentReads } from '~/features/user/components/RecentReads';
+import { useReadingGoal } from '~/features/user/hooks/useReadingGoal';
 import { useColors } from '~/theme/colors';
 import { ME, MOCK_LISTS, MY_BOOKS, type MockBook } from '~/mock';
 
@@ -21,8 +22,9 @@ export default function ProfileScreen() {
   const [selectedBook, setSelectedBook] = useState<MockBook | null>(null);
   const [showEdit, setShowEdit] = useState(false);
 
+  const { data: goalData } = useReadingGoal();
+
   const readingBooks = MY_BOOKS.filter((b) => b.status === 'reading');
-  const booksRead = MY_BOOKS.filter((b) => b.status === 'read').length;
   const recentReads = MY_BOOKS.filter((b) => b.status === 'read').slice(0, 4);
 
   return (
@@ -49,12 +51,14 @@ export default function ProfileScreen() {
 
         <CurrentlyReading books={readingBooks} onPress={setSelectedBook} />
 
-        <ReadingGoal
-          booksRead={booksRead}
-          goal={ME.goal}
-          goalYear={ME.goalYear}
-          onEditGoal={() => router.push('/settings')}
-        />
+        {goalData && (
+          <ReadingGoal
+            booksRead={goalData.booksRead}
+            goal={goalData.goal}
+            goalYear={goalData.goalYear}
+            onEditGoal={() => router.push('/settings')}
+          />
+        )}
 
         <RecentReads books={recentReads} onPress={setSelectedBook} />
 

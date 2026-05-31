@@ -1,12 +1,13 @@
 import { useRouter } from 'expo-router';
 import { ChevronLeft, Monitor, Moon, Sun } from 'lucide-react-native';
 import { useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SettingsItem } from '~/features/user/components/SettingsItem';
 import { SettingsSection } from '~/features/user/components/SettingsSection';
 import { SettingsToggle } from '~/features/user/components/SettingsToggle';
-import { ME } from '~/mock';
+import { useReadingGoal } from '~/features/user/hooks/useReadingGoal';
+import { useUpdateReadingGoal } from '~/features/user/hooks/useUpdateReadingGoal';
 import { type ThemeMode, useThemeStore } from '~/stores/theme.store';
 import { useColors } from '~/theme/colors';
 
@@ -28,8 +29,13 @@ export default function SettingsScreen() {
   const mode = useThemeStore((s) => s.mode);
   const setMode = useThemeStore((s) => s.setMode);
 
-  const [goalVal, setGoalVal]         = useState(ME.goal);
+  const { data: goalData } = useReadingGoal();
+  const updateGoal = useUpdateReadingGoal();
+  const [goalVal, setGoalVal]         = useState<number | null>(null);
   const [showGoal, setShowGoal]       = useState(false);
+
+  const currentGoal = goalVal ?? goalData?.goal ?? 12;
+  const goalYear = goalData?.goalYear ?? new Date().getFullYear();
   const [pushOn, setPushOn]           = useState(true);
   const [followersOn, setFollowersOn] = useState(true);
   const [likesOn, setLikesOn]         = useState(false);
@@ -58,18 +64,21 @@ export default function SettingsScreen() {
           />
           <SettingsItem
             label="Meta de lectura"
-            subtitle={`${goalVal} libros en ${ME.goalYear}`}
-            onPress={() => setShowGoal(s => !s)}
+            subtitle={`${currentGoal} libros en ${goalYear}`}
+            onPress={() => {
+              setGoalVal(goalData?.goal ?? 12);
+              setShowGoal(s => !s);
+            }}
             separator={!showGoal}
           />
           {showGoal && (
             <View className="p-4 bg-sr border-b border-border">
               <Text className="text-xs font-body text-t2 text-center mb-3.5">
-                Libros a leer en {ME.goalYear}
+                Libros a leer en {goalYear}
               </Text>
               <View className="flex-row items-center justify-center gap-4.5 mb-3.5">
                 <Pressable
-                  onPress={() => setGoalVal(g => Math.max(1, g - 5))}
+                  onPress={() => setGoalVal(g => Math.max(1, (g ?? currentGoal) - 5))}
                   className="rounded-full bg-sh border border-border items-center justify-center"
                   style={{ width: 38, height: 38 }}
                 >
@@ -79,10 +88,10 @@ export default function SettingsScreen() {
                   className="font-display-sb text-accent text-center"
                   style={{ fontSize: 42, minWidth: 70, lineHeight: 44 }}
                 >
-                  {goalVal}
+                  {currentGoal}
                 </Text>
                 <Pressable
-                  onPress={() => setGoalVal(g => Math.min(365, g + 5))}
+                  onPress={() => setGoalVal(g => Math.min(365, (g ?? currentGoal) + 5))}
                   className="rounded-full bg-sh border border-border items-center justify-center"
                   style={{ width: 38, height: 38 }}
                 >
@@ -90,11 +99,17 @@ export default function SettingsScreen() {
                 </Pressable>
               </View>
               <Pressable
-                onPress={() => setShowGoal(false)}
+                onPress={() => {
+                  updateGoal.mutate(currentGoal, { onSuccess: () => setShowGoal(false) });
+                }}
+                disabled={updateGoal.isPending}
                 className="py-2.5 rounded-md items-center"
                 style={{ backgroundColor: c.accent }}
               >
-                <Text className="text-xs font-body-sb" style={{ color: '#fff' }}>Guardar</Text>
+                {updateGoal.isPending
+                  ? <ActivityIndicator size="small" color="#fff" />
+                  : <Text className="text-xs font-body-sb" style={{ color: '#fff' }}>Guardar</Text>
+                }
               </Pressable>
             </View>
           )}

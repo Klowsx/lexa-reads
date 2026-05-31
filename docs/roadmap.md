@@ -79,9 +79,9 @@ Hoy todo el flujo de "yo lectora marca un libro" vive en mocks. Es el bloque que
 
 ### B4. Reading goal real
 
-- [ ] Hook `useReadingGoal()` — lee `users.reading_goal` y cuenta `books_read` del año en curso.
-- [ ] Mutación para editar el goal desde settings/perfil.
-- [ ] Reemplazar mock en `ProfileScreen`.
+- [x] Hook `useReadingGoal()` — lee `users.reading_goal` y cuenta `books_read` del año en curso.
+- [x] Mutación para editar el goal desde settings/perfil.
+- [x] Reemplazar mock en `ProfileScreen`.
 
 ---
 
