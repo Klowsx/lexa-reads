@@ -91,41 +91,42 @@ Sin social, Lexa es Goodreads chico. Este es el diferenciador.
 
 ### C1. Perfil propio + perfil ajeno
 
-- [ ] Hook `useProfile(username)` — incluye `is_blocked_by_me`, `is_following`.
-- [ ] Pantalla `app/user/[username].tsx` con header, stats, recent reads, listas públicas, botón follow.
-- [ ] `app/(tabs)/profile.tsx`: usar `useProfile(me.username)` en lugar de mocks.
-- [ ] Pantalla `app/settings/profile.tsx` — editar avatar (Supabase Storage), display_name, bio, favorite_genres, is_private.
+- [x] Hook `useProfile(username)` — incluye `is_blocked_by_me`, `is_following`.
+- [x] Pantalla `app/user/[username].tsx` con header, stats, recent reads, listas públicas, botón follow.
+- [x] `app/(tabs)/profile.tsx`: usar `useMe()` en lugar de mocks; CurrentlyReading y RecentReads con `useLibrary`.
+- [x] `app/edit-profile.tsx` — editar display_name, bio, favorite_genres, is_private; conectado a `useUpdateProfile`.
 
 ### C2. Follows
 
-- [ ] Hooks `useFollow`, `useUnfollow` con optimistic update sobre `followers_count` / `following_count`.
-- [ ] Pantalla `app/user/[username]/followers.tsx` y `/following.tsx` — listas paginadas.
-- [ ] Soporte `status: pending` para cuentas privadas (`is_private = true`): aprobar/rechazar requests en settings.
+- [x] Hooks `useFollow`, `useUnfollow` con optimistic update sobre `followers_count` / `following_count`.
+- [x] Pantalla `app/followers.tsx` — listas paginadas de seguidores/siguiendo con infinite scroll y botón follow por fila.
+- [x] Soporte `status: pending` para cuentas privadas: botón "Solicitud enviada" + cancelar. Solicitudes entrantes aparecen destacadas al tope de Notificaciones con `FollowRequestsSection` (aceptar/rechazar con optimistic update).
 
 ### C3. Búsqueda de usuarios
 
-- [ ] Tab nuevo o segmented control en `search.tsx` (Libros / Usuarios).
-- [ ] Hook `useSearchUsers(q)` con `pg_trgm` sobre `username` y `display_name`.
+- [x] Tab "Usuarios" en `search.tsx` — segmented control animado (Todo / Libros / Usuarios).
+- [x] Hook `useSearchUsers(q)` — query Supabase con `.or(username.ilike / display_name.ilike)`; sin query devuelve top 5 sugeridos por `followers_count`.
+- [x] `UserCard` migrado de `MockFullUser` a `SearchUser` real; botón Seguir conectado a `useFollow`.
 
 ### C4. Feed real
 
-- [ ] Hook `useFeed()` con `useInfiniteQuery`, cursor `(created_at, id)`, lee `activity_feed` filtrado por RLS (sigues/no-bloqueados).
-- [ ] Reemplazar `FEED_INIT` mock.
-- [ ] Verificar que las mutaciones de B1/B3 emitan filas en `activity_feed` (probablemente vía trigger o desde la mutación).
-- [ ] Empty state: si el usuario sigue a 0 personas → CTA "sugerencias de follow".
+- [x] Hook `useFeed()` con `useInfiniteQuery`, cursor `(created_at, id)`, lee `activity_feed` filtrado por RLS (sigues/no-bloqueados).
+- [x] Reemplazar `FEED_INIT` mock.
+- [x] Verificar que las mutaciones de B1/B3 emitan filas en `activity_feed` (probablemente vía trigger o desde la mutación).
+- [x] Empty state: si el usuario sigue a 0 personas → CTA "sugerencias de follow".
 
 ### C5. Likes
 
-- [ ] `useToggleActivityLike` con optimistic update sobre `activity_likes` + `activity_feed.likes_count`.
-- [ ] `useToggleReviewLike` análogo sobre `review_likes` + `reviews.likes_count`.
-- [ ] Wireado del botón corazón en `FeedCard` y en cards de reseña.
+- [x] `useToggleActivityLike` con optimistic update sobre `activity_likes` + `activity_feed.likes_count`.
+- [x] `useToggleReviewLike` análogo sobre `review_likes` + `reviews.likes_count`.
+- [x] Wireado del botón corazón en `FeedCard` y en cards de reseña.
 
 ### C6. Comentarios (motor de retención del feed)
 
-- [ ] Pantalla / bottom-sheet `CommentsSheet` para `target_type ∈ {review, activity}`.
-- [ ] Hooks `useComments(target)`, `useCreateComment` (1 nivel de reply mínimo).
-- [ ] Botón "comentar" en FeedCard y review card abre el sheet.
-- [ ] Soft delete propio + mostrar "comentario eliminado".
+- [x] Pantalla `app/comments/[id].tsx` para `target_type ∈ {review, activity}` — acepta param `type`.
+- [x] Hooks `useComments`, `useCreateComment`, `useDeleteComment`.
+- [x] Botón "comentar" en FeedCard y review card navega a la pantalla.
+- [x] Soft delete propio + mostrar "comentario eliminado".
 
 ### C7. Listas
 

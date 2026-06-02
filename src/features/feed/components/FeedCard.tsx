@@ -2,17 +2,19 @@ import { useState } from 'react';
 import { ActionSheetIOS, Alert, Platform, Pressable, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { BookOpen, Heart, MessageCircle, MoreHorizontal, Share2 } from 'lucide-react-native';
+import { Image } from 'expo-image';
 import { Avatar } from '~/components/ui/Avatar';
 import { StarRating } from '~/components/ui/StarRating';
 import { BookDetailSheet } from '~/features/book/components/BookDetailSheet';
 import { ReportSheet } from '~/features/user/components/ReportSheet';
 import { useToggleActivityLike } from '~/features/feed/hooks/useToggleActivityLike';
-import { ACT_LABEL, type FeedItemType, type MockFeedItem } from '~/mock';
+import type { ActivityType, FeedItem } from '~/features/feed/feed.queries';
 import { fixed, useColors } from '~/theme/colors';
+import { formatRelativeTime } from '~/lib/utils';
 
 // ─── Constants ────────────────────────────────────────────────
 
-const ACTIVITY_COLOR: Record<FeedItemType, string> = {
+const ACTIVITY_COLOR: Record<ActivityType, string> = {
   finished_book:  fixed.status.read,
   started_book:   fixed.status.reading,
   wrote_review:   fixed.accent,
@@ -21,7 +23,7 @@ const ACTIVITY_COLOR: Record<FeedItemType, string> = {
   want_to_read:   fixed.status.want,
 };
 
-const ACTIVITY_LABEL: Record<FeedItemType, string> = {
+const ACTIVITY_LABEL: Record<ActivityType, string> = {
   finished_book:  'Terminó de leer',
   started_book:   'Empezó a leer',
   wrote_review:   'Reseñó',
@@ -29,6 +31,39 @@ const ACTIVITY_LABEL: Record<FeedItemType, string> = {
   abandoned_book: 'Abandonó',
   want_to_read:   'Quiere leer',
 };
+
+const ACT_VERB: Record<ActivityType, string> = {
+  finished_book:  'terminó de leer',
+  started_book:   'empezó a leer',
+  wrote_review:   'reseñó',
+  added_to_list:  'agregó',
+  abandoned_book: 'abandonó',
+  want_to_read:   'quiere leer',
+};
+
+// Paleta de pares de colores para la cover band — derivada del ID del libro.
+const COLOR_PAIRS: [string, string][] = [
+  ['#1C1635', '#7B5EA7'],
+  ['#2A1A08', '#C49A20'],
+  ['#181818', '#AAAAAA'],
+  ['#180F0F', '#8B3A3A'],
+  ['#0A1E2A', '#2A8A8A'],
+  ['#1E0808', '#C43A3A'],
+  ['#0C1628', '#4A8AB8'],
+  ['#1A1208', '#8B6A3A'],
+  ['#0F180F', '#5A8A5A'],
+  ['#1E1408', '#D4902A'],
+  ['#1A0820', '#9B5FC0'],
+  ['#081A14', '#3A9B7A'],
+];
+
+function bookColors(bookId: string): [string, string] {
+  let h = 0;
+  for (let i = 0; i < bookId.length; i++) {
+    h = (h * 31 + bookId.charCodeAt(i)) >>> 0;
+  }
+  return COLOR_PAIRS[h % COLOR_PAIRS.length];
+}
 
 const alpha = (hex: string, op: number) => {
   const n = parseInt(hex.replace('#', ''), 16);
@@ -38,22 +73,25 @@ const alpha = (hex: string, op: number) => {
 // ─── FeedCard ─────────────────────────────────────────────────
 
 interface FeedCardProps {
-  item: MockFeedItem;
-  // activityId: real UUID from activity_feed; undefined when using mock data
-  activityId?: string;
+  item: FeedItem;
 }
 
-export function FeedCard({ item, activityId }: FeedCardProps) {
+export function FeedCard({ item }: FeedCardProps) {
   const router = useRouter();
   const c = useColors();
   const [isPeeking, setIsPeeking] = useState(false);
   const [showReport, setShowReport] = useState(false);
 
   const { liked, count, toggle, isPending } = useToggleActivityLike(
-    activityId,
+    item.id,
     item.liked,
-    item.likes,
+    item.likes_count,
   );
+
+  const displayName = item.user.display_name ?? item.user.username;
+  const author = item.book.authors[0] ?? 'Autor desconocido';
+  const [c1, c2] = bookColors(item.book.id);
+  const activityColor = ACTIVITY_COLOR[item.activity_type];
 
   function openMenu() {
     if (Platform.OS === 'ios') {
@@ -69,14 +107,12 @@ export function FeedCard({ item, activityId }: FeedCardProps) {
       );
     } else {
       Alert.alert(`@${item.user.username}`, undefined, [
-        { text: `Ver perfil`, onPress: () => router.push(`/user/${item.user.username}` as any) },
+        { text: 'Ver perfil', onPress: () => router.push(`/user/${item.user.username}` as any) },
         { text: 'Reportar publicación', onPress: () => setShowReport(true) },
         { text: 'Cancelar', style: 'cancel' },
       ]);
     }
   }
-
-  const activityColor = ACTIVITY_COLOR[item.type];
 
   return (
     <>
@@ -85,7 +121,12 @@ export function FeedCard({ item, activityId }: FeedCardProps) {
         {/* ── Header ─────────────────────────────────── */}
         <View className="flex-row items-center px-3.5 pt-3 pb-2.5 gap-2.5">
           <Pressable onPress={() => router.push(`/user/${item.user.username}` as any)}>
-            <Avatar displayName={item.user.name} username={item.user.username} size={36} />
+            <Avatar
+              displayName={displayName}
+              username={item.user.username}
+              avatarUrl={item.user.avatar_url ?? undefined}
+              size={36}
+            />
           </Pressable>
 
           <Pressable
@@ -93,17 +134,13 @@ export function FeedCard({ item, activityId }: FeedCardProps) {
             onPress={() => router.push(`/user/${item.user.username}` as any)}
           >
             <Text numberOfLines={1}>
-              <Text className="font-body-sb text-sm text-text">
-                {item.user.name}
-              </Text>
-              <Text className="font-body text-xs text-t3">
-                {'  @'}{item.user.username}
-              </Text>
+              <Text className="font-body-sb text-sm text-text">{displayName}</Text>
+              <Text className="font-body text-xs text-t3">{'  @'}{item.user.username}</Text>
             </Text>
           </Pressable>
 
           <Text className="font-body text-xs text-t3 shrink-0">
-            {item.time}
+            {formatRelativeTime(item.created_at)}
           </Text>
 
           <Pressable hitSlop={8} onPress={openMenu}>
@@ -113,25 +150,19 @@ export function FeedCard({ item, activityId }: FeedCardProps) {
 
         {/* ── Book Cover Band ─────────────────────────── */}
         <Pressable
-          onPress={() => router.push(`/book/${item.book.id}` as any)}
+          onPress={() => router.push(`/book/${item.book.google_books_id}` as any)}
           className="items-center justify-center py-7"
-          style={{ backgroundColor: item.book.c1 }}
+          style={{ backgroundColor: c1 }}
         >
           {/* Side accent stripes */}
-          <View
-            className="absolute left-0 top-0 bottom-0 w-[5px]"
-            style={{ backgroundColor: alpha(item.book.c2, 0.55) }}
-          />
-          <View
-            className="absolute right-0 top-0 bottom-0 w-[3px]"
-            style={{ backgroundColor: alpha(item.book.c2, 0.18) }}
-          />
+          <View className="absolute left-0 top-0 bottom-0 w-[5px]" style={{ backgroundColor: alpha(c2, 0.55) }} />
+          <View className="absolute right-0 top-0 bottom-0 w-[3px]" style={{ backgroundColor: alpha(c2, 0.18) }} />
 
           {/* Book cover */}
           <View
             className="w-[130px] h-[195px] rounded-sm overflow-hidden"
             style={{
-              backgroundColor: item.book.c1,
+              backgroundColor: c1,
               shadowColor: '#000',
               shadowOpacity: 0.65,
               shadowRadius: 14,
@@ -139,31 +170,35 @@ export function FeedCard({ item, activityId }: FeedCardProps) {
               elevation: 16,
             }}
           >
-            {/* Spine */}
-            <View
-              className="absolute left-0 top-0 bottom-0 w-[5px]"
-              style={{ backgroundColor: item.book.c2 }}
-            />
-            {/* Text content */}
-            <View className="flex-1 justify-end pl-3 pr-2 pb-3">
-              <Text
-                className="font-display text-xs"
-                style={{
-                  lineHeight: 15,
-                  color: 'rgba(240,234,226,0.92)',
-                }}
-                numberOfLines={6}
-              >
-                {item.book.title}
-              </Text>
-              <Text
-                className="font-body text-xs mt-[5px]"
-                style={{ color: 'rgba(240,234,226,0.45)' }}
-                numberOfLines={1}
-              >
-                {item.book.author}
-              </Text>
-            </View>
+            {item.book.cover_url ? (
+              <Image
+                source={{ uri: item.book.cover_url }}
+                style={{ width: '100%', height: '100%' }}
+                contentFit="cover"
+              />
+            ) : (
+              <>
+                {/* Spine */}
+                <View className="absolute left-0 top-0 bottom-0 w-[5px]" style={{ backgroundColor: c2 }} />
+                {/* Text content */}
+                <View className="flex-1 justify-end pl-3 pr-2 pb-3">
+                  <Text
+                    className="font-display text-xs"
+                    style={{ lineHeight: 15, color: 'rgba(240,234,226,0.92)' }}
+                    numberOfLines={6}
+                  >
+                    {item.book.title}
+                  </Text>
+                  <Text
+                    className="font-body text-xs mt-[5px]"
+                    style={{ color: 'rgba(240,234,226,0.45)' }}
+                    numberOfLines={1}
+                  >
+                    {author}
+                  </Text>
+                </View>
+              </>
+            )}
           </View>
 
           {/* Activity badge — bottom left */}
@@ -175,18 +210,18 @@ export function FeedCard({ item, activityId }: FeedCardProps) {
             }}
           >
             <Text className="font-body-md text-xs" style={{ color: activityColor }}>
-              {ACTIVITY_LABEL[item.type]}
+              {ACTIVITY_LABEL[item.activity_type]}
             </Text>
           </View>
 
           {/* List name badge — bottom right (added_to_list only) */}
-          {item.type === 'added_to_list' && item.listName ? (
+          {item.activity_type === 'added_to_list' && item.list_name ? (
             <View
               className="absolute bottom-[11px] right-[14px] rounded-sm px-2 py-1 border border-border"
               style={{ backgroundColor: alpha(c.sr, 0.88) }}
             >
               <Text className="font-body text-xs text-t2" numberOfLines={1}>
-                {item.listName}
+                {item.list_name}
               </Text>
             </View>
           ) : null}
@@ -207,10 +242,7 @@ export function FeedCard({ item, activityId }: FeedCardProps) {
               fill={liked ? fixed.accent : 'none'}
               strokeWidth={1.7}
             />
-            <Text
-              className="font-body-md text-xs"
-              style={{ color: liked ? fixed.accent : c.t2 }}
-            >
+            <Text className="font-body-md text-xs" style={{ color: liked ? fixed.accent : c.t2 }}>
               {count}
             </Text>
           </Pressable>
@@ -219,13 +251,12 @@ export function FeedCard({ item, activityId }: FeedCardProps) {
           <Pressable
             onPress={() => router.push({
               pathname: '/comments/[id]',
-              params: { id: activityId ?? item.id, type: 'activity' },
+              params: { id: item.id, type: 'activity' },
             } as any)}
             className="flex-row items-center gap-[5px]"
             hitSlop={8}
           >
             <MessageCircle size={21} color={c.t2} strokeWidth={1.7} />
-            <Text className="font-body text-xs text-t2">{item.comments}</Text>
           </Pressable>
 
           {/* Share */}
@@ -233,7 +264,7 @@ export function FeedCard({ item, activityId }: FeedCardProps) {
             <Share2 size={20} color={c.t2} strokeWidth={1.7} />
           </Pressable>
 
-          {/* Vistazo — peek without leaving the feed */}
+          {/* Vistazo */}
           <Pressable
             onPress={() => setIsPeeking(true)}
             className="ml-auto flex-row items-center gap-[5px] rounded-full px-2.5 py-[5px] border"
@@ -252,51 +283,35 @@ export function FeedCard({ item, activityId }: FeedCardProps) {
 
         {/* ── Caption ─────────────────────────────────── */}
         <View className="px-3.5 pt-1 pb-3.5 gap-[5px]">
-          {/* Rating */}
-          {item.rating != null ? (
-            <View className="flex-row items-center gap-1.5">
-              <StarRating rating={item.rating} size={13} />
-              <Text className="font-body-sb text-xs" style={{ color: fixed.star }}>
-                {item.rating}
-              </Text>
-            </View>
-          ) : null}
-
           {/* Activity summary */}
           <Text className="font-body text-xs text-t2" style={{ lineHeight: 19 }}>
-            <Text className="font-body-sb text-text">
-              {item.user.username}
-            </Text>
+            <Text className="font-body-sb text-text">{item.user.username}</Text>
             {'  '}
-            <Text className="text-t2">{ACT_LABEL[item.type]}</Text>
+            <Text className="text-t2">{ACT_VERB[item.activity_type]}</Text>
             {'  '}
-            <Text className="font-display-i text-text">
-              &ldquo;{item.book.title}&rdquo;
-            </Text>
-            {item.type === 'added_to_list' && item.listName ? (
+            <Text className="font-display-i text-text">&ldquo;{item.book.title}&rdquo;</Text>
+            {item.activity_type === 'added_to_list' && item.list_name ? (
               <Text className="text-t2">
                 {'  a  '}
-                <Text style={{ color: fixed.accent }}>
-                  &ldquo;{item.listName}&rdquo;
-                </Text>
+                <Text style={{ color: fixed.accent }}>&ldquo;{item.list_name}&rdquo;</Text>
               </Text>
             ) : null}
           </Text>
 
           {/* Review preview */}
-          {item.preview ? (
+          {item.review_preview ? (
             <Text
               className="font-body text-xs text-t2"
               style={{ lineHeight: 19 }}
               numberOfLines={3}
             >
-              {item.preview}
+              {item.review_preview}
             </Text>
           ) : null}
         </View>
       </View>
 
-      {/* Peek sheet — BookDetailSheet without navigating */}
+      {/* Peek sheet */}
       {isPeeking ? (
         <BookDetailSheet
           book={item.book as any}
