@@ -142,16 +142,16 @@ Sin social, Lexa es Goodreads chico. Este es el diferenciador.
 
 Sin esto NO se puede subir a App Store / Play Store. Hacer **antes** de pulir UI.
 
-- [ ] **Bloqueo de usuarios**: acción en `user/[username].tsx` (menú "..."), hooks `useBlockUser` / `useUnblockUser`, listado en settings.
-- [ ] **Reportar contenido**: bottom-sheet de "reportar" en review, comment, user, list, activity (reason picker + details). Hook `useCreateReport`.
+- [x] **Bloqueo de usuarios**: acción en `user/[username].tsx` (menú "..."), hooks `useBlockUser` / `useUnblockUser`, listado en settings.
+- [x] **Reportar contenido**: bottom-sheet de "reportar" en review, comment, user, list, activity (reason picker + details). Hook `useCreateReport`.
 - [ ] **Panel interno** (mínimo Supabase Studio o vista admin) para resolver reports ≤24h — documentar el proceso.
-- [ ] **Borrado de cuenta**:
-  - Edge Function `delete-account` → marca `users.deleted_at` + crea fila en `account_deletion_requests`.
-  - Pantalla `app/settings/delete-account.tsx` con confirmación + reauth.
-  - `pg_cron` job que ejecuta hard-delete + anonimización a los 30 días.
-- [ ] **Export de datos**: Edge Function `export-user-data` → ZIP con CSV/JSON de user_books, reviews, lists, comments. Botón en settings.
-- [ ] **Política de privacidad** pública (URL accesible) + link desde register y settings.
-- [ ] **Consentimiento granular**: modal en primer login para analytics/push, persistido en `notification_preferences` y posthog opt-in.
+- [x] **Borrado de cuenta**:
+  - Edge Function `delete-account` → crea fila en `account_deletion_requests` + cierra sesiones.
+  - UI inline en `app/settings.tsx` con confirmación + cancelación.
+  - `pg_cron` job que ejecuta hard-delete + anonimización a los 30 días (`migrations/010_compliance.sql`).
+- [x] **Export de datos**: Edge Function `export-user-data` → JSON de user_books, reviews, lists, comments. Botón en settings (Share nativo).
+- [x] **Política de privacidad** pública (URL accesible) + link desde register y settings.
+- [x] **Consentimiento granular**: modal en primer login para push/email, persistido en `notification_preferences.consent_given_at` (migración 010).
 
 ---
 

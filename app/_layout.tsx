@@ -23,6 +23,7 @@ import { useAuthStore } from "~/stores/auth.store";
 import { useThemeStore } from "~/stores/theme.store";
 import { queryClient } from "~/lib/query-client";
 import i18n from "~/lib/i18n";
+import { ConsentModal } from "~/features/user/components/ConsentModal";
 
 function AuthGate() {
   const session = useAuthStore((s) => s.session);
@@ -96,6 +97,7 @@ function RootLayout() {
       <I18nextProvider i18n={i18n}>
         <QueryClientProvider client={queryClient}>
           <AuthGate />
+          <ConsentModal />
           <Stack screenOptions={{ headerShown: false }} />
         </QueryClientProvider>
       </I18nextProvider>

@@ -410,3 +410,164 @@ export const searchUsersQueryOptions = (q: string) =>
     queryFn: () => fetchSearchUsers(q),
     staleTime: q.length >= 2 ? 30_000 : 5 * 60_000,
   });
+
+// ── Bloqueos ──────────────────────────────────────────────────
+
+export type BlockedUser = {
+  id: string;
+  created_at: string;
+  blocked: Pick<UserProfile, "id" | "username" | "display_name" | "avatar_url">;
+};
+
+export async function blockUserFn(
+  blockerId: string,
+  blockedId: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("user_blocks")
+    .insert({ blocker_id: blockerId, blocked_id: blockedId });
+  if (error) throw error;
+}
+
+export async function unblockUserFn(
+  blockerId: string,
+  blockedId: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("user_blocks")
+    .delete()
+    .eq("blocker_id", blockerId)
+    .eq("blocked_id", blockedId);
+  if (error) throw error;
+}
+
+async function fetchBlockedUsers(userId: string): Promise<BlockedUser[]> {
+  const { data, error } = await supabase
+    .from("user_blocks")
+    .select(
+      "id, created_at, blocked:users!blocked_id(id, username, display_name, avatar_url)",
+    )
+    .eq("blocker_id", userId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as unknown as BlockedUser[];
+}
+
+export const blockedUsersQueryOptions = (userId: string) =>
+  queryOptions({
+    queryKey: ["blocked-users", userId],
+    queryFn: () => fetchBlockedUsers(userId),
+    enabled: !!userId,
+  });
+
+// ── Reportes ──────────────────────────────────────────────────
+
+export type ReportTargetType =
+  | "review"
+  | "comment"
+  | "user"
+  | "list"
+  | "activity";
+
+export async function createReportFn(params: {
+  reporterId: string;
+  targetType: ReportTargetType;
+  targetId: string;
+  reason: string;
+  details?: string;
+}): Promise<void> {
+  const { error } = await supabase.from("reports").insert({
+    reporter_id: params.reporterId,
+    target_type: params.targetType,
+    target_id: params.targetId,
+    reason: params.reason,
+    details: params.details ?? null,
+  });
+  if (error) throw error;
+}
+
+// ── Eliminación de cuenta ──────────────────────────────────────
+
+export type DeletionRequest = {
+  id: string;
+  requested_at: string;
+  scheduled_delete_at: string;
+};
+
+async function fetchDeletionRequest(
+  userId: string,
+): Promise<DeletionRequest | null> {
+  const { data, error } = await supabase
+    .from("account_deletion_requests")
+    .select("id, requested_at, scheduled_delete_at")
+    .eq("user_id", userId)
+    .is("cancelled_at", null)
+    .maybeSingle();
+  if (error) throw error;
+  return data as DeletionRequest | null;
+}
+
+export const accountDeletionQueryOptions = (userId: string) =>
+  queryOptions({
+    queryKey: ["account_deletion", userId],
+    queryFn: () => fetchDeletionRequest(userId),
+    enabled: !!userId,
+  });
+
+export async function cancelAccountDeletionFn(requestId: string): Promise<void> {
+  const { error } = await supabase
+    .from("account_deletion_requests")
+    .update({ cancelled_at: new Date().toISOString() })
+    .eq("id", requestId);
+  if (error) throw error;
+}
+
+// ── Preferencias de notificación ───────────────────────────────
+
+export type NotificationPreferences = {
+  user_id: string;
+  push_new_follower: boolean;
+  push_activity_like: boolean;
+  push_review_like: boolean;
+  push_comment: boolean;
+  push_recommendation: boolean;
+  email_weekly_digest: boolean;
+  consent_given_at: string | null; // agregado en migración 010
+  updated_at: string;
+};
+
+async function fetchNotificationPreferences(
+  userId: string,
+): Promise<NotificationPreferences | null> {
+  const { data, error } = await supabase
+    .from("notification_preferences")
+    .select("*")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (error) throw error;
+  return data as NotificationPreferences | null;
+}
+
+export const notificationPreferencesQueryOptions = (userId: string) =>
+  queryOptions({
+    queryKey: ["notification_preferences", userId],
+    queryFn: () => fetchNotificationPreferences(userId),
+    enabled: !!userId,
+  });
+
+export async function upsertNotificationPreferencesFn(
+  userId: string,
+  data: Partial<
+    Omit<NotificationPreferences, "user_id" | "updated_at">
+  > & { markConsent?: boolean },
+): Promise<void> {
+  const { markConsent, ...prefs } = data;
+  // consent_given_at no está en los tipos generados aún (migración 010) — cast necesario
+  const payload = {
+    user_id: userId,
+    ...prefs,
+    ...(markConsent ? { consent_given_at: new Date().toISOString() } : {}),
+  } as any;
+  const { error } = await supabase.from("notification_preferences").upsert(payload);
+  if (error) throw error;
+}

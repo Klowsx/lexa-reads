@@ -321,7 +321,8 @@ export function FeedCard({ item }: FeedCardProps) {
 
       {showReport && (
         <ReportSheet
-          target="content"
+          targetType="activity"
+          targetId={item.id}
           targetName={`Publicación de @${item.user.username}`}
           onClose={() => setShowReport(false)}
         />

@@ -3,6 +3,7 @@ import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import {
   KeyboardAvoidingView,
+  Linking,
   Platform,
   Pressable,
   ScrollView,
@@ -147,8 +148,21 @@ export default function RegisterScreen() {
             {terms && <Check size={11} color="#fff" />}
           </View>
           <Text className="flex-1 text-xs text-t2 leading-[18px] font-body">
-            Acepto los <Text className="text-accent">Términos</Text> y la{" "}
-            <Text className="text-accent">Política de privacidad</Text> de Lexa.
+            Acepto los{" "}
+            <Text
+              className="text-accent"
+              onPress={() => Linking.openURL('https://lexareads.app/terms')}
+            >
+              Términos
+            </Text>
+            {" "}y la{" "}
+            <Text
+              className="text-accent"
+              onPress={() => Linking.openURL('https://lexareads.app/privacy')}
+            >
+              Política de privacidad
+            </Text>
+            {" "}de Lexa.
           </Text>
         </Pressable>
 

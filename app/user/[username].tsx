@@ -19,6 +19,7 @@ import { ProfileLists } from '~/features/user/components/ProfileLists';
 import { ProfileStats } from '~/features/user/components/ProfileStats';
 import { RecentReads } from '~/features/user/components/RecentReads';
 import { ReportSheet } from '~/features/user/components/ReportSheet';
+import { useBlockUser } from '~/features/user/hooks/useBlockUser';
 import { useFollow } from '~/features/user/hooks/useFollow';
 import { useProfile } from '~/features/user/hooks/useProfile';
 import { userRecentReadsQueryOptions } from '~/features/user/user.queries';
@@ -91,9 +92,14 @@ export default function UserProfileScreen() {
     profile?.is_private ?? false,
   );
 
-  const [showReport, setShowReport] = useState(false);
-  const [blocked, setBlocked] = useState(false);
+  const { block, unblock } = useBlockUser(
+    profile?.id ?? '',
+    username,
+  );
 
+  const [showReport, setShowReport] = useState(false);
+
+  const blocked = profile?.is_blocked_by_me ?? false;
   const followStatus = profile?.follow_status ?? null;
   const isFollowing = followStatus === 'accepted';
   const isPending = followStatus === 'pending';
@@ -119,8 +125,11 @@ export default function UserProfileScreen() {
         (index) => {
           if (index === 1) setShowReport(true);
           if (index === 2) {
-            setBlocked((b) => !b);
-            if (!blocked) router.back();
+            if (blocked) {
+              unblock.mutate();
+            } else {
+              block.mutate(undefined, { onSuccess: () => router.back() });
+            }
           }
         },
       );
@@ -131,8 +140,11 @@ export default function UserProfileScreen() {
           text: blocked ? 'Desbloquear' : 'Bloquear',
           style: 'destructive',
           onPress: () => {
-            setBlocked((b) => !b);
-            if (!blocked) router.back();
+            if (blocked) {
+              unblock.mutate();
+            } else {
+              block.mutate(undefined, { onSuccess: () => router.back() });
+            }
           },
         },
         { text: 'Cancelar', style: 'cancel' },
@@ -309,7 +321,8 @@ export default function UserProfileScreen() {
 
       {showReport && (
         <ReportSheet
-          target="user"
+          targetType="user"
+          targetId={profile.id}
           targetName={`@${profile.username}`}
           onClose={() => setShowReport(false)}
         />

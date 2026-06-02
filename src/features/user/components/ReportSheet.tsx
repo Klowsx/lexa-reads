@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import {
+  ActivityIndicator,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -10,14 +11,14 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useCreateReport } from '~/features/user/hooks/useCreateReport';
+import type { ReportTargetType } from '~/features/user/user.queries';
 import { useColors } from '~/theme/colors';
 
 const alpha = (hex: string, op: number) => {
   const n = parseInt(hex.replace('#', ''), 16);
   return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})`;
 };
-
-type ReportTarget = 'content' | 'user';
 
 const REASONS: { id: string; label: string }[] = [
   { id: 'spam',          label: 'Spam o publicidad' },
@@ -29,23 +30,27 @@ const REASONS: { id: string; label: string }[] = [
 ];
 
 interface Props {
-  target: ReportTarget;
+  targetType: ReportTargetType;
+  targetId: string;
   targetName?: string;
   onClose: () => void;
-  onSubmit?: (reason: string, details: string) => void;
 }
 
-export function ReportSheet({ target, targetName, onClose, onSubmit }: Props) {
+export function ReportSheet({ targetType, targetId, targetName, onClose }: Props) {
   const insets = useSafeAreaInsets();
   const c = useColors();
   const [selected, setSelected] = useState<string | null>(null);
   const [details, setDetails] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
-  function handleSubmit() {
+  const report = useCreateReport();
+
+  async function handleSubmit() {
     if (!selected) return;
-    onSubmit?.(selected, details);
-    setSubmitted(true);
+    await report.mutateAsync(
+      { targetType, targetId, reason: selected, details },
+      { onSuccess: () => setSubmitted(true) },
+    );
   }
 
   return (
@@ -89,7 +94,7 @@ export function ReportSheet({ target, targetName, onClose, onSubmit }: Props) {
               contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 8 }}
             >
               <Text className="font-display-sb text-md text-text mb-0.5 pt-1">
-                Reportar {target === 'user' ? 'usuario' : 'contenido'}
+                Reportar {targetType === 'user' ? 'usuario' : 'contenido'}
               </Text>
               {targetName && (
                 <Text className="text-xs font-body text-t2 mb-4">{targetName}</Text>
@@ -163,13 +168,16 @@ export function ReportSheet({ target, targetName, onClose, onSubmit }: Props) {
                 </Pressable>
                 <Pressable
                   onPress={handleSubmit}
-                  disabled={!selected}
+                  disabled={!selected || report.isPending}
                   className="flex-1 py-3 rounded-md items-center"
                   style={{ backgroundColor: selected ? c.accent : alpha(c.accent, 0.35) }}
                 >
-                  <Text className="text-xs font-body-sb" style={{ color: '#fff' }}>
-                    Enviar reporte
-                  </Text>
+                  {report.isPending
+                    ? <ActivityIndicator size="small" color="#fff" />
+                    : <Text className="text-xs font-body-sb" style={{ color: '#fff' }}>
+                        Enviar reporte
+                      </Text>
+                  }
                 </Pressable>
               </View>
             </ScrollView>

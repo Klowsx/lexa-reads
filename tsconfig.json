@@ -8,5 +8,6 @@
       "@/*": ["./*"],
       "~/*": ["./src/*"]
     }
-  }
+  },
+  "exclude": ["supabase/functions/**"]
 }
