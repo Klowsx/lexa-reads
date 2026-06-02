@@ -1,7 +1,9 @@
-﻿import { Tabs } from 'expo-router';
+import { Tabs } from 'expo-router';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
+import { useAuthStore } from '~/stores/auth.store';
+import { useUnreadCount } from '~/features/notifications/hooks/useUnreadCount';
 import { useColors } from '~/theme/colors';
 
 // ─── Tab icons (ported from design prototype) ─────────────────
@@ -38,6 +40,27 @@ function LibraryIcon({ color, active }: { color: string; active: boolean }) {
   );
 }
 
+function BellIcon({ color, active }: { color: string; active: boolean }) {
+  const sw = active ? 2 : 1.5;
+  return (
+    <Svg width={20} height={22} viewBox="0 0 20 22" fill="none">
+      <Path
+        d="M10 2C6.686 2 4 4.686 4 8v5l-2 2v1h16v-1l-2-2V8c0-3.314-2.686-6-6-6z"
+        stroke={color}
+        strokeWidth={sw}
+        fill={active ? color + '33' : 'none'}
+        strokeLinejoin="round"
+      />
+      <Path
+        d="M8 18a2 2 0 004 0"
+        stroke={color}
+        strokeWidth={sw}
+        strokeLinecap="round"
+      />
+    </Svg>
+  );
+}
+
 function ProfileIcon({ color, active }: { color: string; active: boolean }) {
   const sw = active ? 2 : 1.5;
   return (
@@ -51,10 +74,11 @@ function ProfileIcon({ color, active }: { color: string; active: boolean }) {
 // ─── Tab config ───────────────────────────────────────────────
 
 const TAB_CONFIG = [
-  { name: 'feed',    label: 'Inicio',     Icon: FeedIcon    },
-  { name: 'search',  label: 'Buscar',     Icon: SearchIcon  },
-  { name: 'library', label: 'Biblioteca', Icon: LibraryIcon },
-  { name: 'profile', label: 'Perfil',     Icon: ProfileIcon },
+  { name: 'feed',          label: 'Inicio',      Icon: FeedIcon,    hasNotif: false },
+  { name: 'search',        label: 'Buscar',      Icon: SearchIcon,  hasNotif: false },
+  { name: 'library',       label: 'Biblioteca',  Icon: LibraryIcon, hasNotif: false },
+  { name: 'notifications', label: 'Notifs',      Icon: BellIcon,    hasNotif: true  },
+  { name: 'profile',       label: 'Perfil',      Icon: ProfileIcon, hasNotif: false },
 ] as const;
 
 // ─── Custom tab bar ───────────────────────────────────────────
@@ -62,6 +86,24 @@ const TAB_CONFIG = [
 interface TabBarProps {
   state: { routes: { key: string; name: string }[]; index: number };
   navigation: { navigate: (name: string) => void };
+}
+
+function NotifBadge() {
+  const c = useColors();
+  const userId = useAuthStore((s) => s.user?.id) ?? '';
+  const { data: count = 0 } = useUnreadCount();
+  if (!count) return null;
+  const label = count > 9 ? '9+' : String(count);
+  return (
+    <View
+      className="absolute -top-1 -right-1 min-w-[14px] h-[14px] rounded-full items-center justify-center px-[3px]"
+      style={{ backgroundColor: c.accent }}
+    >
+      <Text style={{ fontSize: 8, color: '#fff', fontFamily: 'DMSans_700Bold', lineHeight: 14 }}>
+        {label}
+      </Text>
+    </View>
+  );
 }
 
 function CustomTabBar({ state, navigation }: TabBarProps) {
@@ -86,7 +128,10 @@ function CustomTabBar({ state, navigation }: TabBarProps) {
               onPress={() => navigation.navigate(route.name)}
               activeOpacity={0.7}
             >
-              <tab.Icon color={color} active={active} />
+              <View className="relative">
+                <tab.Icon color={color} active={active} />
+                {tab.hasNotif && <NotifBadge />}
+              </View>
               <Text
                 style={{
                   fontSize: 10,
@@ -112,10 +157,11 @@ export default function TabsLayout() {
       tabBar={props => <CustomTabBar {...(props as any)} />}
       screenOptions={{ headerShown: false }}
     >
-      <Tabs.Screen name="feed"    options={{ title: 'Inicio'     }} />
-      <Tabs.Screen name="search"  options={{ title: 'Buscar'     }} />
-      <Tabs.Screen name="library" options={{ title: 'Biblioteca' }} />
-      <Tabs.Screen name="profile" options={{ title: 'Perfil'     }} />
+      <Tabs.Screen name="feed"          options={{ title: 'Inicio'      }} />
+      <Tabs.Screen name="search"        options={{ title: 'Buscar'      }} />
+      <Tabs.Screen name="library"       options={{ title: 'Biblioteca'  }} />
+      <Tabs.Screen name="notifications" options={{ title: 'Notifs'      }} />
+      <Tabs.Screen name="profile"       options={{ title: 'Perfil'      }} />
     </Tabs>
   );
 }

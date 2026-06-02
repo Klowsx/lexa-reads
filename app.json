@@ -32,6 +32,16 @@
         "projectId": "837bca0d-13c4-4553-b886-a21d10a05aa6"
       }
     },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#C4783A",
+          "sounds": []
+        }
+      ]
+    ],
     "owner": "javierhr"
   }
 }

@@ -157,11 +157,11 @@ Sin esto NO se puede subir a App Store / Play Store. Hacer **antes** de pulir UI
 
 ## Fase E — Notificaciones
 
-- [ ] Pantalla `app/(tabs)/notifications.tsx` (o stack desde campana del feed) — lee tabla `notifications`.
-- [ ] Hook `useNotifications` con `useInfiniteQuery` + marcar como leídas en bulk.
-- [ ] Push opt-in **contextual** (después de la primera actividad social, NO en primer launch) — `expo-notifications`.
-- [ ] Edge Function `send-push` disparada por triggers de DB en eventos (new_follower, review_like, comment_received, activity_like).
-- [ ] Pantalla `app/settings/notifications.tsx` para editar `notification_preferences`.
+- [x] Pantalla `app/(tabs)/notifications.tsx` (o stack desde campana del feed) — lee tabla `notifications`.
+- [x] Hook `useNotifications` con `useInfiniteQuery` + marcar como leídas en bulk.
+- [x] Push opt-in **contextual** (después de la primera actividad social, NO en primer launch) — `expo-notifications`.
+- [x] Edge Function `send-push` disparada por triggers de DB en eventos (new_follower, review_like, comment_received, activity_like).
+- [x] Pantalla `app/settings-notifications.tsx` para editar `notification_preferences`.
 
 ---
 

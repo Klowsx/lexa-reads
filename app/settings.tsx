@@ -48,9 +48,6 @@ export default function SettingsScreen() {
 
   const currentGoal = goalVal ?? goalData?.goal ?? 12;
   const goalYear = goalData?.goalYear ?? new Date().getFullYear();
-  const [pushOn, setPushOn]           = useState(true);
-  const [followersOn, setFollowersOn] = useState(true);
-  const [likesOn, setLikesOn]         = useState(false);
   const [privateOn, setPrivateOn]     = useState(false);
   const [showDelete, setShowDelete]   = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
@@ -189,30 +186,9 @@ export default function SettingsScreen() {
         {/* ── Notificaciones ── */}
         <SettingsSection title="Notificaciones">
           <SettingsItem
-            label="Notificaciones push"
-            trailing={<SettingsToggle on={pushOn} onChange={setPushOn} />}
-          />
-          <SettingsItem
-            label="Nuevos seguidores"
-            subtitle={!pushOn ? 'Activa las notificaciones push primero' : undefined}
-            trailing={
-              <SettingsToggle
-                on={followersOn && pushOn}
-                onChange={v => pushOn && setFollowersOn(v)}
-                disabled={!pushOn}
-              />
-            }
-          />
-          <SettingsItem
-            label="Me gusta y comentarios"
-            subtitle={!pushOn ? 'Activa las notificaciones push primero' : undefined}
-            trailing={
-              <SettingsToggle
-                on={likesOn && pushOn}
-                onChange={v => pushOn && setLikesOn(v)}
-                disabled={!pushOn}
-              />
-            }
+            label="Gestionar notificaciones"
+            subtitle="Push, email y preferencias"
+            onPress={() => router.push('/settings-notifications' as any)}
             separator={false}
           />
         </SettingsSection>
