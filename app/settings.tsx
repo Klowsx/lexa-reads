@@ -118,21 +118,18 @@ export default function SettingsScreen() {
               <View className="flex-row items-center justify-center gap-4.5 mb-3.5">
                 <Pressable
                   onPress={() => setGoalVal(g => Math.max(1, (g ?? currentGoal) - 5))}
-                  className="rounded-full bg-sh border border-border items-center justify-center"
-                  style={{ width: 38, height: 38 }}
+                  className="rounded-full bg-sh border border-border items-center justify-center w-[38px] h-[38px]"
                 >
                   <Text className="text-lg font-body text-text">−</Text>
                 </Pressable>
                 <Text
-                  className="font-display-sb text-accent text-center"
-                  style={{ fontSize: 42, minWidth: 70, lineHeight: 44 }}
+                  className="font-display-sb text-accent text-center text-[42px] min-w-[70px] leading-[44px]"
                 >
                   {currentGoal}
                 </Text>
                 <Pressable
                   onPress={() => setGoalVal(g => Math.min(365, (g ?? currentGoal) + 5))}
-                  className="rounded-full bg-sh border border-border items-center justify-center"
-                  style={{ width: 38, height: 38 }}
+                  className="rounded-full bg-sh border border-border items-center justify-center w-[38px] h-[38px]"
                 >
                   <Text className="text-lg font-body text-text">+</Text>
                 </Pressable>
@@ -147,7 +144,7 @@ export default function SettingsScreen() {
               >
                 {updateGoal.isPending
                   ? <ActivityIndicator size="small" color="#fff" />
-                  : <Text className="text-xs font-body-sb" style={{ color: '#fff' }}>Guardar</Text>
+                  : <Text className="text-xs font-body-sb text-white">Guardar</Text>
                 }
               </Pressable>
             </View>

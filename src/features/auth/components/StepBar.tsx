@@ -1,4 +1,4 @@
-﻿import { StyleSheet, View } from 'react-native';
+﻿import { View } from 'react-native';
 import { useColors } from '~/theme/colors';
 
 type Props = { step: number; total: number };

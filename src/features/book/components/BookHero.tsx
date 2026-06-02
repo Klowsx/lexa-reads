@@ -104,8 +104,7 @@ export function BookHero({ book, onBack, onShare }: BookHeroProps) {
       {/* Title + author */}
       <View className="items-center px-9 pt-container z-[4]">
         <Text
-          className="font-display-sb text-md text-text text-center mb-1.5"
-          style={{ lineHeight: 26, letterSpacing: -0.33 }}
+          className="font-display-sb text-md text-text text-center mb-1.5 leading-[26px] tracking-[-0.33px]"
           numberOfLines={3}
         >
           {book.title}
@@ -137,8 +136,7 @@ export function BookHero({ book, onBack, onShare }: BookHeroProps) {
               }}
             >
               <Text
-                className="font-body-bold text-sm text-text"
-                style={{ lineHeight: 15 }}
+                className="font-body-bold text-sm text-text leading-[15px]"
               >
                 {value}
               </Text>

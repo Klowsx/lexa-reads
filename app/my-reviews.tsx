@@ -1,11 +1,15 @@
+import { FlashList } from '@shopify/flash-list';
 import { useRouter } from 'expo-router';
 import { ChevronLeft, Heart, MessageCircle, AlertTriangle, Pencil, Trash2 } from 'lucide-react-native';
 import { useState } from 'react';
-import { Alert, GestureResponderEvent, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, GestureResponderEvent, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { MockBookCover } from '~/components/ui/MockBookCover';
+import { BookCover } from '~/components/ui/BookCover';
 import { StarRating } from '~/components/ui/StarRating';
-import { MY_REVIEWS, type MockMyReview } from '~/mock';
+import { useDeleteMyReview } from '~/features/reviews/hooks/useDeleteMyReview';
+import { useMyReviews } from '~/features/reviews/hooks/useMyReviews';
+import type { ReviewWithBook } from '~/features/reviews/reviews.queries';
+import { formatRelativeTime } from '~/lib/utils';
 import { fixed, useColors } from '~/theme/colors';
 
 const alpha = (hex: string, op: number) => {
@@ -20,14 +24,14 @@ function ReviewCard({
   onPress,
   onDelete,
 }: {
-  review: MockMyReview;
+  review: ReviewWithBook;
   onPress: () => void;
   onDelete: () => void;
 }) {
-  const router = useRouter();
   const c = useColors();
   const [expanded, setExpanded] = useState(false);
   const isLong = review.body.length > 220;
+  const rating = review.user_books?.rating ?? null;
 
   function stopProp(e: GestureResponderEvent) {
     e.stopPropagation();
@@ -41,26 +45,30 @@ function ReviewCard({
     >
       {/* Book row */}
       <View className="flex-row items-center gap-3 p-3 border-b border-border">
-        <MockBookCover book={review.book} width={40} height={60} />
+        <BookCover book={review.books as any} width={40} height={60} />
         <View className="flex-1 min-w-0">
           <Text className="text-xs font-body-sb text-text" numberOfLines={2} style={{ lineHeight: 16 }}>
-            {review.book.title}
+            {review.books?.title ?? ''}
           </Text>
           <Text className="text-xs font-body text-t3 mt-0.5" numberOfLines={1}>
-            {review.book.author}
+            {review.books?.authors?.join(', ') ?? ''}
           </Text>
-          <View className="flex-row items-center gap-1.5 mt-1.5">
-            <StarRating rating={review.rating} size={10} />
-            <Text className="text-xs font-body-sb" style={{ color: fixed.star }}>
-              {review.rating}
-            </Text>
-          </View>
+          {rating != null && (
+            <View className="flex-row items-center gap-1.5 mt-1.5">
+              <StarRating rating={rating} size={10} />
+              <Text className="text-xs font-body-sb" style={{ color: fixed.star }}>
+                {rating}
+              </Text>
+            </View>
+          )}
         </View>
 
         {/* Date + edited badge */}
         <View className="items-end gap-1 shrink-0">
-          <Text className="text-xs font-body text-t3">{review.createdAt}</Text>
-          {review.editedAt && (
+          <Text className="text-xs font-body text-t3">
+            {formatRelativeTime(review.created_at)}
+          </Text>
+          {review.edited_at && (
             <View
               className="rounded-full px-2 py-0.5"
               style={{
@@ -79,7 +87,7 @@ function ReviewCard({
 
       {/* Body */}
       <View className="px-3.5 pt-3 pb-2.5">
-        {review.containsSpoilers && (
+        {review.contains_spoilers && (
           <View
             className="flex-row items-center gap-1.5 rounded-md px-2.5 py-1.5 mb-2 self-start"
             style={{
@@ -117,22 +125,18 @@ function ReviewCard({
       </View>
 
       {/* Footer */}
-      <View
-        className="flex-row items-center px-3.5 pt-2.5 pb-3 border-t border-border gap-4"
-      >
-        {/* Stats */}
+      <View className="flex-row items-center px-3.5 pt-2.5 pb-3 border-t border-border gap-4">
         <View className="flex-row items-center gap-1.5">
           <Heart size={13} color={c.t3} strokeWidth={1.8} />
-          <Text className="text-xs font-body text-t3">{review.likes}</Text>
+          <Text className="text-xs font-body text-t3">{review.likes_count ?? 0}</Text>
         </View>
         <View className="flex-row items-center gap-1.5">
           <MessageCircle size={13} color={c.t3} strokeWidth={1.8} />
-          <Text className="text-xs font-body text-t3">{review.comments}</Text>
+          <Text className="text-xs font-body text-t3">{review.comments_count ?? 0}</Text>
         </View>
 
         <View className="flex-1" />
 
-        {/* Actions */}
         <Pressable
           onPress={(e) => { stopProp(e); onPress(); }}
           className="flex-row items-center gap-1"
@@ -161,21 +165,35 @@ export default function MyReviewsScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const c = useColors();
-  const [reviews, setReviews] = useState(MY_REVIEWS);
 
-  function handleDelete(id: string, title: string) {
+  const {
+    reviews,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useMyReviews();
+
+  const deleteMutation = useDeleteMyReview();
+
+  function handleDelete(review: ReviewWithBook) {
     Alert.alert(
       'Eliminar reseña',
-      `¿Eliminar tu reseña de "${title}"? Esta acción no se puede deshacer.`,
+      `¿Eliminar tu reseña de "${review.books?.title ?? 'este libro'}"? Esta acción no se puede deshacer.`,
       [
         { text: 'Cancelar', style: 'cancel' },
         {
           text: 'Eliminar',
           style: 'destructive',
-          onPress: () => setReviews((prev) => prev.filter((r) => r.id !== id)),
+          onPress: () => deleteMutation.mutate(review.id),
         },
       ]
     );
+  }
+
+  function handlePress(review: ReviewWithBook) {
+    const googleId = review.books?.google_books_id;
+    if (googleId) router.push(`/book/${googleId}` as any);
   }
 
   return (
@@ -187,10 +205,16 @@ export default function MyReviewsScreen() {
         <Text className="font-display-sb text-xl text-text tracking-tight flex-1">
           Mis reseñas
         </Text>
-        <Text className="text-xs font-body text-t3">{reviews.length}</Text>
+        {!isLoading && (
+          <Text className="text-xs font-body text-t3">{reviews.length}</Text>
+        )}
       </View>
 
-      {reviews.length === 0 ? (
+      {isLoading ? (
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator color={c.accent} />
+        </View>
+      ) : reviews.length === 0 ? (
         <View className="flex-1 items-center justify-center gap-2 px-8">
           <Text className="text-sm font-body-sb text-text text-center">
             Aún no has escrito reseñas
@@ -209,19 +233,26 @@ export default function MyReviewsScreen() {
           </Pressable>
         </View>
       ) : (
-        <ScrollView
-          showsVerticalScrollIndicator={false}
+        <FlashList
+          data={reviews}
+          keyExtractor={(item) => item.id}
+          estimatedItemSize={180}
           contentContainerStyle={{ padding: 16, paddingBottom: 48 }}
-        >
-          {reviews.map((review) => (
+          renderItem={({ item }) => (
             <ReviewCard
-              key={review.id}
-              review={review}
-              onPress={() => router.push(`/book/${review.book.id}` as any)}
-              onDelete={() => handleDelete(review.id, review.book.title)}
+              review={item}
+              onPress={() => handlePress(item)}
+              onDelete={() => handleDelete(item)}
             />
-          ))}
-        </ScrollView>
+          )}
+          onEndReached={() => hasNextPage && fetchNextPage()}
+          onEndReachedThreshold={0.3}
+          ListFooterComponent={
+            isFetchingNextPage ? (
+              <ActivityIndicator color={c.accent} style={{ paddingVertical: 16 }} />
+            ) : null
+          }
+        />
       )}
     </View>
   );

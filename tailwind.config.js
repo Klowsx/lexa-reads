@@ -34,17 +34,18 @@ module.exports = {
       },
 
       fontFamily: {
-        // Display — fuente de títulos y headings 
+        // Display — fuente de títulos y headings
         'display':      ['PlayfairDisplay_400Regular',         'serif'],
         'display-i':    ['PlayfairDisplay_400Regular_Italic',  'serif'],
         'display-sb':   ['PlayfairDisplay_600SemiBold',        'serif'],
         'display-bold': ['PlayfairDisplay_700Bold',            'serif'],
 
-        // Body — fuente de texto corriente 
+        // Body — fuente de texto corriente
         'body':         ['DMSans_400Regular',   'sans-serif'],
         'body-light':   ['DMSans_300Light',     'sans-serif'],
         'body-md':      ['DMSans_500Medium',    'sans-serif'],
         'body-sb':      ['DMSans_600SemiBold',  'sans-serif'],
+        'body-bold':    ['DMSans_700Bold',      'sans-serif'],
       },
 
       fontSize: {
@@ -77,6 +78,8 @@ module.exports = {
       spacing: {
         // Padding horizontal de contenedor principal (18px)
         container: '18px',
+        // gap-4.5 = 18px (entre gap-4/16px y gap-5/20px)
+        '4.5': '18px',
       },
     },
   },

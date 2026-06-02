@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Alert, Text, View } from "react-native";
-import { useFocusEffect } from "expo-router";
+import { ActivityIndicator, Alert, Pressable, Text, View } from "react-native";
+import { useFocusEffect, useRouter } from "expo-router";
+import { ChevronLeft } from "lucide-react-native";
 import { FlashList } from "@shopify/flash-list";
 import { Bell } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -20,6 +21,8 @@ const alpha = (hex: string, op: number) => {
 export default function NotificationsScreen() {
   const insets = useSafeAreaInsets();
   const c = useColors();
+  const router = useRouter();
+  const canGoBack = router.canGoBack();
   const markRead = useMarkNotificationsRead();
   const savePushToken = useSavePushToken();
   const { data: prefs } = useNotificationPreferences();
@@ -81,7 +84,12 @@ export default function NotificationsScreen() {
   return (
     <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
       {/* Header */}
-      <View className="px-4 py-2.5 border-b border-border">
+      <View className="px-4 py-2.5 border-b border-border flex-row items-center gap-2">
+        {canGoBack && (
+          <Pressable hitSlop={8} onPress={() => router.back()}>
+            <ChevronLeft size={24} color={c.t3} strokeWidth={1.6} />
+          </Pressable>
+        )}
         <Text className="font-display-sb text-xl text-text tracking-tight">
           Notificaciones
         </Text>

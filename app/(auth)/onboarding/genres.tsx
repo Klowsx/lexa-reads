@@ -1,6 +1,6 @@
 ﻿import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   OnboardHeader,
@@ -39,11 +39,11 @@ export default function OnboardGenresScreen() {
   return (
     <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
       <OnboardHeader step={1} total={3} />
-      <View style={{ height: 12 }} />
+      <View className="h-3" />
       <StepBar step={1} total={3} />
 
       <View className="px-6 mb-4">
-        <Text className="font-display-sb text-text" style={{ fontSize: 26, lineHeight: 32, letterSpacing: -0.3 }}>
+        <Text className="font-display-sb text-text text-lg tracking-[-0.3px]">
           ¿Qué te gusta leer?
         </Text>
         <Text className="font-body text-t2 text-sm mt-2">
@@ -52,7 +52,7 @@ export default function OnboardGenresScreen() {
       </View>
 
       <ScrollView
-        contentContainerStyle={styles.chips}
+        contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: 20, paddingBottom: 16 }}
         showsVerticalScrollIndicator={false}
       >
         {GENRES.map((g) => {
@@ -61,8 +61,8 @@ export default function OnboardGenresScreen() {
             <Pressable
               key={g.id}
               onPress={() => toggle(g.id)}
-              className="py-[10px] px-[14px] rounded-full bg-surface border border-border"
-              style={on ? { borderColor: c.accent, backgroundColor: alpha(c.accent, 0.14), borderWidth: 1.5 } : { borderWidth: 1.5 }}
+              className="py-[10px] px-[14px] rounded-full bg-surface border-[1.5px] border-border"
+              style={on ? { borderColor: c.accent, backgroundColor: alpha(c.accent, 0.14) } : undefined}
             >
               <Text
                 className={`font-body-md text-sm ${on ? 'text-text' : 'text-t2'}`}
@@ -90,12 +90,3 @@ export default function OnboardGenresScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  chips: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    paddingHorizontal: 20,
-    paddingBottom: 16,
-  },
-});

@@ -284,7 +284,7 @@ export function FeedCard({ item }: FeedCardProps) {
         {/* ── Caption ─────────────────────────────────── */}
         <View className="px-3.5 pt-1 pb-3.5 gap-[5px]">
           {/* Activity summary */}
-          <Text className="font-body text-xs text-t2" style={{ lineHeight: 19 }}>
+          <Text className="font-body text-xs text-t2 leading-[19px]">
             <Text className="font-body-sb text-text">{item.user.username}</Text>
             {'  '}
             <Text className="text-t2">{ACT_VERB[item.activity_type]}</Text>
@@ -301,8 +301,7 @@ export function FeedCard({ item }: FeedCardProps) {
           {/* Review preview */}
           {item.review_preview ? (
             <Text
-              className="font-body text-xs text-t2"
-              style={{ lineHeight: 19 }}
+              className="font-body text-xs text-t2 leading-[19px]"
               numberOfLines={3}
             >
               {item.review_preview}

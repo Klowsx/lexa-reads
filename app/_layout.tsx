@@ -11,6 +11,7 @@ import {
   DMSans_400Regular,
   DMSans_500Medium,
   DMSans_600SemiBold,
+  DMSans_700Bold,
 } from "@expo-google-fonts/dm-sans";
 import { useEffect } from "react";
 import { AppState, Platform, View } from "react-native";
@@ -64,6 +65,7 @@ function RootLayout() {
     DMSans_400Regular,
     DMSans_500Medium,
     DMSans_600SemiBold,
+    DMSans_700Bold,
   });
 
   useEffect(() => {

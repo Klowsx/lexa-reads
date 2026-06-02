@@ -1,4 +1,4 @@
-﻿import { StyleSheet, Text, View } from 'react-native';
+﻿import { Text, View } from 'react-native';
 import { useColors } from '~/theme/colors';
 import { alpha } from './tokens';
 
@@ -17,17 +17,17 @@ export function CodeInput({ value, length = 6 }: Props) {
         return (
           <View
             key={i}
-            className="w-11 h-[54px] rounded-[10px] bg-surface items-center justify-center"
-            style={[
-              styles.cellBorder,
-              isActive && { borderColor: c.accent },
-              filled && !isActive && { borderColor: alpha(c.accent, 0.4) },
-            ]}
+            className="w-11 h-[54px] rounded-[10px] bg-surface items-center justify-center border-[1.5px] border-transparent"
+            style={
+              isActive ? { borderColor: c.accent }
+              : filled ? { borderColor: alpha(c.accent, 0.4) }
+              : undefined
+            }
           >
             {filled ? (
               <Text className="font-display-sb text-lg text-text">{d}</Text>
             ) : isActive ? (
-              <View style={[styles.cursor, { backgroundColor: c.accent }]} />
+              <View className="w-[1.5px] h-[22px] opacity-90" style={{ backgroundColor: c.accent }} />
             ) : null}
           </View>
         );
@@ -36,14 +36,3 @@ export function CodeInput({ value, length = 6 }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  cellBorder: {
-    borderWidth: 1.5,
-    borderColor: 'transparent',
-  },
-  cursor: {
-    width: 1.5,
-    height: 22,
-    opacity: 0.9,
-  },
-});

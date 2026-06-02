@@ -1,48 +1,16 @@
-import { View, Text } from "react-native";
+import { ActivityIndicator, View, Text } from "react-native";
+import { useQuery } from "@tanstack/react-query";
 import { Avatar } from "~/components/ui/Avatar";
 import { StarRating } from "~/components/ui/StarRating";
+import { bookCommunityStatsQueryOptions, type FriendActivity } from "../book.queries";
+import { useAuthStore } from "~/stores/auth.store";
+import { STATUS_META } from "~/lib/book-status";
 import { fixed, useColors } from "~/theme/colors";
-import { USERS } from "~/mock";
 
 const alpha = (hex: string, op: number) => {
   const n = parseInt(hex.replace("#", ""), 16);
   return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})` as const;
 };
-
-const DIST = [
-  { star: 5, pct: 62 },
-  { star: 4, pct: 22 },
-  { star: 3, pct: 10 },
-  { star: 2, pct: 4 },
-  { star: 1, pct: 2 },
-];
-
-const FRIENDS = [
-  { user: USERS[0], status: "read"         as const, progress: null, detail: "Terminó hace 2 días" },
-  { user: USERS[1], status: "reading"      as const, progress: 0.47, detail: "Desde hace 4 días"   },
-  { user: USERS[2], status: "want_to_read" as const, progress: null, detail: "En su lista \"Pendientes\"" },
-];
-
-const STATUS_COLOR: Record<string, string> = {
-  reading:      fixed.status.reading,
-  read:         fixed.status.read,
-  want_to_read: fixed.status.want,
-  abandoned:    fixed.status.abandoned,
-};
-
-const STATUS_LABEL: Record<string, string> = {
-  reading:      "Leyendo",
-  read:         "Leído",
-  want_to_read: "Por leer",
-  abandoned:    "Abandonado",
-};
-
-const STATS = [
-  { value: "1,234", label: "Lectores" },
-  { value: "89",    label: "Leyendo"  },
-  { value: "432",   label: "Por leer" },
-  { value: "4.5 ★", label: "Rating",  isRating: true },
-];
 
 function RatingBar({ star, pct }: { star: number; pct: number }) {
   const c = useColors();
@@ -61,15 +29,76 @@ function RatingBar({ star, pct }: { star: number; pct: number }) {
   );
 }
 
-export function BookCommunityTab() {
+function FriendRow({ friend }: { friend: FriendActivity }) {
   const c = useColors();
+  const meta = STATUS_META[friend.status as keyof typeof STATUS_META];
+  if (!meta) return null;
+
+  return (
+    <View className="flex-row items-center gap-2.5 mb-3">
+      <Avatar
+        displayName={friend.displayName ?? friend.username}
+        username={friend.username}
+        avatarUrl={friend.avatarUrl}
+        size={30}
+      />
+      <View className="flex-1 min-w-0">
+        <Text className="font-body-md text-xs text-text">
+          {friend.displayName ?? friend.username}
+        </Text>
+        <Text className="font-body text-xs text-t3 mt-[1px]">@{friend.username}</Text>
+        {friend.status === "reading" && friend.currentPage != null && (
+          <View className="mt-[5px] h-[3px] bg-sh rounded-full overflow-hidden">
+            <View className="h-full rounded-full" style={{ width: "40%", backgroundColor: fixed.status.reading }} />
+          </View>
+        )}
+      </View>
+      <View
+        className="rounded-full"
+        style={{
+          paddingHorizontal: 9,
+          paddingVertical: 3,
+          backgroundColor: alpha(meta.color, 0.11),
+        }}
+      >
+        <Text className="font-body-md text-xs" style={{ color: meta.color }}>
+          {meta.label}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+export function BookCommunityTab({ bookId }: { bookId: string }) {
+  const c = useColors();
+  const userId = useAuthStore((s) => s.user?.id ?? "");
+  const { data, isLoading } = useQuery(bookCommunityStatsQueryOptions(bookId, userId));
+
+  if (isLoading || !data) {
+    return (
+      <View className="py-12 items-center">
+        <ActivityIndicator color={c.accent} />
+      </View>
+    );
+  }
+
+  const stats = [
+    { value: data.totalReaders.toLocaleString(), label: "Lectores" },
+    { value: data.readingCount.toLocaleString(), label: "Leyendo" },
+    { value: data.wantCount.toLocaleString(), label: "Por leer" },
+    {
+      value: data.avgRating > 0 ? `${data.avgRating} ★` : "—",
+      label: "Rating",
+      isRating: true,
+    },
+  ];
 
   return (
     <View className="pb-6">
       {/* Stats grid */}
       <View className="m-container mb-3.5 bg-surface rounded-card border border-border overflow-hidden">
         <View className="flex-row flex-wrap">
-          {STATS.map(({ value, label, isRating }, i) => (
+          {stats.map(({ value, label, isRating }, i) => (
             <View
               key={label}
               className="items-center py-4 px-2.5"
@@ -90,60 +119,50 @@ export function BookCommunityTab() {
       </View>
 
       {/* Friends activity */}
-      <View className="mx-container mb-3.5 bg-surface rounded-card p-4 border border-border">
-        <Text className="font-body-sb text-xs text-t3 uppercase tracking-wider mb-3">
-          Actividad de amigos
-        </Text>
-        {FRIENDS.map(({ user, status, progress, detail }) => {
-          const sc = STATUS_COLOR[status];
-          return (
-            <View key={user.id} className="flex-row items-center gap-2.5 mb-3">
-              <Avatar displayName={user.name} username={user.username} size={30} />
-              <View className="flex-1 min-w-0">
-                <Text className="font-body-md text-xs text-text">{user.name}</Text>
-                <Text className="font-body text-xs text-t3 mt-[1px]">{detail}</Text>
-                {status === "reading" && progress != null && (
-                  <View className="mt-[5px] h-[3px] bg-sh rounded-full overflow-hidden">
-                    <View
-                      className="h-full rounded-full"
-                      style={{ width: `${progress * 100}%`, backgroundColor: fixed.status.reading }}
-                    />
-                  </View>
-                )}
-              </View>
-              <View
-                className="rounded-full"
-                style={{
-                  paddingHorizontal: 9,
-                  paddingVertical: 3,
-                  backgroundColor: alpha(sc, 0.11),
-                }}
-              >
-                <Text className="font-body-md text-xs" style={{ color: sc }}>
-                  {STATUS_LABEL[status]}
-                </Text>
-              </View>
-            </View>
-          );
-        })}
-      </View>
+      {data.friendActivity.length > 0 && (
+        <View className="mx-container mb-3.5 bg-surface rounded-card p-4 border border-border">
+          <Text className="font-body-sb text-xs text-t3 uppercase tracking-wider mb-3">
+            Actividad de amigos
+          </Text>
+          {data.friendActivity.map((friend) => (
+            <FriendRow key={friend.userId} friend={friend} />
+          ))}
+        </View>
+      )}
 
       {/* Rating distribution */}
-      <View className="mx-container bg-surface rounded-card p-4 border border-border">
-        <Text className="font-body-sb text-xs text-t3 uppercase tracking-wider mb-3">
-          Distribución de ratings
-        </Text>
-        <View className="flex-row gap-container items-start">
-          <View className="items-center shrink-0">
-            <Text className="font-display-bold text-3xl" style={{ color: fixed.star, lineHeight: 46 }}>4.5</Text>
-            <View className="mt-1"><StarRating rating={4.5} size={12} /></View>
-            <Text className="font-body text-xs text-t3 mt-1">1,234</Text>
-          </View>
-          <View className="flex-1 pt-1">
-            {DIST.map(({ star, pct }) => <RatingBar key={star} star={star} pct={pct} />)}
+      {data.ratingsCount > 0 && (
+        <View className="mx-container bg-surface rounded-card p-4 border border-border">
+          <Text className="font-body-sb text-xs text-t3 uppercase tracking-wider mb-3">
+            Distribución de ratings
+          </Text>
+          <View className="flex-row gap-container items-start">
+            <View className="items-center shrink-0">
+              <Text className="font-display-bold text-3xl" style={{ color: fixed.star, lineHeight: 46 }}>
+                {data.avgRating}
+              </Text>
+              <View className="mt-1">
+                <StarRating rating={data.avgRating} size={12} />
+              </View>
+              <Text className="font-body text-xs text-t3 mt-1">{data.ratingsCount.toLocaleString()}</Text>
+            </View>
+            <View className="flex-1 pt-1">
+              {data.distribution.map(({ star, pct }) => (
+                <RatingBar key={star} star={star} pct={pct} />
+              ))}
+            </View>
           </View>
         </View>
-      </View>
+      )}
+
+      {/* Empty state */}
+      {data.totalReaders === 0 && (
+        <View className="mx-container bg-surface rounded-card p-8 border border-border items-center">
+          <Text className="font-body text-xs text-t3 text-center">
+            Sé el primero en agregar este libro a tu biblioteca.
+          </Text>
+        </View>
+      )}
     </View>
   );
 }

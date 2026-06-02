@@ -10,8 +10,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BookCover } from '~/components/ui/BookCover';
 import { StarRating } from '~/components/ui/StarRating';
-import type { BookStatus, MockUserBook } from '~/mock';
-import { STATUS_META } from '~/mock';
+import { STATUS_META, type BookStatus } from '~/lib/book-status';
 import { fixed, useColors } from '~/theme/colors';
 import { Tables } from '@/src/types';
 
@@ -24,7 +23,7 @@ const alpha = (hex: string, op: number) => {
 
 interface BookDetailSheetProps {
   book: Tables<"books">;
-  initialUserBook?: MockUserBook | null;
+  initialUserBook?: { status?: BookStatus | null; rating?: number | null } | null;
   onClose: () => void;
 }
 

@@ -207,6 +207,130 @@ export async function upsertReviewFn(
   return data;
 }
 
+// ─── Community stats ──────────────────────────────────────────
+
+export type RatingBar = { star: number; count: number; pct: number };
+
+export type FriendActivity = {
+  userId: string;
+  username: string;
+  displayName: string | null;
+  avatarUrl: string | null;
+  status: string;
+  rating: number | null;
+  currentPage: number | null;
+};
+
+export type BookCommunityStats = {
+  totalReaders: number;
+  readingCount: number;
+  wantCount: number;
+  avgRating: number;
+  ratingsCount: number;
+  distribution: RatingBar[];
+  friendActivity: FriendActivity[];
+};
+
+async function fetchBookCommunityStats(
+  bookId: string,
+  userId: string,
+): Promise<BookCommunityStats> {
+  const [totalRes, readingRes, wantRes, ratingsRes, followsRes] = await Promise.all([
+    supabase
+      .from("user_books")
+      .select("id", { count: "exact", head: true })
+      .eq("book_id", bookId),
+    supabase
+      .from("user_books")
+      .select("id", { count: "exact", head: true })
+      .eq("book_id", bookId)
+      .eq("status", "reading"),
+    supabase
+      .from("user_books")
+      .select("id", { count: "exact", head: true })
+      .eq("book_id", bookId)
+      .eq("status", "want_to_read"),
+    supabase
+      .from("user_books")
+      .select("rating")
+      .eq("book_id", bookId)
+      .not("rating", "is", null)
+      .limit(500),
+    userId
+      ? supabase
+          .from("follows")
+          .select("following_id")
+          .eq("follower_id", userId)
+          .eq("status", "accepted")
+          .limit(100)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
+
+  const ratings = (ratingsRes.data ?? [])
+    .map((r) => r.rating as number)
+    .filter(Boolean);
+
+  const avgRating =
+    ratings.length > 0
+      ? Math.round((ratings.reduce((a, b) => a + b, 0) / ratings.length) * 10) / 10
+      : 0;
+
+  const dist: Record<number, number> = {};
+  for (const r of ratings) {
+    const key = Math.round(r);
+    dist[key] = (dist[key] ?? 0) + 1;
+  }
+
+  const distribution: RatingBar[] = [5, 4, 3, 2, 1].map((star) => ({
+    star,
+    count: dist[star] ?? 0,
+    pct:
+      ratings.length > 0
+        ? Math.round(((dist[star] ?? 0) / ratings.length) * 100)
+        : 0,
+  }));
+
+  const followedIds = (followsRes.data ?? []).map((f) => f.following_id);
+
+  let friendActivity: FriendActivity[] = [];
+  if (followedIds.length > 0) {
+    const { data: friendBooks } = await supabase
+      .from("user_books")
+      .select("status, rating, current_page, user_id, users(id, username, display_name, avatar_url)")
+      .eq("book_id", bookId)
+      .in("user_id", followedIds)
+      .limit(5);
+
+    friendActivity = ((friendBooks ?? []) as any[]).map((row) => ({
+      userId: row.user_id,
+      username: row.users?.username ?? "",
+      displayName: row.users?.display_name ?? null,
+      avatarUrl: row.users?.avatar_url ?? null,
+      status: row.status,
+      rating: row.rating,
+      currentPage: row.current_page,
+    }));
+  }
+
+  return {
+    totalReaders: totalRes.count ?? 0,
+    readingCount: readingRes.count ?? 0,
+    wantCount: wantRes.count ?? 0,
+    avgRating,
+    ratingsCount: ratings.length,
+    distribution,
+    friendActivity,
+  };
+}
+
+export const bookCommunityStatsQueryOptions = (bookId: string, userId: string) =>
+  queryOptions({
+    queryKey: ["book_community", bookId, userId] as const,
+    queryFn: () => fetchBookCommunityStats(bookId, userId),
+    enabled: !!bookId,
+    staleTime: 1000 * 60 * 5,
+  });
+
 // Soft delete: pone deleted_at en vez de borrar la fila.
 // Así se mantiene la integridad referencial con activity_feed y review_likes.
 export async function deleteReviewFn(
