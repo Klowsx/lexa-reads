@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { ActionSheetIOS, Alert, Platform, Pressable, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { BookOpen, Heart, MessageCircle, MoreHorizontal, Share2 } from 'lucide-react-native';
 import { Avatar } from '~/components/ui/Avatar';
 import { StarRating } from '~/components/ui/StarRating';
 import { BookDetailSheet } from '~/features/book/components/BookDetailSheet';
+import { ReportSheet } from '~/features/user/components/ReportSheet';
 import { ACT_LABEL, type FeedItemType, type MockFeedItem } from '~/mock';
 import { fixed, useColors } from '~/theme/colors';
 
@@ -44,6 +45,28 @@ export function FeedCard({ item, onLike }: FeedCardProps) {
   const router = useRouter();
   const c = useColors();
   const [isPeeking, setIsPeeking] = useState(false);
+  const [showReport, setShowReport] = useState(false);
+
+  function openMenu() {
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ['Cancelar', `Ver perfil de @${item.user.username}`, 'Reportar publicación'],
+          cancelButtonIndex: 0,
+        },
+        (index) => {
+          if (index === 1) router.push(`/user/${item.user.username}` as any);
+          if (index === 2) setShowReport(true);
+        }
+      );
+    } else {
+      Alert.alert(`@${item.user.username}`, undefined, [
+        { text: `Ver perfil`, onPress: () => router.push(`/user/${item.user.username}` as any) },
+        { text: 'Reportar publicación', onPress: () => setShowReport(true) },
+        { text: 'Cancelar', style: 'cancel' },
+      ]);
+    }
+  }
 
   const activityColor = ACTIVITY_COLOR[item.type];
 
@@ -53,9 +76,14 @@ export function FeedCard({ item, onLike }: FeedCardProps) {
 
         {/* ── Header ─────────────────────────────────── */}
         <View className="flex-row items-center px-3.5 pt-3 pb-2.5 gap-2.5">
-          <Avatar user={item.user} size={36} />
+          <Pressable onPress={() => router.push(`/user/${item.user.username}` as any)}>
+            <Avatar user={item.user} size={36} />
+          </Pressable>
 
-          <View className="flex-1 min-w-0">
+          <Pressable
+            className="flex-1 min-w-0"
+            onPress={() => router.push(`/user/${item.user.username}` as any)}
+          >
             <Text numberOfLines={1}>
               <Text className="font-body-sb text-sm text-text">
                 {item.user.name}
@@ -64,13 +92,13 @@ export function FeedCard({ item, onLike }: FeedCardProps) {
                 {'  @'}{item.user.username}
               </Text>
             </Text>
-          </View>
+          </Pressable>
 
           <Text className="font-body text-xs text-t3 shrink-0">
             {item.time}
           </Text>
 
-          <Pressable hitSlop={8}>
+          <Pressable hitSlop={8} onPress={openMenu}>
             <MoreHorizontal size={18} color={c.t3} />
           </Pressable>
         </View>
@@ -179,7 +207,11 @@ export function FeedCard({ item, onLike }: FeedCardProps) {
           </Pressable>
 
           {/* Comment */}
-          <Pressable className="flex-row items-center gap-[5px]" hitSlop={8}>
+          <Pressable
+            onPress={() => router.push({ pathname: '/comments/[id]', params: { id: item.id } } as any)}
+            className="flex-row items-center gap-[5px]"
+            hitSlop={8}
+          >
             <MessageCircle size={21} color={c.t2} strokeWidth={1.7} />
             <Text className="font-body text-xs text-t2">{item.comments}</Text>
           </Pressable>
@@ -259,6 +291,14 @@ export function FeedCard({ item, onLike }: FeedCardProps) {
           onClose={() => setIsPeeking(false)}
         />
       ) : null}
+
+      {showReport && (
+        <ReportSheet
+          target="content"
+          targetName={`Publicación de @${item.user.username}`}
+          onClose={() => setShowReport(false)}
+        />
+      )}
     </>
   );
 }

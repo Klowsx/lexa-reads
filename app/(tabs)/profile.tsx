@@ -47,6 +47,8 @@ export default function ProfileScreen() {
           reviews={ME.reviews}
           followers={ME.followers}
           following={ME.following}
+          onPressFollowers={() => router.push(`/followers?username=${ME.username}&tab=followers` as any)}
+          onPressFollowing={() => router.push(`/followers?username=${ME.username}&tab=following` as any)}
         />
 
         <CurrentlyReading books={readingBooks} onPress={setSelectedBook} />
@@ -62,7 +64,11 @@ export default function ProfileScreen() {
 
         <RecentReads books={recentReads} onPress={setSelectedBook} />
 
-        <ProfileLists lists={MOCK_LISTS} />
+        <ProfileLists
+          lists={MOCK_LISTS}
+          onNewList={() => {}}
+          onPress={(list) => router.push({ pathname: '/list/[slug]', params: { slug: list.id } } as any)}
+        />
       </ScrollView>
 
       {showEdit && (

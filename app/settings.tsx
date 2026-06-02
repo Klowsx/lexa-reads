@@ -186,7 +186,7 @@ export default function SettingsScreen() {
             }
             trailing={<SettingsToggle on={privateOn} onChange={setPrivateOn} />}
           />
-          <SettingsItem label="Usuarios bloqueados" subtitle="0 usuarios" onPress={() => {}} />
+          <SettingsItem label="Usuarios bloqueados" subtitle="0 usuarios" onPress={() => router.push('/blocked-users' as any)} />
           <SettingsItem label="Exportar mis datos" onPress={() => {}} />
           <SettingsItem
             label="Eliminar cuenta"

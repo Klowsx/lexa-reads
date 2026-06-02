@@ -6,26 +6,31 @@ import type { MockList } from '~/mock';
 interface Props {
   lists: MockList[];
   onNewList?: () => void;
+  onPress?: (list: MockList) => void;
+  title?: string;
 }
 
-export function ProfileLists({ lists, onNewList }: Props) {
+export function ProfileLists({ lists, onNewList, onPress, title = 'Mis listas' }: Props) {
   const c = useColors();
 
   return (
     <View className="px-4 pb-7">
       <View className="flex-row justify-between items-baseline mb-2.5">
         <Text className="font-body-sb text-xs text-t3 tracking-widest uppercase">
-          Mis listas
+          {title}
         </Text>
-        <Pressable onPress={onNewList} hitSlop={6}>
-          <Text className="text-xs font-body-sb text-accent">+ Nueva</Text>
-        </Pressable>
+        {onNewList && (
+          <Pressable onPress={onNewList} hitSlop={6}>
+            <Text className="text-xs font-body-sb text-accent">+ Nueva</Text>
+          </Pressable>
+        )}
       </View>
 
       <View className="gap-2">
         {lists.map((list) => (
           <Pressable
-            key={list.name}
+            key={list.id}
+            onPress={() => onPress?.(list)}
             className="flex-row items-center gap-3 px-3.5 py-3 rounded-md border border-border bg-surface"
             style={({ pressed }) => ({ backgroundColor: pressed ? c.sh : c.surface })}
           >

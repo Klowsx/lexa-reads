@@ -84,7 +84,10 @@
       "mcp__plugin_engram_engram__mem_search",
       "Bash(Select-Object FullName)",
       "PowerShell(pnpm tsc *)",
-      "mcp__plugin_engram_engram__mem_save"
+      "mcp__plugin_engram_engram__mem_save",
+      "mcp__plugin_engram_engram__mem_context",
+      "mcp__plugin_engram_engram__mem_judge",
+      "Bash(python *)"
     ]
   }
 }
