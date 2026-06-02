@@ -24,6 +24,7 @@ import { useFollow } from '~/features/user/hooks/useFollow';
 import { useProfile } from '~/features/user/hooks/useProfile';
 import { userRecentReadsQueryOptions } from '~/features/user/user.queries';
 import { getAvatarColor } from '~/lib/avatar';
+import { cn } from '~/lib/utils';
 import { useColors } from '~/theme/colors';
 
 const alpha = (hex: string, op: number) => {
@@ -257,8 +258,7 @@ export default function UserProfileScreen() {
                 />
               )}
               <Text
-                className="text-xs font-body-sb"
-                style={{ color: isFollowing || isPending ? c.t2 : '#fff' }}
+                className={cn("text-xs font-body-sb", isFollowing || isPending ? "text-t2" : "text-white")}
               >
                 {isFollowing
                   ? 'Siguiendo'

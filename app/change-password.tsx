@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { cn } from '~/lib/utils';
 import { useColors } from '~/theme/colors';
 
 const alpha = (hex: string, op: number) => {
@@ -49,8 +50,7 @@ function Field({
         {label}
       </Text>
       <View
-        className="flex-row items-center rounded-md border border-border"
-        style={{ backgroundColor: c.surface }}
+        className="flex-row items-center rounded-md border border-border bg-surface"
       >
         <Lock size={15} color={c.t3} strokeWidth={1.8} style={{ marginLeft: 13 }} />
         <TextInput
@@ -58,12 +58,11 @@ function Field({
           onChangeText={onChange}
           secureTextEntry={!show}
           autoCapitalize="none"
-          className="flex-1 font-body text-sm text-text"
-          style={{ paddingHorizontal: 10, paddingVertical: 12 }}
+          className="flex-1 font-body text-sm text-text px-[10px] py-3"
           placeholderTextColor={c.t3}
         />
         {trailing ?? (
-          <Pressable onPress={onToggleShow} hitSlop={8} style={{ paddingRight: 13 }}>
+          <Pressable onPress={onToggleShow} hitSlop={8} className="pr-[13px]">
             {show
               ? <EyeOff size={16} color={c.t3} strokeWidth={1.8} />
               : <Eye size={16} color={c.t3} strokeWidth={1.8} />
@@ -144,19 +143,18 @@ export default function ChangePasswordScreen() {
           onToggleShow={() => setShowNew((s) => !s)}
           trailing={
             newPw && newPw === confirm ? (
-              <View style={{ paddingRight: 13 }}>
+              <View className="pr-[13px]">
                 <Check size={16} color={c.success} strokeWidth={2} />
               </View>
             ) : (
-              <View style={{ width: 29 }} />
+              <View className="w-[29px]" />
             )
           }
         />
 
         {/* Requirements */}
         <View
-          className="rounded-xl border border-border mt-1 mb-6 p-3 gap-1"
-          style={{ backgroundColor: c.sr }}
+          className="rounded-xl border border-border mt-1 mb-6 p-3 gap-1 bg-sr"
         >
           {NEW_PW_REQUIREMENTS.map(({ label, test }) => {
             const ok = test(newPw, confirm);
@@ -175,8 +173,7 @@ export default function ChangePasswordScreen() {
                   </View>
                 )}
                 <Text
-                  className="font-body text-xs"
-                  style={{ color: ok ? c.text : c.t2 }}
+                  className={cn("font-body text-xs", ok ? "text-text" : "text-t2")}
                 >
                   {label}
                 </Text>
@@ -188,8 +185,8 @@ export default function ChangePasswordScreen() {
         <Pressable
           onPress={() => router.back()}
           disabled={!allMet}
-          className="py-3.5 rounded-md items-center"
-          style={{ backgroundColor: allMet ? c.accent : alpha(c.accent, 0.4) }}
+          className={cn("py-3.5 rounded-md items-center", allMet ? "bg-accent" : "")}
+          style={allMet ? undefined : { backgroundColor: alpha(c.accent, 0.4) }}
         >
           <Text className="text-sm font-body-sb text-white">Guardar contraseña</Text>
         </Pressable>

@@ -53,13 +53,12 @@ export default function FeedScreen() {
           <Text className="font-display-sb text-lg text-text text-center tracking-tight">
             Tu feed está vacío
           </Text>
-          <Text className="font-body text-sm text-t3 text-center" style={{ lineHeight: 20 }}>
+          <Text className="font-body text-sm text-t3 text-center leading-[20px]">
             Sigue a otras lectoras para ver su actividad aquí.
           </Text>
           <Pressable
             onPress={() => router.push('/(tabs)/search' as any)}
-            className="mt-2 px-6 py-3 rounded-full"
-            style={{ backgroundColor: fixed.accent }}
+            className="mt-2 px-6 py-3 rounded-full bg-accent"
           >
             <Text className="font-body-sb text-sm text-white">Buscar personas</Text>
           </Pressable>

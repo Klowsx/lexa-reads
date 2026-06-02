@@ -33,8 +33,7 @@ function BlockedUserRow({ item }: { item: BlockedUser }) {
 
   return (
     <View
-      className="flex-row items-center px-4 py-3.5 gap-3"
-      style={{ borderBottomWidth: 1, borderBottomColor: c.border }}
+      className="flex-row items-center px-4 py-3.5 gap-3 border-b border-border"
     >
       <Avatar
         displayName={item.blocked.display_name ?? item.blocked.username}
@@ -61,7 +60,7 @@ function BlockedUserRow({ item }: { item: BlockedUser }) {
           borderColor: alpha(c.error, 0.25),
         }}
       >
-        <Text className="text-xs font-body-sb" style={{ color: c.error }}>
+        <Text className="text-xs font-body-sb text-error">
           Desbloquear
         </Text>
       </Pressable>

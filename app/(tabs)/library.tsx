@@ -16,6 +16,7 @@ import { useLibrary } from "~/features/library/hooks/useLibrary";
 import { useLibraryCounts } from "~/features/library/hooks/useLibraryCounts";
 import { type BookStatus } from "~/lib/book-status";
 import { fixed, rawDark, rawLight } from "~/theme/colors";
+import { cn } from '~/lib/utils';
 import type { Tables } from "~/types/database";
 import { useColorScheme } from "react-native";
 
@@ -101,11 +102,7 @@ export default function LibraryScreen() {
             }}
           >
             <Text
-              style={{
-                fontSize: 12,
-                fontFamily: "DMSans_500Medium",
-                color: selectedTag === null ? "#fff" : raw.t2,
-              }}
+              className={cn("text-xs font-body-md", selectedTag === null ? "text-white" : "text-t2")}
             >
               Todos
             </Text>
@@ -127,11 +124,7 @@ export default function LibraryScreen() {
                 }}
               >
                 <Text
-                  style={{
-                    fontSize: 12,
-                    fontFamily: "DMSans_500Medium",
-                    color: active ? "#fff" : raw.t2,
-                  }}
+                  className={cn("text-xs font-body-md", active ? "text-white" : "text-t2")}
                 >
                   {tag}
                 </Text>
@@ -165,8 +158,7 @@ export default function LibraryScreen() {
           )}
           ListEmptyComponent={
             <View
-              className="items-center justify-center py-20 px-8"
-              style={{ gap: 12 }}
+            className="items-center justify-center py-20 px-8 gap-3"
             >
               <Text className="text-t3 font-body text-sm text-center">
                 {selectedTag
@@ -177,19 +169,10 @@ export default function LibraryScreen() {
               {!selectedTag && (
                 <Pressable
                   onPress={() => router.navigate("/(tabs)/search")}
-                  style={{
-                    backgroundColor: fixed.accent,
-                    paddingHorizontal: 20,
-                    paddingVertical: 10,
-                    borderRadius: 8,
-                  }}
+                  className="px-5 py-2.5 rounded-lg bg-accent"
                 >
                   <Text
-                    style={{
-                      color: "#fff",
-                      fontSize: 14,
-                      fontFamily: "DMSans_500Medium",
-                    }}
+                    className="text-white text-sm font-body-md"
                   >
                     Buscar libros
                   </Text>

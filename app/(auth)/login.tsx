@@ -114,7 +114,7 @@ export default function LoginScreen() {
           <View className="flex-1 h-px bg-border" />
           <Text
             className="font-body text-xs text-t3 uppercase"
-            style={{ letterSpacing: 0.9 }}
+            className="tracking-[0.9px]"
           >
             o continúa con
           </Text>

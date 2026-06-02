@@ -48,7 +48,7 @@ function ReviewCard({
       <View className="flex-row items-center gap-3 p-3 border-b border-border">
         <BookCover book={review.books as any} width={40} height={60} />
         <View className="flex-1 min-w-0">
-          <Text className="text-xs font-body-sb text-text" numberOfLines={2} style={{ lineHeight: 16 }}>
+          <Text className="text-xs font-body-sb text-text leading-[16px]" numberOfLines={2}>
             {review.books?.title ?? ''}
           </Text>
           <Text className="text-xs font-body text-t3 mt-0.5" numberOfLines={1}>
@@ -57,7 +57,7 @@ function ReviewCard({
           {rating != null && (
             <View className="flex-row items-center gap-1.5 mt-1.5">
               <StarRating rating={rating} size={10} />
-              <Text className="text-xs font-body-sb" style={{ color: fixed.star }}>
+              <Text className="text-xs font-body-sb text-star">
                 {rating}
               </Text>
             </View>
@@ -80,15 +80,14 @@ function ReviewCard({
             }}
           >
             <AlertTriangle size={11} color={c.warning} strokeWidth={2} />
-            <Text className="text-xs font-body-md" style={{ color: c.warning }}>
+            <Text className="text-xs font-body-md text-warning">
               Contiene spoilers
             </Text>
           </View>
         )}
 
         <Text
-          className="text-xs font-body text-t2"
-          style={{ lineHeight: 20 }}
+          className="text-xs font-body text-t2 leading-[20px]"
           numberOfLines={expanded ? undefined : 4}
         >
           {review.body}
@@ -100,7 +99,7 @@ function ReviewCard({
             hitSlop={8}
             className="mt-1.5"
           >
-            <Text className="text-xs font-body-md" style={{ color: c.accent }}>
+            <Text className="text-xs font-body-md text-accent">
               {expanded ? 'Ver menos' : 'Ver más'}
             </Text>
           </Pressable>
@@ -212,7 +211,7 @@ export default function UserReviewsScreen() {
           onEndReachedThreshold={0.3}
           ListFooterComponent={
             isFetchingNextPage ? (
-              <ActivityIndicator color={c.accent} style={{ paddingVertical: 16 }} />
+              <ActivityIndicator color={c.accent} className="py-4" />
             ) : null
           }
         />

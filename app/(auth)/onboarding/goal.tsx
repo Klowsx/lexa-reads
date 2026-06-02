@@ -8,6 +8,7 @@ import {
   StepBar,
   alpha,
 } from '../../../src/features/auth/components';
+import { cn } from '~/lib/utils';
 import { useColors } from '~/theme/colors';
 
 const QUICK_GOALS = [12, 24, 50, 100];
@@ -52,7 +53,7 @@ export default function OnboardGoalScreen() {
         </Pressable>
 
         <View className="items-center min-w-[120px]">
-          <Text className="font-display-sb text-[88px] leading-[88px] tracking-[-4px]" style={{ color: c.accent }}>
+          <Text className="font-display-sb text-[88px] leading-[88px] tracking-[-4px] text-accent">
             {goal}
           </Text>
           <Text className="font-body text-t3 uppercase mt-1.5 text-[12px] tracking-[0.7px]">
@@ -79,8 +80,7 @@ export default function OnboardGoalScreen() {
               style={on ? { borderColor: c.accent, backgroundColor: alpha(c.accent, 0.14) } : undefined}
             >
               <Text
-                className="font-body-md text-t2 text-[12px]"
-                style={on ? { color: c.accent } : undefined}
+                className={cn("font-body-md text-t2 text-[12px]", on && "text-accent")}
               >
                 {n}
               </Text>

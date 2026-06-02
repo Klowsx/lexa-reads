@@ -4,6 +4,7 @@ import { ChevronLeft } from 'lucide-react-native';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCreateList } from '~/features/lists/hooks/useCreateList';
+import { cn } from '~/lib/utils';
 import { useColors } from '~/theme/colors';
 
 const alpha = (hex: string, op: number) => {
@@ -69,7 +70,7 @@ export default function NewListScreen() {
           {createMutation.isPending ? (
             <ActivityIndicator size="small" color={c.accent} />
           ) : (
-            <Text className="text-sm font-body-sb" style={{ color: canSubmit ? c.accent : c.t3 }}>
+            <Text className={cn("text-sm font-body-sb", canSubmit ? "text-accent" : "text-t3")}>
               Crear
             </Text>
           )}
@@ -86,7 +87,7 @@ export default function NewListScreen() {
           className="rounded-md mb-6 px-4 py-4 flex-row items-center gap-3"
           style={{ backgroundColor: alpha(color, 0.1), borderWidth: 1, borderColor: alpha(color, 0.28) }}
         >
-          <View className="rounded-sm shrink-0" style={{ width: 4, height: 40, backgroundColor: color }} />
+          <View className="rounded-sm shrink-0 w-1 h-10" style={{ backgroundColor: color }} />
           <View className="flex-1 min-w-0">
             <Text className="text-sm font-body-sb text-text" numberOfLines={1}>
               {name.trim() || 'Nombre de la lista'}
@@ -103,8 +104,7 @@ export default function NewListScreen() {
             onChangeText={setName}
             placeholder="Ej. Lecturas de verano"
             maxLength={60}
-            className="rounded-md border border-border font-body text-sm text-text"
-            style={{ paddingHorizontal: 14, paddingVertical: 11, backgroundColor: c.surface }}
+            className="rounded-md border border-border font-body text-sm text-text px-[14px] py-[11px] bg-surface"
             placeholderTextColor={c.t3}
           />
           <Text className="text-xs font-body text-t3 text-right mt-1">{name.length}/60</Text>
@@ -122,10 +122,9 @@ export default function NewListScreen() {
             multiline
             numberOfLines={3}
             maxLength={200}
-            className="rounded-md border border-border font-body text-sm text-text"
+            className="rounded-md border border-border font-body text-sm text-text px-[14px] py-[11px] leading-[22px] bg-surface"
             style={{
-              paddingHorizontal: 14, paddingVertical: 11, lineHeight: 22,
-              textAlignVertical: 'top', backgroundColor: c.surface,
+              textAlignVertical: 'top',
             }}
             placeholderTextColor={c.t3}
           />
@@ -142,10 +141,9 @@ export default function NewListScreen() {
                 <Pressable
                   key={v}
                   onPress={() => setVisibility(v)}
-                  className="flex-1 items-center py-2 rounded-sm"
-                  style={{ backgroundColor: active ? c.accent : 'transparent' }}
+                  className={cn("flex-1 items-center py-2 rounded-sm", active ? "bg-accent" : "bg-transparent")}
                 >
-                  <Text className="text-xs font-body-sb" style={{ color: active ? '#fff' : c.t3 }}>{v}</Text>
+                  <Text className={cn("text-xs font-body-sb", active ? "text-white" : "text-t3")}>{v}</Text>
                 </Pressable>
               );
             })}
@@ -181,8 +179,8 @@ export default function NewListScreen() {
         <Pressable
           onPress={handleCreate}
           disabled={!canSubmit || createMutation.isPending}
-          className="py-3.5 rounded-md items-center"
-          style={{ backgroundColor: canSubmit ? c.accent : alpha(c.accent, 0.4) }}
+          className={cn("py-3.5 rounded-md items-center", canSubmit ? "bg-accent" : "")}
+          style={canSubmit ? undefined : { backgroundColor: alpha(c.accent, 0.4) }}
         >
           {createMutation.isPending ? (
             <ActivityIndicator color="#fff" />

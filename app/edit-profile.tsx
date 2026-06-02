@@ -15,6 +15,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Avatar } from '~/components/ui/Avatar';
 import { getAvatarColor } from '~/lib/avatar';
+import { cn } from '~/lib/utils';
 import { useColors } from '~/theme/colors';
 import { useMe } from '~/features/user/hooks/useMe';
 import { useUpdateProfile } from '~/features/user/hooks/useUpdateProfile';
@@ -92,8 +93,7 @@ export default function EditProfileScreen() {
             <ActivityIndicator size="small" color={c.accent} />
           ) : (
             <Text
-              className="text-sm font-body-sb"
-              style={{ color: canSave ? c.accent : c.t3 }}
+              className={cn("text-sm font-body-sb", canSave ? "text-accent" : "text-t3")}
             >
               Guardar
             </Text>
@@ -135,8 +135,7 @@ export default function EditProfileScreen() {
               value={name}
               onChangeText={setName}
               maxLength={50}
-              className="rounded-md border border-border font-body text-sm text-text bg-surface"
-              style={{ paddingHorizontal: 14, paddingVertical: 11 }}
+              className="rounded-md border border-border font-body text-sm text-text bg-surface px-[14px] py-[11px]"
               placeholderTextColor={c.t3}
             />
           </View>
@@ -153,11 +152,8 @@ export default function EditProfileScreen() {
               numberOfLines={3}
               maxLength={160}
               placeholder="Cuéntanos sobre tus lecturas..."
-              className="rounded-md border border-border font-body text-sm text-text bg-surface"
+              className="rounded-md border border-border font-body text-sm text-text bg-surface px-[14px] py-[11px] leading-[22px]"
               style={{
-                paddingHorizontal: 14,
-                paddingVertical: 11,
-                lineHeight: 22,
                 textAlignVertical: 'top',
               }}
               placeholderTextColor={c.t3}
@@ -217,8 +213,7 @@ export default function EditProfileScreen() {
           <Pressable
             onPress={handleSave}
             disabled={!canSave}
-            className="py-3.5 rounded-md items-center mb-2 bg-accent"
-            style={{ opacity: canSave ? 1 : 0.5 }}
+            className={cn("py-3.5 rounded-md items-center mb-2 bg-accent", canSave ? "opacity-100" : "opacity-50")}
           >
             {isPending ? (
               <ActivityIndicator size="small" color="#fff" />

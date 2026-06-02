@@ -70,7 +70,7 @@ function CommentRow({
             {formatRelativeTime(comment.created_at)}
           </Text>
         </View>
-        <Text className="text-xs font-body text-t2" style={{ lineHeight: 19 }}>
+        <Text className="text-xs font-body text-t2 leading-[19px]">
           {comment.body}
         </Text>
       </View>
@@ -205,15 +205,10 @@ export default function CommentsScreen() {
           placeholderTextColor={c.t3}
           returnKeyType="send"
           onSubmitEditing={submitComment}
-          className="flex-1 text-xs font-body text-text"
+          className="flex-1 text-xs font-body text-text rounded-lg px-[14px] py-2 min-h-[36px] border"
           style={{
             backgroundColor: c.sh,
-            borderWidth: 1,
             borderColor: c.border,
-            borderRadius: 20,
-            paddingHorizontal: 14,
-            paddingVertical: 8,
-            minHeight: 36,
           }}
         />
 

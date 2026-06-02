@@ -44,7 +44,7 @@ export default function OnboardUsernameScreen() {
             className="w-[92px] h-[92px] rounded-full items-center justify-center border-2"
             style={{ backgroundColor: alpha(c.accent, 0.18), borderColor: c.accent }}
           >
-            <Text className="font-body-sb text-[34px]" style={{ color: c.accent }}>
+            <Text className="font-body-sb text-[34px] text-accent">
               {username.slice(0, 2).toUpperCase() || '··'}
             </Text>
           </View>

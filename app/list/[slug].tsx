@@ -146,13 +146,13 @@ export default function ListDetailScreen() {
         contentContainerStyle={{ paddingBottom: 48 }}
       >
         {/* ── Hero ── */}
-        <View style={{ height: HERO_H, overflow: 'hidden' }}>
+        <View className="overflow-hidden" style={{ height: HERO_H }}>
           {/* Background gradient + book covers */}
           <LinearGradient
             colors={[alpha(col, 0.35), col]}
             start={{ x: 0.1, y: 0 }}
             end={{ x: 0.9, y: 1 }}
-            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+            className="absolute inset-0"
           />
           {list.items.slice(0, 4).map((item, i) => {
             const pos = BOOK_POSITIONS[i] ?? { left: i * 80, top: 40, rot: '0deg' };
@@ -177,15 +177,13 @@ export default function ListDetailScreen() {
           <LinearGradient
             colors={['rgba(0,0,0,0.28)', 'rgba(0,0,0,0.0)', 'rgba(0,0,0,0.72)']}
             locations={[0, 0.3, 1]}
-            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+            className="absolute inset-0"
           />
 
           {/* Nav bar */}
           <View
-            style={{
-              position: 'absolute', top: insets.top + 6, left: 14, right: 14,
-              flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-            }}
+            className="flex-row items-center justify-between absolute left-[14px] right-[14px]"
+            style={{ top: insets.top + 6 }}
           >
             <HeroBtn onPress={() => router.back()}>
               <ChevronLeft size={18} color="#fff" strokeWidth={2} />
@@ -228,18 +226,19 @@ export default function ListDetailScreen() {
           </View>
 
           {/* Title + pills */}
-          <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 18, paddingBottom: 20 }}>
+          <View className="absolute bottom-0 left-0 right-0 p-[18px] pb-5">
             <Text
+              className="text-white leading-[31px]"
               style={{
                 fontSize: 26, fontFamily: 'PlayfairDisplay_700Bold',
-                color: '#fff', lineHeight: 31, marginBottom: 10,
+                marginBottom: 10,
                 textShadowColor: 'rgba(0,0,0,0.4)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 8,
               }}
               numberOfLines={2}
             >
               {list.name}
             </Text>
-            <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
+            <View className="flex-row gap-1.5 flex-wrap">
               {pills.map((tag) => <Pill key={tag} label={tag} />)}
             </View>
           </View>
@@ -248,8 +247,8 @@ export default function ListDetailScreen() {
         {/* ── Description ── */}
         {list.description ? (
           <Text
-            className="text-t2"
-            style={{ paddingHorizontal: 18, paddingTop: 18, fontSize: 13.5, fontFamily: 'PlayfairDisplay_400Regular_Italic', lineHeight: 22 }}
+            className="text-t2 leading-[22px]"
+            style={{ paddingHorizontal: 18, paddingTop: 18, fontSize: 13.5, fontFamily: 'PlayfairDisplay_400Regular_Italic' }}
           >
             "{list.description}"
           </Text>
@@ -271,27 +270,26 @@ export default function ListDetailScreen() {
         {/* ── Books grid ── */}
         {list.items.length === 0 ? (
           <View
-            className="mx-4 rounded-lg border border-border bg-surface items-center"
-            style={{ paddingVertical: 36, paddingHorizontal: 20, marginBottom: 40 }}
+            className="mx-4 rounded-lg border border-border bg-surface items-center py-9 px-5 mb-10"
           >
-            <Text style={{ fontSize: 32, marginBottom: 10 }}>📚</Text>
+            <Text className="text-[32px] mb-2.5">📚</Text>
             <Text className="text-sm font-body-md text-t2 mb-1.5">Lista vacía</Text>
             <Text className="text-xs font-body text-t3">Toca «+ Agregar» para añadir libros</Text>
           </View>
         ) : (
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 16, gap: 12, paddingBottom: 40 }}>
+          <View className="flex-row flex-wrap px-4 gap-3 pb-10">
             {list.items.map((item) => (
               <Pressable
                 key={item.id}
                 onPress={() => setSelectedBook(item.book as Tables<'books'>)}
-                style={{ width: 100 }}
+                className="w-[100px]"
               >
-                <View style={{ width: 100, height: 150, borderRadius: 6, overflow: 'hidden', backgroundColor: alpha(col, 0.3) }}>
+                <View className="w-[100px] h-[150px] rounded-sm overflow-hidden" style={{ backgroundColor: alpha(col, 0.3) }}>
                   {item.book.cover_url ? (
-                    <Image source={{ uri: item.book.cover_url }} style={{ width: 100, height: 150 }} contentFit="cover" />
+                    <Image source={{ uri: item.book.cover_url }} className="w-[100px] h-[150px]" contentFit="cover" />
                   ) : null}
                 </View>
-                <Text className="text-xs font-body-md text-t2 mt-1.5" style={{ lineHeight: 15, width: 100 }} numberOfLines={2}>
+                <Text className="text-xs font-body-md text-t2 mt-1.5 leading-[15px] w-[100px]" numberOfLines={2}>
                   {item.book.title}
                 </Text>
               </Pressable>

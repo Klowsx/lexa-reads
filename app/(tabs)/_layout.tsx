@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { useAuthStore } from '~/stores/auth.store';
 import { useUnreadCount } from '~/features/notifications/hooks/useUnreadCount';
+import { cn } from '~/lib/utils';
 import { useColors } from '~/theme/colors';
 
 // ─── Tab icons (ported from design prototype) ─────────────────
@@ -97,9 +98,9 @@ function NotifBadge() {
   return (
     <View
       className="absolute -top-1 -right-1 min-w-[14px] h-[14px] rounded-full items-center justify-center px-[3px]"
-      style={{ backgroundColor: c.accent }}
+      className="bg-accent"
     >
-      <Text style={{ fontSize: 8, color: '#fff', fontFamily: 'DMSans_700Bold', lineHeight: 14 }}>
+      <Text className="text-[8px] text-white font-body-bold leading-[14px]">
         {label}
       </Text>
     </View>
@@ -133,11 +134,8 @@ function CustomTabBar({ state, navigation }: TabBarProps) {
                 {tab.hasNotif && <NotifBadge />}
               </View>
               <Text
-                style={{
-                  fontSize: 10,
-                  color,
-                  fontFamily: active ? 'DMSans_600SemiBold' : 'DMSans_400Regular',
-                }}
+                className={cn("text-[10px]", active ? "font-body-sb" : "font-body")}
+                style={{ color }}
               >
                 {tab.label}
               </Text>

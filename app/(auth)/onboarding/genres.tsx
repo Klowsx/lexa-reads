@@ -8,6 +8,7 @@ import {
   StepBar,
   alpha,
 } from '../../../src/features/auth/components';
+import { cn } from '~/lib/utils';
 import { useColors } from '~/theme/colors';
 
 const GENRES = [
@@ -65,8 +66,7 @@ export default function OnboardGenresScreen() {
               style={on ? { borderColor: c.accent, backgroundColor: alpha(c.accent, 0.14) } : undefined}
             >
               <Text
-                className={`font-body-md text-sm ${on ? 'text-text' : 'text-t2'}`}
-                style={on ? { color: c.accent } : undefined}
+                className={cn("font-body-md text-sm", on ? "text-text" : "text-t2", on && "text-accent")}
               >
                 {g.label}
               </Text>

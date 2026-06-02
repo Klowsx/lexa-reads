@@ -27,8 +27,7 @@ export default function SuccessScreen() {
             }}
           >
             <Text
-              className="text-[40px] leading-[48px]"
-              style={{ color: c.success }}
+              className="text-[40px] leading-[48px] text-success"
             >
               ✓
             </Text>

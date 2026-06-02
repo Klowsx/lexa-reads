@@ -10,6 +10,7 @@ import { useFollowing } from '~/features/user/hooks/useFollowing';
 import { useProfile } from '~/features/user/hooks/useProfile';
 import { useFollow } from '~/features/user/hooks/useFollow';
 import type { FollowUser } from '~/features/user/user.queries';
+import { cn } from '~/lib/utils';
 import { useColors } from '~/theme/colors';
 
 const alpha = (hex: string, op: number) => {
@@ -72,15 +73,11 @@ function UserRow({ item }: { item: FollowUser }) {
       <Pressable
         onPress={handleFollow}
         disabled={follow.isPending || unfollow.isPending}
-        className="px-3.5 py-2 rounded-full border shrink-0"
-        style={{
-          backgroundColor: followed ? 'transparent' : alpha(c.accent, 0.1),
-          borderColor: followed ? c.border : alpha(c.accent, 0.35),
-        }}
+        className={cn("px-3.5 py-2 rounded-full border shrink-0", followed ? "bg-transparent border-border" : "")}
+        style={followed ? undefined : { backgroundColor: alpha(c.accent, 0.1), borderColor: alpha(c.accent, 0.35) }}
       >
         <Text
-          className="text-xs font-body-sb"
-          style={{ color: followed ? c.t2 : c.accent }}
+          className={cn("text-xs font-body-sb", followed ? "text-t2" : "text-accent")}
         >
           {followed ? 'Siguiendo' : 'Seguir'}
         </Text>
@@ -138,21 +135,15 @@ export default function FollowersScreen() {
             <Pressable
               key={tab}
               onPress={() => setActiveTab(tab)}
-              className="flex-1 items-center py-3 gap-0.5"
-              style={{
-                borderBottomWidth: active ? 2 : 0,
-                borderBottomColor: c.accent,
-              }}
+              className={cn("flex-1 items-center py-3 gap-0.5", active && "border-b-2 border-b-accent")}
             >
               <Text
-                className="text-sm font-body-sb"
-                style={{ color: active ? c.accent : c.t3 }}
+                className={cn("text-sm font-body-sb", active ? "text-accent" : "text-t3")}
               >
                 {count ?? '—'}
               </Text>
               <Text
-                className="text-xs font-body"
-                style={{ color: active ? c.accent : c.t3 }}
+                className={cn("text-xs font-body", active ? "text-accent" : "text-t3")}
               >
                 {label}
               </Text>

@@ -41,7 +41,7 @@ function ListRow({
       })}
     >
       {/* Color stripe */}
-      <View className="rounded-sm shrink-0" style={{ width: 3.5, height: 36, backgroundColor: col, opacity: 0.85 }} />
+      <View className="rounded-sm shrink-0 w-[3.5px] h-9 opacity-[0.85]" style={{ backgroundColor: col }} />
 
       {/* Info */}
       <View className="flex-1 min-w-0">
@@ -56,8 +56,7 @@ function ListRow({
         <ActivityIndicator size="small" color={c.accent} />
       ) : (
         <View
-          className="w-6 h-6 rounded-full items-center justify-center"
-          style={{ backgroundColor: added ? c.accent : 'transparent', borderWidth: added ? 0 : 1.5, borderColor: c.border }}
+          className={cn("w-6 h-6 rounded-full items-center justify-center", added ? "bg-accent" : "bg-transparent border-[1.5px] border-border")}
         >
           {added && <Check size={13} color="#fff" strokeWidth={2.5} />}
         </View>
@@ -119,7 +118,7 @@ export default function AddToListScreen() {
             className="px-3.5 py-2 rounded-full"
             style={{ backgroundColor: alpha(c.accent, 0.12) }}
           >
-            <Text className="text-xs font-body-sb" style={{ color: c.accent }}>Listo</Text>
+            <Text className="text-xs font-body-sb text-accent">Listo</Text>
           </Pressable>
         )}
       </View>
@@ -136,7 +135,7 @@ export default function AddToListScreen() {
         >
           <Plus size={16} color={c.accent} strokeWidth={2} />
         </View>
-        <Text className="text-sm font-body-md" style={{ color: c.accent }}>Nueva lista</Text>
+        <Text className="text-sm font-body-md text-accent">Nueva lista</Text>
       </Pressable>
 
       {/* Loading */}

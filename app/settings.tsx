@@ -13,6 +13,7 @@ import { useUpdateReadingGoal } from '~/features/user/hooks/useUpdateReadingGoal
 import { useLogout } from '~/features/auth/hooks/useLogout';
 import { type ThemeMode, useThemeStore } from '~/stores/theme.store';
 import { useUIStore } from '~/stores/ui.store';
+import { cn } from '~/lib/utils';
 import { useColors } from '~/theme/colors';
 import { supabase } from '~/lib/supabase';
 
@@ -139,8 +140,7 @@ export default function SettingsScreen() {
                   updateGoal.mutate(currentGoal, { onSuccess: () => setShowGoal(false) });
                 }}
                 disabled={updateGoal.isPending}
-                className="py-2.5 rounded-md items-center"
-                style={{ backgroundColor: c.accent }}
+                className="py-2.5 rounded-md items-center bg-accent"
               >
                 {updateGoal.isPending
                   ? <ActivityIndicator size="small" color="#fff" />
@@ -163,13 +163,11 @@ export default function SettingsScreen() {
                   <Pressable
                     key={m}
                     onPress={() => setMode(m)}
-                    className="flex-1 flex-row items-center justify-center gap-1.5 py-2 rounded-sm"
-                    style={{ backgroundColor: active ? c.accent : 'transparent' }}
+                    className={cn("flex-1 flex-row items-center justify-center gap-1.5 py-2 rounded-sm", active ? "bg-accent" : "bg-transparent")}
                   >
                     <Icon size={14} color={active ? '#fff' : c.t3} strokeWidth={1.8} />
                     <Text
-                      className="text-xs font-body-sb"
-                      style={{ color: active ? '#fff' : c.t3 }}
+                      className={cn("text-xs font-body-sb", active ? "text-white" : "text-t3")}
                     >
                       {label}
                     </Text>
@@ -240,7 +238,7 @@ export default function SettingsScreen() {
             {deletionRequest ? (
               /* Ya hay una solicitud pendiente */
               <>
-                <Text className="text-xs font-body-sb mb-1.5" style={{ color: c.error }}>
+                <Text className="text-xs font-body-sb text-error mb-1.5">
                   Eliminación programada
                 </Text>
                 <Text className="text-xs font-body text-t2 mb-3">
@@ -266,7 +264,7 @@ export default function SettingsScreen() {
                   >
                     {cancelDeletion.isPending
                       ? <ActivityIndicator size="small" color={c.error} />
-                      : <Text className="text-xs font-body-sb" style={{ color: c.error }}>
+                      : <Text className="text-xs font-body-sb text-error">
                           Cancelar eliminación
                         </Text>
                     }
@@ -276,7 +274,7 @@ export default function SettingsScreen() {
             ) : (
               /* Sin solicitud — mostrar confirmación */
               <>
-                <Text className="text-xs font-body-sb mb-1.5" style={{ color: c.error }}>
+                <Text className="text-xs font-body-sb text-error mb-1.5">
                   ¿Eliminar tu cuenta?
                 </Text>
                 <Text className="text-xs font-body text-t2 mb-3">
@@ -300,7 +298,7 @@ export default function SettingsScreen() {
                   >
                     {requestDeletion.isPending
                       ? <ActivityIndicator size="small" color={c.error} />
-                      : <Text className="text-xs font-body-sb" style={{ color: c.error }}>
+                      : <Text className="text-xs font-body-sb text-error">
                           Solicitar eliminación
                         </Text>
                     }

@@ -11,6 +11,7 @@ import { useList } from '~/features/lists/hooks/useList';
 import { useUpdateList } from '~/features/lists/hooks/useUpdateList';
 import { useDeleteList } from '~/features/lists/hooks/useDeleteList';
 import { useRemoveBookFromList } from '~/features/lists/hooks/useRemoveBookFromList';
+import { cn } from '~/lib/utils';
 import { useColors } from '~/theme/colors';
 
 const alpha = (hex: string, op: number) => {
@@ -111,7 +112,7 @@ export default function EditListScreen() {
           {updateMutation.isPending ? (
             <ActivityIndicator size="small" color={c.accent} />
           ) : (
-            <Text className="text-sm font-body-sb" style={{ color: canSave ? c.accent : c.t3 }}>Guardar</Text>
+            <Text className={cn("text-sm font-body-sb", canSave ? "text-accent" : "text-t3")}>Guardar</Text>
           )}
         </Pressable>
       </View>
@@ -144,8 +145,8 @@ export default function EditListScreen() {
             value={name}
             onChangeText={setName}
             maxLength={60}
-            className="rounded-md border border-border font-body text-sm text-text"
-            style={{ paddingHorizontal: 14, paddingVertical: 11, backgroundColor: c.surface }}
+            className="rounded-md border border-border font-body text-sm text-text px-[14px] py-[11px]"
+            style={{ backgroundColor: c.surface }}
             placeholderTextColor={c.t3}
           />
           <Text className="text-xs font-body text-t3 text-right mt-1">{name.length}/60</Text>
@@ -163,9 +164,8 @@ export default function EditListScreen() {
             multiline
             numberOfLines={3}
             maxLength={200}
-            className="rounded-md border border-border font-body text-sm text-text"
+            className="rounded-md border border-border font-body text-sm text-text px-[14px] py-[11px] leading-[22px]"
             style={{
-              paddingHorizontal: 14, paddingVertical: 11, lineHeight: 22,
               textAlignVertical: 'top', backgroundColor: c.surface,
             }}
             placeholderTextColor={c.t3}
@@ -186,7 +186,7 @@ export default function EditListScreen() {
                   className="flex-1 items-center py-2 rounded-sm"
                   style={{ backgroundColor: active ? c.accent : 'transparent' }}
                 >
-                  <Text className="text-xs font-body-sb" style={{ color: active ? '#fff' : c.t3 }}>{v}</Text>
+                  <Text className={cn("text-xs font-body-sb", active ? "text-white" : "text-t3")}>{v}</Text>
                 </Pressable>
               );
             })}
@@ -235,9 +235,9 @@ export default function EditListScreen() {
                   className="flex-row items-center gap-3 rounded-md border border-border px-3 py-2.5"
                   style={{ backgroundColor: c.surface }}
                 >
-                  <View style={{ width: 40, height: 58, borderRadius: 4, overflow: 'hidden', backgroundColor: c.sh }}>
+                  <View className="w-10 h-[58px] rounded-[4px] overflow-hidden" style={{ backgroundColor: c.sh }}>
                     {item.book.cover_url ? (
-                      <Image source={{ uri: item.book.cover_url }} style={{ width: 40, height: 58 }} contentFit="cover" />
+                      <Image source={{ uri: item.book.cover_url }} className="w-10 h-[58px]" contentFit="cover" />
                     ) : null}
                   </View>
                   <View className="flex-1 min-w-0">

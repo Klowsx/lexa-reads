@@ -11,6 +11,7 @@ import { UserCard } from '~/features/user/components/UserCard';
 import { useSearchBooks } from '~/features/book/hooks/useSearchBook';
 import { useTrendingBooks } from '~/features/book/hooks/useTrendingBooks';
 import { useSearchUsers } from '~/features/user/hooks/useSearchUsers';
+import { cn } from '~/lib/utils';
 import { useColors } from '~/theme/colors';
 import { useDebounce } from '~/lib/useDebounce';
 import type { Tables } from '~/types/database';
@@ -56,13 +57,7 @@ function SegmentedControl({ active, onChange }: SegmentedControlProps) {
   return (
     <View
       onLayout={onLayout}
-      className="flex-row rounded-md mx-4 mb-3 relative overflow-hidden"
-      style={{
-        backgroundColor: c.sh,
-        borderWidth: 1,
-        borderColor: c.border,
-        height: 34,
-      }}
+      className="flex-row rounded-md mx-4 mb-3 relative overflow-hidden h-[34px] border border-border bg-sh"
     >
       {/* Sliding pill */}
       {containerWidth > 0 && (
@@ -88,8 +83,7 @@ function SegmentedControl({ active, onChange }: SegmentedControlProps) {
             className="flex-1 items-center justify-center"
           >
             <Text
-              className="text-xs font-body-sb"
-              style={{ color: isActive ? '#fff' : c.t2 }}
+              className={cn("text-xs font-body-sb", isActive ? "text-white" : "text-t2")}
             >
               {label}
             </Text>
@@ -202,8 +196,7 @@ export default function SearchScreen() {
           <View className="px-4">
             <View className="flex-row items-center gap-1.5 mb-2">
               <Text
-                className="text-xs text-t3 tracking-widest flex-1"
-                style={{ fontFamily: 'DMSans_600SemiBold', textTransform: 'uppercase' }}
+                className="text-xs text-t3 tracking-widest flex-1 font-body-sb uppercase"
               >
                 {showingSearch
                   ? isLoading ? 'Buscando...' : `${results.length} libro${results.length !== 1 ? 's' : ''}`
@@ -215,7 +208,7 @@ export default function SearchScreen() {
                   hitSlop={8}
                   className="w-4 h-4 rounded-full border border-t3 items-center justify-center"
                 >
-                  <Text className="text-t3" style={{ fontSize: 9, fontFamily: 'DMSans_600SemiBold', lineHeight: 12 }}>i</Text>
+                  <Text className="text-t3 text-[9px] font-body-sb leading-[12px]">i</Text>
                 </Pressable>
               )}
             </View>
@@ -237,8 +230,7 @@ export default function SearchScreen() {
           {/* Users section */}
           <View className="px-4 mt-3">
             <Text
-              className="text-xs text-t3 tracking-widest mb-2"
-              style={{ fontFamily: 'DMSans_600SemiBold', textTransform: 'uppercase' }}
+              className="text-xs text-t3 tracking-widest mb-2 font-body-sb uppercase"
             >
               {showingSearch
                 ? `${userResults.length} usuario${userResults.length !== 1 ? 's' : ''}`
@@ -310,8 +302,7 @@ export default function SearchScreen() {
             {!query && <GenreChips />}
             <View className="flex-row items-center gap-1.5 mb-2.5">
               <Text
-                className="text-xs text-t3 tracking-widest"
-                style={{ fontFamily: 'DMSans_600SemiBold', textTransform: 'uppercase' }}
+                className="text-xs text-t3 tracking-widest font-body-sb uppercase"
               >
                 {!query
                   ? discoverLabel
@@ -325,7 +316,7 @@ export default function SearchScreen() {
                   hitSlop={8}
                   className="w-4 h-4 rounded-full border border-t3 items-center justify-center"
                 >
-                  <Text className="text-t3" style={{ fontSize: 9, fontFamily: 'DMSans_600SemiBold', lineHeight: 12 }}>i</Text>
+                  <Text className="text-t3 text-[9px] font-body-sb leading-[12px]">i</Text>
                 </Pressable>
               )}
             </View>

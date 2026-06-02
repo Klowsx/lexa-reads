@@ -167,13 +167,10 @@ export default function NewReviewScreen() {
                     numberOfLines={8}
                     placeholder="¿Qué te pareció el libro? Comparte tu opinión..."
                     placeholderTextColor={c.t3}
-                    className="rounded-card bg-sr border text-text font-body text-sm"
+                    className="rounded-card bg-sr border text-text font-body text-sm px-[14px] py-3 min-h-[160px]"
                     style={{
                       // textAlignVertical top para que el cursor empiece arriba
                       textAlignVertical: "top",
-                      paddingHorizontal: 14,
-                      paddingVertical: 12,
-                      minHeight: 160,
                       // Borde de error en rojo si hay validación fallida
                       borderColor: errors.body ? c.error : c.border,
                     }}
@@ -226,12 +223,11 @@ export default function NewReviewScreen() {
               onPress={handleSubmit(onSubmit)}
               // El botón se desactiva mientras se envía o si el form no es válido
               disabled={upsertMutation.isPending || !isValid}
-              className="py-3.5 rounded-card items-center"
-              style={{
-                // Opacidad reducida cuando está desactivado para feedback visual
-                opacity: upsertMutation.isPending || !isValid ? 0.5 : 1,
-                backgroundColor: c.accent,
-              }}
+          className="py-3.5 rounded-card items-center bg-accent"
+          style={{
+            // Opacidad reducida cuando está desactivado para feedback visual
+            opacity: upsertMutation.isPending || !isValid ? 0.5 : 1,
+          }}
             >
               {upsertMutation.isPending ? (
                 <ActivityIndicator color="#fff" size="small" />
