@@ -16,9 +16,10 @@ const alpha = (hex: string, op: number) => {
 interface BookHeroProps {
   book: Tables<"books">;
   onBack: () => void;
+  onShare?: () => void;
 }
 
-export function BookHero({ book, onBack }: BookHeroProps) {
+export function BookHero({ book, onBack, onShare }: BookHeroProps) {
   const scheme = useColorScheme();
   const raw = scheme === "dark" ? rawDark : rawLight;
 
@@ -70,6 +71,7 @@ export function BookHero({ book, onBack }: BookHeroProps) {
         <View className="flex-row gap-2">
           <Pressable
             hitSlop={10}
+            onPress={onShare}
             className="w-9 h-9 rounded-full items-center justify-center"
             style={{ backgroundColor: "rgba(0,0,0,0.42)" }}
           >

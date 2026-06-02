@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -7,15 +7,19 @@ import {
   View,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { Heart, MessageCircle, Pencil, Trash2 } from "lucide-react-native";
+import ViewShot from "react-native-view-shot";
+import { Heart, MessageCircle, Pencil, Share2, Trash2 } from "lucide-react-native";
 import { StarRating } from "~/components/ui/StarRating";
 import { UserAvatar } from "~/components/ui/UserAvatar";
 import { useBookReviews } from "../hooks/useBookReviews";
 import { useMyReview } from "../hooks/useMyReview";
 import { useDeleteReview } from "../hooks/useDeleteReview";
 import { useToggleReviewLike } from "~/features/feed/hooks/useToggleReviewLike";
+import { ReviewShareCard } from "~/features/share/components/ReviewShareCard";
+import { useShareCard } from "~/features/share/hooks/useShareCard";
 import { fixed, useColors } from "~/theme/colors";
 import { formatRelativeTime } from "~/lib/utils";
+import type { Tables } from "~/types/database";
 import type { ReviewWithUser } from "../book.queries";
 
 const alpha = (hex: string, op: number) => {
@@ -73,11 +77,13 @@ function ReviewCard({
   isOwn = false,
   onEdit,
   onDelete,
+  onShare,
 }: {
   review: ReviewWithUser;
   isOwn?: boolean;
   onEdit?: () => void;
   onDelete?: () => void;
+  onShare?: () => void;
 }) {
   const router = useRouter();
   const c = useColors();
@@ -209,6 +215,13 @@ function ReviewCard({
             </TouchableOpacity>
           </>
         )}
+        {/* Botón compartir — disponible en reseñas propias y ajenas */}
+        <TouchableOpacity
+          onPress={onShare}
+          className="ml-auto flex-row items-center gap-[5px]"
+        >
+          <Share2 size={13} color={c.t3} strokeWidth={1.8} />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -217,9 +230,8 @@ function ReviewCard({
 // ─── Tab principal ────────────────────────────────────────────
 
 interface BookReviewsTabProps {
-  // bookId es necesario para cargar las reseñas reales.
   bookId: string;
-  // Callback que abre el modal de crear/editar reseña.
+  book?: Tables<"books">;
   onWriteReview: () => void;
 }
 
@@ -233,9 +245,21 @@ const DIST_MOCK = [
   { star: 1, pct: 2 },
 ];
 
-export function BookReviewsTab({ bookId, onWriteReview }: BookReviewsTabProps) {
+export function BookReviewsTab({ bookId, book, onWriteReview }: BookReviewsTabProps) {
   const c = useColors();
   const [starFilter, setStarFilter] = useState<number | null>(null);
+  const [sharingReview, setSharingReview] = useState<ReviewWithUser | null>(null);
+  const { ref: shareRef, capture } = useShareCard();
+
+  useEffect(() => {
+    if (!sharingReview) return;
+    // Esperar a que el ViewShot se monte antes de capturar
+    const t = setTimeout(async () => {
+      await capture();
+      setSharingReview(null);
+    }, 80);
+    return () => clearTimeout(t);
+  }, [sharingReview?.id]);
 
   // Reseñas paginadas del libro.
   const {
@@ -333,10 +357,11 @@ export function BookReviewsTab({ bookId, onWriteReview }: BookReviewsTabProps) {
             Mi reseña
           </Text>
           <ReviewCard
-            review={{ ...myReview, users: null }} // no necesitamos JOIN para la propia
+            review={{ ...myReview, users: null }}
             isOwn
             onEdit={onWriteReview}
             onDelete={() => deleteMutation.mutate(myReview.id)}
+            onShare={() => setSharingReview({ ...myReview, users: null })}
           />
         </View>
       )}
@@ -368,7 +393,11 @@ export function BookReviewsTab({ bookId, onWriteReview }: BookReviewsTabProps) {
 
         {/* Lista de tarjetas de reseña */}
         {otherReviews.map((review) => (
-          <ReviewCard key={review.id} review={review} />
+          <ReviewCard
+            key={review.id}
+            review={review}
+            onShare={() => setSharingReview(review)}
+          />
         ))}
 
         {/* Botón "Cargar más" — visible solo si hay más páginas */}
@@ -388,6 +417,18 @@ export function BookReviewsTab({ bookId, onWriteReview }: BookReviewsTabProps) {
           </Pressable>
         )}
       </View>
+
+      {/* ViewShot offscreen para capturar ReviewShareCard */}
+      {sharingReview && (
+        <ViewShot ref={shareRef} style={{ position: "absolute", left: -9999, top: 0 }}>
+          <ReviewShareCard
+            review={sharingReview}
+            bookTitle={book?.title}
+            bookCoverUrl={book?.cover_url}
+            bookGoogleId={book?.google_books_id}
+          />
+        </ViewShot>
+      )}
     </View>
   );
 }

@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
+import ViewShot from "react-native-view-shot";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useBook } from "~/features/book/hooks/useBook";
 import { BookCommunityTab } from "~/features/book/components/BookCommunityTab";
@@ -13,6 +14,9 @@ import { BookTabBar, type BookTab } from "~/features/book/components/BookTabBar"
 import { useDeleteUserBook } from "~/features/library/hooks/useDeleteUserBook";
 import { useUpsertUserBook } from "~/features/library/hooks/useUpsertUserBook";
 import { useUserBook } from "~/features/library/hooks/useUserBook";
+import { BookShareCard } from "~/features/share/components/BookShareCard";
+import { useShareCard } from "~/features/share/hooks/useShareCard";
+import { useAuthStore } from "~/stores/auth.store";
 import { type BookStatus } from "~/lib/book-status";
 import { fixed, useColors } from "~/theme/colors";
 
@@ -21,6 +25,7 @@ export default function BookDetailScreen() {
   const router = useRouter();
   const c = useColors();
   const insets = useSafeAreaInsets();
+  const username = useAuthStore((s) => s.user?.user_metadata?.username as string | undefined);
 
   const [activeTab, setActiveTab] = useState<BookTab>(0);
 
@@ -28,6 +33,8 @@ export default function BookDetailScreen() {
   const { data: userBook } = useUserBook(book?.id ?? "");
   const upsertMutation = useUpsertUserBook(book?.id ?? "");
   const deleteMutation = useDeleteUserBook(book?.id ?? "");
+
+  const { ref: shareRef, capture: captureBook } = useShareCard();
 
   const status = (userBook?.status as BookStatus) ?? null;
   const rating = userBook?.rating ?? null;
@@ -118,7 +125,7 @@ export default function BookDetailScreen() {
         stickyHeaderIndices={[2]}
       >
         {/* 0 — scrolls away */}
-        <BookHero book={book} onBack={() => router.back()} />
+        <BookHero book={book} onBack={() => router.back()} onShare={captureBook} />
 
         {/* 1 — scrolls away */}
         <BookCtaBar
@@ -153,6 +160,7 @@ export default function BookDetailScreen() {
           {activeTab === 1 && (
             <BookReviewsTab
               bookId={book.id}
+              book={book}
               onWriteReview={handleWriteReview}
             />
           )}
@@ -160,6 +168,11 @@ export default function BookDetailScreen() {
           {activeTab === 3 && <BookSimilarTab />}
         </View>
       </ScrollView>
+
+      {/* ViewShot off-screen para capturar BookShareCard */}
+      <ViewShot ref={shareRef} style={{ position: "absolute", left: -9999, top: 0 }}>
+        <BookShareCard book={book} rating={rating} username={username} />
+      </ViewShot>
     </View>
   );
 }

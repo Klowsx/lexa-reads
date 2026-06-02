@@ -14,7 +14,8 @@
     "scheme": "lexa",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.lexareads.app"
+      "bundleIdentifier": "com.lexareads.app",
+      "associatedDomains": ["applinks:lexareads.app"]
     },
     "android": {
       "adaptiveIcon": {
@@ -22,7 +23,19 @@
         "backgroundColor": "#ffffff"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.lexareads.app"
+      "package": "com.lexareads.app",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            { "scheme": "https", "host": "lexareads.app", "pathPrefix": "/book" },
+            { "scheme": "https", "host": "lexareads.app", "pathPrefix": "/user" },
+            { "scheme": "https", "host": "lexareads.app", "pathPrefix": "/list" }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"

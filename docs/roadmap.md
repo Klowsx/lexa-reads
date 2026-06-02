@@ -168,8 +168,8 @@ Sin esto NO se puede subir a App Store / Play Store. Hacer **antes** de pulir UI
 ## Fase F — Adquisición y polish
 
 - [ ] **Escaneo ISBN** con `expo-camera` (incluye barcode scanning en SDK 54) — botón en SearchBar.
-- [ ] **Compartir a redes**: capturar card del libro/reseña como imagen (`react-native-view-shot`) + `expo-sharing`. Botón en review y book detail.
-- [ ] **Deep linking** (universal links + scheme `lexa://`): rutas para `book/[id]`, `user/[username]`, `list/[slug]`.
+- [x] **Compartir a redes**: capturar card del libro/reseña como imagen (`react-native-view-shot`) + `expo-sharing`. Botón en review y book detail.
+- [x] **Deep linking** (universal links + scheme `lexa://`): rutas para `book/[id]`, `user/[username]`, `list/[slug]`.
 - [ ] **Sugerencias de follow** en onboarding (último step) — query a usuarios con más seguidos en común o más activos, requerir ≥5 follows para continuar.
 - [ ] **Sentry**: validar source maps en builds production de EAS.
 - [ ] **PostHog**: feature flags + eventos clave (signup, first_book_added, first_review, follow, like, comment).
