@@ -6,6 +6,7 @@ import { Avatar } from '~/components/ui/Avatar';
 import { StarRating } from '~/components/ui/StarRating';
 import { BookDetailSheet } from '~/features/book/components/BookDetailSheet';
 import { ReportSheet } from '~/features/user/components/ReportSheet';
+import { useToggleActivityLike } from '~/features/feed/hooks/useToggleActivityLike';
 import { ACT_LABEL, type FeedItemType, type MockFeedItem } from '~/mock';
 import { fixed, useColors } from '~/theme/colors';
 
@@ -38,14 +39,21 @@ const alpha = (hex: string, op: number) => {
 
 interface FeedCardProps {
   item: MockFeedItem;
-  onLike: () => void;
+  // activityId: real UUID from activity_feed; undefined when using mock data
+  activityId?: string;
 }
 
-export function FeedCard({ item, onLike }: FeedCardProps) {
+export function FeedCard({ item, activityId }: FeedCardProps) {
   const router = useRouter();
   const c = useColors();
   const [isPeeking, setIsPeeking] = useState(false);
   const [showReport, setShowReport] = useState(false);
+
+  const { liked, count, toggle, isPending } = useToggleActivityLike(
+    activityId,
+    item.liked,
+    item.likes,
+  );
 
   function openMenu() {
     if (Platform.OS === 'ios') {
@@ -188,27 +196,31 @@ export function FeedCard({ item, onLike }: FeedCardProps) {
         <View className="flex-row items-center px-3.5 pt-[11px] pb-[5px] gap-3.5">
           {/* Like */}
           <Pressable
-            onPress={onLike}
+            onPress={() => toggle()}
+            disabled={isPending}
             className="flex-row items-center gap-[5px]"
             hitSlop={8}
           >
             <Heart
               size={22}
-              color={item.liked ? fixed.accent : c.t2}
-              fill={item.liked ? fixed.accent : 'none'}
+              color={liked ? fixed.accent : c.t2}
+              fill={liked ? fixed.accent : 'none'}
               strokeWidth={1.7}
             />
             <Text
               className="font-body-md text-xs"
-              style={{ color: item.liked ? fixed.accent : c.t2 }}
+              style={{ color: liked ? fixed.accent : c.t2 }}
             >
-              {item.likes}
+              {count}
             </Text>
           </Pressable>
 
           {/* Comment */}
           <Pressable
-            onPress={() => router.push({ pathname: '/comments/[id]', params: { id: item.id } } as any)}
+            onPress={() => router.push({
+              pathname: '/comments/[id]',
+              params: { id: activityId ?? item.id, type: 'activity' },
+            } as any)}
             className="flex-row items-center gap-[5px]"
             hitSlop={8}
           >

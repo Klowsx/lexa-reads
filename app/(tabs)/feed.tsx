@@ -1,6 +1,5 @@
 import { useRouter } from 'expo-router'
 import { Bell } from 'lucide-react-native'
-import { useState } from 'react'
 import { Pressable, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { FlashList } from '@shopify/flash-list'
@@ -14,21 +13,7 @@ export default function FeedScreen() {
   const insets = useSafeAreaInsets()
   const router = useRouter()
   const c = useColors()
-  const [items, setItems] = useState(FEED_INIT)
   const unreadCount = NOTIFICATIONS.filter((n) => !n.read).length
-
-  const toggleLike = (id: string) =>
-    setItems((prev) =>
-      prev.map((it) =>
-        it.id === id
-          ? {
-              ...it,
-              liked: !it.liked,
-              likes: it.liked ? it.likes - 1 : it.likes + 1
-            }
-          : it
-      )
-    )
 
   return (
     <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
@@ -58,10 +43,8 @@ export default function FeedScreen() {
       </View>
       {/* Feed */}
       <FlashList
-        data={items}
-        renderItem={({ item }) => (
-          <FeedCard item={item} onLike={() => toggleLike(item.id)} />
-        )}
+        data={FEED_INIT}
+        renderItem={({ item }) => <FeedCard item={item} />}
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ paddingBottom: 72 }}
         showsVerticalScrollIndicator={false}

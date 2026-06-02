@@ -6,12 +6,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useRouter } from "expo-router";
 import { Heart, MessageCircle, Pencil, Trash2 } from "lucide-react-native";
 import { StarRating } from "~/components/ui/StarRating";
 import { UserAvatar } from "~/components/ui/UserAvatar";
 import { useBookReviews } from "../hooks/useBookReviews";
 import { useMyReview } from "../hooks/useMyReview";
 import { useDeleteReview } from "../hooks/useDeleteReview";
+import { useToggleReviewLike } from "~/features/feed/hooks/useToggleReviewLike";
 import { fixed, useColors } from "~/theme/colors";
 import { formatRelativeTime } from "~/lib/utils";
 import type { ReviewWithUser } from "../book.queries";
@@ -77,7 +79,14 @@ function ReviewCard({
   onEdit?: () => void;
   onDelete?: () => void;
 }) {
+  const router = useRouter();
   const c = useColors();
+
+  const { liked, count, toggle, isPending } = useToggleReviewLike(
+    review.id,
+    false,
+    review.likes_count ?? 0,
+  );
 
   // El usuario puede no estar disponible si la FK falla — fallback a datos básicos.
   const user = review.users ?? {
@@ -168,15 +177,33 @@ function ReviewCard({
             </TouchableOpacity>
           </>
         ) : (
-          // Reseña ajena: like y responder (likes/comentarios vendrán en C5/C6)
+          // Reseña ajena: like y comentar
           <>
-            <TouchableOpacity className="flex-row items-center gap-[5px]">
-              <Heart size={14} color={c.t3} fill="transparent" strokeWidth={1.8} />
-              <Text className="font-body text-xs text-t3">
-                {review.likes_count ?? 0}
+            <TouchableOpacity
+              onPress={() => toggle()}
+              disabled={isPending}
+              className="flex-row items-center gap-[5px]"
+            >
+              <Heart
+                size={14}
+                color={liked ? fixed.accent : c.t3}
+                fill={liked ? fixed.accent : 'transparent'}
+                strokeWidth={1.8}
+              />
+              <Text
+                className="font-body text-xs"
+                style={{ color: liked ? fixed.accent : c.t3 }}
+              >
+                {count}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity className="flex-row items-center gap-[5px]">
+            <TouchableOpacity
+              onPress={() => router.push({
+                pathname: '/comments/[id]',
+                params: { id: review.id, type: 'review' },
+              } as any)}
+              className="flex-row items-center gap-[5px]"
+            >
               <MessageCircle size={14} color={c.t3} strokeWidth={1.8} />
               <Text className="font-body text-xs text-t3">Responder</Text>
             </TouchableOpacity>

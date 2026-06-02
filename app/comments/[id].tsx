@@ -1,76 +1,85 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Heart, ChevronLeft, Send } from 'lucide-react-native';
+import { ChevronLeft, Send, Trash2 } from 'lucide-react-native';
 import { useRef, useState } from 'react';
 import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  ScrollView,
   Text,
   TextInput,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Avatar } from '~/components/ui/Avatar';
-import { MockBookCover } from '~/components/ui/MockBookCover';
-import { StarRating } from '~/components/ui/StarRating';
-import {
-  ACT_LABEL,
-  FEED_COMMENTS,
-  FEED_INIT,
-  type MockComment,
-} from '~/mock';
+import { useComments } from '~/features/feed/hooks/useComments';
+import { useCreateComment } from '~/features/feed/hooks/useCreateComment';
+import { useDeleteComment } from '~/features/feed/hooks/useDeleteComment';
+import { useAuthStore } from '~/stores/auth.store';
 import { fixed, useColors } from '~/theme/colors';
-
-const alpha = (hex: string, op: number) => {
-  const n = parseInt(hex.replace('#', ''), 16);
-  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})`;
-};
-
-const ME_MOCK = { av: 'JM', avC: '#C4783A' };
+import { formatRelativeTime } from '~/lib/utils';
+import type { CommentRow, CommentTargetType } from '~/features/feed/feed.queries';
 
 // ─── Comment row ──────────────────────────────────────────────
 
-function CommentRow({ comment, onLike }: { comment: MockComment; onLike: () => void }) {
+function CommentRow({
+  comment,
+  currentUserId,
+  onDelete,
+}: {
+  comment: CommentRow;
+  currentUserId: string | undefined;
+  onDelete: () => void;
+}) {
   const c = useColors();
+  const isOwn = comment.user_id === currentUserId;
+  const isDeleted = !!comment.deleted_at;
+
+  if (isDeleted) {
+    return (
+      <View className="py-3 border-b border-border">
+        <Text className="text-xs font-body text-t3 italic">Comentario eliminado.</Text>
+      </View>
+    );
+  }
+
+  function confirmDelete() {
+    Alert.alert('Eliminar comentario', '¿Seguro que quieres borrar este comentario?', [
+      { text: 'Cancelar', style: 'cancel' },
+      { text: 'Eliminar', style: 'destructive', onPress: onDelete },
+    ]);
+  }
 
   return (
-    <View
-      className="flex-row gap-2.5 py-3"
-      style={{ borderBottomWidth: 1, borderBottomColor: c.border }}
-    >
-      <Avatar displayName={comment.user.name} username={comment.user.username} size={34} />
+    <View className="flex-row gap-2.5 py-3 border-b border-border">
+      <Avatar
+        displayName={comment.user.display_name ?? comment.user.username}
+        username={comment.user.username}
+        avatarUrl={comment.user.avatar_url ?? undefined}
+        size={34}
+      />
 
       <View className="flex-1 min-w-0">
         <View className="flex-row items-baseline gap-1.5 mb-0.5">
-          <Text className="text-xs font-body-sb text-text">{comment.user.name}</Text>
-          <Text className="text-xs font-body text-t3">{comment.time}</Text>
+          <Text className="text-xs font-body-sb text-text">
+            {comment.user.display_name ?? comment.user.username}
+          </Text>
+          <Text className="text-xs font-body text-t3">
+            {formatRelativeTime(comment.created_at)}
+          </Text>
         </View>
         <Text className="text-xs font-body text-t2" style={{ lineHeight: 19 }}>
-          {comment.text}
+          {comment.body}
         </Text>
-
-        <Pressable
-          onPress={onLike}
-          className="flex-row items-center gap-1 mt-2"
-          hitSlop={8}
-        >
-          <Heart
-            size={13}
-            color={comment.liked ? fixed.accent : c.t3}
-            fill={comment.liked ? fixed.accent : 'none'}
-            strokeWidth={1.8}
-          />
-          {comment.likes > 0 && (
-            <Text
-              className="text-xs font-body"
-              style={{ color: comment.liked ? fixed.accent : c.t3 }}
-            >
-              {comment.likes}
-            </Text>
-          )}
-        </Pressable>
       </View>
+
+      {isOwn && (
+        <Pressable onPress={confirmDelete} hitSlop={8} className="self-center">
+          <Trash2 size={14} color={c.t3} strokeWidth={1.8} />
+        </Pressable>
+      )}
     </View>
   );
 }
@@ -78,43 +87,36 @@ function CommentRow({ comment, onLike }: { comment: MockComment; onLike: () => v
 // ─── Screen ───────────────────────────────────────────────────
 
 export default function CommentsScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, type } = useLocalSearchParams<{ id: string; type?: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const c = useColors();
-
-  const item = FEED_INIT.find((f) => f.id === id) ?? FEED_INIT[0];
-  const [comments, setComments] = useState<MockComment[]>(
-    FEED_COMMENTS[id] ?? []
-  );
-  const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
+  const [text, setText] = useState('');
 
-  function toggleLike(commentId: string) {
-    setComments((prev) =>
-      prev.map((c) =>
-        c.id === commentId
-          ? { ...c, liked: !c.liked, likes: c.liked ? c.likes - 1 : c.likes + 1 }
-          : c
-      )
-    );
-  }
+  const currentUserId = useAuthStore((s) => s.user?.id);
+  const targetType: CommentTargetType = type === 'review' ? 'review' : 'activity';
+
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useComments(targetType, id ?? '');
+
+  const createMutation = useCreateComment(targetType, id ?? '');
+  const deleteMutation = useDeleteComment(targetType, id ?? '');
+
+  const allComments = data?.pages.flatMap((p) => p.items) ?? [];
+  const totalCount = allComments.length;
 
   function submitComment() {
     const trimmed = text.trim();
     if (!trimmed) return;
-    setComments((prev) => [
-      ...prev,
-      {
-        id: `local-${Date.now()}`,
-        user: { id: 'me', username: 'javierml', name: 'Javier M.', av: 'JM', avC: '#C4783A' },
-        text: trimmed,
-        time: 'ahora',
-        liked: false,
-        likes: 0,
-      },
-    ]);
-    setText('');
+    createMutation.mutate(trimmed, {
+      onSuccess: () => setText(''),
+    });
     inputRef.current?.blur();
   }
 
@@ -132,91 +134,68 @@ export default function CommentsScreen() {
         <Text className="font-display-sb text-xl text-text tracking-tight flex-1">
           Comentarios
         </Text>
-        <Text className="text-xs font-body text-t3">{comments.length}</Text>
+        {!isLoading && (
+          <Text className="text-xs font-body text-t3">{totalCount}</Text>
+        )}
       </View>
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        keyboardDismissMode="interactive"
-        contentContainerStyle={{ paddingBottom: 16 }}
-      >
-        {/* Post context card */}
-        <View
-          className="mx-4 mt-3 mb-1 rounded-md border border-border bg-surface p-3 flex-row gap-3"
-        >
-          <MockBookCover book={item.book} width={46} height={70} />
-
-          <View className="flex-1 min-w-0 justify-between py-0.5">
-            <View>
-              <Text className="text-xs font-body-sb text-text" numberOfLines={2} style={{ lineHeight: 17 }}>
-                {item.book.title}
-              </Text>
-              <Text className="text-xs font-body text-t3 mt-0.5" numberOfLines={1}>
-                {item.book.author}
-              </Text>
-            </View>
-
-            <View className="flex-row items-center gap-1.5 mt-1.5">
-              <Avatar displayName={item.user.name} username={item.user.username} size={18} />
-              <Text className="text-xs font-body text-t2" numberOfLines={1}>
-                <Text className="font-body-sb">{item.user.name} </Text>
-                <Text style={{ color: c.t3 }}>{ACT_LABEL[item.type]}</Text>
-              </Text>
-            </View>
-
-            {item.rating != null && (
-              <View className="flex-row items-center gap-1 mt-1">
-                <StarRating rating={item.rating} size={10} />
-                <Text className="text-xs font-body-sb" style={{ color: fixed.star }}>
-                  {item.rating}
-                </Text>
-              </View>
-            )}
-          </View>
+      {/* List */}
+      {isLoading ? (
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator color={c.accent} />
         </View>
-
-        {/* Comments */}
-        <View className="px-4">
-          {comments.length === 0 ? (
+      ) : (
+        <FlatList
+          data={allComments}
+          keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={false}
+          keyboardDismissMode="interactive"
+          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }}
+          ListEmptyComponent={
             <View className="items-center py-12 gap-2">
               <Text className="text-sm font-body-sb text-text">Sin comentarios</Text>
               <Text className="text-xs font-body text-t3 text-center">
                 Sé el primero en comentar.
               </Text>
             </View>
-          ) : (
-            comments.map((comment) => (
-              <CommentRow
-                key={comment.id}
-                comment={comment}
-                onLike={() => toggleLike(comment.id)}
-              />
-            ))
+          }
+          ListFooterComponent={
+            hasNextPage ? (
+              <Pressable
+                onPress={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+                className="items-center py-3"
+              >
+                {isFetchingNextPage ? (
+                  <ActivityIndicator color={c.accent} size="small" />
+                ) : (
+                  <Text className="text-xs font-body-md text-accent">
+                    Cargar más
+                  </Text>
+                )}
+              </Pressable>
+            ) : null
+          }
+          renderItem={({ item }) => (
+            <CommentRow
+              comment={item}
+              currentUserId={currentUserId}
+              onDelete={() => deleteMutation.mutate(item.id)}
+            />
           )}
-        </View>
-      </ScrollView>
+        />
+      )}
 
       {/* Input bar */}
       <View
         className="border-t border-border flex-row items-center px-3 gap-2 bg-surface"
         style={{ paddingBottom: insets.bottom + 8, paddingTop: 8 }}
       >
-        <View
-          style={{
-            width: 32,
-            height: 32,
-            borderRadius: 16,
-            backgroundColor: alpha(ME_MOCK.avC, 0.18),
-            borderWidth: 1.5,
-            borderColor: ME_MOCK.avC,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Text className="font-body-sb" style={{ fontSize: 10, color: ME_MOCK.avC }}>
-            {ME_MOCK.av}
-          </Text>
-        </View>
+        <Avatar
+          displayName={currentUserId ?? 'Yo'}
+          username={currentUserId ?? ''}
+          size={32}
+        />
 
         <TextInput
           ref={inputRef}
@@ -241,9 +220,14 @@ export default function CommentsScreen() {
         <Pressable
           onPress={submitComment}
           hitSlop={8}
-          style={{ opacity: text.trim() ? 1 : 0.35 }}
+          disabled={createMutation.isPending || !text.trim()}
+          style={{ opacity: text.trim() && !createMutation.isPending ? 1 : 0.35 }}
         >
-          <Send size={20} color={c.accent} strokeWidth={1.8} />
+          {createMutation.isPending ? (
+            <ActivityIndicator size="small" color={c.accent} />
+          ) : (
+            <Send size={20} color={c.accent} strokeWidth={1.8} />
+          )}
         </Pressable>
       </View>
     </KeyboardAvoidingView>
