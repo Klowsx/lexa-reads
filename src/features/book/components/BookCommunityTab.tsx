@@ -98,7 +98,7 @@ export function BookCommunityTab() {
           const sc = STATUS_COLOR[status];
           return (
             <View key={user.id} className="flex-row items-center gap-2.5 mb-3">
-              <Avatar user={user} size={30} />
+              <Avatar displayName={user.name} username={user.username} size={30} />
               <View className="flex-1 min-w-0">
                 <Text className="font-body-md text-xs text-text">{user.name}</Text>
                 <Text className="font-body text-xs text-t3 mt-[1px]">{detail}</Text>

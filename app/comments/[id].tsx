@@ -39,7 +39,7 @@ function CommentRow({ comment, onLike }: { comment: MockComment; onLike: () => v
       className="flex-row gap-2.5 py-3"
       style={{ borderBottomWidth: 1, borderBottomColor: c.border }}
     >
-      <Avatar user={comment.user} size={34} />
+      <Avatar displayName={comment.user.name} username={comment.user.username} size={34} />
 
       <View className="flex-1 min-w-0">
         <View className="flex-row items-baseline gap-1.5 mb-0.5">
@@ -157,7 +157,7 @@ export default function CommentsScreen() {
             </View>
 
             <View className="flex-row items-center gap-1.5 mt-1.5">
-              <Avatar user={item.user} size={18} />
+              <Avatar displayName={item.user.name} username={item.user.username} size={18} />
               <Text className="text-xs font-body text-t2" numberOfLines={1}>
                 <Text className="font-body-sb">{item.user.name} </Text>
                 <Text style={{ color: c.t3 }}>{ACT_LABEL[item.type]}</Text>

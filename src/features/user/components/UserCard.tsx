@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Avatar } from '~/components/ui/Avatar';
-import type { MockFullUser } from '~/mock';
+import { useFollow } from '~/features/user/hooks/useFollow';
+import type { SearchUser } from '~/features/user/user.queries';
 import { useColors } from '~/theme/colors';
 
 const alpha = (hex: string, op: number) => {
@@ -11,25 +12,43 @@ const alpha = (hex: string, op: number) => {
 };
 
 interface Props {
-  user: MockFullUser;
+  user: SearchUser;
 }
 
 export function UserCard({ user }: Props) {
   const router = useRouter();
   const c = useColors();
-  const [following, setFollowing] = useState(false);
+  const [followed, setFollowed] = useState(false);
+  const { follow, unfollow } = useFollow(
+    user.id,
+    user.username,
+    user.is_private ?? false,
+  );
+
+  function handleFollow(e: any) {
+    e.stopPropagation();
+    if (followed) {
+      unfollow.mutate(undefined, { onSuccess: () => setFollowed(false) });
+    } else {
+      follow.mutate(undefined, { onSuccess: () => setFollowed(true) });
+    }
+  }
 
   return (
     <Pressable
       onPress={() => router.push(`/user/${user.username}` as any)}
-      className="flex-row items-center gap-3 py-3"
-      style={{ borderBottomWidth: 1, borderBottomColor: c.border }}
+      className="flex-row items-center gap-3 py-3 border-b border-border"
     >
-      <Avatar user={user} size={44} />
+      <Avatar
+        displayName={user.display_name}
+        username={user.username}
+        avatarUrl={user.avatar_url}
+        size={44}
+      />
 
       <View className="flex-1 min-w-0">
         <Text className="text-xs font-body-sb text-text" numberOfLines={1}>
-          {user.name}
+          {user.display_name}
         </Text>
         <Text className="text-xs font-body text-t3 mt-0.5" numberOfLines={1}>
           @{user.username}
@@ -42,21 +61,19 @@ export function UserCard({ user }: Props) {
       </View>
 
       <Pressable
-        onPress={(e) => {
-          e.stopPropagation();
-          setFollowing((f) => !f);
-        }}
+        onPress={handleFollow}
+        disabled={follow.isPending || unfollow.isPending}
         className="px-3.5 py-2 rounded-full border shrink-0"
         style={{
-          backgroundColor: following ? 'transparent' : alpha(c.accent, 0.1),
-          borderColor: following ? c.border : alpha(c.accent, 0.35),
+          backgroundColor: followed ? 'transparent' : alpha(c.accent, 0.1),
+          borderColor: followed ? c.border : alpha(c.accent, 0.35),
         }}
       >
         <Text
           className="text-xs font-body-sb"
-          style={{ color: following ? c.t2 : c.accent }}
+          style={{ color: followed ? c.t2 : c.accent }}
         >
-          {following ? 'Siguiendo' : 'Seguir'}
+          {followed ? 'Siguiendo' : 'Seguir'}
         </Text>
       </Pressable>
     </Pressable>

@@ -10,9 +10,9 @@ import { SearchBar } from '~/features/book/components/SearchBar';
 import { UserCard } from '~/features/user/components/UserCard';
 import { useSearchBooks } from '~/features/book/hooks/useSearchBook';
 import { useTrendingBooks } from '~/features/book/hooks/useTrendingBooks';
+import { useSearchUsers } from '~/features/user/hooks/useSearchUsers';
 import { useColors } from '~/theme/colors';
 import { useDebounce } from '~/lib/useDebounce';
-import { FULL_USERS } from '~/mock';
 import type { Tables } from '~/types/database';
 
 // ─── Segmented control ────────────────────────────────────────
@@ -116,22 +116,15 @@ export default function SearchScreen() {
   const debouncedQuery = useDebounce(query, 400);
   const { data: results = [], isLoading } = useSearchBooks(debouncedQuery);
   const { data: trending, isLoading: isTrendingLoading } = useTrendingBooks();
+  const { data: userResults = [], isLoading: isUsersLoading } = useSearchUsers(debouncedQuery);
   const trendingBooks = trending?.books ?? [];
   const trendingSource = trending?.source;
 
   const discoverLabel =
     trendingSource === 'community' ? 'En Lexa ahora' : 'Populares esta semana';
 
-  // Filter users by query
-  const filteredUsers = debouncedQuery.length > 1
-    ? FULL_USERS.filter(
-        (u) =>
-          u.name.toLowerCase().includes(debouncedQuery.toLowerCase()) ||
-          u.username.toLowerCase().includes(debouncedQuery.toLowerCase())
-      )
-    : FULL_USERS.slice(0, 3);
-
   const bookData = debouncedQuery.length > 2 ? results : trendingBooks;
+  const showingSearch = debouncedQuery.length > 2;
 
   // ── Render for "Usuarios" tab ──────────────────────────────
   if (activeTab === 'users') {
@@ -149,7 +142,11 @@ export default function SearchScreen() {
         </View>
         <SegmentedControl active={activeTab} onChange={setActiveTab} />
 
-        {filteredUsers.length === 0 ? (
+        {isUsersLoading ? (
+          <View className="flex-1 items-center justify-center">
+            <ActivityIndicator color={c.accent} />
+          </View>
+        ) : userResults.length === 0 && showingSearch ? (
           <View className="flex-1 items-center justify-center px-8 gap-2">
             <Text className="text-xs font-body text-t3 text-center">
               Sin resultados para "{debouncedQuery}"
@@ -160,12 +157,12 @@ export default function SearchScreen() {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 72 }}
           >
-            {!debouncedQuery && (
+            {!showingSearch && (
               <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-1 mt-1">
                 Sugeridos
               </Text>
             )}
-            {filteredUsers.map((user) => (
+            {userResults.map((user) => (
               <UserCard key={user.id} user={user} />
             ))}
           </ScrollView>
@@ -176,8 +173,6 @@ export default function SearchScreen() {
 
   // ── Render for "Todo" tab (mixed) ──────────────────────────
   if (activeTab === 'all') {
-    const showingSearch = debouncedQuery.length > 2;
-
     return (
       <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
         <View className="px-4 pt-2.5 pb-3">
@@ -239,20 +234,24 @@ export default function SearchScreen() {
             )}
           </View>
 
-          {/* Users section — always visible, filtered when searching */}
+          {/* Users section */}
           <View className="px-4 mt-3">
             <Text
               className="text-xs text-t3 tracking-widest mb-2"
               style={{ fontFamily: 'DMSans_600SemiBold', textTransform: 'uppercase' }}
             >
               {showingSearch
-                ? `${filteredUsers.length} usuario${filteredUsers.length !== 1 ? 's' : ''}`
+                ? `${userResults.length} usuario${userResults.length !== 1 ? 's' : ''}`
                 : 'Lectores sugeridos'}
             </Text>
 
-            {filteredUsers.map((user) => (
-              <UserCard key={user.id} user={user} />
-            ))}
+            {isUsersLoading ? (
+              <ActivityIndicator color={c.accent} className="my-2" />
+            ) : (
+              userResults.map((user) => (
+                <UserCard key={user.id} user={user} />
+              ))
+            )}
           </View>
         </ScrollView>
 

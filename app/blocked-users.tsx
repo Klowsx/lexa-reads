@@ -38,7 +38,7 @@ function BlockedUserRow({
       className="flex-row items-center px-4 py-3.5 gap-3"
       style={{ borderBottomWidth: 1, borderBottomColor: c.border }}
     >
-      <Avatar user={user} size={44} />
+      <Avatar displayName={user.name} username={user.username} size={44} />
 
       <View className="flex-1 min-w-0">
         <Text className="text-xs font-body-sb text-text" numberOfLines={1}>

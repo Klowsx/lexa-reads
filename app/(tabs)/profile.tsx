@@ -1,9 +1,10 @@
 import { useRouter } from 'expo-router';
 import { Settings } from 'lucide-react-native';
 import { useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BookDetailSheet } from '~/features/book/components/BookDetailSheet';
+import { useLibrary } from '~/features/library/hooks/useLibrary';
 import { CurrentlyReading } from '~/features/user/components/CurrentlyReading';
 import { EditProfileSheet } from '~/features/user/components/EditProfileSheet';
 import { FeaturedLists } from '~/features/user/components/FeaturedLists';
@@ -12,28 +13,45 @@ import { ProfileLists } from '~/features/user/components/ProfileLists';
 import { ProfileStats } from '~/features/user/components/ProfileStats';
 import { ReadingGoal } from '~/features/user/components/ReadingGoal';
 import { RecentReads } from '~/features/user/components/RecentReads';
+import { useMe } from '~/features/user/hooks/useMe';
 import { useReadingGoal } from '~/features/user/hooks/useReadingGoal';
+import type { LibraryRow } from '~/features/library/library.queries';
+import type { Tables } from '~/types';
 import { useColors } from '~/theme/colors';
-import { ME, MOCK_LISTS, MY_BOOKS, type MockBook, type MockList } from '~/mock';
+import { MOCK_LISTS, type MockList } from '~/mock';
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const c = useColors();
-  const [selectedBook, setSelectedBook] = useState<MockBook | null>(null);
+
+  const { data: me, isLoading } = useMe();
+  const { data: goalData } = useReadingGoal();
+  const { data: readingBooks = [] } = useLibrary('reading');
+  const { data: readBooks = [] } = useLibrary('read');
+
+  const [selectedBook, setSelectedBook] = useState<Tables<'books'> | null>(null);
   const [showEdit, setShowEdit] = useState(false);
+  // Lists are phase C7 — keeping mock until then
   const [lists, setLists] = useState<MockList[]>(MOCK_LISTS);
 
-  const { data: goalData } = useReadingGoal();
-
-  const readingBooks = MY_BOOKS.filter((b) => b.status === 'reading');
-  const recentReads = MY_BOOKS.filter((b) => b.status === 'read').slice(0, 4);
+  const recentReads = (readBooks as LibraryRow[]).slice(0, 8);
 
   function handleToggleFeatured(id: string) {
     setLists((prev) =>
-      prev.map((l) => (l.id === id ? { ...l, featured: !l.featured } : l))
+      prev.map((l) => (l.id === id ? { ...l, featured: !l.featured } : l)),
     );
   }
+
+  if (isLoading) {
+    return (
+      <View className="flex-1 bg-bg items-center justify-center">
+        <ActivityIndicator color={c.accent} />
+      </View>
+    );
+  }
+
+  if (!me) return null;
 
   return (
     <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
@@ -48,17 +66,21 @@ export default function ProfileScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 72 }}
       >
-        <IdentityCard user={ME} onEditPress={() => setShowEdit(true)} />
+        <IdentityCard user={me} onEditPress={() => setShowEdit(true)} />
 
         <ProfileStats
-          books={ME.books}
-          reviews={ME.reviews}
-          followers={ME.followers}
-          following={ME.following}
+          books={me.books_read_count ?? 0}
+          reviews={me.reviews_count ?? 0}
+          followers={me.followers_count ?? 0}
+          following={me.following_count ?? 0}
           onPressBooks={() => router.navigate('/(tabs)/library' as any)}
           onPressReviews={() => router.push('/my-reviews' as any)}
-          onPressFollowers={() => router.push(`/followers?username=${ME.username}&tab=followers` as any)}
-          onPressFollowing={() => router.push(`/followers?username=${ME.username}&tab=following` as any)}
+          onPressFollowers={() =>
+            router.push(`/followers?username=${me.username}&tab=followers` as any)
+          }
+          onPressFollowing={() =>
+            router.push(`/followers?username=${me.username}&tab=following` as any)
+          }
         />
 
         <FeaturedLists
@@ -68,7 +90,7 @@ export default function ProfileScreen() {
           }
         />
 
-        <CurrentlyReading books={readingBooks} onPress={setSelectedBook} />
+        <CurrentlyReading books={readingBooks as LibraryRow[]} />
 
         {goalData && (
           <ReadingGoal
@@ -79,22 +101,27 @@ export default function ProfileScreen() {
           />
         )}
 
-        <RecentReads books={recentReads} onPress={setSelectedBook} />
+        <RecentReads
+          books={recentReads}
+          onViewAll={() => router.navigate('/(tabs)/library' as any)}
+        />
 
         <ProfileLists
           lists={lists}
           onNewList={() => router.push('/list/new' as any)}
           onToggleFeatured={handleToggleFeatured}
-          onPress={(list) => router.push({ pathname: '/list/[slug]', params: { slug: list.id } } as any)}
+          onPress={(list) =>
+            router.push({ pathname: '/list/[slug]', params: { slug: list.id } } as any)
+          }
         />
       </ScrollView>
 
       {showEdit && (
-        <EditProfileSheet user={ME} onClose={() => setShowEdit(false)} />
+        <EditProfileSheet user={me} onClose={() => setShowEdit(false)} />
       )}
 
       {selectedBook && (
-        <BookDetailSheet book={selectedBook as any} onClose={() => setSelectedBook(null)} />
+        <BookDetailSheet book={selectedBook} onClose={() => setSelectedBook(null)} />
       )}
     </View>
   );

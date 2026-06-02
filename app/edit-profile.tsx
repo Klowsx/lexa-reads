@@ -1,19 +1,23 @@
 import { useRouter } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
+  Switch,
   Text,
   TextInput,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Avatar } from '~/components/ui/Avatar';
-import { ME } from '~/mock';
+import { getAvatarColor } from '~/lib/avatar';
 import { useColors } from '~/theme/colors';
+import { useMe } from '~/features/user/hooks/useMe';
+import { useUpdateProfile } from '~/features/user/hooks/useUpdateProfile';
 
 const alpha = (hex: string, op: number) => {
   const n = parseInt(hex.replace('#', ''), 16);
@@ -30,17 +34,42 @@ export default function EditProfileScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const c = useColors();
+  const { data: me } = useMe();
+  const { mutate: updateProfile, isPending } = useUpdateProfile();
 
-  const [name, setName] = useState(ME.name);
-  const [username, setUsername] = useState(ME.username);
-  const [bio, setBio] = useState(ME.bio);
-  const [selectedGenres, setSelectedGenres] = useState(['Fantasía', 'Clásicos']);
+  const color = me ? getAvatarColor(me.username) : c.accent;
 
-  const canSave = name.trim().length >= 2 && username.trim().length >= 3;
+  const [name, setName] = useState('');
+  const [bio, setBio] = useState('');
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
+  const [isPrivate, setIsPrivate] = useState(false);
+
+  useEffect(() => {
+    if (!me) return;
+    setName(me.display_name);
+    setBio(me.bio ?? '');
+    setSelectedGenres(me.favorite_genres ?? []);
+    setIsPrivate(me.is_private ?? false);
+  }, [me]);
+
+  const canSave = name.trim().length >= 2 && !isPending;
 
   function toggleGenre(g: string) {
     setSelectedGenres((prev) =>
-      prev.includes(g) ? prev.filter((x) => x !== g) : [...prev, g]
+      prev.includes(g) ? prev.filter((x) => x !== g) : [...prev, g],
+    );
+  }
+
+  function handleSave() {
+    if (!canSave) return;
+    updateProfile(
+      {
+        display_name: name.trim(),
+        bio: bio.trim() || null,
+        favorite_genres: selectedGenres.length > 0 ? selectedGenres : null,
+        is_private: isPrivate,
+      },
+      { onSuccess: () => router.back() },
     );
   }
 
@@ -58,13 +87,17 @@ export default function EditProfileScreen() {
         <Text className="font-display-sb text-xl text-text tracking-tight flex-1">
           Editar perfil
         </Text>
-        <Pressable hitSlop={8} onPress={() => canSave && router.back()} disabled={!canSave}>
-          <Text
-            className="text-sm font-body-sb"
-            style={{ color: canSave ? c.accent : c.t3 }}
-          >
-            Guardar
-          </Text>
+        <Pressable hitSlop={8} onPress={handleSave} disabled={!canSave}>
+          {isPending ? (
+            <ActivityIndicator size="small" color={c.accent} />
+          ) : (
+            <Text
+              className="text-sm font-body-sb"
+              style={{ color: canSave ? c.accent : c.t3 }}
+            >
+              Guardar
+            </Text>
+          )}
         </Pressable>
       </View>
 
@@ -74,18 +107,23 @@ export default function EditProfileScreen() {
         contentContainerStyle={{ paddingBottom: 48 }}
       >
         {/* Avatar */}
-        <View
-          className="items-center py-6 border-b border-border"
-          style={{ backgroundColor: alpha(ME.avC, 0.04) }}
-        >
-          <Avatar user={ME} size={80} />
-          <Pressable
-            className="mt-3 px-4 py-2 rounded-md bg-sh border border-border"
+        {me && (
+          <View
+            className="items-center py-6 border-b border-border"
+            style={{ backgroundColor: alpha(color, 0.04) }}
           >
-            <Text className="text-xs font-body-md text-text">Cambiar foto</Text>
-          </Pressable>
-          <Text className="text-xs font-body text-t3 mt-1.5">JPG, PNG · Máx. 5 MB</Text>
-        </View>
+            <Avatar
+              displayName={me.display_name}
+              username={me.username}
+              avatarUrl={me.avatar_url}
+              size={80}
+            />
+            <Pressable className="mt-3 px-4 py-2 rounded-md bg-sh border border-border">
+              <Text className="text-xs font-body-md text-text">Cambiar foto</Text>
+            </Pressable>
+            <Text className="text-xs font-body text-t3 mt-1.5">JPG, PNG · Máx. 5 MB</Text>
+          </View>
+        )}
 
         <View className="px-5 pt-6">
           {/* Nombre */}
@@ -97,45 +135,10 @@ export default function EditProfileScreen() {
               value={name}
               onChangeText={setName}
               maxLength={50}
-              className="rounded-md border border-border font-body text-sm text-text"
-              style={{
-                paddingHorizontal: 14,
-                paddingVertical: 11,
-                backgroundColor: c.surface,
-              }}
+              className="rounded-md border border-border font-body text-sm text-text bg-surface"
+              style={{ paddingHorizontal: 14, paddingVertical: 11 }}
               placeholderTextColor={c.t3}
             />
-          </View>
-
-          {/* Usuario */}
-          <View className="mb-4">
-            <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-1.5">
-              Usuario
-            </Text>
-            <View
-              className="flex-row items-center rounded-md border border-border overflow-hidden"
-              style={{ backgroundColor: c.surface }}
-            >
-              <View
-                className="px-3 py-3 border-r border-border"
-                style={{ backgroundColor: c.sh }}
-              >
-                <Text className="text-sm font-body text-t3">@</Text>
-              </View>
-              <TextInput
-                value={username}
-                onChangeText={(v) => setUsername(v.toLowerCase().replace(/\s/g, ''))}
-                maxLength={30}
-                autoCapitalize="none"
-                autoCorrect={false}
-                className="flex-1 font-body text-sm text-text"
-                style={{ paddingHorizontal: 12, paddingVertical: 11 }}
-                placeholderTextColor={c.t3}
-              />
-            </View>
-            <Text className="text-xs font-body text-t3 mt-1">
-              lexa.app/@{username || '…'}
-            </Text>
           </View>
 
           {/* Bio */}
@@ -150,13 +153,12 @@ export default function EditProfileScreen() {
               numberOfLines={3}
               maxLength={160}
               placeholder="Cuéntanos sobre tus lecturas..."
-              className="rounded-md border border-border font-body text-sm text-text"
+              className="rounded-md border border-border font-body text-sm text-text bg-surface"
               style={{
                 paddingHorizontal: 14,
                 paddingVertical: 11,
                 lineHeight: 22,
                 textAlignVertical: 'top',
-                backgroundColor: c.surface,
               }}
               placeholderTextColor={c.t3}
             />
@@ -166,7 +168,7 @@ export default function EditProfileScreen() {
           </View>
 
           {/* Géneros favoritos */}
-          <View className="mb-8">
+          <View className="mb-6">
             <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-2">
               Géneros favoritos
             </Text>
@@ -177,15 +179,16 @@ export default function EditProfileScreen() {
                   <Pressable
                     key={g}
                     onPress={() => toggleGenre(g)}
-                    className="px-3 py-1.5 rounded-full border"
-                    style={{
-                      backgroundColor: active ? alpha(c.accent, 0.14) : c.sh,
-                      borderColor: active ? c.accent : c.border,
-                    }}
+                    className="px-3 py-1.5 rounded-full border bg-sh border-border"
+                    style={
+                      active
+                        ? { backgroundColor: alpha(color, 0.14), borderColor: color }
+                        : undefined
+                    }
                   >
                     <Text
-                      className="text-xs font-body"
-                      style={{ color: active ? c.accent : c.t2 }}
+                      className="text-xs font-body text-t2"
+                      style={active ? { color } : undefined}
                     >
                       {g}
                     </Text>
@@ -195,13 +198,33 @@ export default function EditProfileScreen() {
             </View>
           </View>
 
+          {/* Cuenta privada */}
+          <View className="flex-row items-center justify-between py-3.5 border-t border-border mb-8">
+            <View className="flex-1 mr-4">
+              <Text className="text-sm font-body-md text-text">Cuenta privada</Text>
+              <Text className="text-xs font-body text-t3 mt-0.5">
+                Solo tus seguidores podrán ver tu actividad
+              </Text>
+            </View>
+            <Switch
+              value={isPrivate}
+              onValueChange={setIsPrivate}
+              trackColor={{ false: c.border, true: c.accent }}
+              thumbColor="#fff"
+            />
+          </View>
+
           <Pressable
-            onPress={() => canSave && router.back()}
+            onPress={handleSave}
             disabled={!canSave}
-            className="py-3.5 rounded-md items-center mb-2"
-            style={{ backgroundColor: canSave ? c.accent : alpha(c.accent, 0.4) }}
+            className="py-3.5 rounded-md items-center mb-2 bg-accent"
+            style={{ opacity: canSave ? 1 : 0.5 }}
           >
-            <Text className="text-sm font-body-sb text-white">Guardar cambios</Text>
+            {isPending ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text className="text-sm font-body-sb text-white">Guardar cambios</Text>
+            )}
           </Pressable>
         </View>
       </ScrollView>

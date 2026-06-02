@@ -1,8 +1,8 @@
+import { useRouter } from 'expo-router';
 import { useEffect, useRef } from 'react';
 import { Animated, Pressable, Text, View } from 'react-native';
-import { MockBookCover } from '~/components/ui/MockBookCover';
-import type { MockBook, MockUserBook } from '~/mock';
-import { READING_PROGRESS } from '~/mock';
+import { BookCover } from '~/components/ui/BookCover';
+import type { LibraryRow } from '~/features/library/library.queries';
 import { useColors } from '~/theme/colors';
 
 const alpha = (hex: string, op: number) => {
@@ -11,12 +11,12 @@ const alpha = (hex: string, op: number) => {
 };
 
 interface Props {
-  books: MockUserBook[];
-  onPress: (book: MockBook) => void;
+  books: LibraryRow[];
 }
 
-export function CurrentlyReading({ books, onPress }: Props) {
+export function CurrentlyReading({ books }: Props) {
   const c = useColors();
+  const router = useRouter();
   const anim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -37,14 +37,19 @@ export function CurrentlyReading({ books, onPress }: Props) {
       </Text>
 
       <View className="gap-2.5">
-        {books.map(({ book }) => {
-          const prog = READING_PROGRESS[book.id];
-          const pct = prog ? prog.current / prog.total : null;
+        {books.map((row) => {
+          if (!row.books) return null;
+          const book = row.books;
+          const pages = book.page_count;
+          const current = row.current_page;
+          const pct = pages && current ? current / pages : null;
 
           return (
             <Pressable
-              key={book.id}
-              onPress={() => onPress(book)}
+              key={row.id}
+              onPress={() =>
+                router.push({ pathname: '/book/[id]', params: { id: book.id } })
+              }
               className="flex-row gap-3.5 p-3.5 bg-surface rounded-lg overflow-hidden border"
               style={{
                 borderTopColor: alpha(c.status.reading, 0.3),
@@ -58,14 +63,16 @@ export function CurrentlyReading({ books, onPress }: Props) {
                 style={{ height: 2.5, backgroundColor: c.status.reading, opacity: 0.85 }}
               />
 
-              <MockBookCover book={book} width={62} height={93} />
+              <BookCover book={book} width={62} height={93} />
 
               <View className="flex-1 justify-between pt-0.5">
                 <View>
                   <Text className="font-display-sb text-sm text-text mb-1" numberOfLines={2}>
                     {book.title}
                   </Text>
-                  <Text className="text-xs font-body text-t2">{book.author}</Text>
+                  <Text className="text-xs font-body text-t2">
+                    {book.authors?.[0] ?? ''}
+                  </Text>
                 </View>
 
                 {pct !== null ? (
@@ -84,9 +91,12 @@ export function CurrentlyReading({ books, onPress }: Props) {
                     </View>
                     <Text className="text-xs font-body text-t3">
                       {'Pág. '}
-                      <Text className="font-body-md text-t2">{prog!.current}</Text>
-                      {` de ${prog!.total} · `}
-                      <Text className="font-body-sb" style={{ color: c.status.reading }}>
+                      <Text className="font-body-md text-t2">{current}</Text>
+                      {` de ${pages} · `}
+                      <Text
+                        className="font-body-sb"
+                        style={{ color: c.status.reading }}
+                      >
                         {Math.round(pct * 100)}%
                       </Text>
                     </Text>

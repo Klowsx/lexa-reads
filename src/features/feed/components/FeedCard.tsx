@@ -77,7 +77,7 @@ export function FeedCard({ item, onLike }: FeedCardProps) {
         {/* ── Header ─────────────────────────────────── */}
         <View className="flex-row items-center px-3.5 pt-3 pb-2.5 gap-2.5">
           <Pressable onPress={() => router.push(`/user/${item.user.username}` as any)}>
-            <Avatar user={item.user} size={36} />
+            <Avatar displayName={item.user.name} username={item.user.username} size={36} />
           </Pressable>
 
           <Pressable

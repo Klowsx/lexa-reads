@@ -1,16 +1,18 @@
+import { useRouter } from 'expo-router';
 import { Pressable, ScrollView, Text, View } from 'react-native';
-import { MockBookCover } from '~/components/ui/MockBookCover';
+import { BookCover } from '~/components/ui/BookCover';
 import { StarRating } from '~/components/ui/StarRating';
-import type { MockBook, MockUserBook } from '~/mock';
-import { useColors } from '~/theme/colors';
+import type { LibraryRow } from '~/features/library/library.queries';
 
 interface Props {
-  books: MockUserBook[];
-  onPress: (book: MockBook) => void;
+  books: LibraryRow[];
+  onViewAll?: () => void;
 }
 
-export function RecentReads({ books, onPress }: Props) {
-  const c = useColors();
+export function RecentReads({ books, onViewAll }: Props) {
+  const router = useRouter();
+
+  if (books.length === 0) return null;
 
   return (
     <View className="mb-5">
@@ -22,21 +24,37 @@ export function RecentReads({ books, onPress }: Props) {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 16, gap: 12, paddingVertical: 2 }}
       >
-        {books.map(({ book, rating }) => (
-          <Pressable key={book.id} onPress={() => onPress(book)}>
-            <MockBookCover book={book} width={72} height={108} />
-            {rating != null && (
-              <View className="mt-1.5">
-                <StarRating rating={rating} size={9} />
-              </View>
-            )}
-          </Pressable>
-        ))}
+        {books.map((row) => {
+          if (!row.books) return null;
+          return (
+            <Pressable
+              key={row.id}
+              onPress={() =>
+                router.push({
+                  pathname: '/book/[id]',
+                  params: { id: row.books!.id },
+                })
+              }
+            >
+              <BookCover book={row.books} width={72} height={108} />
+              {row.rating != null && (
+                <View className="mt-1.5">
+                  <StarRating rating={row.rating} size={9} />
+                </View>
+              )}
+            </Pressable>
+          );
+        })}
 
-        <Pressable className="w-12 items-center justify-center gap-1 opacity-70">
-          <Text className="text-t3" style={{ fontSize: 24, lineHeight: 26 }}>›</Text>
-          <Text className="text-xs font-body text-t3 text-center">Ver todo</Text>
-        </Pressable>
+        {onViewAll && (
+          <Pressable
+            onPress={onViewAll}
+            className="w-12 items-center justify-center gap-1 opacity-70"
+          >
+            <Text className="text-t3" style={{ fontSize: 24, lineHeight: 26 }}>›</Text>
+            <Text className="text-xs font-body text-t3 text-center">Ver todo</Text>
+          </Pressable>
+        )}
       </ScrollView>
     </View>
   );

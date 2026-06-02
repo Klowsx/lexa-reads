@@ -1,7 +1,8 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { Pressable, Text, View } from 'react-native';
-import type { MockMe } from '~/mock';
-import { useColors } from '~/theme/colors';
+import { Avatar } from '~/components/ui/Avatar';
+import { getAvatarColor } from '~/lib/avatar';
+import type { UserProfile } from '~/types/user';
 
 const alpha = (hex: string, op: number) => {
   const n = parseInt(hex.replace('#', ''), 16);
@@ -9,47 +10,50 @@ const alpha = (hex: string, op: number) => {
 };
 
 interface Props {
-  user: MockMe;
+  user: UserProfile;
   onEditPress: () => void;
 }
 
 export function IdentityCard({ user, onEditPress }: Props) {
-  const c = useColors();
+  const color = getAvatarColor(user.username);
 
   return (
     <View
       className="mx-4 mb-5 rounded-lg overflow-hidden border"
-      style={{ borderColor: alpha(user.avC, 0.22) }}
+      style={{ borderColor: alpha(color, 0.22) }}
     >
       <LinearGradient
-        colors={[alpha(user.avC, 0.1), alpha(c.border, 0.3)]}
+        colors={[alpha(color, 0.1), alpha(color, 0.04)]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         className="p-4"
       >
         <View className="flex-row gap-3.5 items-start mb-4">
           <View
-            className="rounded-full items-center justify-center shrink-0 w-[72px] h-[72px]"
             style={{
-              backgroundColor: alpha(user.avC, 0.13),
-              borderWidth: 2.5,
-              borderColor: user.avC,
-              shadowColor: user.avC,
+              shadowColor: color,
               shadowOpacity: 0.3,
               shadowRadius: 10,
               shadowOffset: { width: 0, height: 0 },
               elevation: 6,
             }}
           >
-            <Text className="text-lg font-body-sb" style={{ color: user.avC }}>
-              {user.av}
-            </Text>
+            <Avatar
+              displayName={user.display_name}
+              username={user.username}
+              avatarUrl={user.avatar_url}
+              size={72}
+            />
           </View>
 
           <View className="flex-1 pt-1">
-            <Text className="text-md font-body-sb text-text leading-tight">{user.name}</Text>
+            <Text className="text-md font-body-sb text-text leading-tight">
+              {user.display_name}
+            </Text>
             <Text className="text-sm font-body text-t2 mt-1">@{user.username}</Text>
-            <Text className="text-xs font-body text-t3 mt-2">{user.bio}</Text>
+            {user.bio ? (
+              <Text className="text-xs font-body text-t3 mt-2">{user.bio}</Text>
+            ) : null}
           </View>
         </View>
 
@@ -57,8 +61,8 @@ export function IdentityCard({ user, onEditPress }: Props) {
           onPress={onEditPress}
           className="py-2.5 rounded-xl items-center border"
           style={({ pressed }) => ({
-            backgroundColor: pressed ? alpha(user.avC, 0.08) : alpha(c.text, 0.05),
-            borderColor: alpha(user.avC, 0.22),
+            backgroundColor: pressed ? alpha(color, 0.08) : alpha(color, 0.05),
+            borderColor: alpha(color, 0.22),
           })}
         >
           <Text className="text-xs font-body-md text-text">Editar perfil</Text>

@@ -5,6 +5,8 @@ import { Pressable, Text, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NotificationItem } from '~/features/notifications/components/NotificationItem';
+import { FollowRequestsSection } from '~/features/user/components/FollowRequestsSection';
+import { usePendingFollowRequests } from '~/features/user/hooks/usePendingFollowRequests';
 import { NOTIFICATIONS, type MockNotification } from '~/mock';
 import { useColors } from '~/theme/colors';
 
@@ -14,6 +16,8 @@ export default function NotificationsScreen() {
   const c = useColors();
   const [items, setItems] = useState<MockNotification[]>(NOTIFICATIONS);
 
+  const { data: pendingRequests = [] } = usePendingFollowRequests();
+
   const unreadCount = items.filter((n) => !n.read).length;
 
   function markAllRead() {
@@ -21,8 +25,12 @@ export default function NotificationsScreen() {
   }
 
   function markRead(id: string) {
-    setItems((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
+    setItems((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
+    );
   }
+
+  const hasContent = pendingRequests.length > 0 || items.length > 0;
 
   return (
     <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
@@ -40,17 +48,19 @@ export default function NotificationsScreen() {
             className="flex-row items-center gap-1"
           >
             <Check size={14} color={c.accent} strokeWidth={2} />
-            <Text className="text-xs font-body-md" style={{ color: c.accent }}>
+            <Text className="text-xs font-body-md text-accent">
               Marcar todas
             </Text>
           </Pressable>
         )}
       </View>
 
-      {items.length === 0 ? (
+      {!hasContent ? (
         <View className="flex-1 items-center justify-center gap-2 px-8">
           <Text className="font-display text-2xl text-t3">—</Text>
-          <Text className="text-sm font-body-sb text-text text-center">Sin notificaciones</Text>
+          <Text className="text-sm font-body-sb text-text text-center">
+            Sin notificaciones
+          </Text>
           <Text className="text-xs font-body text-t3 text-center leading-[20px]">
             Cuando alguien interactúe con tu perfil o reseñas, lo verás aquí.
           </Text>
@@ -58,6 +68,9 @@ export default function NotificationsScreen() {
       ) : (
         <FlashList
           data={items}
+          ListHeaderComponent={
+            <FollowRequestsSection requests={pendingRequests} />
+          }
           renderItem={({ item }) => (
             <NotificationItem item={item} onPress={() => markRead(item.id)} />
           )}

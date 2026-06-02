@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
   Modal,
   Pressable,
   ScrollView,
@@ -8,8 +9,11 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import type { MockMe } from '~/mock';
+import { Avatar } from '~/components/ui/Avatar';
+import { getAvatarColor } from '~/lib/avatar';
 import { useColors } from '~/theme/colors';
+import type { UserProfile } from '~/types/user';
+import { useUpdateProfile } from '../hooks/useUpdateProfile';
 
 const alpha = (hex: string, op: number) => {
   const n = parseInt(hex.replace('#', ''), 16);
@@ -22,22 +26,43 @@ const GENRES = [
 ];
 
 interface Props {
-  user: MockMe;
+  user: UserProfile;
   onClose: () => void;
 }
 
 export function EditProfileSheet({ user, onClose }: Props) {
   const c = useColors();
   const insets = useSafeAreaInsets();
+  const color = getAvatarColor(user.username);
+  const { mutate: updateProfile, isPending } = useUpdateProfile();
 
-  const [name, setName] = useState(user.name);
-  const [bio, setBio] = useState(user.bio);
-  const [selectedGenres, setSelectedGenres] = useState(['Fantasía', 'Clásicos']);
+  const [name, setName] = useState(user.display_name);
+  const [bio, setBio] = useState(user.bio ?? '');
+  const [selectedGenres, setSelectedGenres] = useState<string[]>(
+    user.favorite_genres ?? [],
+  );
+
+  useEffect(() => {
+    setName(user.display_name);
+    setBio(user.bio ?? '');
+    setSelectedGenres(user.favorite_genres ?? []);
+  }, [user]);
 
   const toggleGenre = (g: string) =>
-    setSelectedGenres(prev =>
-      prev.includes(g) ? prev.filter(x => x !== g) : [...prev, g]
+    setSelectedGenres((prev) =>
+      prev.includes(g) ? prev.filter((x) => x !== g) : [...prev, g],
     );
+
+  function handleSave() {
+    updateProfile(
+      {
+        display_name: name.trim(),
+        bio: bio.trim() || null,
+        favorite_genres: selectedGenres.length > 0 ? selectedGenres : null,
+      },
+      { onSuccess: onClose },
+    );
+  }
 
   return (
     <Modal
@@ -56,17 +81,12 @@ export function EditProfileSheet({ user, onClose }: Props) {
 
         <View
           className="rounded-t-xl overflow-hidden bg-surface"
-          style={{
-            maxHeight: '90%',
-            paddingBottom: insets.bottom + 12,
-          }}
+          style={{ maxHeight: '90%', paddingBottom: insets.bottom + 12 }}
         >
-          {/* Handle */}
           <View className="items-center pt-3 pb-1">
             <View className="w-10 h-1 rounded-full bg-border" />
           </View>
 
-          {/* Header */}
           <View className="flex-row justify-between items-center px-5 pt-3 pb-4">
             <Text className="font-display-sb text-md text-text">Editar perfil</Text>
             <Pressable onPress={onClose} hitSlop={8} className="w-8 h-8 items-center justify-center">
@@ -75,20 +95,13 @@ export function EditProfileSheet({ user, onClose }: Props) {
           </View>
 
           <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-            {/* Avatar row */}
             <View className="flex-row items-center gap-4 px-5 pb-5">
-              <View
-                className="rounded-full items-center justify-center shrink-0 w-[66px] h-[66px]"
-                style={{
-                  backgroundColor: alpha(user.avC, 0.14),
-                  borderWidth: 2.5,
-                  borderColor: user.avC,
-                }}
-              >
-                <Text className="text-md font-body-sb" style={{ color: user.avC }}>
-                  {user.av}
-                </Text>
-              </View>
+              <Avatar
+                displayName={user.display_name}
+                username={user.username}
+                avatarUrl={user.avatar_url}
+                size={66}
+              />
               <View>
                 <Pressable className="px-4 py-2 rounded-md bg-sh border border-border mb-1.5">
                   <Text className="text-xs font-body-md text-text">Cambiar foto</Text>
@@ -98,7 +111,6 @@ export function EditProfileSheet({ user, onClose }: Props) {
             </View>
 
             <View className="px-5">
-              {/* Name */}
               <View className="mb-3.5">
                 <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-1.5">
                   Nombre
@@ -106,13 +118,13 @@ export function EditProfileSheet({ user, onClose }: Props) {
                 <TextInput
                   value={name}
                   onChangeText={setName}
+                  maxLength={50}
                   className="rounded-md bg-sr border border-border text-text font-body text-sm"
                   style={{ paddingHorizontal: 14, paddingVertical: 11 }}
                   placeholderTextColor={c.t3}
                 />
               </View>
 
-              {/* Bio */}
               <View className="mb-[18px]">
                 <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-1.5">
                   Bio
@@ -122,6 +134,8 @@ export function EditProfileSheet({ user, onClose }: Props) {
                   onChangeText={setBio}
                   multiline
                   numberOfLines={3}
+                  maxLength={160}
+                  placeholder="Cuéntanos sobre tus lecturas..."
                   className="rounded-md bg-sr border border-border text-text font-body text-sm"
                   style={{
                     paddingHorizontal: 14,
@@ -130,18 +144,18 @@ export function EditProfileSheet({ user, onClose }: Props) {
                     textAlignVertical: 'top',
                   }}
                   placeholderTextColor={c.t3}
-                  maxLength={160}
                 />
-                <Text className="text-xs font-body text-t3 text-right mt-1">{bio.length}/160</Text>
+                <Text className="text-xs font-body text-t3 text-right mt-1">
+                  {bio.length}/160
+                </Text>
               </View>
 
-              {/* Genre chips */}
               <View className="mb-6">
                 <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-2">
                   Géneros favoritos
                 </Text>
                 <View className="flex-row flex-wrap gap-1.5">
-                  {GENRES.map(g => {
+                  {GENRES.map((g) => {
                     const active = selectedGenres.includes(g);
                     return (
                       <Pressable
@@ -149,13 +163,13 @@ export function EditProfileSheet({ user, onClose }: Props) {
                         onPress={() => toggleGenre(g)}
                         className="px-3 py-1.5 rounded-full border"
                         style={{
-                          backgroundColor: active ? alpha(c.accent, 0.14) : c.sh,
-                          borderColor: active ? c.accent : c.border,
+                          backgroundColor: active ? alpha(color, 0.14) : undefined,
+                          borderColor: active ? color : undefined,
                         }}
                       >
                         <Text
-                          className="text-xs font-body"
-                          style={{ color: active ? c.accent : c.t2 }}
+                          className={`text-xs font-body ${active ? '' : 'text-t2'}`}
+                          style={active ? { color } : undefined}
                         >
                           {g}
                         </Text>
@@ -166,12 +180,16 @@ export function EditProfileSheet({ user, onClose }: Props) {
               </View>
 
               <Pressable
-                onPress={onClose}
+                onPress={handleSave}
+                disabled={isPending || !name.trim()}
                 className="py-3 rounded-md items-center mb-1 bg-accent"
+                style={{ opacity: isPending || !name.trim() ? 0.6 : 1 }}
               >
-                <Text className="text-sm font-body-sb text-white">
-                  Guardar cambios
-                </Text>
+                {isPending ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Text className="text-sm font-body-sb text-white">Guardar cambios</Text>
+                )}
               </Pressable>
             </View>
           </ScrollView>

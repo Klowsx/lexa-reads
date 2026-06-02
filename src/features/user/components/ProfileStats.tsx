@@ -1,5 +1,4 @@
 import { Pressable, Text, View } from 'react-native';
-import { useColors } from '~/theme/colors';
 
 interface Props {
   books: number;
@@ -22,8 +21,6 @@ export function ProfileStats({
   onPressFollowers,
   onPressFollowing,
 }: Props) {
-  const c = useColors();
-
   const stats = [
     { label: 'Libros',     value: books,     onPress: onPressBooks },
     { label: 'Reseñas',    value: reviews,   onPress: onPressReviews },
@@ -37,14 +34,10 @@ export function ProfileStats({
         <Pressable
           key={label}
           onPress={onPress}
-          className="flex-1 items-center py-3.5"
-          style={{
-            borderRightWidth: i < 3 ? 1 : 0,
-            borderRightColor: c.border,
-          }}
+          className={`flex-1 items-center py-3.5 ${i < 3 ? 'border-r border-border' : ''}`}
         >
           <Text className="text-lg font-body-sb text-text leading-[26px]">
-            {value}
+            {value ?? 0}
           </Text>
           <Text className="text-xs font-body text-t3 mt-1 tracking-wide">
             {label}

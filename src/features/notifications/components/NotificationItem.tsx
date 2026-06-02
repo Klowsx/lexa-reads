@@ -48,7 +48,7 @@ export function NotificationItem({ item, onPress }: Props) {
         />
       )}
 
-      <Avatar user={item.user} size={40} />
+      <Avatar displayName={item.user.name} username={item.user.username} size={40} />
 
       <View className="flex-1 min-w-0 pt-0.5">
         <Text className="text-xs font-body text-text leading-[19px]" numberOfLines={2}>

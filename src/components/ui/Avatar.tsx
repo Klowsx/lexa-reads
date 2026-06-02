@@ -1,5 +1,6 @@
+import { Image } from 'expo-image';
 import { Text, View } from 'react-native';
-import type { MockUser } from '~/mock';
+import { getAvatarColor, getInitials } from '~/lib/avatar';
 
 const alpha = (hex: string, op: number) => {
   const n = parseInt(hex.replace('#', ''), 16);
@@ -7,20 +8,39 @@ const alpha = (hex: string, op: number) => {
 };
 
 interface AvatarProps {
-  user: Pick<MockUser, 'av' | 'avC'>;
+  displayName: string;
+  username: string;
+  avatarUrl?: string | null;
   size?: number;
 }
 
-export function Avatar({ user, size = 34 }: AvatarProps) {
+export function Avatar({ displayName, username, avatarUrl, size = 34 }: AvatarProps) {
+  const color = getAvatarColor(username);
+
+  if (avatarUrl) {
+    return (
+      <Image
+        source={{ uri: avatarUrl }}
+        style={{
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          flexShrink: 0,
+        }}
+        contentFit="cover"
+      />
+    );
+  }
+
   return (
     <View
       style={{
         width: size,
         height: size,
         borderRadius: size / 2,
-        backgroundColor: alpha(user.avC, 0.18),
+        backgroundColor: alpha(color, 0.18),
         borderWidth: 1.5,
-        borderColor: user.avC,
+        borderColor: color,
         alignItems: 'center',
         justifyContent: 'center',
         flexShrink: 0,
@@ -28,12 +48,9 @@ export function Avatar({ user, size = 34 }: AvatarProps) {
     >
       <Text
         className="font-body-sb"
-        style={{
-          fontSize: size * 0.33,
-          color: user.avC,
-        }}
+        style={{ fontSize: size * 0.33, color }}
       >
-        {user.av}
+        {getInitials(displayName)}
       </Text>
     </View>
   );

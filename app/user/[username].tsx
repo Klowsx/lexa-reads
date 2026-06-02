@@ -4,6 +4,7 @@ import { ChevronLeft, Lock, MoreHorizontal, UserMinus, UserPlus } from 'lucide-r
 import { useState } from 'react';
 import {
   ActionSheetIOS,
+  ActivityIndicator,
   Alert,
   Platform,
   Pressable,
@@ -13,12 +14,15 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Avatar } from '~/components/ui/Avatar';
-import { BookDetailSheet } from '~/features/book/components/BookDetailSheet';
+import { useQuery } from '@tanstack/react-query';
 import { ProfileLists } from '~/features/user/components/ProfileLists';
 import { ProfileStats } from '~/features/user/components/ProfileStats';
 import { RecentReads } from '~/features/user/components/RecentReads';
 import { ReportSheet } from '~/features/user/components/ReportSheet';
-import { FULL_USERS, MOCK_LISTS, MY_BOOKS, type MockBook } from '~/mock';
+import { useFollow } from '~/features/user/hooks/useFollow';
+import { useProfile } from '~/features/user/hooks/useProfile';
+import { userRecentReadsQueryOptions } from '~/features/user/user.queries';
+import { getAvatarColor } from '~/lib/avatar';
 import { useColors } from '~/theme/colors';
 
 const alpha = (hex: string, op: number) => {
@@ -59,15 +63,10 @@ function PrivacyGate({
 
       <Pressable
         onPress={onFollow}
-        className="flex-row items-center gap-2 px-5 py-2.5 rounded-full"
-        style={({ pressed }) => ({
-          backgroundColor: pressed ? alpha(c.accent, 0.85) : c.accent,
-        })}
+        className="flex-row items-center gap-2 px-5 py-2.5 rounded-full bg-accent"
       >
         <UserPlus size={14} color="#fff" strokeWidth={2} />
-        <Text className="text-xs font-body-sb" style={{ color: '#fff' }}>
-          Seguir
-        </Text>
+        <Text className="text-xs font-body-sb text-white">Seguir</Text>
       </Pressable>
     </View>
   );
@@ -81,17 +80,33 @@ export default function UserProfileScreen() {
   const insets = useSafeAreaInsets();
   const c = useColors();
 
-  const user = FULL_USERS.find((u) => u.username === username) ?? FULL_USERS[0];
+  const { data: profile, isLoading } = useProfile(username);
+  const { data: recentReads = [] } = useQuery(
+    userRecentReadsQueryOptions(profile?.id ?? ''),
+  );
 
-  const [following, setFollowing] = useState(false);
-  const [selectedBook, setSelectedBook] = useState<MockBook | null>(null);
+  const { follow, unfollow } = useFollow(
+    profile?.id ?? '',
+    username,
+    profile?.is_private ?? false,
+  );
+
   const [showReport, setShowReport] = useState(false);
   const [blocked, setBlocked] = useState(false);
 
-  // Contenido visible: siempre si es pública, solo si sigues si es privada
-  const contentVisible = !user.isPrivate || following;
+  const followStatus = profile?.follow_status ?? null;
+  const isFollowing = followStatus === 'accepted';
+  const isPending = followStatus === 'pending';
+  const color = profile ? getAvatarColor(profile.username) : c.accent;
+  const contentVisible = !profile?.is_private || isFollowing;
 
-  const recentReads = MY_BOOKS.filter((b) => b.status === 'read').slice(0, 4);
+  function handleFollow() {
+    if (isFollowing || isPending) {
+      unfollow.mutate();
+    } else {
+      follow.mutate();
+    }
+  }
 
   function openMenu() {
     if (Platform.OS === 'ios') {
@@ -107,16 +122,41 @@ export default function UserProfileScreen() {
             setBlocked((b) => !b);
             if (!blocked) router.back();
           }
-        }
+        },
       );
     } else {
-      Alert.alert(`@${user.username}`, undefined, [
-        { text: 'Reportar usuario',                    onPress: () => setShowReport(true) },
-        { text: blocked ? 'Desbloquear' : 'Bloquear', style: 'destructive', onPress: () => { setBlocked((b) => !b); if (!blocked) router.back(); } },
-        { text: 'Cancelar',                            style: 'cancel' },
+      Alert.alert(`@${username}`, undefined, [
+        { text: 'Reportar usuario', onPress: () => setShowReport(true) },
+        {
+          text: blocked ? 'Desbloquear' : 'Bloquear',
+          style: 'destructive',
+          onPress: () => {
+            setBlocked((b) => !b);
+            if (!blocked) router.back();
+          },
+        },
+        { text: 'Cancelar', style: 'cancel' },
       ]);
     }
   }
+
+  if (isLoading) {
+    return (
+      <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
+        <View className="px-4 py-2.5 border-b border-border flex-row items-center gap-2">
+          <Pressable hitSlop={8} onPress={() => router.back()}>
+            <ChevronLeft size={24} color={c.t3} strokeWidth={1.6} />
+          </Pressable>
+          <Text className="font-body-md text-sm text-t2">@{username}</Text>
+        </View>
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator color={c.accent} />
+        </View>
+      </View>
+    );
+  }
+
+  if (!profile) return null;
 
   return (
     <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
@@ -127,9 +167,9 @@ export default function UserProfileScreen() {
         </Pressable>
         <View className="flex-1 flex-row items-center gap-1.5 min-w-0">
           <Text className="font-body-md text-sm text-t2" numberOfLines={1}>
-            @{user.username}
+            @{profile.username}
           </Text>
-          {user.isPrivate && (
+          {profile.is_private && (
             <Lock size={12} color={c.t3} strokeWidth={1.8} />
           )}
         </View>
@@ -145,105 +185,132 @@ export default function UserProfileScreen() {
         {/* Identity card */}
         <View
           className="mx-4 mt-4 mb-5 rounded-lg overflow-hidden border"
-          style={{ borderColor: alpha(user.avC, 0.22) }}
+          style={{ borderColor: alpha(color, 0.22) }}
         >
           <LinearGradient
-            colors={[alpha(user.avC, 0.1), alpha(c.border, 0.3)]}
+            colors={[alpha(color, 0.1), alpha(color, 0.04)]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             className="p-4"
           >
             <View className="flex-row gap-3.5 items-start mb-4">
-              <Avatar user={user} size={72} />
+              <Avatar
+                displayName={profile.display_name}
+                username={profile.username}
+                avatarUrl={profile.avatar_url}
+                size={72}
+              />
               <View className="flex-1 pt-1">
-                <Text className="text-md font-body-sb text-text leading-tight">{user.name}</Text>
-                <Text className="text-sm font-body text-t2 mt-1">@{user.username}</Text>
-                {user.isPrivate && (
+                <Text className="text-md font-body-sb text-text leading-tight">
+                  {profile.display_name}
+                </Text>
+                <Text className="text-sm font-body text-t2 mt-1">
+                  @{profile.username}
+                </Text>
+                {profile.is_private && (
                   <View className="flex-row items-center gap-1 mt-1">
                     <Lock size={10} color={c.t3} strokeWidth={2} />
                     <Text className="text-xs font-body text-t3">Perfil privado</Text>
                   </View>
                 )}
-                <Text className="text-xs font-body text-t3 mt-2">{user.bio}</Text>
+                {profile.bio ? (
+                  <Text className="text-xs font-body text-t3 mt-2">{profile.bio}</Text>
+                ) : null}
               </View>
             </View>
 
             {/* Follow button */}
             <Pressable
-              onPress={() => setFollowing((f) => !f)}
+              onPress={handleFollow}
+              disabled={follow.isPending || unfollow.isPending}
               className="py-2.5 rounded-xl items-center border flex-row justify-center gap-2"
               style={({ pressed }) => ({
-                backgroundColor: following
-                  ? alpha(c.text, 0.05)
-                  : pressed
-                  ? alpha(user.avC, 0.85)
-                  : user.avC,
-                borderColor: following ? alpha(user.avC, 0.22) : user.avC,
+                backgroundColor:
+                  isFollowing || isPending
+                    ? alpha(c.text, 0.05)
+                    : pressed
+                      ? alpha(color, 0.85)
+                      : color,
+                borderColor:
+                  isFollowing || isPending ? alpha(color, 0.22) : color,
               })}
             >
-              {following ? (
+              {isFollowing ? (
                 <UserMinus size={14} color={c.t2} strokeWidth={2} />
               ) : (
-                <UserPlus size={14} color="#fff" strokeWidth={2} />
+                <UserPlus
+                  size={14}
+                  color={isPending ? c.t2 : '#fff'}
+                  strokeWidth={2}
+                />
               )}
               <Text
                 className="text-xs font-body-sb"
-                style={{ color: following ? c.t2 : '#fff' }}
+                style={{ color: isFollowing || isPending ? c.t2 : '#fff' }}
               >
-                {following ? 'Siguiendo' : 'Seguir'}
+                {isFollowing
+                  ? 'Siguiendo'
+                  : isPending
+                    ? 'Solicitud enviada'
+                    : 'Seguir'}
               </Text>
             </Pressable>
           </LinearGradient>
         </View>
 
-        {/* Stats — siempre visibles, pero los taps están desactivados si el contenido está bloqueado */}
         <ProfileStats
-          books={user.books}
-          reviews={user.reviews}
-          followers={user.followers}
-          following={user.following}
+          books={profile.books_read_count ?? 0}
+          reviews={profile.reviews_count ?? 0}
+          followers={profile.followers_count ?? 0}
+          following={profile.following_count ?? 0}
           onPressReviews={
             contentVisible
-              ? () => router.push({ pathname: '/user-reviews/[username]', params: { username: user.username } } as any)
+              ? () =>
+                  router.push({
+                    pathname: '/user-reviews/[username]',
+                    params: { username: profile.username },
+                  } as any)
               : undefined
           }
           onPressFollowers={() =>
-            router.push(`/followers?username=${user.username}&tab=followers` as any)
+            router.push(
+              `/followers?username=${profile.username}&tab=followers` as any,
+            )
           }
           onPressFollowing={() =>
-            router.push(`/followers?username=${user.username}&tab=following` as any)
+            router.push(
+              `/followers?username=${profile.username}&tab=following` as any,
+            )
           }
         />
 
-        {/* Contenido — bloqueado si cuenta privada y no sigues */}
         {contentVisible ? (
           <>
-            <RecentReads books={recentReads} onPress={setSelectedBook} />
+            <RecentReads books={recentReads} />
 
             <ProfileLists
-              lists={MOCK_LISTS.filter((l) => l.visibility === 'Pública')}
+              lists={[]}
               title="Listas públicas"
               onPress={(list) =>
-                router.push({ pathname: '/list/[slug]', params: { slug: list.id } } as any)
+                router.push({
+                  pathname: '/list/[slug]',
+                  params: { slug: list.id },
+                } as any)
               }
             />
           </>
         ) : (
           <PrivacyGate
-            username={user.username}
-            onFollow={() => setFollowing(true)}
+            username={profile.username}
+            onFollow={handleFollow}
           />
         )}
       </ScrollView>
 
-      {selectedBook && (
-        <BookDetailSheet book={selectedBook as any} onClose={() => setSelectedBook(null)} />
-      )}
-
       {showReport && (
         <ReportSheet
           target="user"
-          targetName={`@${user.username}`}
+          targetName={`@${profile.username}`}
           onClose={() => setShowReport(false)}
         />
       )}
