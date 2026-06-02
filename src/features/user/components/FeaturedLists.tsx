@@ -1,10 +1,8 @@
+import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Star } from 'lucide-react-native';
 import { Pressable, ScrollView, Text, View } from 'react-native';
-import { MockBookCover } from '~/components/ui/MockBookCover';
-import { LIST_BOOKS } from '~/mock';
-import type { MockList } from '~/mock';
-import { useColors } from '~/theme/colors';
+import type { ListRow } from '~/features/lists/list.queries';
 
 const alpha = (hex: string, op: number) => {
   const n = parseInt(hex.replace('#', ''), 16);
@@ -19,14 +17,13 @@ const OFFSETS = [
 ];
 
 interface Props {
-  lists: MockList[];
-  onPress: (list: MockList) => void;
+  lists: ListRow[];
+  onPress: (list: ListRow) => void;
   onManage?: () => void;
 }
 
 export function FeaturedLists({ lists, onPress, onManage }: Props) {
-  const c = useColors();
-  const featured = lists.filter((l) => l.featured);
+  const featured = lists.filter((l) => l.is_featured);
 
   if (featured.length === 0) return null;
 
@@ -49,7 +46,7 @@ export function FeaturedLists({ lists, onPress, onManage }: Props) {
         contentContainerStyle={{ paddingHorizontal: 16, gap: 12, paddingVertical: 2 }}
       >
         {featured.map((list) => {
-          const books = LIST_BOOKS[list.id] ?? [];
+          const col = list.accent_color ?? '#4A96B8';
           return (
             <Pressable
               key={list.id}
@@ -69,27 +66,42 @@ export function FeaturedLists({ lists, onPress, onManage }: Props) {
             >
               {/* Background gradient */}
               <LinearGradient
-                colors={[alpha(list.col, 0.5), list.col]}
+                colors={[alpha(col, 0.5), col]}
                 start={{ x: 0.1, y: 0 }}
                 end={{ x: 0.9, y: 1 }}
                 style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
               />
 
-              {/* Scattered book covers */}
-              {books.slice(0, 3).map((book, i) => (
-                <View
-                  key={book.id}
-                  style={{
-                    position: 'absolute',
-                    left: OFFSETS[i].left,
-                    top: OFFSETS[i].top,
-                    transform: [{ rotate: `${ROTATIONS[i]}deg` }],
-                    opacity: 0.72,
-                  }}
-                >
-                  <MockBookCover book={book} width={54} height={82} />
-                </View>
-              ))}
+              {/* Book cover previews */}
+              {list.preview_books.slice(0, 3).map((book, i) => {
+                const offset = OFFSETS[i] ?? { left: i * 40, top: 30 };
+                const rot = ROTATIONS[i] ?? 0;
+                return (
+                  <View
+                    key={book.id}
+                    style={{
+                      position: 'absolute',
+                      left: offset.left,
+                      top: offset.top,
+                      transform: [{ rotate: `${rot}deg` }],
+                      opacity: 0.72,
+                      width: 54,
+                      height: 82,
+                      borderRadius: 4,
+                      overflow: 'hidden',
+                      backgroundColor: alpha(col, 0.4),
+                    }}
+                  >
+                    {book.cover_url ? (
+                      <Image
+                        source={{ uri: book.cover_url }}
+                        style={{ width: 54, height: 82 }}
+                        contentFit="cover"
+                      />
+                    ) : null}
+                  </View>
+                );
+              })}
 
               {/* Bottom gradient scrim */}
               <LinearGradient
@@ -131,7 +143,7 @@ export function FeaturedLists({ lists, onPress, onManage }: Props) {
                   {list.name}
                 </Text>
                 <Text style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.68)' }}>
-                  {books.length} libros
+                  {list.books_count ?? 0} libros
                 </Text>
               </View>
             </Pressable>

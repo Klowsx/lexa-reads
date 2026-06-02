@@ -5,6 +5,9 @@ import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-nati
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BookDetailSheet } from '~/features/book/components/BookDetailSheet';
 import { useLibrary } from '~/features/library/hooks/useLibrary';
+import { useUserLists } from '~/features/lists/hooks/useUserLists';
+import { useUpdateList } from '~/features/lists/hooks/useUpdateList';
+import type { ListRow } from '~/features/lists/list.queries';
 import { CurrentlyReading } from '~/features/user/components/CurrentlyReading';
 import { EditProfileSheet } from '~/features/user/components/EditProfileSheet';
 import { FeaturedLists } from '~/features/user/components/FeaturedLists';
@@ -18,7 +21,6 @@ import { useReadingGoal } from '~/features/user/hooks/useReadingGoal';
 import type { LibraryRow } from '~/features/library/library.queries';
 import type { Tables } from '~/types';
 import { useColors } from '~/theme/colors';
-import { MOCK_LISTS, type MockList } from '~/mock';
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
@@ -29,18 +31,22 @@ export default function ProfileScreen() {
   const { data: goalData } = useReadingGoal();
   const { data: readingBooks = [] } = useLibrary('reading');
   const { data: readBooks = [] } = useLibrary('read');
+  const { data: lists = [] } = useUserLists();
+
+  const updateListMutation = useUpdateList('');
 
   const [selectedBook, setSelectedBook] = useState<Tables<'books'> | null>(null);
   const [showEdit, setShowEdit] = useState(false);
-  // Lists are phase C7 — keeping mock until then
-  const [lists, setLists] = useState<MockList[]>(MOCK_LISTS);
 
   const recentReads = (readBooks as LibraryRow[]).slice(0, 8);
 
-  function handleToggleFeatured(id: string) {
-    setLists((prev) =>
-      prev.map((l) => (l.id === id ? { ...l, featured: !l.featured } : l)),
-    );
+  function handleToggleFeatured(listId: string) {
+    const list = lists.find((l) => l.id === listId);
+    if (!list) return;
+    updateListMutation.mutate({
+      listId,
+      isFeatured: !list.is_featured,
+    });
   }
 
   if (isLoading) {
@@ -86,7 +92,7 @@ export default function ProfileScreen() {
         <FeaturedLists
           lists={lists}
           onPress={(list) =>
-            router.push({ pathname: '/list/[slug]', params: { slug: list.id } } as any)
+            router.push({ pathname: '/list/[slug]', params: { slug: list.slug } } as any)
           }
         />
 
@@ -110,8 +116,8 @@ export default function ProfileScreen() {
           lists={lists}
           onNewList={() => router.push('/list/new' as any)}
           onToggleFeatured={handleToggleFeatured}
-          onPress={(list) =>
-            router.push({ pathname: '/list/[slug]', params: { slug: list.id } } as any)
+          onPress={(list: ListRow) =>
+            router.push({ pathname: '/list/[slug]', params: { slug: list.slug } } as any)
           }
         />
       </ScrollView>

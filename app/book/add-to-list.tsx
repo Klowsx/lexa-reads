@@ -1,10 +1,12 @@
+import { useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Check, ChevronLeft, Plus } from 'lucide-react-native';
-import { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { MOCK_LISTS, type MockList } from '~/mock';
+import { useUserLists } from '~/features/lists/hooks/useUserLists';
+import { useAddBookToList } from '~/features/lists/hooks/useAddBookToList';
+import type { ListRow } from '~/features/lists/list.queries';
 import { useColors } from '~/theme/colors';
 
 const alpha = (hex: string, op: number) => {
@@ -15,73 +17,85 @@ const alpha = (hex: string, op: number) => {
 function ListRow({
   list,
   added,
+  isPending,
   onToggle,
 }: {
-  list: MockList;
+  list: ListRow;
   added: boolean;
+  isPending: boolean;
   onToggle: () => void;
 }) {
   const c = useColors();
+  const col = list.accent_color ?? '#4A96B8';
 
   return (
     <Pressable
       onPress={onToggle}
+      disabled={isPending}
       className="flex-row items-center gap-3 px-4 py-3.5"
       style={({ pressed }) => ({
         backgroundColor: pressed ? c.sh : 'transparent',
         borderBottomWidth: 1,
         borderBottomColor: c.border,
+        opacity: isPending ? 0.6 : 1,
       })}
     >
       {/* Color stripe */}
-      <View
-        className="rounded-sm shrink-0"
-        style={{ width: 3.5, height: 36, backgroundColor: list.col, opacity: 0.85 }}
-      />
+      <View className="rounded-sm shrink-0" style={{ width: 3.5, height: 36, backgroundColor: col, opacity: 0.85 }} />
 
       {/* Info */}
       <View className="flex-1 min-w-0">
-        <Text className="text-sm font-body-sb text-text" numberOfLines={1}>
-          {list.name}
-        </Text>
+        <Text className="text-sm font-body-sb text-text" numberOfLines={1}>{list.name}</Text>
         <Text className="text-xs font-body text-t3 mt-0.5">
-          {list.count} libros · {list.visibility}
+          {list.books_count} libros · {list.visibility === 'public' ? 'Pública' : 'Privada'}
         </Text>
       </View>
 
       {/* Toggle */}
-      <View
-        className="w-6 h-6 rounded-full items-center justify-center"
-        style={{
-          backgroundColor: added ? c.accent : 'transparent',
-          borderWidth: added ? 0 : 1.5,
-          borderColor: c.border,
-        }}
-      >
-        {added && <Check size={13} color="#fff" strokeWidth={2.5} />}
-      </View>
+      {isPending ? (
+        <ActivityIndicator size="small" color={c.accent} />
+      ) : (
+        <View
+          className="w-6 h-6 rounded-full items-center justify-center"
+          style={{ backgroundColor: added ? c.accent : 'transparent', borderWidth: added ? 0 : 1.5, borderColor: c.border }}
+        >
+          {added && <Check size={13} color="#fff" strokeWidth={2.5} />}
+        </View>
+      )}
     </Pressable>
   );
 }
 
 export default function AddToListScreen() {
-  const { bookId, bookTitle } = useLocalSearchParams<{
-    bookId: string;
+  const { bookId, bookTitle, listSlug } = useLocalSearchParams<{
+    bookId?: string;
     bookTitle?: string;
+    listSlug?: string;
   }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const c = useColors();
 
-  // Start with no lists selected
-  const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
+  const { data: lists = [], isLoading } = useUserLists();
+  const addMutation = useAddBookToList();
 
-  function toggleList(id: string) {
-    setAddedIds((prev) => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
+  // Track which lists have been added during this session
+  const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
+  const [pendingId, setPendingId] = useState<string | null>(null);
+
+  function handleToggle(list: ListRow) {
+    if (!bookId || addedIds.has(list.id) || pendingId) return;
+    setPendingId(list.id);
+    addMutation.mutate(
+      { listId: list.id, bookId, position: list.books_count },
+      {
+        onSuccess: () => {
+          setAddedIds((prev) => new Set([...prev, list.id]));
+          setPendingId(null);
+        },
+        onError: () => setPendingId(null),
+      },
+    );
   }
 
   const addedCount = addedIds.size;
@@ -94,13 +108,9 @@ export default function AddToListScreen() {
           <ChevronLeft size={24} color={c.t3} strokeWidth={1.6} />
         </Pressable>
         <View className="flex-1 min-w-0">
-          <Text className="font-display-sb text-xl text-text tracking-tight">
-            Agregar a lista
-          </Text>
+          <Text className="font-display-sb text-xl text-text tracking-tight">Agregar a lista</Text>
           {bookTitle ? (
-            <Text className="text-xs font-body text-t3" numberOfLines={1}>
-              {bookTitle}
-            </Text>
+            <Text className="text-xs font-body text-t3" numberOfLines={1}>{bookTitle}</Text>
           ) : null}
         </View>
         {addedCount > 0 && (
@@ -109,9 +119,7 @@ export default function AddToListScreen() {
             className="px-3.5 py-2 rounded-full"
             style={{ backgroundColor: alpha(c.accent, 0.12) }}
           >
-            <Text className="text-xs font-body-sb" style={{ color: c.accent }}>
-              Listo
-            </Text>
+            <Text className="text-xs font-body-sb" style={{ color: c.accent }}>Listo</Text>
           </Pressable>
         )}
       </View>
@@ -120,9 +128,7 @@ export default function AddToListScreen() {
       <Pressable
         onPress={() => router.push('/list/new' as any)}
         className="flex-row items-center gap-3 px-4 py-3.5 border-b border-border"
-        style={({ pressed }) => ({
-          backgroundColor: pressed ? c.sh : alpha(c.accent, 0.04),
-        })}
+        style={({ pressed }) => ({ backgroundColor: pressed ? c.sh : alpha(c.accent, 0.04) })}
       >
         <View
           className="w-8 h-8 rounded-full items-center justify-center"
@@ -130,30 +136,38 @@ export default function AddToListScreen() {
         >
           <Plus size={16} color={c.accent} strokeWidth={2} />
         </View>
-        <Text className="text-sm font-body-md" style={{ color: c.accent }}>
-          Nueva lista
-        </Text>
+        <Text className="text-sm font-body-md" style={{ color: c.accent }}>Nueva lista</Text>
       </Pressable>
 
+      {/* Loading */}
+      {isLoading && (
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator color={c.accent} />
+        </View>
+      )}
+
       {/* Lists */}
-      <FlashList
-        data={MOCK_LISTS}
-        renderItem={({ item }) => (
-          <ListRow
-            list={item}
-            added={addedIds.has(item.id)}
-            onToggle={() => toggleList(item.id)}
-          />
-        )}
-        keyExtractor={(item) => item.id}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 32 }}
-        ListEmptyComponent={
-          <View className="flex-1 items-center justify-center py-16">
-            <Text className="text-xs font-body text-t3">No tienes listas todavía.</Text>
-          </View>
-        }
-      />
+      {!isLoading && (
+        <FlashList
+          data={lists}
+          renderItem={({ item }) => (
+            <ListRow
+              list={item}
+              added={addedIds.has(item.id)}
+              isPending={pendingId === item.id}
+              onToggle={() => handleToggle(item)}
+            />
+          )}
+          keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 32 }}
+          ListEmptyComponent={
+            <View className="flex-1 items-center justify-center py-16">
+              <Text className="text-xs font-body text-t3">No tienes listas todavía.</Text>
+            </View>
+          }
+        />
+      )}
     </View>
   );
 }

@@ -1,15 +1,18 @@
 import { Image } from 'expo-image';
-import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Camera, ChevronLeft, MoreHorizontal, Star } from 'lucide-react-native';
+import { ChevronLeft, Heart, MoreHorizontal, Star } from 'lucide-react-native';
 import { useState } from 'react';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { MockBookCover } from '~/components/ui/MockBookCover';
 import { BookDetailSheet } from '~/features/book/components/BookDetailSheet';
-import { LIST_BOOKS, MOCK_LISTS, type MockBook } from '~/mock';
+import { useList } from '~/features/lists/hooks/useList';
+import { useDeleteList } from '~/features/lists/hooks/useDeleteList';
+import { useUpdateList } from '~/features/lists/hooks/useUpdateList';
+import { useToggleListLike } from '~/features/lists/hooks/useToggleListLike';
+import { useAuthStore } from '~/stores/auth.store';
 import { useColors } from '~/theme/colors';
+import type { Tables } from '~/types';
 
 const alpha = (hex: string, op: number) => {
   const n = parseInt(hex.replace('#', ''), 16);
@@ -28,25 +31,15 @@ const BOOK_POSITIONS = [
 
 // ─── Frosted-glass circular button ───────────────────────────
 
-function HeroBtn({
-  onPress,
-  children,
-}: {
-  onPress: () => void;
-  children: React.ReactNode;
-}) {
+function HeroBtn({ onPress, children }: { onPress: () => void; children: React.ReactNode }) {
   return (
     <Pressable
       onPress={onPress}
       style={({ pressed }) => ({
-        width: 34,
-        height: 34,
-        borderRadius: 17,
+        width: 34, height: 34, borderRadius: 17,
         backgroundColor: pressed ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.38)',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.14)',
-        alignItems: 'center',
-        justifyContent: 'center',
+        borderWidth: 1, borderColor: 'rgba(255,255,255,0.14)',
+        alignItems: 'center', justifyContent: 'center',
       })}
     >
       {children}
@@ -54,123 +47,16 @@ function HeroBtn({
   );
 }
 
-// ─── Pill tag ─────────────────────────────────────────────────
-
 function Pill({ label }: { label: string }) {
   return (
-    <View
-      style={{
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-        borderRadius: 100,
-        backgroundColor: 'rgba(0,0,0,0.4)',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.16)',
-      }}
-    >
-      <Text
-        style={{
-          fontSize: 11,
-          fontFamily: 'DMSans_600SemiBold',
-          color: 'rgba(255,255,255,0.9)',
-          letterSpacing: 0.3,
-        }}
-      >
+    <View style={{
+      paddingHorizontal: 10, paddingVertical: 4, borderRadius: 100,
+      backgroundColor: 'rgba(0,0,0,0.4)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.16)',
+    }}>
+      <Text style={{ fontSize: 11, fontFamily: 'DMSans_600SemiBold', color: 'rgba(255,255,255,0.9)', letterSpacing: 0.3 }}>
         {label}
       </Text>
     </View>
-  );
-}
-
-// ─── Options bottom sheet ─────────────────────────────────────
-
-function OptionsSheet({
-  visible,
-  isFeatured,
-  onClose,
-  onChangeCover,
-  onToggleFeatured,
-  onEdit,
-  onDelete,
-}: {
-  visible: boolean;
-  isFeatured: boolean;
-  onClose: () => void;
-  onChangeCover: () => void;
-  onToggleFeatured: () => void;
-  onEdit: () => void;
-  onDelete: () => void;
-}) {
-  const c = useColors();
-
-  const options = [
-    {
-      label: 'Cambiar portada',
-      color: c.t2,
-      onPress: () => { onChangeCover(); onClose(); },
-    },
-    {
-      label: isFeatured ? 'Quitar de destacadas' : 'Destacar en perfil',
-      color: GOLD,
-      onPress: () => { onToggleFeatured(); onClose(); },
-    },
-    {
-      label: 'Editar lista',
-      color: c.t2,
-      onPress: () => { onClose(); onEdit(); },
-    },
-    {
-      label: 'Eliminar lista',
-      color: c.error,
-      onPress: () => { onDelete(); onClose(); },
-    },
-  ];
-
-  if (!visible) return null;
-
-  return (
-    <Pressable
-      style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 200 }}
-      onPress={onClose}
-    >
-      <View
-        style={{
-          position: 'absolute',
-          top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.6)',
-        }}
-      />
-      <Pressable
-        style={{
-          position: 'absolute',
-          bottom: 0, left: 0, right: 0,
-          backgroundColor: c.surface,
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
-          paddingBottom: 36,
-        }}
-      >
-        <View style={{ alignItems: 'center', paddingTop: 10, paddingBottom: 6 }}>
-          <View style={{ width: 36, height: 4, backgroundColor: c.border, borderRadius: 100 }} />
-        </View>
-
-        {options.map((opt) => (
-          <Pressable
-            key={opt.label}
-            onPress={opt.onPress}
-            style={({ pressed }) => ({
-              paddingVertical: 14,
-              paddingHorizontal: 22,
-              backgroundColor: pressed ? c.sh : 'transparent',
-            })}
-          >
-            <Text style={{ fontSize: 15, fontFamily: 'DMSans_500Medium', color: opt.color }}>
-              {opt.label}
-            </Text>
-          </Pressable>
-        ))}
-      </Pressable>
-    </Pressable>
   );
 }
 
@@ -182,52 +68,75 @@ export default function ListDetailScreen() {
   const insets = useSafeAreaInsets();
   const c = useColors();
 
-  const list = MOCK_LISTS.find((l) => l.id === slug) ?? MOCK_LISTS[0];
-  const books = LIST_BOOKS[list.id] ?? [];
+  const currentUserId = useAuthStore((s) => s.user?.id);
+  const { data: list, isLoading } = useList(slug ?? '');
+  const deleteMutation = useDeleteList();
+  const updateMutation = useUpdateList(slug ?? '');
 
-  const [isFeatured, setIsFeatured] = useState(!!list.featured);
-  const [showMenu, setShowMenu] = useState(false);
-  const [coverUri, setCoverUri] = useState<string | null>(null);
-  const [selectedBook, setSelectedBook] = useState<MockBook | null>(null);
+  const { liked, count, toggle: toggleLike, isPending: likePending } = useToggleListLike(
+    list?.id ?? '',
+    false,
+    list?.likes_count ?? 0,
+  );
 
-  async function handlePickCover() {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert(
-        'Permiso necesario',
-        'Necesitamos acceso a tu galería para cambiar la portada.',
-        [{ text: 'OK' }]
-      );
-      return;
-    }
+  const [selectedBook, setSelectedBook] = useState<Tables<'books'> | null>(null);
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsEditing: true,
-      aspect: [3, 4],
-      quality: 0.85,
-    });
-
-    if (!result.canceled && result.assets[0]) {
-      setCoverUri(result.assets[0].uri);
-    }
-  }
+  const isOwner = list?.user_id === currentUserId;
+  const col = list?.accent_color ?? '#4A96B8';
 
   function handleDelete() {
+    if (!list) return;
     Alert.alert(
       'Eliminar lista',
       `¿Eliminar "${list.name}"? Esta acción no se puede deshacer.`,
       [
         { text: 'Cancelar', style: 'cancel' },
-        { text: 'Eliminar', style: 'destructive', onPress: () => router.back() },
+        {
+          text: 'Eliminar',
+          style: 'destructive',
+          onPress: () => deleteMutation.mutate(list.id, { onSuccess: () => router.back() }),
+        },
       ]
     );
   }
 
+  function handleToggleFeatured() {
+    if (!list) return;
+    updateMutation.mutate({ listId: list.id, isFeatured: !list.is_featured });
+  }
+
+  function openMenu() {
+    Alert.alert(list?.name ?? 'Lista', undefined, [
+      { text: 'Editar lista', onPress: () => router.push({ pathname: '/list/edit/[slug]', params: { slug: slug ?? '' } } as any) },
+      { text: list?.is_featured ? 'Quitar de destacadas' : 'Destacar en perfil', onPress: handleToggleFeatured },
+      { text: 'Eliminar lista', style: 'destructive', onPress: handleDelete },
+      { text: 'Cancelar', style: 'cancel' },
+    ]);
+  }
+
+  if (isLoading) {
+    return (
+      <View className="flex-1 bg-bg items-center justify-center" style={{ paddingTop: insets.top }}>
+        <ActivityIndicator color={c.accent} />
+      </View>
+    );
+  }
+
+  if (!list) {
+    return (
+      <View className="flex-1 bg-bg items-center justify-center" style={{ paddingTop: insets.top }}>
+        <Text className="font-body text-sm text-t3">Lista no encontrada.</Text>
+        <Pressable onPress={() => router.back()} className="mt-4">
+          <Text className="font-body-sb text-sm text-accent">Volver</Text>
+        </Pressable>
+      </View>
+    );
+  }
+
   const pills = [
-    `${books.length} libros`,
-    list.visibility,
-    isFeatured ? '★ Destacada' : null,
+    `${list.books_count} libros`,
+    list.visibility === 'public' ? 'Pública' : 'Privada',
+    list.is_featured ? '★ Destacada' : null,
   ].filter(Boolean) as string[];
 
   return (
@@ -238,43 +147,33 @@ export default function ListDetailScreen() {
       >
         {/* ── Hero ── */}
         <View style={{ height: HERO_H, overflow: 'hidden' }}>
+          {/* Background gradient + book covers */}
+          <LinearGradient
+            colors={[alpha(col, 0.35), col]}
+            start={{ x: 0.1, y: 0 }}
+            end={{ x: 0.9, y: 1 }}
+            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+          />
+          {list.items.slice(0, 4).map((item, i) => {
+            const pos = BOOK_POSITIONS[i] ?? { left: i * 80, top: 40, rot: '0deg' };
+            return (
+              <View
+                key={item.id}
+                style={{
+                  position: 'absolute', left: pos.left, top: pos.top,
+                  transform: [{ rotate: pos.rot }], opacity: 0.55,
+                  width: 72, height: 108, borderRadius: 4, overflow: 'hidden',
+                  backgroundColor: alpha(col, 0.5),
+                }}
+              >
+                {item.book.cover_url ? (
+                  <Image source={{ uri: item.book.cover_url }} style={{ width: 72, height: 108 }} contentFit="cover" />
+                ) : null}
+              </View>
+            );
+          })}
 
-          {/* Background: custom photo OR gradient + book covers */}
-          {coverUri ? (
-            <Image
-              source={{ uri: coverUri }}
-              style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-              contentFit="cover"
-            />
-          ) : (
-            <>
-              <LinearGradient
-                colors={[alpha(list.col, 0.35), list.col]}
-                start={{ x: 0.1, y: 0 }}
-                end={{ x: 0.9, y: 1 }}
-                style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-              />
-              {books.slice(0, 4).map((book, i) => {
-                const pos = BOOK_POSITIONS[i] ?? { left: i * 80, top: 40, rot: '0deg' };
-                return (
-                  <View
-                    key={book.id}
-                    style={{
-                      position: 'absolute',
-                      left: pos.left,
-                      top: pos.top,
-                      transform: [{ rotate: pos.rot }],
-                      opacity: 0.55,
-                    }}
-                  >
-                    <MockBookCover book={book} width={72} height={108} />
-                  </View>
-                );
-              })}
-            </>
-          )}
-
-          {/* Scrim — top + bottom */}
+          {/* Scrim */}
           <LinearGradient
             colors={['rgba(0,0,0,0.28)', 'rgba(0,0,0,0.0)', 'rgba(0,0,0,0.72)']}
             locations={[0, 0.3, 1]}
@@ -284,13 +183,8 @@ export default function ListDetailScreen() {
           {/* Nav bar */}
           <View
             style={{
-              position: 'absolute',
-              top: insets.top + 6,
-              left: 14,
-              right: 14,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
+              position: 'absolute', top: insets.top + 6, left: 14, right: 14,
+              flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
             }}
           >
             <HeroBtn onPress={() => router.back()}>
@@ -298,119 +192,107 @@ export default function ListDetailScreen() {
             </HeroBtn>
 
             <View style={{ flexDirection: 'row', gap: 8 }}>
-              {/* Camera button — always visible */}
-              <HeroBtn onPress={handlePickCover}>
-                <Camera size={15} color="#fff" strokeWidth={2} />
-              </HeroBtn>
+              {/* Like button */}
+              <Pressable
+                onPress={() => toggleLike()}
+                disabled={likePending}
+                style={{
+                  width: 34, height: 34, borderRadius: 17,
+                  backgroundColor: liked ? alpha('#ff4d4d', 0.5) : 'rgba(0,0,0,0.38)',
+                  borderWidth: 1, borderColor: liked ? 'rgba(255,77,77,0.4)' : 'rgba(255,255,255,0.14)',
+                  alignItems: 'center', justifyContent: 'center',
+                }}
+              >
+                <Heart size={15} color={liked ? '#fff' : '#fff'} fill={liked ? '#ff4d4d' : 'none'} strokeWidth={1.9} />
+              </Pressable>
 
-              <HeroBtn onPress={() => setIsFeatured((f) => !f)}>
-                <Star
-                  size={15}
-                  color={isFeatured ? GOLD : '#fff'}
-                  fill={isFeatured ? GOLD : 'transparent'}
-                  strokeWidth={1.9}
-                />
-              </HeroBtn>
+              {/* Featured toggle */}
+              {isOwner && (
+                <HeroBtn onPress={handleToggleFeatured}>
+                  <Star
+                    size={15}
+                    color={list.is_featured ? GOLD : '#fff'}
+                    fill={list.is_featured ? GOLD : 'transparent'}
+                    strokeWidth={1.9}
+                  />
+                </HeroBtn>
+              )}
 
-              <HeroBtn onPress={() => setShowMenu(true)}>
-                <MoreHorizontal size={15} color="#fff" strokeWidth={2} />
-              </HeroBtn>
+              {/* Options */}
+              {isOwner && (
+                <HeroBtn onPress={openMenu}>
+                  <MoreHorizontal size={15} color="#fff" strokeWidth={2} />
+                </HeroBtn>
+              )}
             </View>
           </View>
 
           {/* Title + pills */}
-          <View
-            style={{
-              position: 'absolute',
-              bottom: 0, left: 0, right: 0,
-              padding: 18,
-              paddingBottom: 20,
-            }}
-          >
+          <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 18, paddingBottom: 20 }}>
             <Text
               style={{
-                fontSize: 26,
-                fontFamily: 'PlayfairDisplay_700Bold',
-                color: '#fff',
-                lineHeight: 31,
-                marginBottom: 10,
-                textShadowColor: 'rgba(0,0,0,0.4)',
-                textShadowOffset: { width: 0, height: 2 },
-                textShadowRadius: 8,
+                fontSize: 26, fontFamily: 'PlayfairDisplay_700Bold',
+                color: '#fff', lineHeight: 31, marginBottom: 10,
+                textShadowColor: 'rgba(0,0,0,0.4)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 8,
               }}
               numberOfLines={2}
             >
               {list.name}
             </Text>
             <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
-              {pills.map((tag) => (
-                <Pill key={tag} label={tag} />
-              ))}
+              {pills.map((tag) => <Pill key={tag} label={tag} />)}
             </View>
           </View>
         </View>
 
         {/* ── Description ── */}
-        {list.desc ? (
+        {list.description ? (
           <Text
             className="text-t2"
-            style={{
-              paddingHorizontal: 18,
-              paddingTop: 18,
-              fontSize: 13.5,
-              fontFamily: 'PlayfairDisplay_400Regular_Italic',
-              lineHeight: 22,
-            }}
+            style={{ paddingHorizontal: 18, paddingTop: 18, fontSize: 13.5, fontFamily: 'PlayfairDisplay_400Regular_Italic', lineHeight: 22 }}
           >
-            "{list.desc}"
+            "{list.description}"
           </Text>
         ) : null}
 
         {/* ── Books header ── */}
         <View className="flex-row justify-between items-center px-4 pt-5 pb-3.5">
-          <Text className="font-body-sb text-xs text-t3 tracking-widest uppercase">
-            Libros
-          </Text>
-          <Pressable onPress={() => router.navigate('/(tabs)/search' as any)} hitSlop={6}>
-            <Text className="text-xs font-body-sb text-accent">+ Agregar</Text>
-          </Pressable>
+          <Text className="font-body-sb text-xs text-t3 tracking-widest uppercase">Libros</Text>
+          {isOwner && (
+            <Pressable
+              onPress={() => router.push({ pathname: '/book/add-to-list', params: { listSlug: slug ?? '' } } as any)}
+              hitSlop={6}
+            >
+              <Text className="text-xs font-body-sb text-accent">+ Agregar</Text>
+            </Pressable>
+          )}
         </View>
 
         {/* ── Books grid ── */}
-        {books.length === 0 ? (
+        {list.items.length === 0 ? (
           <View
             className="mx-4 rounded-lg border border-border bg-surface items-center"
             style={{ paddingVertical: 36, paddingHorizontal: 20, marginBottom: 40 }}
           >
             <Text style={{ fontSize: 32, marginBottom: 10 }}>📚</Text>
             <Text className="text-sm font-body-md text-t2 mb-1.5">Lista vacía</Text>
-            <Text className="text-xs font-body text-t3">
-              Toca «+ Agregar» para añadir libros
-            </Text>
+            <Text className="text-xs font-body text-t3">Toca «+ Agregar» para añadir libros</Text>
           </View>
         ) : (
-          <View
-            style={{
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              paddingHorizontal: 16,
-              gap: 12,
-              paddingBottom: 40,
-            }}
-          >
-            {books.map((book, i) => (
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 16, gap: 12, paddingBottom: 40 }}>
+            {list.items.map((item) => (
               <Pressable
-                key={`${book.id}-${i}`}
-                onPress={() => setSelectedBook(book)}
+                key={item.id}
+                onPress={() => setSelectedBook(item.book as Tables<'books'>)}
                 style={{ width: 100 }}
               >
-                <MockBookCover book={book} width={100} height={150} />
-                <Text
-                  className="text-xs font-body-md text-t2 mt-1.5"
-                  style={{ lineHeight: 15, width: 100 }}
-                  numberOfLines={2}
-                >
-                  {book.title}
+                <View style={{ width: 100, height: 150, borderRadius: 6, overflow: 'hidden', backgroundColor: alpha(col, 0.3) }}>
+                  {item.book.cover_url ? (
+                    <Image source={{ uri: item.book.cover_url }} style={{ width: 100, height: 150 }} contentFit="cover" />
+                  ) : null}
+                </View>
+                <Text className="text-xs font-body-md text-t2 mt-1.5" style={{ lineHeight: 15, width: 100 }} numberOfLines={2}>
+                  {item.book.title}
                 </Text>
               </Pressable>
             ))}
@@ -418,19 +300,8 @@ export default function ListDetailScreen() {
         )}
       </ScrollView>
 
-      {/* ── Options sheet ── */}
-      <OptionsSheet
-        visible={showMenu}
-        isFeatured={isFeatured}
-        onClose={() => setShowMenu(false)}
-        onChangeCover={handlePickCover}
-        onToggleFeatured={() => setIsFeatured((f) => !f)}
-        onEdit={() => router.push({ pathname: '/list/edit/[slug]', params: { slug: list.id } } as any)}
-        onDelete={handleDelete}
-      />
-
       {selectedBook && (
-        <BookDetailSheet book={selectedBook as any} onClose={() => setSelectedBook(null)} />
+        <BookDetailSheet book={selectedBook} onClose={() => setSelectedBook(null)} />
       )}
     </View>
   );

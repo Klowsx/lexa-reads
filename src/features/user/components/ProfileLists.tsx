@@ -1,7 +1,7 @@
 import { ChevronRight, Star } from 'lucide-react-native';
 import { Pressable, Text, View } from 'react-native';
 import { useColors } from '~/theme/colors';
-import type { MockList } from '~/mock';
+import type { ListRow } from '~/features/lists/list.queries';
 
 const alpha = (hex: string, op: number) => {
   const n = parseInt(hex.replace('#', ''), 16);
@@ -11,9 +11,9 @@ const alpha = (hex: string, op: number) => {
 const GOLD = '#E8C05A';
 
 interface Props {
-  lists: MockList[];
+  lists: ListRow[];
   onNewList?: () => void;
-  onPress?: (list: MockList) => void;
+  onPress?: (list: ListRow) => void;
   onToggleFeatured?: (id: string) => void;
   title?: string;
 }
@@ -40,9 +40,16 @@ export function ProfileLists({
         )}
       </View>
 
+      {lists.length === 0 && (
+        <View className="py-6 items-center">
+          <Text className="text-xs font-body text-t3">Sin listas todavía.</Text>
+        </View>
+      )}
+
       <View className="gap-2">
         {lists.map((list) => {
-          const isFeatured = !!list.featured;
+          const col = list.accent_color ?? '#4A96B8';
+          const isFeatured = list.is_featured ?? false;
           return (
             <Pressable
               key={list.id}
@@ -54,16 +61,16 @@ export function ProfileLists({
                 borderBottomWidth: 1,
                 borderLeftWidth: 1,
                 borderRightWidth: 1,
-                borderTopColor: isFeatured ? alpha(list.col, 0.35) : c.border,
-                borderBottomColor: isFeatured ? alpha(list.col, 0.18) : c.border,
-                borderLeftColor: isFeatured ? alpha(list.col, 0.25) : c.border,
-                borderRightColor: isFeatured ? alpha(list.col, 0.18) : c.border,
+                borderTopColor: isFeatured ? alpha(col, 0.35) : c.border,
+                borderBottomColor: isFeatured ? alpha(col, 0.18) : c.border,
+                borderLeftColor: isFeatured ? alpha(col, 0.25) : c.border,
+                borderRightColor: isFeatured ? alpha(col, 0.18) : c.border,
               })}
             >
               {/* Color stripe */}
               <View
                 className="shrink-0 rounded-sm"
-                style={{ width: 3.5, height: 36, backgroundColor: list.col, opacity: 0.85 }}
+                style={{ width: 3.5, height: 36, backgroundColor: col, opacity: 0.85 }}
               />
 
               {/* Name + meta */}
@@ -77,7 +84,7 @@ export function ProfileLists({
                   )}
                 </View>
                 <Text className="text-xs font-body text-t3 mt-0.5">
-                  {list.count} libros · {list.visibility}
+                  {list.books_count ?? 0} libros · {list.visibility === 'public' ? 'Pública' : 'Privada'}
                 </Text>
               </View>
 

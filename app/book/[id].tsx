@@ -66,11 +66,17 @@ export default function BookDetailScreen() {
     setActiveTab(0);
   }
 
-  // Navega al modal de reseña pasando el id interno del libro (no el de Google Books).
-  // El modal usa bookId para crear/editar la reseña en la tabla reviews.
   function handleWriteReview() {
     if (!book) return;
     router.push(`/review/new?bookId=${book.id}`);
+  }
+
+  function handleAddToList() {
+    if (!book) return;
+    router.push({
+      pathname: '/book/add-to-list',
+      params: { bookId: book.id, bookTitle: book.title },
+    } as any);
   }
 
   if (isLoading) {
@@ -123,6 +129,7 @@ export default function BookDetailScreen() {
           isPending={isPending}
           onStatusPress={handleCtaStatusPress}
           onRatingPress={handleRatingButtonPress}
+          onAddToList={handleAddToList}
         />
 
         {/* 2 — sticks to top */}

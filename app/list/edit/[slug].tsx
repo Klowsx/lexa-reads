@@ -1,19 +1,16 @@
+import { useState, useEffect } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ChevronLeft, Trash2 } from 'lucide-react-native';
-import { useState } from 'react';
+import { Image } from 'expo-image';
 import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
+  ActivityIndicator, Alert, KeyboardAvoidingView, Platform,
+  Pressable, ScrollView, Text, TextInput, View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { MockBookCover } from '~/components/ui/MockBookCover';
-import { LIST_BOOKS, MOCK_LISTS, type MockBook } from '~/mock';
+import { useList } from '~/features/lists/hooks/useList';
+import { useUpdateList } from '~/features/lists/hooks/useUpdateList';
+import { useDeleteList } from '~/features/lists/hooks/useDeleteList';
+import { useRemoveBookFromList } from '~/features/lists/hooks/useRemoveBookFromList';
 import { useColors } from '~/theme/colors';
 
 const alpha = (hex: string, op: number) => {
@@ -34,29 +31,69 @@ export default function EditListScreen() {
   const insets = useSafeAreaInsets();
   const c = useColors();
 
-  const list = MOCK_LISTS.find((l) => l.id === slug) ?? MOCK_LISTS[0];
-  const initialBooks = LIST_BOOKS[list.id] ?? [];
+  const { data: list, isLoading } = useList(slug ?? '');
+  const updateMutation = useUpdateList(slug ?? '');
+  const deleteMutation = useDeleteList();
+  const removeBookMutation = useRemoveBookFromList(slug ?? '');
 
-  const [name, setName] = useState(list.name);
-  const [desc, setDesc] = useState(list.desc ?? '');
-  const [visibility, setVisibility] = useState<Visibility>(
-    list.visibility as Visibility
-  );
-  const [color, setColor] = useState(list.col);
-  const [books, setBooks] = useState<MockBook[]>(initialBooks);
+  const [name, setName] = useState('');
+  const [desc, setDesc] = useState('');
+  const [visibility, setVisibility] = useState<Visibility>('Pública');
+  const [color, setColor] = useState(LIST_COLORS[0]);
+
+  useEffect(() => {
+    if (list) {
+      setName(list.name);
+      setDesc(list.description ?? '');
+      setVisibility(list.visibility === 'public' ? 'Pública' : 'Privada');
+      setColor(list.accent_color ?? LIST_COLORS[0]);
+    }
+  }, [list]);
 
   const canSave = name.trim().length >= 2;
 
-  function removeBook(id: number) {
-    Alert.alert('Quitar libro', '¿Quitar este libro de la lista?', [
+  function handleSave() {
+    if (!list || !canSave || updateMutation.isPending) return;
+    updateMutation.mutate(
+      {
+        listId: list.id,
+        name: name.trim(),
+        description: desc.trim() || null,
+        visibility: visibility === 'Pública' ? 'public' : 'private',
+        accentColor: color,
+      },
+      { onSuccess: () => router.back() },
+    );
+  }
+
+  function handleDelete() {
+    if (!list) return;
+    Alert.alert('Eliminar lista', `¿Eliminar "${list.name}"? Esta acción no se puede deshacer.`, [
       { text: 'Cancelar', style: 'cancel' },
       {
-        text: 'Quitar',
+        text: 'Eliminar',
         style: 'destructive',
-        onPress: () => setBooks((prev) => prev.filter((b) => b.id !== id)),
+        onPress: () => deleteMutation.mutate(list.id, { onSuccess: () => router.back() }),
       },
     ]);
   }
+
+  function handleRemoveBook(listBookId: string, title: string) {
+    Alert.alert('Quitar libro', `¿Quitar "${title}" de la lista?`, [
+      { text: 'Cancelar', style: 'cancel' },
+      { text: 'Quitar', style: 'destructive', onPress: () => removeBookMutation.mutate(listBookId) },
+    ]);
+  }
+
+  if (isLoading) {
+    return (
+      <View className="flex-1 bg-bg items-center justify-center" style={{ paddingTop: insets.top }}>
+        <ActivityIndicator color={c.accent} />
+      </View>
+    );
+  }
+
+  if (!list) return null;
 
   return (
     <KeyboardAvoidingView
@@ -69,16 +106,13 @@ export default function EditListScreen() {
         <Pressable hitSlop={8} onPress={() => router.back()}>
           <ChevronLeft size={24} color={c.t3} strokeWidth={1.6} />
         </Pressable>
-        <Text className="font-display-sb text-xl text-text tracking-tight flex-1">
-          Editar lista
-        </Text>
-        <Pressable hitSlop={8} onPress={() => canSave && router.back()} disabled={!canSave}>
-          <Text
-            className="text-sm font-body-sb"
-            style={{ color: canSave ? c.accent : c.t3 }}
-          >
-            Guardar
-          </Text>
+        <Text className="font-display-sb text-xl text-text tracking-tight flex-1">Editar lista</Text>
+        <Pressable hitSlop={8} onPress={handleSave} disabled={!canSave || updateMutation.isPending}>
+          {updateMutation.isPending ? (
+            <ActivityIndicator size="small" color={c.accent} />
+          ) : (
+            <Text className="text-sm font-body-sb" style={{ color: canSave ? c.accent : c.t3 }}>Guardar</Text>
+          )}
         </Pressable>
       </View>
 
@@ -90,46 +124,31 @@ export default function EditListScreen() {
         {/* Preview */}
         <View
           className="rounded-md mb-6 px-4 py-4 flex-row items-center gap-3"
-          style={{
-            backgroundColor: alpha(color, 0.1),
-            borderWidth: 1,
-            borderColor: alpha(color, 0.28),
-          }}
+          style={{ backgroundColor: alpha(color, 0.1), borderWidth: 1, borderColor: alpha(color, 0.28) }}
         >
-          <View
-            className="rounded-sm shrink-0"
-            style={{ width: 4, height: 40, backgroundColor: color }}
-          />
+          <View className="rounded-sm shrink-0" style={{ width: 4, height: 40, backgroundColor: color }} />
           <View className="flex-1 min-w-0">
             <Text className="text-sm font-body-sb text-text" numberOfLines={1}>
               {name.trim() || 'Nombre de la lista'}
             </Text>
             <Text className="text-xs font-body text-t3 mt-0.5">
-              {books.length} libros · {visibility}
+              {list.items.length} libros · {visibility}
             </Text>
           </View>
         </View>
 
         {/* Nombre */}
         <View className="mb-4">
-          <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-1.5">
-            Nombre
-          </Text>
+          <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-1.5">Nombre</Text>
           <TextInput
             value={name}
             onChangeText={setName}
             maxLength={60}
             className="rounded-md border border-border font-body text-sm text-text"
-            style={{
-              paddingHorizontal: 14,
-              paddingVertical: 11,
-              backgroundColor: c.surface,
-            }}
+            style={{ paddingHorizontal: 14, paddingVertical: 11, backgroundColor: c.surface }}
             placeholderTextColor={c.t3}
           />
-          <Text className="text-xs font-body text-t3 text-right mt-1">
-            {name.length}/60
-          </Text>
+          <Text className="text-xs font-body text-t3 text-right mt-1">{name.length}/60</Text>
         </View>
 
         {/* Descripción */}
@@ -146,24 +165,17 @@ export default function EditListScreen() {
             maxLength={200}
             className="rounded-md border border-border font-body text-sm text-text"
             style={{
-              paddingHorizontal: 14,
-              paddingVertical: 11,
-              lineHeight: 22,
-              textAlignVertical: 'top',
-              backgroundColor: c.surface,
+              paddingHorizontal: 14, paddingVertical: 11, lineHeight: 22,
+              textAlignVertical: 'top', backgroundColor: c.surface,
             }}
             placeholderTextColor={c.t3}
           />
-          <Text className="text-xs font-body text-t3 text-right mt-1">
-            {desc.length}/200
-          </Text>
+          <Text className="text-xs font-body text-t3 text-right mt-1">{desc.length}/200</Text>
         </View>
 
         {/* Visibilidad */}
         <View className="mb-6">
-          <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-2">
-            Visibilidad
-          </Text>
+          <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-2">Visibilidad</Text>
           <View className="flex-row rounded-md bg-sh p-1 border border-border">
             {(['Pública', 'Privada'] as Visibility[]).map((v) => {
               const active = visibility === v;
@@ -174,12 +186,7 @@ export default function EditListScreen() {
                   className="flex-1 items-center py-2 rounded-sm"
                   style={{ backgroundColor: active ? c.accent : 'transparent' }}
                 >
-                  <Text
-                    className="text-xs font-body-sb"
-                    style={{ color: active ? '#fff' : c.t3 }}
-                  >
-                    {v}
-                  </Text>
+                  <Text className="text-xs font-body-sb" style={{ color: active ? '#fff' : c.t3 }}>{v}</Text>
                 </Pressable>
               );
             })}
@@ -188,9 +195,7 @@ export default function EditListScreen() {
 
         {/* Color */}
         <View className="mb-6">
-          <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-2">
-            Color
-          </Text>
+          <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-2">Color</Text>
           <View className="flex-row gap-3 flex-wrap">
             {LIST_COLORS.map((col) => {
               const active = color === col;
@@ -199,17 +204,10 @@ export default function EditListScreen() {
                   key={col}
                   onPress={() => setColor(col)}
                   style={{
-                    width: 34,
-                    height: 34,
-                    borderRadius: 17,
-                    backgroundColor: col,
-                    borderWidth: active ? 3 : 2,
-                    borderColor: active ? c.text : 'transparent',
-                    shadowColor: col,
-                    shadowOpacity: active ? 0.5 : 0,
-                    shadowRadius: 6,
-                    shadowOffset: { width: 0, height: 2 },
-                    elevation: active ? 4 : 0,
+                    width: 34, height: 34, borderRadius: 17, backgroundColor: col,
+                    borderWidth: active ? 3 : 2, borderColor: active ? c.text : 'transparent',
+                    shadowColor: col, shadowOpacity: active ? 0.5 : 0,
+                    shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: active ? 4 : 0,
                   }}
                 />
               );
@@ -221,47 +219,40 @@ export default function EditListScreen() {
         <View className="mb-8">
           <View className="flex-row justify-between items-baseline mb-3">
             <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase">
-              Libros · {books.length}
+              Libros · {list.items.length}
             </Text>
-            <Pressable
-              onPress={() => router.navigate('/(tabs)/search' as any)}
-              hitSlop={6}
-            >
-              <Text className="text-xs font-body-sb text-accent">+ Agregar</Text>
-            </Pressable>
           </View>
 
-          {books.length === 0 ? (
-            <View
-              className="rounded-md border border-border items-center py-8"
-              style={{ backgroundColor: c.surface }}
-            >
+          {list.items.length === 0 ? (
+            <View className="rounded-md border border-border items-center py-8" style={{ backgroundColor: c.surface }}>
               <Text className="text-xs font-body text-t3">Lista vacía</Text>
             </View>
           ) : (
             <View className="gap-2.5">
-              {books.map((book) => (
+              {list.items.map((item) => (
                 <View
-                  key={book.id}
+                  key={item.id}
                   className="flex-row items-center gap-3 rounded-md border border-border px-3 py-2.5"
                   style={{ backgroundColor: c.surface }}
                 >
-                  <MockBookCover book={book} width={40} height={58} />
+                  <View style={{ width: 40, height: 58, borderRadius: 4, overflow: 'hidden', backgroundColor: c.sh }}>
+                    {item.book.cover_url ? (
+                      <Image source={{ uri: item.book.cover_url }} style={{ width: 40, height: 58 }} contentFit="cover" />
+                    ) : null}
+                  </View>
                   <View className="flex-1 min-w-0">
-                    <Text
-                      className="text-xs font-body-sb text-text"
-                      numberOfLines={1}
-                    >
-                      {book.title}
+                    <Text className="text-xs font-body-sb text-text" numberOfLines={1}>
+                      {item.book.title}
                     </Text>
                     <Text className="text-xs font-body text-t3 mt-0.5">
-                      {book.author}
+                      {item.book.authors?.[0] ?? ''}
                     </Text>
                   </View>
                   <Pressable
-                    onPress={() => removeBook(book.id)}
+                    onPress={() => handleRemoveBook(item.id, item.book.title)}
                     hitSlop={8}
                     className="p-2"
+                    disabled={removeBookMutation.isPending}
                   >
                     <Trash2 size={15} color={c.error} strokeWidth={1.8} />
                   </Pressable>
@@ -271,13 +262,27 @@ export default function EditListScreen() {
           )}
         </View>
 
+        {/* Guardar */}
         <Pressable
-          onPress={() => canSave && router.back()}
-          disabled={!canSave}
-          className="py-3.5 rounded-md items-center"
+          onPress={handleSave}
+          disabled={!canSave || updateMutation.isPending}
+          className="py-3.5 rounded-md items-center mb-4"
           style={{ backgroundColor: canSave ? c.accent : alpha(c.accent, 0.4) }}
         >
-          <Text className="text-sm font-body-sb text-white">Guardar cambios</Text>
+          {updateMutation.isPending ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text className="text-sm font-body-sb text-white">Guardar cambios</Text>
+          )}
+        </Pressable>
+
+        {/* Eliminar */}
+        <Pressable
+          onPress={handleDelete}
+          disabled={deleteMutation.isPending}
+          className="py-3.5 rounded-md items-center border border-border"
+        >
+          <Text className="text-sm font-body-sb" style={{ color: c.error }}>Eliminar lista</Text>
         </Pressable>
       </ScrollView>
     </KeyboardAvoidingView>

@@ -1,4 +1,4 @@
-import { ChevronDown } from "lucide-react-native";
+import { ChevronDown, ListPlus } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
 import { fixed, useColors } from "~/theme/colors";
 import { type BookStatus, STATUS_META } from "~/lib/book-status";
@@ -17,6 +17,7 @@ interface BookCtaBarProps {
   isPending: boolean;
   onStatusPress: () => void;
   onRatingPress: () => void;
+  onAddToList?: () => void;
 }
 
 export function BookCtaBar({
@@ -27,6 +28,7 @@ export function BookCtaBar({
   isPending,
   onStatusPress,
   onRatingPress,
+  onAddToList,
 }: BookCtaBarProps) {
   const c = useColors();
 
@@ -71,6 +73,16 @@ export function BookCtaBar({
             <ChevronDown size={12} color={statusColor} strokeWidth={2} />
           )}
         </Pressable>
+
+        {/* Add to list button */}
+        {onAddToList && (
+          <Pressable
+            onPress={onAddToList}
+            className="flex-row items-center gap-1.5 py-3 px-3 rounded-card bg-surface border border-border"
+          >
+            <ListPlus size={16} color={c.t2} strokeWidth={1.8} />
+          </Pressable>
+        )}
 
         {/* Rating button */}
         <Pressable

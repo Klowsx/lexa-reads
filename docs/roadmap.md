@@ -130,11 +130,11 @@ Sin social, Lexa es Goodreads chico. Este es el diferenciador.
 
 ### C7. Listas
 
-- [ ] `app/list/new.tsx` — crear lista (name, description, visibility, slug auto).
-- [ ] `app/list/[slug].tsx` — ver lista con `list_books` reordenables (drag con Reanimated/Gesture Handler).
-- [ ] Hooks `useList(slug)`, `useAddBookToList`, `useRemoveBookFromList`, `useReorderListBooks`, `useToggleListLike`.
-- [ ] En `book/[id].tsx`: botón "agregar a lista" → bottom-sheet con mis listas + opción "crear nueva".
-- [ ] En perfil: ya hay `ProfileLists` mock — conectar a `useUserLists(userId)`.
+- [x] `app/list/new.tsx` — crear lista (name, description, visibility, slug auto).
+- [x] `app/list/[slug].tsx` — ver lista con `list_books` reordenables (drag con Reanimated/Gesture Handler).
+- [x] Hooks `useList(slug)`, `useAddBookToList`, `useRemoveBookFromList`, `useReorderListBooks`, `useToggleListLike`.
+- [x] En `book/[id].tsx`: botón "agregar a lista" → bottom-sheet con mis listas + opción "crear nueva".
+- [x] En perfil: ya hay `ProfileLists` mock — conectar a `useUserLists(userId)`.
 
 ---
 
