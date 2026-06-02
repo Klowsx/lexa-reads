@@ -60,7 +60,7 @@ export default function SettingsScreen() {
           <SettingsItem
             label="Editar perfil"
             subtitle="Nombre, bio, géneros favoritos"
-            onPress={() => {}}
+            onPress={() => router.push('/edit-profile' as any)}
           />
           <SettingsItem
             label="Meta de lectura"
@@ -113,7 +113,7 @@ export default function SettingsScreen() {
               </Pressable>
             </View>
           )}
-          <SettingsItem label="Cambiar contraseña" onPress={() => {}} separator={false} />
+          <SettingsItem label="Cambiar contraseña" onPress={() => router.push('/change-password' as any)} separator={false} />
         </SettingsSection>
 
         {/* ── Apariencia ── */}

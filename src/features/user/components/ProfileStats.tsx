@@ -6,6 +6,8 @@ interface Props {
   reviews: number;
   followers: number;
   following: number;
+  onPressBooks?: () => void;
+  onPressReviews?: () => void;
   onPressFollowers?: () => void;
   onPressFollowing?: () => void;
 }
@@ -15,14 +17,16 @@ export function ProfileStats({
   reviews,
   followers,
   following,
+  onPressBooks,
+  onPressReviews,
   onPressFollowers,
   onPressFollowing,
 }: Props) {
   const c = useColors();
 
   const stats = [
-    { label: 'Libros',     value: books,     onPress: undefined },
-    { label: 'Reseñas',    value: reviews,   onPress: undefined },
+    { label: 'Libros',     value: books,     onPress: onPressBooks },
+    { label: 'Reseñas',    value: reviews,   onPress: onPressReviews },
     { label: 'Seguidores', value: followers, onPress: onPressFollowers },
     { label: 'Siguiendo',  value: following, onPress: onPressFollowing },
   ];

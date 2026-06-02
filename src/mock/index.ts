@@ -141,12 +141,13 @@ export type MockList = {
   visibility: string;
   col: string;
   desc?: string;
+  featured?: boolean;
 };
 
 export const MOCK_LISTS: MockList[] = [
-  { id: 'lista-verano',    name: 'Lista de verano',    count: 4,  visibility: 'Pública', col: '#4A96B8', desc: 'Lecturas ligeras y emocionantes para el verano.' },
-  { id: 'dark-academia',   name: 'Dark Academia 2026', count: 7,  visibility: 'Pública', col: '#8A6CD8', desc: 'Libros con atmósfera académica oscura y literaria.' },
-  { id: 'pendientes',      name: 'Pendientes',         count: 12, visibility: 'Privada', col: '#6A635C' },
+  { id: 'lista-verano',  name: 'Lista de verano',    count: 4,  visibility: 'Pública', col: '#4A96B8', desc: 'Lecturas ligeras y emocionantes para el verano.', featured: true },
+  { id: 'dark-academia', name: 'Dark Academia 2026', count: 7,  visibility: 'Pública', col: '#8A6CD8', desc: 'Libros con atmósfera académica oscura y literaria.', featured: true },
+  { id: 'pendientes',    name: 'Pendientes',         count: 12, visibility: 'Privada', col: '#6A635C', featured: false },
 ];
 
 export const LIST_BOOKS: Record<string, MockBook[]> = {
@@ -198,6 +199,29 @@ export const READING_PROGRESS: Record<number, { current: number; total: number }
   6: { current: 102, total: 545 },
 };
 
+// ─── My reviews ───────────────────────────────────────────────
+
+export type MockMyReview = {
+  id: string;
+  book: MockBook;
+  rating: number;
+  body: string;
+  containsSpoilers: boolean;
+  createdAt: string;
+  editedAt?: string;
+  likes: number;
+  comments: number;
+};
+
+export const MY_REVIEWS: MockMyReview[] = [
+  { id: 'r1', book: BOOKS[1], rating: 5,   containsSpoilers: false, createdAt: 'hace 2 semanas',                    likes: 14, comments: 3,  body: 'Una obra maestra absoluta. García Márquez construye Macondo con una precisión poética que nunca he encontrado en otro libro. Cada página tiene una imagen que se te queda grabada para siempre. La estructura circular del tiempo es desconcertante al principio, pero hacia el final entiendes que era la única forma posible de contar esta historia.' },
+  { id: 'r2', book: BOOKS[7], rating: 4.5, containsSpoilers: false, createdAt: 'hace 1 mes',    editedAt: 'hace 3 semanas', likes: 8,  comments: 1,  body: 'Westover escribe con una honestidad brutal. Su historia sobre educación autodidacta y ruptura familiar es difícil de leer en los mejores momentos. Lo que más me impresionó fue cómo maneja la memoria y la subjetividad — reconoce que sus recuerdos pueden estar distorsionados, lo cual paradójicamente hace el libro más creíble.' },
+  { id: 'r3', book: BOOKS[6], rating: 5,   containsSpoilers: false, createdAt: 'hace 1 mes',                          likes: 31, comments: 7,  body: 'Imposible de describir sin arruinarlo. Clarke construye un mundo con reglas propias que se revelan muy lentamente, y la voz del narrador es uno de los logros más originales que he leído. Terminé el libro en una tarde y me quedé un rato en silencio procesando lo que acababa de leer.' },
+  { id: 'r4', book: BOOKS[8], rating: 4.5, containsSpoilers: false, createdAt: 'hace 2 meses',                        likes: 5,  comments: 0,  body: "O'Farrell hace algo extraordinario: toma la figura más famosa de la literatura inglesa y la pone completamente en segundo plano para contar la historia de su hijo y su esposa. El resultado es una novela sobre el duelo que te rompe sin necesidad de melodrama." },
+  { id: 'r5', book: BOOKS[5], rating: 4,   containsSpoilers: true,  createdAt: 'hace 3 meses',  editedAt: 'hace 2 meses',   likes: 19, comments: 4,  body: 'Kuang es increíblemente ambiciosa y casi siempre lo logra. La crítica al colonialismo a través de la magia de la plata es brillante. El ritmo flaquea en el tercer acto, pero el desenlace — aunque oscuro — es coherente con todo lo que el libro construyó. SPOILER: el sacrificio de Ramy me dejó sin palabras.' },
+  { id: 'r6', book: BOOKS[0], rating: 4.5, containsSpoilers: false, createdAt: 'hace 4 meses',                        likes: 22, comments: 5,  body: 'Rothfuss escribe las mejores escenas de taberna de la fantasía. Kvothe como narrador poco confiable es un acierto enorme, y el sistema de magia (la simpatía) es de los más originales que he encontrado. Mi único reproche es que a veces el ritmo cae en la parte de la universidad.' },
+];
+
 // ─── Notifications ────────────────────────────────────────────
 
 export type NotificationType =
@@ -228,14 +252,38 @@ export const NOTIFICATIONS: MockNotification[] = [
 
 // ─── Full user profiles (for other-user profile screens) ──────
 
-export type MockFullUser = MockMe;
+export type MockFullUser = MockMe & { isPrivate?: boolean };
 
 export const FULL_USERS: MockFullUser[] = [
   { id: 'u1', username: 'marisol_br', name: 'Marisol B.', av: 'MB', avC: '#7B5EA7', books: 34,  reviews: 18, followers: 245, following: 67,  goal: 40, goalYear: 2026, bio: 'Amante de la fantasía épica y la ficción literaria.' },
-  { id: 'u2', username: 'carlos_lee', name: 'Carlos L.',  av: 'CL', avC: '#4A96B8', books: 112, reviews: 56, followers: 892, following: 134, goal: 60, goalYear: 2026, bio: 'Lector omnívoro. Ciencia ficción, thriller y clásicos.' },
+  { id: 'u2', username: 'carlos_lee', name: 'Carlos L.',  av: 'CL', avC: '#4A96B8', books: 112, reviews: 56, followers: 892, following: 134, goal: 60, goalYear: 2026, bio: 'Lector omnívoro. Ciencia ficción, thriller y clásicos.', isPrivate: true },
   { id: 'u3', username: 'anasantos',  name: 'Ana S.',     av: 'AS', avC: '#5CAF7E', books: 28,  reviews: 11, followers: 71,  following: 53,  goal: 30, goalYear: 2026, bio: 'Novelas contemporáneas y memorias.' },
   { id: 'u4', username: 'luis_mr',    name: 'Luis MR',    av: 'LM', avC: '#8B3A3A', books: 65,  reviews: 29, followers: 178, following: 201, goal: 52, goalYear: 2026, bio: 'Historia, ensayo y ficción latinoamericana.' },
 ];
+
+// ─── Other users' reviews ──────────────────────────────────────
+
+export type MockOtherReview = Omit<MockMyReview, 'id'> & { id: string };
+
+export const USER_REVIEWS: Record<string, MockOtherReview[]> = {
+  marisol_br: [
+    { id: 'ur1', book: BOOKS[0], rating: 5,   containsSpoilers: false, createdAt: 'hace 3 días',   likes: 22, comments: 4, body: 'Rothfuss consigue algo rarísimo: que el protagonista sea el narrador de su propia leyenda y aún así te sorprenda. El sistema de magia de la simpatía es de lo más originales que he leído. Esperando el tercer libro desde hace años...' },
+    { id: 'ur2', book: BOOKS[5], rating: 4.5, containsSpoilers: false, createdAt: 'hace 2 semanas', likes: 18, comments: 2, body: 'Babel es una novela que te hace pensar en el lenguaje como poder y como arma. Kuang construye Oxford con una precisión histórica impresionante. El ritmo del tercer acto podría ser más ágil, pero el desenlace es valiente y coherente.' },
+    { id: 'ur3', book: BOOKS[6], rating: 5,   containsSpoilers: false, createdAt: 'hace 1 mes',     likes: 41, comments: 9, body: 'Piranesi me dejó sin palabras. Clarke construye un mundo con sus propias reglas que no entiendes hasta el final, y la voz del narrador es uno de los logros literarios más originales que recuerdo. Imprescindible.' },
+  ],
+  anasantos: [
+    { id: 'ur4', book: BOOKS[2], rating: 4,   containsSpoilers: false, createdAt: 'hace 1 semana',  likes: 7,  comments: 1, body: 'Normal People me atrapó de principio a fin. Rooney tiene una forma de escribir tensión emocional muy específica — no hace falta que pase nada dramático, la incomodidad está en cada diálogo.' },
+    { id: 'ur5', book: BOOKS[8], rating: 4.5, containsSpoilers: false, createdAt: 'hace 3 semanas', likes: 5,  comments: 0, body: "Hamnet es una novela sobre el silencio y el duelo. O'Farrell pone a Shakespeare completamente en segundo plano para contar la historia de Agnes, y es una de las decisiones narrativas más inteligentes que he visto." },
+  ],
+  luis_mr: [
+    { id: 'ur6', book: BOOKS[1], rating: 5,   containsSpoilers: false, createdAt: 'hace 4 días',    likes: 34, comments: 6, body: 'Cien años de soledad es el tipo de libro que solo puedes leer una primera vez. La segunda lectura es completamente diferente porque ya sabes lo que viene, pero la primera es una experiencia irrepetible. García Márquez construyó un universo propio.' },
+    { id: 'ur7', book: BOOKS[3], rating: 4,   containsSpoilers: false, createdAt: 'hace 2 meses',   likes: 11, comments: 3, body: 'La sombra del viento es atmósfera pura. El Barcelona de posguerra que construye Ruiz Zafón es tan presente que casi se convierte en un personaje más. La trama de misterio funciona muy bien aunque el ritmo no siempre es parejo.' },
+    { id: 'ur8', book: BOOKS[7], rating: 4.5, containsSpoilers: false, createdAt: 'hace 3 meses',   likes: 15, comments: 2, body: 'Educated es uno de esos libros que te hacen reflexionar sobre la memoria y la identidad. Westover escribe con una honestidad que pocas veces se ve en las memorias, reconociendo las limitaciones de su propio recuerdo.' },
+  ],
+  carlos_lee: [
+    { id: 'ur9', book: BOOKS[9], rating: 4,   containsSpoilers: false, createdAt: 'hace 1 semana',  likes: 28, comments: 5, body: 'Klara y el sol es Ishiguro siendo Ishiguro: prosa impecable, emoción contenida, final devastador. La perspectiva de Klara como observadora del mundo humano es brillante. No es su mejor libro, pero es muy bueno.' },
+  ],
+};
 
 // ─── Blocked users ─────────────────────────────────────────────
 

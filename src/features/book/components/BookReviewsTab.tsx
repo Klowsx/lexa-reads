@@ -100,12 +100,28 @@ function ReviewCard({
             @{user.username}
           </Text>
         </View>
-        <Text className="font-body text-xs text-t3">
-          {/* Tiempo relativo: "hace 3 días" */}
-          {formatRelativeTime(review.created_at)}
-          {/* Indica si fue editada */}
-          {review.edited_at ? " · editado" : ""}
-        </Text>
+        <View className="items-end gap-1">
+          <Text className="font-body text-xs text-t3">
+            {formatRelativeTime(review.created_at)}
+          </Text>
+          {review.edited_at && (
+            <View
+              className="rounded-full px-2 py-0.5"
+              style={{
+                backgroundColor: alpha(fixed.accent, 0.12),
+                borderWidth: 1,
+                borderColor: alpha(fixed.accent, 0.3),
+              }}
+            >
+              <Text
+                className="font-body-md"
+                style={{ color: fixed.accent, fontSize: 10 }}
+              >
+                Editada
+              </Text>
+            </View>
+          )}
+        </View>
       </View>
 
       {/* Aviso de spoiler — se muestra encima del cuerpo si aplica */}

@@ -1,16 +1,30 @@
-import { ChevronRight } from 'lucide-react-native';
+import { ChevronRight, Star } from 'lucide-react-native';
 import { Pressable, Text, View } from 'react-native';
 import { useColors } from '~/theme/colors';
 import type { MockList } from '~/mock';
+
+const alpha = (hex: string, op: number) => {
+  const n = parseInt(hex.replace('#', ''), 16);
+  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})`;
+};
+
+const GOLD = '#E8C05A';
 
 interface Props {
   lists: MockList[];
   onNewList?: () => void;
   onPress?: (list: MockList) => void;
+  onToggleFeatured?: (id: string) => void;
   title?: string;
 }
 
-export function ProfileLists({ lists, onNewList, onPress, title = 'Mis listas' }: Props) {
+export function ProfileLists({
+  lists,
+  onNewList,
+  onPress,
+  onToggleFeatured,
+  title = 'Mis listas',
+}: Props) {
   const c = useColors();
 
   return (
@@ -27,26 +41,66 @@ export function ProfileLists({ lists, onNewList, onPress, title = 'Mis listas' }
       </View>
 
       <View className="gap-2">
-        {lists.map((list) => (
-          <Pressable
-            key={list.id}
-            onPress={() => onPress?.(list)}
-            className="flex-row items-center gap-3 px-3.5 py-3 rounded-md border border-border bg-surface"
-            style={({ pressed }) => ({ backgroundColor: pressed ? c.sh : c.surface })}
-          >
-            <View
-              className="shrink-0 rounded-sm"
-              style={{ width: 3.5, height: 36, backgroundColor: list.col, opacity: 0.85 }}
-            />
-            <View className="flex-1 min-w-0">
-              <Text className="text-sm font-body-sb text-text">{list.name}</Text>
-              <Text className="text-xs font-body text-t3 mt-0.5">
-                {list.count} libros · {list.visibility}
-              </Text>
-            </View>
-            <ChevronRight size={16} color={c.t3} strokeWidth={1.6} />
-          </Pressable>
-        ))}
+        {lists.map((list) => {
+          const isFeatured = !!list.featured;
+          return (
+            <Pressable
+              key={list.id}
+              onPress={() => onPress?.(list)}
+              className="flex-row items-center gap-3 px-3.5 py-3 rounded-md bg-surface"
+              style={({ pressed }) => ({
+                backgroundColor: pressed ? c.sh : c.surface,
+                borderTopWidth: 1,
+                borderBottomWidth: 1,
+                borderLeftWidth: 1,
+                borderRightWidth: 1,
+                borderTopColor: isFeatured ? alpha(list.col, 0.35) : c.border,
+                borderBottomColor: isFeatured ? alpha(list.col, 0.18) : c.border,
+                borderLeftColor: isFeatured ? alpha(list.col, 0.25) : c.border,
+                borderRightColor: isFeatured ? alpha(list.col, 0.18) : c.border,
+              })}
+            >
+              {/* Color stripe */}
+              <View
+                className="shrink-0 rounded-sm"
+                style={{ width: 3.5, height: 36, backgroundColor: list.col, opacity: 0.85 }}
+              />
+
+              {/* Name + meta */}
+              <View className="flex-1 min-w-0">
+                <View className="flex-row items-center gap-1.5">
+                  <Text className="text-sm font-body-sb text-text" numberOfLines={1}>
+                    {list.name}
+                  </Text>
+                  {isFeatured && (
+                    <Star size={11} color={GOLD} fill={GOLD} strokeWidth={1.5} />
+                  )}
+                </View>
+                <Text className="text-xs font-body text-t3 mt-0.5">
+                  {list.count} libros · {list.visibility}
+                </Text>
+              </View>
+
+              {/* Star toggle */}
+              {onToggleFeatured && (
+                <Pressable
+                  onPress={() => onToggleFeatured(list.id)}
+                  hitSlop={8}
+                  className="p-1.5"
+                >
+                  <Star
+                    size={16}
+                    color={isFeatured ? GOLD : c.t3}
+                    fill={isFeatured ? GOLD : 'transparent'}
+                    strokeWidth={1.8}
+                  />
+                </Pressable>
+              )}
+
+              <ChevronRight size={16} color={c.t3} strokeWidth={1.6} />
+            </Pressable>
+          );
+        })}
       </View>
     </View>
   );
