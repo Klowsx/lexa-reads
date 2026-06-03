@@ -20,6 +20,7 @@ import { useDeleteComment } from '~/features/feed/hooks/useDeleteComment';
 import { useAuthStore } from '~/stores/auth.store';
 import { fixed, useColors } from '~/theme/colors';
 import { formatRelativeTime } from '~/lib/utils';
+import { MAX_COMMENT_LENGTH } from '~/lib/content-limits';
 import type { CommentRow, CommentTargetType } from '~/features/feed/feed.queries';
 
 // ─── Comment row ──────────────────────────────────────────────
@@ -76,7 +77,13 @@ function CommentRow({
       </View>
 
       {isOwn && (
-        <Pressable onPress={confirmDelete} hitSlop={8} className="self-center">
+        <Pressable
+          onPress={confirmDelete}
+          hitSlop={8}
+          className="self-center"
+          accessibilityRole="button"
+          accessibilityLabel="Eliminar comentario"
+        >
           <Trash2 size={14} color={c.t3} strokeWidth={1.8} />
         </Pressable>
       )}
@@ -113,7 +120,7 @@ export default function CommentsScreen() {
 
   function submitComment() {
     const trimmed = text.trim();
-    if (!trimmed) return;
+    if (!trimmed || trimmed.length > MAX_COMMENT_LENGTH) return;
     createMutation.mutate(trimmed, {
       onSuccess: () => setText(''),
     });
@@ -128,7 +135,12 @@ export default function CommentsScreen() {
     >
       {/* Header */}
       <View className="px-4 py-2.5 border-b border-border flex-row items-center gap-2">
-        <Pressable hitSlop={8} onPress={() => router.back()}>
+        <Pressable
+          hitSlop={8}
+          onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel="Volver"
+        >
           <ChevronLeft size={24} color={c.t3} strokeWidth={1.6} />
         </Pressable>
         <Text className="font-display-sb text-xl text-text tracking-tight flex-1">
@@ -203,6 +215,7 @@ export default function CommentsScreen() {
           onChangeText={setText}
           placeholder="Añade un comentario..."
           placeholderTextColor={c.t3}
+          maxLength={MAX_COMMENT_LENGTH}
           returnKeyType="send"
           onSubmitEditing={submitComment}
           className="flex-1 text-xs font-body text-text rounded-lg px-[14px] py-2 min-h-[36px] border border-border bg-sh"
@@ -212,6 +225,8 @@ export default function CommentsScreen() {
           onPress={submitComment}
           hitSlop={8}
           disabled={createMutation.isPending || !text.trim()}
+          accessibilityRole="button"
+          accessibilityLabel="Enviar comentario"
           style={{ opacity: text.trim() && !createMutation.isPending ? 1 : 0.35 }}
         >
           {createMutation.isPending ? (

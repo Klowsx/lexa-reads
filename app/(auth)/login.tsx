@@ -113,8 +113,7 @@ export default function LoginScreen() {
         <View className="flex-row items-center gap-[10px] my-[22px]">
           <View className="flex-1 h-px bg-border" />
           <Text
-            className="font-body text-xs text-t3 uppercase"
-            className="tracking-[0.9px]"
+            className="font-body text-xs text-t3 uppercase tracking-[0.9px]"
           >
             o continúa con
           </Text>

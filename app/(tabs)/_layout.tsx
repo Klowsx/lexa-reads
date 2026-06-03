@@ -97,8 +97,7 @@ function NotifBadge() {
   const label = count > 9 ? '9+' : String(count);
   return (
     <View
-      className="absolute -top-1 -right-1 min-w-[14px] h-[14px] rounded-full items-center justify-center px-[3px]"
-      className="bg-accent"
+      className="absolute -top-1 -right-1 min-w-[14px] h-[14px] rounded-full items-center justify-center px-[3px] bg-accent"
     >
       <Text className="text-[8px] text-white font-body-bold leading-[14px]">
         {label}
@@ -128,6 +127,9 @@ function CustomTabBar({ state, navigation }: TabBarProps) {
               className="flex-1 items-center pt-2.5 pb-1 gap-0.5"
               onPress={() => navigation.navigate(route.name)}
               activeOpacity={0.7}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: active }}
+              accessibilityLabel={tab.label}
             >
               <View className="relative">
                 <tab.Icon color={color} active={active} />

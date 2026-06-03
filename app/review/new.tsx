@@ -17,14 +17,19 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { z } from "zod";
 import { useMyReview } from "~/features/book/hooks/useMyReview";
 import { useUpsertReview } from "~/features/book/hooks/useUpsertReview";
+import { MAX_REVIEW_LENGTH } from "~/lib/content-limits";
 import { useColors } from "~/theme/colors";
 
 // ─── Validación con Zod ───────────────────────────────────────
 
 // El body requiere al menos 10 caracteres para forzar una reseña
-// mínimamente útil en lugar de "muy bueno" o similar.
+// mínimamente útil en lugar de "muy bueno" o similar, y un tope que
+// refleja el CHECK de DB (016_content_length_limits.sql).
 const reviewSchema = z.object({
-  body: z.string().min(10, "La reseña debe tener al menos 10 caracteres"),
+  body: z
+    .string()
+    .min(10, "La reseña debe tener al menos 10 caracteres")
+    .max(MAX_REVIEW_LENGTH, `Máximo ${MAX_REVIEW_LENGTH} caracteres`),
   containsSpoilers: z.boolean(),
 });
 
@@ -163,6 +168,7 @@ export default function NewReviewScreen() {
                     onChangeText={onChange}
                     onBlur={onBlur}
                     multiline
+                    maxLength={MAX_REVIEW_LENGTH}
                     // ~8 líneas de altura mínima para invitar a escribir más
                     numberOfLines={8}
                     placeholder="¿Qué te pareció el libro? Comparte tu opinión..."

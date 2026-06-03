@@ -234,7 +234,6 @@ export default function MyReviewsScreen() {
         <FlashList
           data={reviews}
           keyExtractor={(item) => item.id}
-          estimatedItemSize={180}
           contentContainerStyle={{ padding: 16, paddingBottom: 48 }}
           renderItem={({ item }) => (
             <ReviewCard

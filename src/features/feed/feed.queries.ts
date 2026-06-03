@@ -40,6 +40,12 @@ export type FeedItem = {
 
 const FEED_PAGE = 20;
 
+// Cursor compuesto (created_at, id) — CLAUDE.md §6 / D-2.
+// Filtrar solo por created_at pierde o duplica filas cuando dos comparten
+// timestamp justo en el borde de página (común con inserciones en lote en
+// activity_feed). El id desempata de forma determinista.
+export type FeedCursor = { created_at: string; id: string };
+
 const FEED_COLS = `
   id, user_id, activity_type, book_id, review_id, list_id, likes_count, created_at,
   user:users!activity_feed_user_id_fkey(id, username, display_name, avatar_url),
@@ -62,8 +68,8 @@ type RawFeedRow = {
 
 async function fetchFeedPage(
   userId: string,
-  cursor?: string,
-): Promise<{ items: FeedItem[]; nextCursor: string | null }> {
+  cursor?: FeedCursor,
+): Promise<{ items: FeedItem[]; nextCursor: FeedCursor | null }> {
   let query = supabase
     .from("activity_feed")
     .select(FEED_COLS)
@@ -72,7 +78,11 @@ async function fetchFeedPage(
     .limit(FEED_PAGE);
 
   if (cursor) {
-    query = query.lt("created_at", cursor);
+    // Orden descendente: la siguiente página son las filas estrictamente
+    // "anteriores" al cursor en la secuencia (created_at, id).
+    query = query.or(
+      `created_at.lt.${cursor.created_at},and(created_at.eq.${cursor.created_at},id.lt.${cursor.id})`,
+    );
   }
 
   const { data, error } = await query;
@@ -102,8 +112,9 @@ async function fetchFeedPage(
     created_at: row.created_at,
   }));
 
+  const last = items[items.length - 1];
   const nextCursor =
-    items.length === FEED_PAGE ? items[items.length - 1].created_at : null;
+    items.length === FEED_PAGE ? { created_at: last.created_at, id: last.id } : null;
 
   return { items, nextCursor };
 }
@@ -112,8 +123,8 @@ export const feedInfiniteOptions = (userId: string) =>
   infiniteQueryOptions({
     queryKey: ["feed", userId],
     queryFn: ({ pageParam }) =>
-      fetchFeedPage(userId, pageParam as string | undefined),
-    initialPageParam: undefined as string | undefined,
+      fetchFeedPage(userId, pageParam as FeedCursor | undefined),
+    initialPageParam: undefined as FeedCursor | undefined,
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
     enabled: !!userId,
     staleTime: 1000 * 60 * 2,
@@ -223,8 +234,8 @@ export async function fetchReviewLiked(
 async function fetchComments(
   targetType: CommentTargetType,
   targetId: string,
-  cursor?: string,
-): Promise<{ items: CommentRow[]; nextCursor: string | null }> {
+  cursor?: FeedCursor,
+): Promise<{ items: CommentRow[]; nextCursor: FeedCursor | null }> {
   let query = supabase
     .from("comments")
     .select(COMMENT_COLS)
@@ -232,18 +243,27 @@ async function fetchComments(
     .eq("target_id", targetId)
     .is("parent_id", null)
     .order("created_at", { ascending: true })
+    .order("id", { ascending: true })
     .limit(COMMENT_PAGE);
 
-  if (cursor) query = query.gt("created_at", cursor);
+  if (cursor) {
+    // Orden ascendente: cursor compuesto (created_at, id) — ver D-2.
+    query = query.or(
+      `created_at.gt.${cursor.created_at},and(created_at.eq.${cursor.created_at},id.gt.${cursor.id})`,
+    );
+  }
 
   const { data, error } = await query;
   if (error) throw error;
 
   const items = (data ?? []) as unknown as CommentRow[];
+  const last = items[items.length - 1];
   return {
     items,
     nextCursor:
-      items.length === COMMENT_PAGE ? (items[items.length - 1].created_at ?? null) : null,
+      items.length === COMMENT_PAGE && last?.created_at
+        ? { created_at: last.created_at, id: last.id }
+        : null,
   };
 }
 
@@ -254,8 +274,8 @@ export const commentsInfiniteOptions = (
   infiniteQueryOptions({
     queryKey: ["comments", targetType, targetId],
     queryFn: ({ pageParam }) =>
-      fetchComments(targetType, targetId, pageParam as string | undefined),
-    initialPageParam: undefined as string | undefined,
+      fetchComments(targetType, targetId, pageParam as FeedCursor | undefined),
+    initialPageParam: undefined as FeedCursor | undefined,
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
     enabled: !!targetId,
   });

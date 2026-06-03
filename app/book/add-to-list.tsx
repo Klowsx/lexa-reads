@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useUserLists } from '~/features/lists/hooks/useUserLists';
 import { useAddBookToList } from '~/features/lists/hooks/useAddBookToList';
 import type { ListRow } from '~/features/lists/list.queries';
+import { cn } from '~/lib/utils';
 import { useColors } from '~/theme/colors';
 
 const alpha = (hex: string, op: number) => {

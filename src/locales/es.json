@@ -18,7 +18,9 @@
     "back": "Volver",
     "done": "Listo",
     "search": "Buscar",
-    "noResults": "Sin resultados"
+    "noResults": "Sin resultados",
+    "somethingWrong": "Algo salió mal",
+    "unexpectedError": "Ocurrió un error inesperado. Puedes intentar de nuevo."
   },
   "book": {
     "status": {

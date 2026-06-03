@@ -163,8 +163,7 @@ export default function EditListScreen() {
             multiline
             numberOfLines={3}
             maxLength={200}
-            className="rounded-md border border-border font-body text-sm text-text px-[14px] py-[11px] leading-[22px]"
-            className="bg-surface"
+            className="rounded-md border border-border font-body text-sm text-text px-[14px] py-[11px] leading-[22px] bg-surface"
             style={{ textAlignVertical: 'top' }}
             placeholderTextColor={c.t3}
           />

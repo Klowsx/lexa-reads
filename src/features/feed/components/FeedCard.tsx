@@ -82,11 +82,11 @@ export function FeedCard({ item }: FeedCardProps) {
   const [isPeeking, setIsPeeking] = useState(false);
   const [showReport, setShowReport] = useState(false);
 
-  const { liked, count, toggle, isPending } = useToggleActivityLike(
-    item.id,
-    item.liked,
-    item.likes_count,
-  );
+  // El estado de like vive en la caché del feed (D-1): leemos directo del item
+  // y el optimistic setQueryData re-renderiza esta card.
+  const liked = item.liked;
+  const count = item.likes_count;
+  const { toggle, isPending } = useToggleActivityLike(item.id);
 
   const displayName = item.user.display_name ?? item.user.username;
   const author = item.book.authors[0] ?? 'Autor desconocido';
@@ -120,7 +120,11 @@ export function FeedCard({ item }: FeedCardProps) {
 
         {/* ── Header ─────────────────────────────────── */}
         <View className="flex-row items-center px-3.5 pt-3 pb-2.5 gap-2.5">
-          <Pressable onPress={() => router.push(`/user/${item.user.username}` as any)}>
+          <Pressable
+            onPress={() => router.push(`/user/${item.user.username}` as any)}
+            accessibilityRole="button"
+            accessibilityLabel={`Perfil de ${displayName}`}
+          >
             <Avatar
               displayName={displayName}
               username={item.user.username}
@@ -143,7 +147,12 @@ export function FeedCard({ item }: FeedCardProps) {
             {formatRelativeTime(item.created_at)}
           </Text>
 
-          <Pressable hitSlop={8} onPress={openMenu}>
+          <Pressable
+            hitSlop={8}
+            onPress={openMenu}
+            accessibilityRole="button"
+            accessibilityLabel="Más opciones"
+          >
             <MoreHorizontal size={18} color={c.t3} />
           </Pressable>
         </View>
@@ -151,6 +160,8 @@ export function FeedCard({ item }: FeedCardProps) {
         {/* ── Book Cover Band ─────────────────────────── */}
         <Pressable
           onPress={() => router.push(`/book/${item.book.google_books_id}` as any)}
+          accessibilityRole="button"
+          accessibilityLabel={`Ver libro ${item.book.title}`}
           className="items-center justify-center py-7"
           style={{ backgroundColor: c1 }}
         >
@@ -231,8 +242,11 @@ export function FeedCard({ item }: FeedCardProps) {
         <View className="flex-row items-center px-3.5 pt-[11px] pb-[5px] gap-3.5">
           {/* Like */}
           <Pressable
-            onPress={() => toggle()}
+            onPress={() => toggle(liked)}
             disabled={isPending}
+            accessibilityRole="button"
+            accessibilityState={{ selected: liked }}
+            accessibilityLabel={liked ? `Quitar me gusta, ${count}` : `Me gusta, ${count}`}
             className="flex-row items-center gap-[5px]"
             hitSlop={8}
           >
@@ -255,6 +269,8 @@ export function FeedCard({ item }: FeedCardProps) {
             } as any)}
             className="flex-row items-center gap-[5px]"
             hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel="Comentar"
           >
             <MessageCircle size={21} color={c.t2} strokeWidth={1.7} />
           </Pressable>
@@ -262,6 +278,8 @@ export function FeedCard({ item }: FeedCardProps) {
           {/* Share */}
           <Pressable
             hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel="Compartir"
             onPress={() =>
               Share.share({
                 message: `"${item.book.title}" en Lexa · https://lexareads.app/book/${item.book.google_books_id}`,
@@ -274,6 +292,8 @@ export function FeedCard({ item }: FeedCardProps) {
           {/* Vistazo */}
           <Pressable
             onPress={() => setIsPeeking(true)}
+            accessibilityRole="button"
+            accessibilityLabel="Vistazo al libro"
             className="ml-auto flex-row items-center gap-[5px] rounded-full px-2.5 py-[5px] border"
             style={{
               backgroundColor: alpha(fixed.accent, 0.1),

@@ -7,8 +7,9 @@
 ALTER TABLE notification_preferences
   ADD COLUMN IF NOT EXISTS push_token text;
 
--- Agregar comment_received al enum de tipos de notificación
-ALTER TYPE notification_type ADD VALUE IF NOT EXISTS 'comment_received';
+-- NOTA (D-3): el valor de enum 'comment_received' se agrega en su propia
+-- migración previa (`011_notification_enum.sql`) — no puede usarse en la
+-- misma transacción que lo crea. Aquí ya está committeado y disponible.
 
 -- ─── Trigger: notificar nuevo seguidor ───────────────────────────────────────
 CREATE OR REPLACE FUNCTION notify_new_follower()

@@ -12,7 +12,8 @@ Referencias: [STACK.md](./STACK.md) (canon producto/DB) · [gaps-produccion.md](
 
 **Listo**
 
-- Scaffold completo: NativeWind, i18n, Sentry, theme dark/light, Zustand stores (auth/ui/theme).
+- Scaffold completo: NativeWind, i18n, theme dark/light, Zustand stores (auth/ui/theme).
+  - **Crash reporting:** Sentry fue retirado (no está en `package.json`). En su lugar hay un `ErrorBoundary` raíz + `src/lib/crash-reporting.ts` (`logError` → consola, con reporter PostHog enchufable vía `setCrashReporter`). Pendiente: inicializar PostHog y conectarlo.
 - DB migrada (001–008): tablas MVP + RLS + triggers + bloqueos + reports + account_deletion_requests.
 - Auth: login, register, forgot/new-password, verify-email, success + hooks (`useLogin`, `useRegister`, `useLogout`, `useResetPassword`).
 - Onboarding: `genres`, `goal`, `username` (pantallas creadas).
@@ -171,9 +172,9 @@ Sin esto NO se puede subir a App Store / Play Store. Hacer **antes** de pulir UI
 - [x] **Compartir a redes**: capturar card del libro/reseña como imagen (`react-native-view-shot`) + `expo-sharing`. Botón en review y book detail.
 - [x] **Deep linking** (universal links + scheme `lexa://`): rutas para `book/[id]`, `user/[username]`, `list/[slug]`.
 - [ ] **Sugerencias de follow** en onboarding (último step) — query a usuarios con más seguidos en común o más activos, requerir ≥5 follows para continuar.
-- [ ] **Sentry**: validar source maps en builds production de EAS.
+- [ ] **Crash reporting (sin Sentry)**: inicializar PostHog y conectarlo con `setCrashReporter` en `src/lib/crash-reporting.ts`. El `ErrorBoundary` raíz ya está.
 - [ ] **PostHog**: feature flags + eventos clave (signup, first_book_added, first_review, follow, like, comment).
-- [ ] **Skeletons consistentes**: extraer patrones a `<QueryBoundary>` + skeletons por feature.
+- [x] **Skeletons consistentes**: `<QueryBoundary>` + `ErrorState` + `Skeleton` creados; feed migrado. Pendiente: migrar el resto de pantallas (library, book, profile).
 - [ ] **i18n**: pasar TODOS los strings hardcoded a `src/locales/{es,en}.json`.
 
 ---

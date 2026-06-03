@@ -17,7 +17,12 @@ export function StarRating({ rating, size = 12 }: StarRatingProps) {
   if (rating == null) return null;
 
   return (
-    <View className="flex-row gap-px">
+    <View
+      className="flex-row gap-px"
+      accessible
+      accessibilityRole="image"
+      accessibilityLabel={`Calificación: ${rating} de 5 estrellas`}
+    >
       {[1, 2, 3, 4, 5].map(i => {
         const full = rating >= i;
         const half = !full && rating >= i - 0.5;

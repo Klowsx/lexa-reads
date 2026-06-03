@@ -18,7 +18,9 @@
     "back": "Back",
     "done": "Done",
     "search": "Search",
-    "noResults": "No results"
+    "noResults": "No results",
+    "somethingWrong": "Something went wrong",
+    "unexpectedError": "An unexpected error occurred. You can try again."
   },
   "book": {
     "status": {

@@ -2,7 +2,12 @@ import { createClient } from "@supabase/supabase-js";
 import { Platform } from "react-native";
 import type { Database } from "~/types/database";
 
-// expo-secure-store is native-only; fall back to localStorage on web
+// A-2 (auditoría): en web no existe expo-secure-store, así que los tokens caen
+// a `localStorage`, accesible por cualquier XSS. POSTURA DE PRODUCCIÓN: la web
+// es SOLO dev/preview — NO es target de producción. Si en el futuro se publica
+// la web como producto, migrar a cookies httpOnly servidas por un backend (el
+// cliente anon de Supabase no puede setear httpOnly por sí solo).
+// En nativo (iOS/Android) los tokens van a expo-secure-store (CLAUDE.md §10).
 const ExpoSecureStoreAdapter = Platform.OS === "web"
   ? {
       getItem: (key: string) => Promise.resolve(localStorage.getItem(key)),
