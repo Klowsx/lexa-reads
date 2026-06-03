@@ -69,7 +69,7 @@ export function FeaturedLists({ lists, onPress, onManage }: Props) {
                 colors={[alpha(col, 0.5), col]}
                 start={{ x: 0.1, y: 0 }}
                 end={{ x: 0.9, y: 1 }}
-                style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+                className="absolute inset-0"
               />
 
               {/* Book cover previews */}
@@ -95,7 +95,7 @@ export function FeaturedLists({ lists, onPress, onManage }: Props) {
                     {book.cover_url ? (
                       <Image
                         source={{ uri: book.cover_url }}
-                        style={{ width: 54, height: 82 }}
+                        className="w-[54px] h-[82px]"
                         contentFit="cover"
                       />
                     ) : null}
@@ -106,38 +106,23 @@ export function FeaturedLists({ lists, onPress, onManage }: Props) {
               {/* Bottom gradient scrim */}
               <LinearGradient
                 colors={['transparent', 'rgba(0,0,0,0.88)']}
-                style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+                className="absolute inset-0"
               />
 
               {/* Star badge top-left */}
               <View
-                style={{
-                  position: 'absolute',
-                  top: 9,
-                  left: 9,
-                  width: 26,
-                  height: 26,
-                  borderRadius: 13,
-                  backgroundColor: 'rgba(0,0,0,0.38)',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
+                className="absolute top-[9px] left-[9px] w-[26px] h-[26px] rounded-full bg-black/[0.38] items-center justify-center"
               >
                 <Star size={12} color="#E8C05A" fill="#E8C05A" strokeWidth={1.5} />
               </View>
 
               {/* List info bottom */}
               <View
-                style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 12 }}
+                className="absolute bottom-0 left-0 right-0 p-3"
               >
                 <Text
-                  style={{
-                    fontSize: 13.5,
-                    fontFamily: 'DMSans_600SemiBold',
-                    color: '#fff',
-                    lineHeight: 18,
-                    marginBottom: 3,
-                  }}
+                  className="font-body-sb text-white leading-[18px] mb-[3px]"
+                  style={{ fontSize: 13.5 }}
                   numberOfLines={2}
                 >
                   {list.name}

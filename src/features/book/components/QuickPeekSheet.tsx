@@ -36,8 +36,7 @@ export function QuickPeekSheet({ book, onClose }: Props) {
     <Modal visible transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
       <View className="flex-1 justify-end">
         <Pressable
-          className="absolute inset-0"
-          style={{ backgroundColor: 'rgba(0,0,0,0.72)' }}
+          className="absolute inset-0 bg-black/[0.72]"
           onPress={onClose}
         />
 
@@ -109,12 +108,12 @@ export function QuickPeekSheet({ book, onClose }: Props) {
                       onPress={() => setRating((prev) => (prev === i ? null : i))}
                       hitSlop={4}
                     >
-                      <View style={{ position: 'relative', width: 34, height: 32 }}>
+                      <View className="relative w-[34px] h-8">
                         <Text className="text-xl absolute" style={{ lineHeight: 32, color: alpha(STAR, 0.2) }}>
                           ★
                         </Text>
                         {rating != null && rating >= i && (
-                          <Text className="text-xl absolute" style={{ lineHeight: 32, color: STAR }}>
+                          <Text className="text-xl absolute leading-8 text-star">
                             ★
                           </Text>
                         )}
@@ -123,7 +122,7 @@ export function QuickPeekSheet({ book, onClose }: Props) {
                   ))}
                 </View>
                 {rating != null && (
-                  <Text className="font-body-sb text-md" style={{ color: STAR }}>
+                  <Text className="font-body-sb text-md text-star">
                     {rating}
                   </Text>
                 )}

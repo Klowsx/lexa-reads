@@ -46,8 +46,7 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
     >
       <View className="flex-1 justify-end">
         <Pressable
-          className="absolute inset-0"
-          style={{ backgroundColor: 'rgba(0,0,0,0.72)' }}
+          className="absolute inset-0 bg-black/[0.72]"
           onPress={onClose}
         />
 
@@ -71,7 +70,7 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
                 <Text className="font-body text-sm text-t2 mb-2">{book.authors?.join(', ')}</Text>
                 <View className="flex-row items-center gap-1.5 mb-1.5">
                   <StarRating rating={111} size={13} />
-                  <Text className="font-body-sb text-xs" style={{ color: STAR }}>
+                  <Text className="font-body-sb text-xs text-star">
                     {111}
                   </Text>
                 </View>
@@ -123,7 +122,7 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
                       onPress={() => setRating(prev => (prev === i ? null : i))}
                       hitSlop={4}
                     >
-                      <View style={{ position: 'relative', width: 34, height: 32 }}>
+                      <View className="relative w-[34px] h-8">
                         <Text
                           className="text-xl absolute"
                           style={{ lineHeight: 32, color: alpha(STAR, 0.2) }}
@@ -132,8 +131,7 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
                         </Text>
                         {rating != null && rating >= i && (
                           <Text
-                            className="text-xl absolute"
-                            style={{ lineHeight: 32, color: STAR }}
+                            className="text-xl absolute leading-8 text-star"
                           >
                             ★
                           </Text>
@@ -143,7 +141,7 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
                   ))}
                 </View>
                 {rating != null && (
-                  <Text className="font-body-sb text-md" style={{ color: STAR }}>
+                  <Text className="font-body-sb text-md text-star">
                     {rating}
                   </Text>
                 )}

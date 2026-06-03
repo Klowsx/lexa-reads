@@ -170,9 +170,11 @@ export default function BookDetailScreen() {
       </ScrollView>
 
       {/* ViewShot off-screen para capturar BookShareCard */}
-      <ViewShot ref={shareRef} className="absolute left-[-9999px] top-0">
-        <BookShareCard book={book} rating={rating} username={username} />
-      </ViewShot>
+      <View className="absolute left-[-9999px] top-0">
+        <ViewShot ref={shareRef}>
+          <BookShareCard book={book} rating={rating} username={username} />
+        </ViewShot>
+      </View>
     </View>
   );
 }

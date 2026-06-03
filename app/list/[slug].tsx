@@ -49,11 +49,8 @@ function HeroBtn({ onPress, children }: { onPress: () => void; children: React.R
 
 function Pill({ label }: { label: string }) {
   return (
-    <View style={{
-      paddingHorizontal: 10, paddingVertical: 4, borderRadius: 100,
-      backgroundColor: 'rgba(0,0,0,0.4)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.16)',
-    }}>
-      <Text style={{ fontSize: 11, fontFamily: 'DMSans_600SemiBold', color: 'rgba(255,255,255,0.9)', letterSpacing: 0.3 }}>
+    <View className="px-[10px] py-1 rounded-full border bg-black/40 border-white/[0.16]">
+      <Text className="font-body-sb text-white/90 tracking-[0.3px]" style={{ fontSize: 11 }}>
         {label}
       </Text>
     </View>
@@ -167,7 +164,7 @@ export default function ListDetailScreen() {
                 }}
               >
                 {item.book.cover_url ? (
-                  <Image source={{ uri: item.book.cover_url }} style={{ width: 72, height: 108 }} contentFit="cover" />
+                  <Image source={{ uri: item.book.cover_url }} className="w-[72px] h-[108px]" contentFit="cover" />
                 ) : null}
               </View>
             );
@@ -189,7 +186,7 @@ export default function ListDetailScreen() {
               <ChevronLeft size={18} color="#fff" strokeWidth={2} />
             </HeroBtn>
 
-            <View style={{ flexDirection: 'row', gap: 8 }}>
+            <View className="flex-row gap-2">
               {/* Like button */}
               <Pressable
                 onPress={() => toggleLike()}
@@ -228,12 +225,8 @@ export default function ListDetailScreen() {
           {/* Title + pills */}
           <View className="absolute bottom-0 left-0 right-0 p-[18px] pb-5">
             <Text
-              className="text-white leading-[31px]"
-              style={{
-                fontSize: 26, fontFamily: 'PlayfairDisplay_700Bold',
-                marginBottom: 10,
-                textShadowColor: 'rgba(0,0,0,0.4)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 8,
-              }}
+              className="text-white leading-[31px] text-lg font-display-bold mb-[10px]"
+              style={{ textShadowColor: 'rgba(0,0,0,0.4)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 8 }}
               numberOfLines={2}
             >
               {list.name}
@@ -247,8 +240,8 @@ export default function ListDetailScreen() {
         {/* ── Description ── */}
         {list.description ? (
           <Text
-            className="text-t2 leading-[22px]"
-            style={{ paddingHorizontal: 18, paddingTop: 18, fontSize: 13.5, fontFamily: 'PlayfairDisplay_400Regular_Italic' }}
+            className="text-t2 leading-[22px] px-container pt-container font-display-i"
+            style={{ fontSize: 13.5 }}
           >
             "{list.description}"
           </Text>

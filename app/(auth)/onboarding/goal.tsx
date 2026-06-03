@@ -49,7 +49,7 @@ export default function OnboardGoalScreen() {
           onPress={() => setGoal((g) => Math.max(1, g - 1))}
           className="w-12 h-12 rounded-full bg-surface border border-border items-center justify-center"
         >
-          <Text className="font-body-light text-text text-[22px] leading-7">−</Text>
+          <Text className="font-body-light text-text text-md leading-7">−</Text>
         </Pressable>
 
         <View className="items-center min-w-[120px]">
@@ -65,7 +65,7 @@ export default function OnboardGoalScreen() {
           onPress={() => setGoal((g) => Math.min(365, g + 1))}
           className="w-12 h-12 rounded-full bg-surface border border-border items-center justify-center"
         >
-          <Text className="font-body-light text-text text-[22px] leading-7">+</Text>
+          <Text className="font-body-light text-text text-md leading-7">+</Text>
         </Pressable>
       </View>
 

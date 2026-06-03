@@ -27,7 +27,7 @@ export function CodeInput({ value, length = 6 }: Props) {
             {filled ? (
               <Text className="font-display-sb text-lg text-text">{d}</Text>
             ) : isActive ? (
-              <View className="w-[1.5px] h-[22px] opacity-90" style={{ backgroundColor: c.accent }} />
+              <View className="w-[1.5px] h-[22px] opacity-90 bg-accent" />
             ) : null}
           </View>
         );

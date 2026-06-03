@@ -17,14 +17,14 @@ function RatingBar({ star, pct }: { star: number; pct: number }) {
 
   return (
     <View className="flex-row items-center gap-[7px] py-[2px]">
-      <Text className="font-body text-xs text-t3" style={{ width: 8, textAlign: "right" }}>{star}</Text>
+      <Text className="font-body text-xs text-t3 w-2 text-right">{star}</Text>
       <View className="flex-1 h-1 bg-sh rounded-full overflow-hidden">
         <View
           className="h-full rounded-full"
           style={{ width: `${pct}%`, backgroundColor: fixed.star }}
         />
       </View>
-      <Text className="font-body text-xs text-t3" style={{ width: 26, textAlign: "left" }}>{pct}%</Text>
+      <Text className="font-body text-xs text-t3 w-[26px] text-left">{pct}%</Text>
     </View>
   );
 }
@@ -138,7 +138,7 @@ export function BookCommunityTab({ bookId }: { bookId: string }) {
           </Text>
           <View className="flex-row gap-container items-start">
             <View className="items-center shrink-0">
-              <Text className="font-display-bold text-3xl" style={{ color: fixed.star, lineHeight: 46 }}>
+              <Text className="font-display-bold text-3xl text-star leading-[46px]">
                 {data.avgRating}
               </Text>
               <View className="mt-1">

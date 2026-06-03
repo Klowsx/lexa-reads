@@ -41,7 +41,7 @@ export function BookCard({ book, onPress, onQuickPeek }: Props) {
                   hitSlop={8}
                   className="w-3.5 h-3.5 rounded-full border border-t3 items-center justify-center"
                 >
-                  <Text className="text-t3 font-body-sb text-xs" style={{ lineHeight: 11 }}>i</Text>
+                  <Text className="text-t3 font-body-sb text-xs leading-[11px]">i</Text>
                 </Pressable>
               </>
             ) : null}

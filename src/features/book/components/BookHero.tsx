@@ -62,8 +62,7 @@ export function BookHero({ book, onBack, onShare }: BookHeroProps) {
         <Pressable
           onPress={onBack}
           hitSlop={10}
-          className="w-9 h-9 rounded-full items-center justify-center"
-          style={{ backgroundColor: "rgba(0,0,0,0.42)" }}
+          className="w-9 h-9 rounded-full items-center justify-center bg-black/[0.42]"
         >
           <ChevronLeft size={18} color="#fff" strokeWidth={1.9} />
         </Pressable>
@@ -72,15 +71,13 @@ export function BookHero({ book, onBack, onShare }: BookHeroProps) {
           <Pressable
             hitSlop={10}
             onPress={onShare}
-            className="w-9 h-9 rounded-full items-center justify-center"
-            style={{ backgroundColor: "rgba(0,0,0,0.42)" }}
+            className="w-9 h-9 rounded-full items-center justify-center bg-black/[0.42]"
           >
             <Share2 size={15} color="#fff" strokeWidth={1.5} />
           </Pressable>
           <Pressable
             hitSlop={10}
-            className="w-9 h-9 rounded-full items-center justify-center"
-            style={{ backgroundColor: "rgba(0,0,0,0.42)" }}
+            className="w-9 h-9 rounded-full items-center justify-center bg-black/[0.42]"
           >
             <MoreHorizontal size={15} color="#fff" strokeWidth={1.5} />
           </Pressable>

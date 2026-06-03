@@ -145,8 +145,7 @@ export default function EditListScreen() {
             value={name}
             onChangeText={setName}
             maxLength={60}
-            className="rounded-md border border-border font-body text-sm text-text px-[14px] py-[11px]"
-            style={{ backgroundColor: c.surface }}
+            className="rounded-md border border-border font-body text-sm text-text px-[14px] py-[11px] bg-surface"
             placeholderTextColor={c.t3}
           />
           <Text className="text-xs font-body text-t3 text-right mt-1">{name.length}/60</Text>
@@ -165,9 +164,8 @@ export default function EditListScreen() {
             numberOfLines={3}
             maxLength={200}
             className="rounded-md border border-border font-body text-sm text-text px-[14px] py-[11px] leading-[22px]"
-            style={{
-              textAlignVertical: 'top', backgroundColor: c.surface,
-            }}
+            className="bg-surface"
+            style={{ textAlignVertical: 'top' }}
             placeholderTextColor={c.t3}
           />
           <Text className="text-xs font-body text-t3 text-right mt-1">{desc.length}/200</Text>
@@ -224,7 +222,7 @@ export default function EditListScreen() {
           </View>
 
           {list.items.length === 0 ? (
-            <View className="rounded-md border border-border items-center py-8" style={{ backgroundColor: c.surface }}>
+            <View className="rounded-md border border-border items-center py-8 bg-surface">
               <Text className="text-xs font-body text-t3">Lista vacía</Text>
             </View>
           ) : (
@@ -232,10 +230,9 @@ export default function EditListScreen() {
               {list.items.map((item) => (
                 <View
                   key={item.id}
-                  className="flex-row items-center gap-3 rounded-md border border-border px-3 py-2.5"
-                  style={{ backgroundColor: c.surface }}
+                  className="flex-row items-center gap-3 rounded-md border border-border px-3 py-2.5 bg-surface"
                 >
-                  <View className="w-10 h-[58px] rounded-[4px] overflow-hidden" style={{ backgroundColor: c.sh }}>
+                  <View className="w-10 h-[58px] rounded-[4px] overflow-hidden bg-sh">
                     {item.book.cover_url ? (
                       <Image source={{ uri: item.book.cover_url }} className="w-10 h-[58px]" contentFit="cover" />
                     ) : null}
@@ -282,7 +279,7 @@ export default function EditListScreen() {
           disabled={deleteMutation.isPending}
           className="py-3.5 rounded-md items-center border border-border"
         >
-          <Text className="text-sm font-body-sb" style={{ color: c.error }}>Eliminar lista</Text>
+          <Text className="text-sm font-body-sb text-error">Eliminar lista</Text>
         </Pressable>
       </ScrollView>
     </KeyboardAvoidingView>

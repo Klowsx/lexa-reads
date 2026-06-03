@@ -24,13 +24,12 @@ export function BookSimilarTab() {
     <View className="px-container pt-4 pb-6">
       <View className="flex-row flex-wrap gap-3.5">
         {SIMILAR.map((book) => (
-          <Pressable key={book.id} style={{ width: "30%" }}>
+          <Pressable key={book.id} className="w-[30%]">
             <BookCover book={book} height={128} />
             <View className="mt-1.5">
               <Text
                 numberOfLines={2}
-                className="font-display text-xs text-text"
-                style={{ lineHeight: 14 }}
+                className="font-display text-xs text-text leading-[14px]"
               >
                 {book.title}
               </Text>

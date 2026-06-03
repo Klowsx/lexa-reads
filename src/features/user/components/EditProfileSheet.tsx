@@ -75,8 +75,7 @@ export function EditProfileSheet({ user, onClose }: Props) {
       <View className="flex-1 justify-end">
         <Pressable
           onPress={onClose}
-          className="absolute inset-0"
-          style={{ backgroundColor: 'rgba(0,0,0,0.72)' }}
+          className="absolute inset-0 bg-black/[0.72]"
         />
 
         <View
@@ -119,8 +118,7 @@ export function EditProfileSheet({ user, onClose }: Props) {
                   value={name}
                   onChangeText={setName}
                   maxLength={50}
-                  className="rounded-md bg-sr border border-border text-text font-body text-sm"
-                  style={{ paddingHorizontal: 14, paddingVertical: 11 }}
+                  className="rounded-md bg-sr border border-border text-text font-body text-sm px-[14px] py-[11px]"
                   placeholderTextColor={c.t3}
                 />
               </View>

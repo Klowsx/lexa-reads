@@ -173,7 +173,7 @@ export function FeedCard({ item }: FeedCardProps) {
             {item.book.cover_url ? (
               <Image
                 source={{ uri: item.book.cover_url }}
-                style={{ width: '100%', height: '100%' }}
+                className="w-full h-full"
                 contentFit="cover"
               />
             ) : (
@@ -275,7 +275,7 @@ export function FeedCard({ item }: FeedCardProps) {
             hitSlop={8}
           >
             <BookOpen size={13} color={fixed.accent} strokeWidth={2} />
-            <Text className="font-body-md text-xs" style={{ color: fixed.accent }}>
+            <Text className="font-body-md text-xs text-accent">
               Vistazo
             </Text>
           </Pressable>
@@ -293,7 +293,7 @@ export function FeedCard({ item }: FeedCardProps) {
             {item.activity_type === 'added_to_list' && item.list_name ? (
               <Text className="text-t2">
                 {'  a  '}
-                <Text style={{ color: fixed.accent }}>&ldquo;{item.list_name}&rdquo;</Text>
+                <Text className="text-accent">&ldquo;{item.list_name}&rdquo;</Text>
               </Text>
             ) : null}
           </Text>

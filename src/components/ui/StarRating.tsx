@@ -17,7 +17,7 @@ export function StarRating({ rating, size = 12 }: StarRatingProps) {
   if (rating == null) return null;
 
   return (
-    <View style={{ flexDirection: 'row', gap: 1 }}>
+    <View className="flex-row gap-px">
       {[1, 2, 3, 4, 5].map(i => {
         const full = rating >= i;
         const half = !full && rating >= i - 0.5;

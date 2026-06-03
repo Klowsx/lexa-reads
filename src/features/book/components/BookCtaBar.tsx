@@ -92,8 +92,7 @@ export function BookCtaBar({
           {rating != null ? (
             <>
               <Text
-                className="text-sm"
-                style={{ color: fixed.star, lineHeight: 15 }}
+                className="text-sm text-star leading-[15px]"
               >
                 ★
               </Text>
@@ -102,8 +101,7 @@ export function BookCtaBar({
           ) : (
             <>
               <Text
-                className="text-sm text-t3"
-                style={{ lineHeight: 15 }}
+                className="text-sm text-t3 leading-[15px]"
               >
                 ☆
               </Text>

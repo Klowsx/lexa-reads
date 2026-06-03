@@ -99,8 +99,7 @@ export function BookSummaryTab({
             {book.genres.map((g) => (
               <Text
                 key={g}
-                className="font-body text-xs text-t3 bg-surface border border-border rounded-md"
-                style={{ paddingHorizontal: 12, paddingVertical: 5 }}
+                className="font-body text-xs text-t3 bg-surface border border-border rounded-md px-3 py-[5px]"
               >
                 {g}
               </Text>
@@ -174,8 +173,7 @@ export function BookSummaryTab({
                   hitSlop={4}
                 >
                   <View
-                    className="items-center justify-center"
-                    style={{ width: 38, height: 36, position: "relative" }}
+                    className="items-center justify-center relative w-[38px] h-9"
                   >
                     {/* Empty star background */}
                     <Text
@@ -187,12 +185,10 @@ export function BookSummaryTab({
                     {/* Half star (rating = i - 0.5) */}
                     {rating != null && rating === i - 0.5 && rHover == null && (
                       <View
-                        className="absolute left-0 overflow-hidden"
-                        style={{ width: 19 }}
+                        className="absolute left-0 overflow-hidden w-[19px]"
                       >
                         <Text
-                          className="text-2xl"
-                          style={{ lineHeight: 36, color: STAR }}
+                          className="text-2xl leading-9 text-star"
                         >
                           ★
                         </Text>
@@ -201,8 +197,7 @@ export function BookSummaryTab({
                     {/* Full star */}
                     {on && (
                       <Text
-                        className="text-2xl absolute"
-                        style={{ lineHeight: 36, color: STAR }}
+                        className="text-2xl absolute leading-9 text-star"
                       >
                         ★
                       </Text>

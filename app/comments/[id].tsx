@@ -205,11 +205,7 @@ export default function CommentsScreen() {
           placeholderTextColor={c.t3}
           returnKeyType="send"
           onSubmitEditing={submitComment}
-          className="flex-1 text-xs font-body text-text rounded-lg px-[14px] py-2 min-h-[36px] border"
-          style={{
-            backgroundColor: c.sh,
-            borderColor: c.border,
-          }}
+          className="flex-1 text-xs font-body text-text rounded-lg px-[14px] py-2 min-h-[36px] border border-border bg-sh"
         />
 
         <Pressable

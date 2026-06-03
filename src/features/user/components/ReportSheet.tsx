@@ -56,13 +56,12 @@ export function ReportSheet({ targetType, targetId, targetName, onClose }: Props
   return (
     <Modal transparent animationType="slide" onRequestClose={onClose}>
       <Pressable
-        className="flex-1"
-        style={{ backgroundColor: 'rgba(0,0,0,0.55)' }}
+        className="flex-1 bg-black/[0.55]"
         onPress={onClose}
       />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}
+        className="absolute bottom-0 left-0 right-0"
       >
         <View
           className="rounded-t-xl border-t border-border bg-surface"
@@ -81,10 +80,9 @@ export function ReportSheet({ targetType, targetId, targetName, onClose }: Props
               </Text>
               <Pressable
                 onPress={onClose}
-                className="mt-2 py-2.5 px-8 rounded-md"
-                style={{ backgroundColor: c.accent }}
+                className="mt-2 py-2.5 px-8 rounded-md bg-accent"
               >
-                <Text className="text-xs font-body-sb" style={{ color: '#fff' }}>Cerrar</Text>
+                <Text className="text-xs font-body-sb text-white">Cerrar</Text>
               </Pressable>
             </View>
           ) : (
@@ -147,16 +145,8 @@ export function ReportSheet({ targetType, targetId, targetName, onClose }: Props
                 placeholderTextColor={c.t3}
                 multiline
                 numberOfLines={3}
-                className="text-xs font-body text-text"
-                style={{
-                  backgroundColor: c.sr,
-                  borderWidth: 1,
-                  borderColor: c.border,
-                  borderRadius: 8,
-                  padding: 10,
-                  minHeight: 72,
-                  textAlignVertical: 'top',
-                }}
+                className="text-xs font-body text-text bg-sr border border-border rounded-md p-[10px] min-h-[72px]"
+                style={{ textAlignVertical: 'top' }}
               />
 
               <View className="flex-row gap-2 mt-4">
@@ -174,7 +164,7 @@ export function ReportSheet({ targetType, targetId, targetName, onClose }: Props
                 >
                   {report.isPending
                     ? <ActivityIndicator size="small" color="#fff" />
-                    : <Text className="text-xs font-body-sb" style={{ color: '#fff' }}>
+                    : <Text className="text-xs font-body-sb text-white">
                         Enviar reporte
                       </Text>
                   }

@@ -79,8 +79,7 @@ export function ConsentModal() {
   return (
     <Modal transparent animationType="fade" statusBarTranslucent>
       <View
-        className="flex-1 justify-end"
-        style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
+        className="flex-1 justify-end bg-black/60"
       >
         <View
           className="bg-surface rounded-t-xl border-t border-border"
@@ -142,12 +141,11 @@ export function ConsentModal() {
             <Pressable
               onPress={handleSave}
               disabled={upsert.isPending}
-              className="mt-5 py-3.5 rounded-md items-center"
-              style={{ backgroundColor: c.accent }}
+              className="mt-5 py-3.5 rounded-md items-center bg-accent"
             >
               {upsert.isPending
                 ? <ActivityIndicator size="small" color="#fff" />
-                : <Text className="text-xs font-body-sb" style={{ color: '#fff' }}>
+                : <Text className="text-xs font-body-sb text-white">
                     Continuar
                   </Text>
               }

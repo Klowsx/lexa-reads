@@ -52,7 +52,7 @@ function Field({
       <View
         className="flex-row items-center rounded-md border border-border bg-surface"
       >
-        <Lock size={15} color={c.t3} strokeWidth={1.8} style={{ marginLeft: 13 }} />
+        <Lock size={15} color={c.t3} strokeWidth={1.8} className="ml-[13px]" />
         <TextInput
           value={value}
           onChangeText={onChange}

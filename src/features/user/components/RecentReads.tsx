@@ -51,7 +51,7 @@ export function RecentReads({ books, onViewAll }: Props) {
             onPress={onViewAll}
             className="w-12 items-center justify-center gap-1 opacity-70"
           >
-            <Text className="text-t3" style={{ fontSize: 24, lineHeight: 26 }}>›</Text>
+            <Text className="text-t3 text-[24px] leading-[26px]">›</Text>
             <Text className="text-xs font-body text-t3 text-center">Ver todo</Text>
           </Pressable>
         )}

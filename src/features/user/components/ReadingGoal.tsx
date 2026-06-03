@@ -39,7 +39,7 @@ export function ReadingGoal({ booksRead, goal, goalYear, onEditGoal }: Props) {
           </Text>
         </View>
         <View className="items-end">
-          <Text className="font-display-sb text-accent text-[30px] leading-8">
+          <Text className="font-display-sb text-accent text-xl leading-8">
             {booksRead}
           </Text>
           <Text className="text-xs font-body text-t3">de {goal}</Text>

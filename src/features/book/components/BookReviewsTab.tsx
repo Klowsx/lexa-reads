@@ -8,7 +8,13 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import ViewShot from "react-native-view-shot";
-import { Heart, MessageCircle, Pencil, Share2, Trash2 } from "lucide-react-native";
+import {
+  Heart,
+  MessageCircle,
+  Pencil,
+  Share2,
+  Trash2,
+} from "lucide-react-native";
 import { StarRating } from "~/components/ui/StarRating";
 import { UserAvatar } from "~/components/ui/UserAvatar";
 import { useBookReviews } from "../hooks/useBookReviews";
@@ -45,17 +51,27 @@ function RatingBar({
   const c = useColors();
 
   return (
-    <Pressable onPress={onPress} className="flex-row items-center gap-[7px] py-[2px]">
+    <Pressable
+      onPress={onPress}
+      className="flex-row items-center gap-[7px] py-[2px]"
+    >
       <Text
         className={active ? "font-body-bold text-xs" : "font-body text-xs"}
-        style={{ color: active ? fixed.star : c.t3, width: 8, textAlign: "right" }}
+        style={{
+          color: active ? fixed.star : c.t3,
+          width: 8,
+          textAlign: "right",
+        }}
       >
         {star}
       </Text>
       <View className="flex-1 h-1 bg-sh rounded-full overflow-hidden">
         <View
           className="h-full rounded-full"
-          style={{ width: `${pct}%`, backgroundColor: active ? c.text : fixed.star }}
+          style={{
+            width: `${pct}%`,
+            backgroundColor: active ? c.text : fixed.star,
+          }}
         />
       </View>
       <Text
@@ -111,9 +127,7 @@ function ReviewCard({
           <Text className="font-body-sb text-xs text-text">
             {user.display_name ?? user.username}
           </Text>
-          <Text className="font-body text-xs text-t3">
-            @{user.username}
-          </Text>
+          <Text className="font-body text-xs text-t3">@{user.username}</Text>
         </View>
         <View className="items-end gap-1">
           <Text className="font-body text-xs text-t3">
@@ -128,10 +142,7 @@ function ReviewCard({
                 borderColor: alpha(fixed.accent, 0.3),
               }}
             >
-              <Text
-                className="font-body-md"
-                style={{ color: fixed.accent, fontSize: 10 }}
-              >
+              <Text className="font-body-md text-accent text-[10px]">
                 Editada
               </Text>
             </View>
@@ -142,7 +153,7 @@ function ReviewCard({
       {/* Aviso de spoiler — se muestra encima del cuerpo si aplica */}
       {review.contains_spoilers && (
         <View className="bg-warning/10 border border-warning/30 rounded-md px-2.5 py-1.5 mb-2">
-          <Text className="font-body-md text-xs" style={{ color: c.warning }}>
+          <Text className="font-body-md text-xs text-warning">
             ⚠ Contiene spoilers
           </Text>
         </View>
@@ -177,9 +188,7 @@ function ReviewCard({
               className="flex-row items-center gap-[5px]"
             >
               <Trash2 size={13} color={c.error} strokeWidth={1.8} />
-              <Text className="font-body text-xs" style={{ color: c.error }}>
-                Eliminar
-              </Text>
+              <Text className="font-body text-xs text-error">Eliminar</Text>
             </TouchableOpacity>
           </>
         ) : (
@@ -193,7 +202,7 @@ function ReviewCard({
               <Heart
                 size={14}
                 color={liked ? fixed.accent : c.t3}
-                fill={liked ? fixed.accent : 'transparent'}
+                fill={liked ? fixed.accent : "transparent"}
                 strokeWidth={1.8}
               />
               <Text
@@ -204,10 +213,12 @@ function ReviewCard({
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => router.push({
-                pathname: '/comments/[id]',
-                params: { id: review.id, type: 'review' },
-              } as any)}
+              onPress={() =>
+                router.push({
+                  pathname: "/comments/[id]",
+                  params: { id: review.id, type: "review" },
+                } as any)
+              }
               className="flex-row items-center gap-[5px]"
             >
               <MessageCircle size={14} color={c.t3} strokeWidth={1.8} />
@@ -245,10 +256,16 @@ const DIST_MOCK = [
   { star: 1, pct: 2 },
 ];
 
-export function BookReviewsTab({ bookId, book, onWriteReview }: BookReviewsTabProps) {
+export function BookReviewsTab({
+  bookId,
+  book,
+  onWriteReview,
+}: BookReviewsTabProps) {
   const c = useColors();
   const [starFilter, setStarFilter] = useState<number | null>(null);
-  const [sharingReview, setSharingReview] = useState<ReviewWithUser | null>(null);
+  const [sharingReview, setSharingReview] = useState<ReviewWithUser | null>(
+    null,
+  );
   const { ref: shareRef, capture } = useShareCard();
 
   useEffect(() => {
@@ -262,13 +279,8 @@ export function BookReviewsTab({ bookId, book, onWriteReview }: BookReviewsTabPr
   }, [sharingReview?.id]);
 
   // Reseñas paginadas del libro.
-  const {
-    reviews,
-    isLoading,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
-  } = useBookReviews(bookId);
+  const { reviews, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
+    useBookReviews(bookId);
 
   // Reseña del usuario actual (null si no ha escrito ninguna).
   const { data: myReview } = useMyReview(bookId);
@@ -290,13 +302,13 @@ export function BookReviewsTab({ bookId, book, onWriteReview }: BookReviewsTabPr
       {/* ── Resumen de ratings (mock) ────────────────────── */}
       <View className="m-container mb-0 bg-surface rounded-card p-4 border border-border flex-row gap-container items-start">
         <View className="items-center shrink-0">
-          <Text className="font-display-bold text-3xl" style={{ color: fixed.star, lineHeight: 48 }}>
+          <Text className="font-display-bold text-3xl text-star leading-[48px]">
             4.5
           </Text>
           <View className="mt-[5px]">
             <StarRating rating={4.5} size={12} />
           </View>
-          <Text className="font-body text-xs text-t3 mt-[5px] text-center" style={{ lineHeight: 14 }}>
+          <Text className="font-body text-xs text-t3 mt-[5px] text-center leading-[14px]">
             {"1,234\nreseñas"}
           </Text>
         </View>
@@ -420,14 +432,16 @@ export function BookReviewsTab({ bookId, book, onWriteReview }: BookReviewsTabPr
 
       {/* ViewShot offscreen para capturar ReviewShareCard */}
       {sharingReview && (
-        <ViewShot ref={shareRef} style={{ position: "absolute", left: -9999, top: 0 }}>
-          <ReviewShareCard
-            review={sharingReview}
-            bookTitle={book?.title}
-            bookCoverUrl={book?.cover_url}
-            bookGoogleId={book?.google_books_id}
-          />
-        </ViewShot>
+        <View className="absolute top-0 left-[-9999px]">
+          <ViewShot ref={shareRef}>
+            <ReviewShareCard
+              review={sharingReview}
+              bookTitle={book?.title}
+              bookCoverUrl={book?.cover_url}
+              bookGoogleId={book?.google_books_id}
+            />
+          </ViewShot>
+        </View>
       )}
     </View>
   );

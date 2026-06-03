@@ -105,8 +105,7 @@ export function NotificationRow({ item }: NotificationRowProps) {
       {/* Unread dot */}
       {isUnread && (
         <View
-          className="w-2 h-2 rounded-full shrink-0"
-          style={{ backgroundColor: c.accent }}
+          className="w-2 h-2 rounded-full shrink-0 bg-accent"
         />
       )}
     </Pressable>
