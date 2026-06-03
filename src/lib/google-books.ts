@@ -283,6 +283,11 @@ export async function getBook(googleBooksId: string): Promise<BookRow | null> {
  * Paso 3: guarda el resultado en la DB y lo retorna.
  */
 export async function getBookByIsbn(isbn: string): Promise<BookRow | null> {
+  // Paso 0: validar el formato. El valor se interpola en el filtro `.or()` de
+  // PostgREST más abajo; sin esta guarda, comas o caracteres especiales podrían
+  // romper o manipular el filtro. Un ISBN válido es 10 o 13 dígitos.
+  if (!/^\d{10}(\d{3})?$/.test(isbn)) return null;
+
   // Paso 1: buscar en caché local (puede estar guardado de antes)
   const { data: cached } = await supabase
     .from("books")

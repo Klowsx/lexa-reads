@@ -31,7 +31,10 @@ function notificationTarget(
 ): string | null {
   if (type === "new_follower" && actorUsername) return `/user/${actorUsername}`;
   if (type === "recommendation_received" && actorUsername) return `/user/${actorUsername}`;
-  if (type === "review_like" && actorUsername) return `/user/${actorUsername}`;
+  if (type === "review_like") {
+    if (referenceId) return `/comments/${referenceId}?type=review`;
+    if (actorUsername) return `/user/${actorUsername}`;
+  }
   if ((type === "activity_like" || type === "comment_received") && referenceId) {
     return `/comments/${referenceId}?type=${referenceType ?? "activity"}`;
   }

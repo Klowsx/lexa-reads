@@ -16,6 +16,32 @@ import { useColors } from '~/theme/colors';
 import { useDebounce } from '~/lib/useDebounce';
 import type { Tables } from '~/types/database';
 
+// ─── NYT info modal ───────────────────────────────────────────
+
+function NytInfoModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
+  return (
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      <Pressable className="flex-1 bg-black/50 justify-end" onPress={onClose}>
+        <Pressable className="bg-surface rounded-t-xl px-6 pt-6 pb-10 gap-3" onPress={() => {}}>
+          <Text className="font-display-sb text-lg text-text">¿Por qué los títulos están en inglés?</Text>
+          <Text className="font-body text-sm text-t2 leading-5">
+            La lista "Populares esta semana" usa los bestsellers de The New York Times, que registra los libros con su título original en inglés.
+          </Text>
+          <Text className="font-body text-sm text-t2 leading-5">
+            La mayoría tienen traducción al español — búscalos por su título en español en la barra de búsqueda para encontrar la edición en tu idioma.
+          </Text>
+          <Text className="font-body-md text-xs text-t3 mt-1">
+            Cuando más lectores usen Lexa, esta lista pasará a mostrar lo que la propia comunidad está leyendo.
+          </Text>
+          <Pressable onPress={onClose} className="mt-2 bg-accent rounded-lg py-3 items-center">
+            <Text className="font-body-sb text-sm text-white">Entendido</Text>
+          </Pressable>
+        </Pressable>
+      </Pressable>
+    </Modal>
+  );
+}
+
 // ─── Segmented control ────────────────────────────────────────
 
 type SearchTab = 'all' | 'books' | 'users';
@@ -107,6 +133,11 @@ export default function SearchScreen() {
   const [quickPeekBook, setQuickPeekBook] = useState<Tables<'books'> | null>(null);
   const [infoVisible, setInfoVisible] = useState(false);
 
+  function handleTabChange(tab: SearchTab) {
+    setActiveTab(tab);
+    setInfoVisible(false);
+  }
+
   const debouncedQuery = useDebounce(query, 400);
   const { data: results = [], isLoading } = useSearchBooks(debouncedQuery);
   const { data: trending, isLoading: isTrendingLoading } = useTrendingBooks();
@@ -134,7 +165,7 @@ export default function SearchScreen() {
             onBlur={() => setFocused(false)}
           />
         </View>
-        <SegmentedControl active={activeTab} onChange={setActiveTab} />
+        <SegmentedControl active={activeTab} onChange={handleTabChange} />
 
         {isUsersLoading ? (
           <View className="flex-1 items-center justify-center">
@@ -179,7 +210,7 @@ export default function SearchScreen() {
             onBlur={() => setFocused(false)}
           />
         </View>
-        <SegmentedControl active={activeTab} onChange={setActiveTab} />
+        <SegmentedControl active={activeTab} onChange={handleTabChange} />
 
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -254,25 +285,7 @@ export default function SearchScreen() {
           />
         )}
 
-        <Modal visible={infoVisible} transparent animationType="fade" onRequestClose={() => setInfoVisible(false)}>
-          <Pressable className="flex-1 bg-black/50 justify-end" onPress={() => setInfoVisible(false)}>
-            <Pressable className="bg-surface rounded-t-xl px-6 pt-6 pb-10 gap-3" onPress={() => {}}>
-              <Text className="font-display-sb text-lg text-text">¿Por qué los títulos están en inglés?</Text>
-              <Text className="font-body text-sm text-t2 leading-5">
-                La lista "Populares esta semana" usa los bestsellers de The New York Times, que registra los libros con su título original en inglés.
-              </Text>
-              <Text className="font-body text-sm text-t2 leading-5">
-                La mayoría tienen traducción al español — búscalos por su título en español en la barra de búsqueda para encontrar la edición en tu idioma.
-              </Text>
-              <Text className="font-body-md text-xs text-t3 mt-1">
-                Cuando más lectores usen Lexa, esta lista pasará a mostrar lo que la propia comunidad está leyendo.
-              </Text>
-              <Pressable onPress={() => setInfoVisible(false)} className="mt-2 bg-accent rounded-lg py-3 items-center">
-                <Text className="font-body-sb text-sm text-white">Entendido</Text>
-              </Pressable>
-            </Pressable>
-          </Pressable>
-        </Modal>
+        <NytInfoModal visible={infoVisible} onClose={() => setInfoVisible(false)} />
       </View>
     );
   }
@@ -290,7 +303,7 @@ export default function SearchScreen() {
           onBlur={() => setFocused(false)}
         />
       </View>
-      <SegmentedControl active={activeTab} onChange={setActiveTab} />
+      <SegmentedControl active={activeTab} onChange={handleTabChange} />
 
       <FlashList
         data={bookData}
@@ -343,25 +356,7 @@ export default function SearchScreen() {
         />
       )}
 
-      <Modal visible={infoVisible} transparent animationType="fade" onRequestClose={() => setInfoVisible(false)}>
-        <Pressable className="flex-1 bg-black/50 justify-end" onPress={() => setInfoVisible(false)}>
-          <Pressable className="bg-surface rounded-t-xl px-6 pt-6 pb-10 gap-3" onPress={() => {}}>
-            <Text className="font-display-sb text-lg text-text">¿Por qué los títulos están en inglés?</Text>
-            <Text className="font-body text-sm text-t2 leading-5">
-              La lista "Populares esta semana" usa los bestsellers de The New York Times, que registra los libros con su título original en inglés.
-            </Text>
-            <Text className="font-body text-sm text-t2 leading-5">
-              La mayoría tienen traducción al español — búscalos por su título en español en la barra de búsqueda para encontrar la edición en tu idioma.
-            </Text>
-            <Text className="font-body-md text-xs text-t3 mt-1">
-              Cuando más lectores usen Lexa, esta lista pasará a mostrar lo que la propia comunidad está leyendo.
-            </Text>
-            <Pressable onPress={() => setInfoVisible(false)} className="mt-2 bg-accent rounded-lg py-3 items-center">
-              <Text className="font-body-sb text-sm text-white">Entendido</Text>
-            </Pressable>
-          </Pressable>
-        </Pressable>
-      </Modal>
+      <NytInfoModal visible={infoVisible} onClose={() => setInfoVisible(false)} />
     </View>
   );
 }

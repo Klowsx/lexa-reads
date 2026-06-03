@@ -164,7 +164,7 @@ export default function BookDetailScreen() {
               onWriteReview={handleWriteReview}
             />
           )}
-          {activeTab === 2 && <BookCommunityTab bookId={book.id} />}
+          {activeTab === 2 && <BookCommunityTab bookId={book.id} pageCount={book.page_count} />}
           {activeTab === 3 && <BookSimilarTab />}
         </View>
       </ScrollView>

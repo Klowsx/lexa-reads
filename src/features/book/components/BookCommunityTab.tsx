@@ -29,10 +29,18 @@ function RatingBar({ star, pct }: { star: number; pct: number }) {
   );
 }
 
-function FriendRow({ friend }: { friend: FriendActivity }) {
+function FriendRow({ friend, pageCount }: { friend: FriendActivity; pageCount?: number | null }) {
   const c = useColors();
   const meta = STATUS_META[friend.status as keyof typeof STATUS_META];
   if (!meta) return null;
+
+  const progressPct =
+    friend.status === "reading" &&
+    friend.currentPage != null &&
+    pageCount != null &&
+    pageCount > 0
+      ? Math.min(100, Math.round((friend.currentPage / pageCount) * 100))
+      : null;
 
   return (
     <View className="flex-row items-center gap-2.5 mb-3">
@@ -47,9 +55,14 @@ function FriendRow({ friend }: { friend: FriendActivity }) {
           {friend.displayName ?? friend.username}
         </Text>
         <Text className="font-body text-xs text-t3 mt-[1px]">@{friend.username}</Text>
-        {friend.status === "reading" && friend.currentPage != null && (
-          <View className="mt-[5px] h-[3px] bg-sh rounded-full overflow-hidden">
-            <View className="h-full rounded-full" style={{ width: "40%", backgroundColor: fixed.status.reading }} />
+        {progressPct != null && (
+          <View className="mt-[5px]">
+            <View className="h-[3px] bg-sh rounded-full overflow-hidden">
+              <View className="h-full rounded-full" style={{ width: `${progressPct}%`, backgroundColor: fixed.status.reading }} />
+            </View>
+            <Text className="font-body text-[9px] text-t3 mt-[2px]">
+              Pág. {friend.currentPage} · {progressPct}%
+            </Text>
           </View>
         )}
       </View>
@@ -69,7 +82,7 @@ function FriendRow({ friend }: { friend: FriendActivity }) {
   );
 }
 
-export function BookCommunityTab({ bookId }: { bookId: string }) {
+export function BookCommunityTab({ bookId, pageCount }: { bookId: string; pageCount?: number | null }) {
   const c = useColors();
   const userId = useAuthStore((s) => s.user?.id ?? "");
   const { data, isLoading } = useQuery(bookCommunityStatsQueryOptions(bookId, userId));
@@ -125,7 +138,7 @@ export function BookCommunityTab({ bookId }: { bookId: string }) {
             Actividad de amigos
           </Text>
           {data.friendActivity.map((friend) => (
-            <FriendRow key={friend.userId} friend={friend} />
+            <FriendRow key={friend.userId} friend={friend} pageCount={pageCount} />
           ))}
         </View>
       )}

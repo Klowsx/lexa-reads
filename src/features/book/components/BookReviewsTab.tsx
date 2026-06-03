@@ -7,6 +7,7 @@ import {
   View,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { useQuery } from "@tanstack/react-query";
 import ViewShot from "react-native-view-shot";
 import {
   Heart,
@@ -23,6 +24,8 @@ import { useDeleteReview } from "../hooks/useDeleteReview";
 import { useToggleReviewLike } from "~/features/feed/hooks/useToggleReviewLike";
 import { ReviewShareCard } from "~/features/share/components/ReviewShareCard";
 import { useShareCard } from "~/features/share/hooks/useShareCard";
+import { bookCommunityStatsQueryOptions } from "../book.queries";
+import { useAuthStore } from "~/stores/auth.store";
 import { fixed, useColors } from "~/theme/colors";
 import { formatRelativeTime } from "~/lib/utils";
 import type { Tables } from "~/types/database";
@@ -246,27 +249,19 @@ interface BookReviewsTabProps {
   onWriteReview: () => void;
 }
 
-// Distribución de ratings mock — en el futuro se puede obtener
-// con una query a user_books agregada por rating.
-const DIST_MOCK = [
-  { star: 5, pct: 62 },
-  { star: 4, pct: 22 },
-  { star: 3, pct: 10 },
-  { star: 2, pct: 4 },
-  { star: 1, pct: 2 },
-];
-
 export function BookReviewsTab({
   bookId,
   book,
   onWriteReview,
 }: BookReviewsTabProps) {
   const c = useColors();
-  const [starFilter, setStarFilter] = useState<number | null>(null);
+  const userId = useAuthStore((s) => s.user?.id ?? "");
   const [sharingReview, setSharingReview] = useState<ReviewWithUser | null>(
     null,
   );
   const { ref: shareRef, capture } = useShareCard();
+
+  const { data: communityStats } = useQuery(bookCommunityStatsQueryOptions(bookId, userId));
 
   useEffect(() => {
     if (!sharingReview) return;
@@ -291,63 +286,39 @@ export function BookReviewsTab({
   // Las reseñas ajenas excluyen la mía (se muestra en su propia sección).
   const otherReviews = reviews.filter((r) => r.id !== myReview?.id);
 
-  // Aplicamos el filtro de estrellas sobre el conteo visual (mock).
-  // El filtro real por rating requiere un JOIN con user_books — pendiente (C-feature).
-  const activeDist = starFilter
-    ? DIST_MOCK.filter((d) => d.star === starFilter)
-    : DIST_MOCK;
+  const dist = communityStats?.distribution ?? [];
+  const avgRating = communityStats?.avgRating ?? 0;
+  const ratingsCount = communityStats?.ratingsCount ?? 0;
 
   return (
     <View className="pb-6">
-      {/* ── Resumen de ratings (mock) ────────────────────── */}
-      <View className="m-container mb-0 bg-surface rounded-card p-4 border border-border flex-row gap-container items-start">
-        <View className="items-center shrink-0">
-          <Text className="font-display-bold text-3xl text-star leading-[48px]">
-            4.5
-          </Text>
-          <View className="mt-[5px]">
-            <StarRating rating={4.5} size={12} />
-          </View>
-          <Text className="font-body text-xs text-t3 mt-[5px] text-center leading-[14px]">
-            {"1,234\nreseñas"}
-          </Text>
-        </View>
-        <View className="flex-1 pt-1">
-          {DIST_MOCK.map(({ star, pct }) => (
-            <RatingBar
-              key={star}
-              star={star}
-              pct={pct}
-              active={starFilter === star}
-              onPress={() => setStarFilter(starFilter === star ? null : star)}
-            />
-          ))}
-        </View>
-      </View>
-
-      {/* ── Filtros por estrellas ────────────────────────── */}
-      <View className="flex-row flex-wrap gap-1.5 px-container pt-3.5">
-        {[null, 5, 4, 3, 2, 1].map((r) => (
-          <Pressable
-            key={r ?? "all"}
-            onPress={() => setStarFilter(r)}
-            className="rounded-full border"
-            style={{
-              paddingHorizontal: 11,
-              paddingVertical: 4,
-              backgroundColor: starFilter === r ? fixed.accent : c.surface,
-              borderColor: starFilter === r ? fixed.accent : c.border,
-            }}
-          >
-            <Text
-              className="font-body text-xs"
-              style={{ color: starFilter === r ? "#fff" : c.t3 }}
-            >
-              {r === null ? "Todas" : `${r} ★`}
+      {/* ── Resumen de ratings ───────────────────────────── */}
+      {communityStats && ratingsCount > 0 && (
+        <View className="m-container mb-0 bg-surface rounded-card p-4 border border-border flex-row gap-container items-start">
+          <View className="items-center shrink-0">
+            <Text className="font-display-bold text-3xl text-star leading-[48px]">
+              {avgRating > 0 ? avgRating.toFixed(1) : "—"}
             </Text>
-          </Pressable>
-        ))}
-      </View>
+            <View className="mt-[5px]">
+              <StarRating rating={avgRating} size={12} />
+            </View>
+            <Text className="font-body text-xs text-t3 mt-[5px] text-center leading-[14px]">
+              {`${ratingsCount.toLocaleString()}\nratings`}
+            </Text>
+          </View>
+          <View className="flex-1 pt-1">
+            {dist.map(({ star, pct }) => (
+              <RatingBar
+                key={star}
+                star={star}
+                pct={pct}
+                active={false}
+                onPress={() => {}}
+              />
+            ))}
+          </View>
+        </View>
+      )}
 
       {/* ── CTA escribir reseña ──────────────────────────── */}
       <View className="px-container pt-3.5 pb-3.5">

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ActionSheetIOS, Alert, Platform, Pressable, Text, View } from 'react-native';
+import { ActionSheetIOS, Alert, Platform, Pressable, Share, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { BookOpen, Heart, MessageCircle, MoreHorizontal, Share2 } from 'lucide-react-native';
 import { Image } from 'expo-image';
@@ -260,7 +260,14 @@ export function FeedCard({ item }: FeedCardProps) {
           </Pressable>
 
           {/* Share */}
-          <Pressable hitSlop={8}>
+          <Pressable
+            hitSlop={8}
+            onPress={() =>
+              Share.share({
+                message: `"${item.book.title}" en Lexa · https://lexareads.app/book/${item.book.google_books_id}`,
+              }).catch(() => {})
+            }
+          >
             <Share2 size={20} color={c.t2} strokeWidth={1.7} />
           </Pressable>
 

@@ -8,7 +8,9 @@ import { SettingsSection } from '~/features/user/components/SettingsSection';
 import { SettingsToggle } from '~/features/user/components/SettingsToggle';
 import { useAccountDeletion } from '~/features/user/hooks/useAccountDeletion';
 import { useBlockedUsers } from '~/features/user/hooks/useBlockedUsers';
+import { useMe } from '~/features/user/hooks/useMe';
 import { useReadingGoal } from '~/features/user/hooks/useReadingGoal';
+import { useUpdateProfile } from '~/features/user/hooks/useUpdateProfile';
 import { useUpdateReadingGoal } from '~/features/user/hooks/useUpdateReadingGoal';
 import { useLogout } from '~/features/auth/hooks/useLogout';
 import { type ThemeMode, useThemeStore } from '~/stores/theme.store';
@@ -41,15 +43,17 @@ export default function SettingsScreen() {
   const setMode = useThemeStore((s) => s.setMode);
   const addToast = useUIStore((s) => s.addToast);
 
+  const { data: me } = useMe();
   const { data: goalData } = useReadingGoal();
   const updateGoal = useUpdateReadingGoal();
+  const updateProfile = useUpdateProfile();
   const logout = useLogout();
   const [goalVal, setGoalVal]         = useState<number | null>(null);
   const [showGoal, setShowGoal]       = useState(false);
 
   const currentGoal = goalVal ?? goalData?.goal ?? 12;
   const goalYear = goalData?.goalYear ?? new Date().getFullYear();
-  const [privateOn, setPrivateOn]     = useState(false);
+  const privateOn = me?.is_private ?? false;
   const [showDelete, setShowDelete]   = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
 
@@ -197,7 +201,13 @@ export default function SettingsScreen() {
                 ? 'Solo seguidores aprobados ven tu perfil'
                 : 'Tu perfil es visible para todos'
             }
-            trailing={<SettingsToggle on={privateOn} onChange={setPrivateOn} />}
+            trailing={
+              <SettingsToggle
+                on={privateOn}
+                onChange={(val) => updateProfile.mutate({ is_private: val })}
+                disabled={updateProfile.isPending || !me}
+              />
+            }
           />
           <SettingsItem
             label="Usuarios bloqueados"

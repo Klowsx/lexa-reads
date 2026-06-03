@@ -30,6 +30,15 @@ function buildMessage(
 }
 
 Deno.serve(async (req) => {
+  // Verificación de origen: este endpoint es público, así que solo aceptamos
+  // invocaciones del Database Webhook que conozcan el secreto compartido.
+  // Sin esto, cualquiera podría POSTear un `record` arbitrario y disparar
+  // push notifications suplantando a otros usuarios.
+  const secret = Deno.env.get("WEBHOOK_SECRET");
+  if (!secret || req.headers.get("x-webhook-secret") !== secret) {
+    return new Response("Forbidden", { status: 403 });
+  }
+
   try {
     const payload = await req.json();
     // Supabase webhook sends { type, table, record, ... }
