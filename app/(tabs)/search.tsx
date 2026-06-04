@@ -1,5 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Animated, LayoutChangeEvent, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FlashList } from '@shopify/flash-list';
@@ -19,22 +20,28 @@ import type { Tables } from '~/types/database';
 // ─── NYT info modal ───────────────────────────────────────────
 
 function NytInfoModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
+  const { t } = useTranslation();
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable className="flex-1 bg-black/50 justify-end" onPress={onClose}>
         <Pressable className="bg-surface rounded-t-xl px-6 pt-6 pb-10 gap-3" onPress={() => {}}>
-          <Text className="font-display-sb text-lg text-text">¿Por qué los títulos están en inglés?</Text>
+          <Text className="font-display-sb text-lg text-text">{t('search.nytTitle')}</Text>
           <Text className="font-body text-sm text-t2 leading-5">
-            La lista "Populares esta semana" usa los bestsellers de The New York Times, que registra los libros con su título original en inglés.
+            {t('search.nytBody1')}
           </Text>
           <Text className="font-body text-sm text-t2 leading-5">
-            La mayoría tienen traducción al español — búscalos por su título en español en la barra de búsqueda para encontrar la edición en tu idioma.
+            {t('search.nytBody2')}
           </Text>
           <Text className="font-body-md text-xs text-t3 mt-1">
-            Cuando más lectores usen Lexa, esta lista pasará a mostrar lo que la propia comunidad está leyendo.
+            {t('search.nytBody3')}
           </Text>
-          <Pressable onPress={onClose} className="mt-2 bg-accent rounded-lg py-3 items-center">
-            <Text className="font-body-sb text-sm text-white">Entendido</Text>
+          <Pressable
+            onPress={onClose}
+            accessibilityRole="button"
+            accessibilityLabel={t('common.gotIt')}
+            className="mt-2 bg-accent rounded-lg py-3 items-center"
+          >
+            <Text className="font-body-sb text-sm text-white">{t('common.gotIt')}</Text>
           </Pressable>
         </Pressable>
       </Pressable>
@@ -46,10 +53,10 @@ function NytInfoModal({ visible, onClose }: { visible: boolean; onClose: () => v
 
 type SearchTab = 'all' | 'books' | 'users';
 
-const TABS: { id: SearchTab; label: string }[] = [
-  { id: 'all',   label: 'Todo'     },
-  { id: 'books', label: 'Libros'   },
-  { id: 'users', label: 'Usuarios' },
+const TABS: { id: SearchTab; labelKey: string }[] = [
+  { id: 'all',   labelKey: 'search.tabAll'   },
+  { id: 'books', labelKey: 'search.tabBooks' },
+  { id: 'users', labelKey: 'search.tabUsers' },
 ];
 
 interface SegmentedControlProps {
@@ -59,6 +66,7 @@ interface SegmentedControlProps {
 
 function SegmentedControl({ active, onChange }: SegmentedControlProps) {
   const c = useColors();
+  const { t } = useTranslation();
   const [containerWidth, setContainerWidth] = useState(0);
   const slideX = useRef(new Animated.Value(0)).current;
 
@@ -100,12 +108,16 @@ function SegmentedControl({ active, onChange }: SegmentedControlProps) {
           }}
         />
       )}
-      {TABS.map(({ id, label }) => {
+      {TABS.map(({ id, labelKey }) => {
         const isActive = active === id;
+        const label = t(labelKey);
         return (
           <Pressable
             key={id}
             onPress={() => onChange(id)}
+            accessibilityRole="tab"
+            accessibilityLabel={label}
+            accessibilityState={{ selected: isActive }}
             className="flex-1 items-center justify-center"
           >
             <Text
@@ -126,6 +138,7 @@ export default function SearchScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const c = useColors();
+  const { t } = useTranslation();
 
   const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
@@ -146,7 +159,7 @@ export default function SearchScreen() {
   const trendingSource = trending?.source;
 
   const discoverLabel =
-    trendingSource === 'community' ? 'En Lexa ahora' : 'Populares esta semana';
+    trendingSource === 'community' ? t('search.inLexaNow') : t('search.popularThisWeek');
 
   const bookData = debouncedQuery.length > 2 ? results : trendingBooks;
   const showingSearch = debouncedQuery.length > 2;
@@ -156,7 +169,7 @@ export default function SearchScreen() {
     return (
       <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
         <View className="px-4 pt-2.5 pb-3">
-          <Text className="font-display-sb text-xl text-text tracking-tight mb-3">Buscar</Text>
+          <Text className="font-display-sb text-xl text-text tracking-tight mb-3">{t('search.title')}</Text>
           <SearchBar
             value={query}
             onChangeText={setQuery}
@@ -174,7 +187,7 @@ export default function SearchScreen() {
         ) : userResults.length === 0 && showingSearch ? (
           <View className="flex-1 items-center justify-center px-8 gap-2">
             <Text className="text-xs font-body text-t3 text-center">
-              Sin resultados para "{debouncedQuery}"
+              {t('search.noResultsFor', { query: debouncedQuery })}
             </Text>
           </View>
         ) : (
@@ -184,7 +197,7 @@ export default function SearchScreen() {
           >
             {!showingSearch && (
               <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-1 mt-1">
-                Sugeridos
+                {t('search.suggested')}
               </Text>
             )}
             {userResults.map((user) => (
@@ -201,7 +214,7 @@ export default function SearchScreen() {
     return (
       <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
         <View className="px-4 pt-2.5 pb-3">
-          <Text className="font-display-sb text-xl text-text tracking-tight mb-3">Buscar</Text>
+          <Text className="font-display-sb text-xl text-text tracking-tight mb-3">{t('search.title')}</Text>
           <SearchBar
             value={query}
             onChangeText={setQuery}
@@ -230,13 +243,15 @@ export default function SearchScreen() {
                 className="text-xs text-t3 tracking-widest flex-1 font-body-sb uppercase"
               >
                 {showingSearch
-                  ? isLoading ? 'Buscando...' : `${results.length} libro${results.length !== 1 ? 's' : ''}`
+                  ? isLoading ? t('search.searching') : t('search.booksCount', { count: results.length })
                   : discoverLabel}
               </Text>
               {!showingSearch && trendingSource === 'bestsellers' && (
                 <Pressable
                   onPress={() => setInfoVisible(true)}
                   hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('search.moreInfo')}
                   className="w-4 h-4 rounded-full border border-t3 items-center justify-center"
                 >
                   <Text className="text-t3 text-[9px] font-body-sb leading-[12px]">i</Text>
@@ -264,8 +279,8 @@ export default function SearchScreen() {
               className="text-xs text-t3 tracking-widest mb-2 font-body-sb uppercase"
             >
               {showingSearch
-                ? `${userResults.length} usuario${userResults.length !== 1 ? 's' : ''}`
-                : 'Lectores sugeridos'}
+                ? t('search.usersCount', { count: userResults.length })
+                : t('search.suggestedReaders')}
             </Text>
 
             {isUsersLoading ? (
@@ -294,7 +309,7 @@ export default function SearchScreen() {
   return (
     <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
       <View className="px-4 pt-2.5 pb-3">
-        <Text className="font-display-sb text-xl text-text tracking-tight mb-3">Buscar</Text>
+        <Text className="font-display-sb text-xl text-text tracking-tight mb-3">{t('search.title')}</Text>
         <SearchBar
           value={query}
           onChangeText={setQuery}
@@ -320,13 +335,15 @@ export default function SearchScreen() {
                 {!query
                   ? discoverLabel
                   : isLoading
-                    ? 'Buscando...'
-                    : `${results.length} resultado${results.length !== 1 ? 's' : ''} · "${query}"`}
+                    ? t('search.searching')
+                    : t('search.resultsFor', { count: results.length, query })}
               </Text>
               {!query && trendingSource === 'bestsellers' && (
                 <Pressable
                   onPress={() => setInfoVisible(true)}
                   hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('search.moreInfo')}
                   className="w-4 h-4 rounded-full border border-t3 items-center justify-center"
                 >
                   <Text className="text-t3 text-[9px] font-body-sb leading-[12px]">i</Text>

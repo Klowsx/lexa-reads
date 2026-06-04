@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActionSheetIOS, Alert, Platform, Pressable, Share, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { BookOpen, Heart, MessageCircle, MoreHorizontal, Share2 } from 'lucide-react-native';
@@ -21,24 +22,6 @@ const ACTIVITY_COLOR: Record<ActivityType, string> = {
   added_to_list:  fixed.status.want,
   abandoned_book: fixed.status.abandoned,
   want_to_read:   fixed.status.want,
-};
-
-const ACTIVITY_LABEL: Record<ActivityType, string> = {
-  finished_book:  'Terminó de leer',
-  started_book:   'Empezó a leer',
-  wrote_review:   'Reseñó',
-  added_to_list:  'Añadió a lista',
-  abandoned_book: 'Abandonó',
-  want_to_read:   'Quiere leer',
-};
-
-const ACT_VERB: Record<ActivityType, string> = {
-  finished_book:  'terminó de leer',
-  started_book:   'empezó a leer',
-  wrote_review:   'reseñó',
-  added_to_list:  'agregó',
-  abandoned_book: 'abandonó',
-  want_to_read:   'quiere leer',
 };
 
 // Paleta de pares de colores para la cover band — derivada del ID del libro.
@@ -79,6 +62,7 @@ interface FeedCardProps {
 export function FeedCard({ item }: FeedCardProps) {
   const router = useRouter();
   const c = useColors();
+  const { t } = useTranslation();
   const [isPeeking, setIsPeeking] = useState(false);
   const [showReport, setShowReport] = useState(false);
 
@@ -89,7 +73,7 @@ export function FeedCard({ item }: FeedCardProps) {
   const { toggle, isPending } = useToggleActivityLike(item.id);
 
   const displayName = item.user.display_name ?? item.user.username;
-  const author = item.book.authors[0] ?? 'Autor desconocido';
+  const author = item.book.authors[0] ?? t('feed.unknownAuthor');
   const [c1, c2] = bookColors(item.book.id);
   const activityColor = ACTIVITY_COLOR[item.activity_type];
 
@@ -97,7 +81,7 @@ export function FeedCard({ item }: FeedCardProps) {
     if (Platform.OS === 'ios') {
       ActionSheetIOS.showActionSheetWithOptions(
         {
-          options: ['Cancelar', `Ver perfil de @${item.user.username}`, 'Reportar publicación'],
+          options: [t('common.cancel'), t('feed.viewProfileOf', { username: item.user.username }), t('feed.reportPost')],
           cancelButtonIndex: 0,
         },
         (index) => {
@@ -107,9 +91,9 @@ export function FeedCard({ item }: FeedCardProps) {
       );
     } else {
       Alert.alert(`@${item.user.username}`, undefined, [
-        { text: 'Ver perfil', onPress: () => router.push(`/user/${item.user.username}` as any) },
-        { text: 'Reportar publicación', onPress: () => setShowReport(true) },
-        { text: 'Cancelar', style: 'cancel' },
+        { text: t('feed.viewProfile'), onPress: () => router.push(`/user/${item.user.username}` as any) },
+        { text: t('feed.reportPost'), onPress: () => setShowReport(true) },
+        { text: t('common.cancel'), style: 'cancel' },
       ]);
     }
   }
@@ -123,7 +107,7 @@ export function FeedCard({ item }: FeedCardProps) {
           <Pressable
             onPress={() => router.push(`/user/${item.user.username}` as any)}
             accessibilityRole="button"
-            accessibilityLabel={`Perfil de ${displayName}`}
+            accessibilityLabel={t('feed.profileOf', { name: displayName })}
           >
             <Avatar
               displayName={displayName}
@@ -151,7 +135,7 @@ export function FeedCard({ item }: FeedCardProps) {
             hitSlop={8}
             onPress={openMenu}
             accessibilityRole="button"
-            accessibilityLabel="Más opciones"
+            accessibilityLabel={t('feed.moreOptions')}
           >
             <MoreHorizontal size={18} color={c.t3} />
           </Pressable>
@@ -161,7 +145,7 @@ export function FeedCard({ item }: FeedCardProps) {
         <Pressable
           onPress={() => router.push(`/book/${item.book.google_books_id}` as any)}
           accessibilityRole="button"
-          accessibilityLabel={`Ver libro ${item.book.title}`}
+          accessibilityLabel={t('feed.viewBook', { title: item.book.title })}
           className="items-center justify-center py-7"
           style={{ backgroundColor: c1 }}
         >
@@ -221,7 +205,7 @@ export function FeedCard({ item }: FeedCardProps) {
             }}
           >
             <Text className="font-body-md text-xs" style={{ color: activityColor }}>
-              {ACTIVITY_LABEL[item.activity_type]}
+              {t(`feed.label.${item.activity_type}`)}
             </Text>
           </View>
 
@@ -246,7 +230,7 @@ export function FeedCard({ item }: FeedCardProps) {
             disabled={isPending}
             accessibilityRole="button"
             accessibilityState={{ selected: liked }}
-            accessibilityLabel={liked ? `Quitar me gusta, ${count}` : `Me gusta, ${count}`}
+            accessibilityLabel={liked ? t('feed.unlike', { count }) : t('feed.like', { count })}
             className="flex-row items-center gap-[5px]"
             hitSlop={8}
           >
@@ -270,7 +254,7 @@ export function FeedCard({ item }: FeedCardProps) {
             className="flex-row items-center gap-[5px]"
             hitSlop={8}
             accessibilityRole="button"
-            accessibilityLabel="Comentar"
+            accessibilityLabel={t('feed.comment')}
           >
             <MessageCircle size={21} color={c.t2} strokeWidth={1.7} />
           </Pressable>
@@ -279,10 +263,13 @@ export function FeedCard({ item }: FeedCardProps) {
           <Pressable
             hitSlop={8}
             accessibilityRole="button"
-            accessibilityLabel="Compartir"
+            accessibilityLabel={t('common.share')}
             onPress={() =>
               Share.share({
-                message: `"${item.book.title}" en Lexa · https://lexareads.app/book/${item.book.google_books_id}`,
+                message: t('feed.shareMessage', {
+                  title: item.book.title,
+                  url: `https://lexareads.app/book/${item.book.google_books_id}`,
+                }),
               }).catch(() => {})
             }
           >
@@ -293,7 +280,7 @@ export function FeedCard({ item }: FeedCardProps) {
           <Pressable
             onPress={() => setIsPeeking(true)}
             accessibilityRole="button"
-            accessibilityLabel="Vistazo al libro"
+            accessibilityLabel={t('feed.peekBook')}
             className="ml-auto flex-row items-center gap-[5px] rounded-full px-2.5 py-[5px] border"
             style={{
               backgroundColor: alpha(fixed.accent, 0.1),
@@ -303,7 +290,7 @@ export function FeedCard({ item }: FeedCardProps) {
           >
             <BookOpen size={13} color={fixed.accent} strokeWidth={2} />
             <Text className="font-body-md text-xs text-accent">
-              Vistazo
+              {t('feed.peek')}
             </Text>
           </Pressable>
         </View>
@@ -314,12 +301,12 @@ export function FeedCard({ item }: FeedCardProps) {
           <Text className="font-body text-xs text-t2 leading-[19px]">
             <Text className="font-body-sb text-text">{item.user.username}</Text>
             {'  '}
-            <Text className="text-t2">{ACT_VERB[item.activity_type]}</Text>
+            <Text className="text-t2">{t(`feed.verb.${item.activity_type}`)}</Text>
             {'  '}
             <Text className="font-display-i text-text">&ldquo;{item.book.title}&rdquo;</Text>
             {item.activity_type === 'added_to_list' && item.list_name ? (
               <Text className="text-t2">
-                {'  a  '}
+                {`  ${t('feed.addedToConnector').trim()}  `}
                 <Text className="text-accent">&ldquo;{item.list_name}&rdquo;</Text>
               </Text>
             ) : null}
@@ -349,7 +336,7 @@ export function FeedCard({ item }: FeedCardProps) {
         <ReportSheet
           targetType="activity"
           targetId={item.id}
-          targetName={`Publicación de @${item.user.username}`}
+          targetName={t('feed.postBy', { username: item.user.username })}
           onClose={() => setShowReport(false)}
         />
       )}

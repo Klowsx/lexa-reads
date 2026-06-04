@@ -2,6 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ChevronLeft, Lock, MoreHorizontal, UserMinus, UserPlus } from 'lucide-react-native';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ActionSheetIOS,
   ActivityIndicator,
@@ -42,6 +43,7 @@ function PrivacyGate({
   onFollow: () => void;
 }) {
   const c = useColors();
+  const { t } = useTranslation();
 
   return (
     <View className="items-center px-10 py-12 gap-4">
@@ -57,9 +59,9 @@ function PrivacyGate({
       </View>
 
       <View className="items-center gap-1.5">
-        <Text className="text-sm font-body-sb text-text">Perfil privado</Text>
+        <Text className="text-sm font-body-sb text-text">{t('user.privateProfile')}</Text>
         <Text className="text-xs font-body text-t3 text-center leading-[20px]">
-          Sigue a @{username} para ver su biblioteca, reseñas y listas.
+          {t('user.privateGateBody', { username })}
         </Text>
       </View>
 
@@ -68,7 +70,7 @@ function PrivacyGate({
         className="flex-row items-center gap-2 px-5 py-2.5 rounded-full bg-accent"
       >
         <UserPlus size={14} color="#fff" strokeWidth={2} />
-        <Text className="text-xs font-body-sb text-white">Seguir</Text>
+        <Text className="text-xs font-body-sb text-white">{t('common.follow')}</Text>
       </Pressable>
     </View>
   );
@@ -81,6 +83,7 @@ export default function UserProfileScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const c = useColors();
+  const { t } = useTranslation();
 
   const { data: profile, isLoading } = useProfile(username);
   const { data: recentReads = [] } = useQuery(
@@ -119,7 +122,7 @@ export default function UserProfileScreen() {
     if (Platform.OS === 'ios') {
       ActionSheetIOS.showActionSheetWithOptions(
         {
-          options: ['Cancelar', 'Reportar usuario', blocked ? 'Desbloquear' : 'Bloquear usuario'],
+          options: [t('common.cancel'), t('user.reportUser'), blocked ? t('user.unblock') : t('user.blockUser')],
           destructiveButtonIndex: 2,
           cancelButtonIndex: 0,
         },
@@ -136,9 +139,9 @@ export default function UserProfileScreen() {
       );
     } else {
       Alert.alert(`@${username}`, undefined, [
-        { text: 'Reportar usuario', onPress: () => setShowReport(true) },
+        { text: t('user.reportUser'), onPress: () => setShowReport(true) },
         {
-          text: blocked ? 'Desbloquear' : 'Bloquear',
+          text: blocked ? t('user.unblock') : t('user.block'),
           style: 'destructive',
           onPress: () => {
             if (blocked) {
@@ -148,7 +151,7 @@ export default function UserProfileScreen() {
             }
           },
         },
-        { text: 'Cancelar', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
       ]);
     }
   }

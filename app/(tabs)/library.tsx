@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
   Pressable,
   ScrollView,
   Text,
@@ -11,7 +11,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FlashList } from "@shopify/flash-list";
 import { BookDetailSheet } from "~/features/book/components/BookDetailSheet";
 import { LibraryItem } from "~/features/library/components/LibraryItem";
+import { LibrarySkeleton } from "~/features/library/components/LibrarySkeleton";
 import { LibraryTabs } from "~/features/library/components/LibraryTabs";
+import { QueryBoundary } from "~/components/ui/QueryBoundary";
 import { useLibrary } from "~/features/library/hooks/useLibrary";
 import { useLibraryCounts } from "~/features/library/hooks/useLibraryCounts";
 import { type BookStatus } from "~/lib/book-status";
@@ -27,6 +29,7 @@ const ESTIMATED_ITEM_HEIGHT = Math.round(ITEM_WIDTH * 1.52) + 40;
 export default function LibraryScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { t } = useTranslation();
   const scheme = useColorScheme();
   const raw = scheme === "dark" ? rawDark : rawLight;
 
@@ -38,7 +41,8 @@ export default function LibraryScreen() {
     null,
   );
 
-  const { data: items = [], isLoading } = useLibrary(activeTab);
+  const libraryQuery = useLibrary(activeTab);
+  const items = libraryQuery.data ?? [];
   const { data: counts } = useLibraryCounts();
 
   // Mientras los contadores cargan usamos 0 para no romper el layout
@@ -69,7 +73,7 @@ export default function LibraryScreen() {
     <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
       <View className="px-4 pt-2.5 pb-0">
         <Text className="font-display-sb text-xl text-text tracking-tight mb-3">
-          Mi biblioteca
+          {t("library.title")}
         </Text>
         <LibraryTabs
           activeTab={activeTab}
@@ -92,6 +96,9 @@ export default function LibraryScreen() {
           {/* Chip "Todos" para quitar el filtro */}
           <Pressable
             onPress={() => setSelectedTag(null)}
+            accessibilityRole="button"
+            accessibilityLabel={t("library.showAll")}
+            accessibilityState={{ selected: selectedTag === null }}
             style={{
               paddingHorizontal: 12,
               paddingVertical: 5,
@@ -104,7 +111,7 @@ export default function LibraryScreen() {
             <Text
               className={cn("text-xs font-body-md", selectedTag === null ? "text-white" : "text-t2")}
             >
-              Todos
+              {t("library.allTag")}
             </Text>
           </Pressable>
 
@@ -114,6 +121,9 @@ export default function LibraryScreen() {
               <Pressable
                 key={tag}
                 onPress={() => setSelectedTag(active ? null : tag)}
+                accessibilityRole="button"
+                accessibilityLabel={t("library.filterByTag", { tag })}
+                accessibilityState={{ selected: active }}
                 style={{
                   paddingHorizontal: 12,
                   paddingVertical: 5,
@@ -134,54 +144,54 @@ export default function LibraryScreen() {
         </ScrollView>
       )}
 
-      {isLoading ? (
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator color={fixed.accent} />
-        </View>
-      ) : (
-        <FlashList
-          data={shown}
-          numColumns={3}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{
-            paddingHorizontal: 12,
-            paddingTop: 16,
-            paddingBottom: 72,
-          }}
-          showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <LibraryItem
-              item={item}
-              itemWidth={ITEM_WIDTH}
-              onPress={() => item.books && setSelectedBook(item.books)}
-            />
-          )}
-          ListEmptyComponent={
-            <View
-            className="items-center justify-center py-20 px-8 gap-3"
-            >
-              <Text className="text-t3 font-body text-sm text-center">
-                {selectedTag
-                  ? `No hay libros con la etiqueta "${selectedTag}".`
-                  : "No hay libros en esta lista todavía."}
-              </Text>
-              {/* CTA a búsqueda solo cuando no hay filtro activo */}
-              {!selectedTag && (
-                <Pressable
-                  onPress={() => router.navigate("/(tabs)/search")}
-                  className="px-5 py-2.5 rounded-lg bg-accent"
-                >
-                  <Text
-                    className="text-white text-sm font-body-md"
+      <QueryBoundary query={libraryQuery} skeleton={<LibrarySkeleton itemWidth={ITEM_WIDTH} />}>
+        {() => (
+          <FlashList
+            data={shown}
+            numColumns={3}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={{
+              paddingHorizontal: 12,
+              paddingTop: 16,
+              paddingBottom: 72,
+            }}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item }) => (
+              <LibraryItem
+                item={item}
+                itemWidth={ITEM_WIDTH}
+                onPress={() => item.books && setSelectedBook(item.books)}
+              />
+            )}
+            ListEmptyComponent={
+              <View
+              className="items-center justify-center py-20 px-8 gap-3"
+              >
+                <Text className="text-t3 font-body text-sm text-center">
+                  {selectedTag
+                    ? t("library.emptyFiltered", { tag: selectedTag })
+                    : t("library.emptyDefault")}
+                </Text>
+                {/* CTA a búsqueda solo cuando no hay filtro activo */}
+                {!selectedTag && (
+                  <Pressable
+                    onPress={() => router.navigate("/(tabs)/search")}
+                    accessibilityRole="button"
+                    accessibilityLabel={t("library.searchBooks")}
+                    className="px-5 py-2.5 rounded-lg bg-accent"
                   >
-                    Buscar libros
-                  </Text>
-                </Pressable>
-              )}
-            </View>
-          }
-        />
-      )}
+                    <Text
+                      className="text-white text-sm font-body-md"
+                    >
+                      {t("library.searchBooks")}
+                    </Text>
+                  </Pressable>
+                )}
+              </View>
+            }
+          />
+        )}
+      </QueryBoundary>
 
       {selectedBook && (
         <BookDetailSheet

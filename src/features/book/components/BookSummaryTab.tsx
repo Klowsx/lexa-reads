@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, Text, TouchableOpacity, View } from "react-native";
 import { fixed, useColors } from "~/theme/colors";
 import { type BookStatus, STATUS_META, STATUS_ORDER } from "~/lib/book-status";
@@ -41,15 +42,16 @@ export function BookSummaryTab({
   onWriteReview,
 }: BookSummaryTabProps) {
   const c = useColors();
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [rHover, setRHover] = useState<number | null>(null);
 
   const detailRows = [
-    { label: "Editorial", value: book.publisher },
-    { label: "Publicado", value: book.published_date },
-    { label: "Idioma", value: book.language?.toUpperCase() },
-    { label: "Páginas", value: book.page_count?.toString() },
-    { label: "ISBN-13", value: book.isbn_13 },
+    { label: t("book.detail.publisher"), value: book.publisher },
+    { label: t("book.detail.published"), value: book.published_date },
+    { label: t("book.detail.language"), value: book.language?.toUpperCase() },
+    { label: t("book.detail.pages"), value: book.page_count?.toString() },
+    { label: t("book.detail.isbn13"), value: book.isbn_13 },
   ].filter((r) => r.value);
 
   return (
@@ -81,7 +83,7 @@ export function BookSummaryTab({
                   className={active ? "font-body-sb text-xs" : "font-body text-xs"}
                   style={{ color: active ? meta.color : c.t3 }}
                 >
-                  {meta.label}
+                  {t(meta.labelKey)}
                 </Text>
               </Pressable>
             );
@@ -114,7 +116,7 @@ export function BookSummaryTab({
           className="px-container py-4 border-b"
           style={{ borderBottomColor: alpha(c.border, 0.55) }}
         >
-          <SectionLabel>Sinopsis</SectionLabel>
+          <SectionLabel>{t("book.synopsis")}</SectionLabel>
           <Text
             className="font-body text-xs text-t2 mb-2"
             style={{ lineHeight: 13.5 * 1.76 }}
@@ -124,7 +126,7 @@ export function BookSummaryTab({
           </Text>
           <Pressable onPress={() => setExpanded((e) => !e)}>
             <Text className="font-body-md text-xs text-accent">
-              {expanded ? "Leer menos ↑" : "Leer más ↓"}
+              {expanded ? t("book.readLess") : t("book.readMore")}
             </Text>
           </Pressable>
         </View>
@@ -136,7 +138,7 @@ export function BookSummaryTab({
           className="px-container py-4 border-b"
           style={{ borderBottomColor: alpha(c.border, 0.55) }}
         >
-          <SectionLabel>Detalles</SectionLabel>
+          <SectionLabel>{t("book.details")}</SectionLabel>
           <View className="rounded-card overflow-hidden border border-border bg-surface">
             {detailRows.map((row, i) => (
               <View
@@ -160,7 +162,7 @@ export function BookSummaryTab({
         className="px-container py-4 border-b"
         style={{ borderBottomColor: alpha(c.border, 0.55) }}
       >
-        <SectionLabel>Mi calificación</SectionLabel>
+        <SectionLabel>{t("book.myRating")}</SectionLabel>
         <View className="rounded-card p-4 border border-border bg-surface">
           <View className="flex-row justify-center gap-1 mb-2">
             {[1, 2, 3, 4, 5].map((i) => {
@@ -208,7 +210,7 @@ export function BookSummaryTab({
             })}
           </View>
           <Text className="font-body text-xs text-t3 text-center">
-            {rating != null ? `Tu calificación: ${rating} ★` : "Toca para calificar"}
+            {rating != null ? t("book.ratingValue", { rating }) : t("book.tapToRate")}
           </Text>
         </View>
       </View>
@@ -221,7 +223,7 @@ export function BookSummaryTab({
           className="py-3.5 rounded-card bg-accent items-center"
         >
           <Text className="font-body-sb text-sm text-white tracking-tight">
-            Escribir mi reseña
+            {t("book.writeMyReview")}
           </Text>
         </TouchableOpacity>
       </View>

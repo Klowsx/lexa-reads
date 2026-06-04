@@ -1,5 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Animated, Pressable, Text, View } from 'react-native';
 import { BookCover } from '~/components/ui/BookCover';
 import type { LibraryRow } from '~/features/library/library.queries';
@@ -17,6 +18,7 @@ interface Props {
 export function CurrentlyReading({ books }: Props) {
   const c = useColors();
   const router = useRouter();
+  const { t } = useTranslation();
   const anim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -33,7 +35,7 @@ export function CurrentlyReading({ books }: Props) {
   return (
     <View className="px-4 mb-5">
       <Text className="font-body-sb text-xs text-t3 tracking-widest mb-2.5 uppercase">
-        Leyendo ahora
+        {t('profile.currentlyReading')}
       </Text>
 
       <View className="gap-2.5">
@@ -90,9 +92,9 @@ export function CurrentlyReading({ books }: Props) {
                       />
                     </View>
                     <Text className="text-xs font-body text-t3">
-                      {'Pág. '}
+                      {t('profile.pageWord') + ' '}
                       <Text className="font-body-md text-t2">{current}</Text>
-                      {` de ${pages} · `}
+                      {` ${t('profile.ofConnector')} ${pages} · `}
                       <Text
                         className="font-body-sb"
                         style={{ color: c.status.reading }}
@@ -103,7 +105,7 @@ export function CurrentlyReading({ books }: Props) {
                   </View>
                 ) : (
                   <Text className="text-xs font-body text-t3">
-                    Sin progreso · toca para registrar
+                    {t('profile.noProgress')}
                   </Text>
                 )}
               </View>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ChevronLeft, Trash2 } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { Image } from 'expo-image';
 import {
   ActivityIndicator, Alert, KeyboardAvoidingView, Platform,
@@ -24,13 +25,14 @@ const LIST_COLORS = [
   '#8B3A3A', '#2A8A8A', '#C4903A', '#6A635C',
 ];
 
-type Visibility = 'Pública' | 'Privada';
+type Visibility = 'public' | 'private';
 
 export default function EditListScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const c = useColors();
+  const { t } = useTranslation();
 
   const { data: list, isLoading } = useList(slug ?? '');
   const updateMutation = useUpdateList(slug ?? '');
@@ -39,14 +41,17 @@ export default function EditListScreen() {
 
   const [name, setName] = useState('');
   const [desc, setDesc] = useState('');
-  const [visibility, setVisibility] = useState<Visibility>('Pública');
+  const [visibility, setVisibility] = useState<Visibility>('public');
   const [color, setColor] = useState(LIST_COLORS[0]);
+
+  const visibilityLabel = (v: Visibility) =>
+    v === 'public' ? t('lists.public') : t('lists.private');
 
   useEffect(() => {
     if (list) {
       setName(list.name);
       setDesc(list.description ?? '');
-      setVisibility(list.visibility === 'public' ? 'Pública' : 'Privada');
+      setVisibility(list.visibility === 'public' ? 'public' : 'private');
       setColor(list.accent_color ?? LIST_COLORS[0]);
     }
   }, [list]);
@@ -60,7 +65,7 @@ export default function EditListScreen() {
         listId: list.id,
         name: name.trim(),
         description: desc.trim() || null,
-        visibility: visibility === 'Pública' ? 'public' : 'private',
+        visibility,
         accentColor: color,
       },
       { onSuccess: () => router.back() },
@@ -69,10 +74,10 @@ export default function EditListScreen() {
 
   function handleDelete() {
     if (!list) return;
-    Alert.alert('Eliminar lista', `¿Eliminar "${list.name}"? Esta acción no se puede deshacer.`, [
-      { text: 'Cancelar', style: 'cancel' },
+    Alert.alert(t('lists.deleteList'), t('lists.deleteConfirm', { name: list.name }), [
+      { text: t('common.cancel'), style: 'cancel' },
       {
-        text: 'Eliminar',
+        text: t('common.delete'),
         style: 'destructive',
         onPress: () => deleteMutation.mutate(list.id, { onSuccess: () => router.back() }),
       },
@@ -80,9 +85,9 @@ export default function EditListScreen() {
   }
 
   function handleRemoveBook(listBookId: string, title: string) {
-    Alert.alert('Quitar libro', `¿Quitar "${title}" de la lista?`, [
-      { text: 'Cancelar', style: 'cancel' },
-      { text: 'Quitar', style: 'destructive', onPress: () => removeBookMutation.mutate(listBookId) },
+    Alert.alert(t('lists.removeBook'), t('lists.removeBookConfirm', { title }), [
+      { text: t('common.cancel'), style: 'cancel' },
+      { text: t('lists.remove'), style: 'destructive', onPress: () => removeBookMutation.mutate(listBookId) },
     ]);
   }
 
@@ -107,12 +112,12 @@ export default function EditListScreen() {
         <Pressable hitSlop={8} onPress={() => router.back()}>
           <ChevronLeft size={24} color={c.t3} strokeWidth={1.6} />
         </Pressable>
-        <Text className="font-display-sb text-xl text-text tracking-tight flex-1">Editar lista</Text>
+        <Text className="font-display-sb text-xl text-text tracking-tight flex-1">{t('lists.editTitle')}</Text>
         <Pressable hitSlop={8} onPress={handleSave} disabled={!canSave || updateMutation.isPending}>
           {updateMutation.isPending ? (
             <ActivityIndicator size="small" color={c.accent} />
           ) : (
-            <Text className={cn("text-sm font-body-sb", canSave ? "text-accent" : "text-t3")}>Guardar</Text>
+            <Text className={cn("text-sm font-body-sb", canSave ? "text-accent" : "text-t3")}>{t('common.save')}</Text>
           )}
         </Pressable>
       </View>
@@ -130,17 +135,17 @@ export default function EditListScreen() {
           <View className="rounded-sm shrink-0" style={{ width: 4, height: 40, backgroundColor: color }} />
           <View className="flex-1 min-w-0">
             <Text className="text-sm font-body-sb text-text" numberOfLines={1}>
-              {name.trim() || 'Nombre de la lista'}
+              {name.trim() || t('lists.namePlaceholder')}
             </Text>
             <Text className="text-xs font-body text-t3 mt-0.5">
-              {list.items.length} libros · {visibility}
+              {t('lists.booksCount', { count: list.items.length })} · {visibilityLabel(visibility)}
             </Text>
           </View>
         </View>
 
         {/* Nombre */}
         <View className="mb-4">
-          <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-1.5">Nombre</Text>
+          <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-1.5">{t('lists.name')}</Text>
           <TextInput
             value={name}
             onChangeText={setName}
@@ -154,12 +159,12 @@ export default function EditListScreen() {
         {/* Descripción */}
         <View className="mb-4">
           <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-1.5">
-            Descripción <Text className="normal-case tracking-normal">(opcional)</Text>
+            {t('lists.description')} <Text className="normal-case tracking-normal">{t('lists.optional')}</Text>
           </Text>
           <TextInput
             value={desc}
             onChangeText={setDesc}
-            placeholder="¿De qué trata esta lista?"
+            placeholder={t('lists.descPlaceholder')}
             multiline
             numberOfLines={3}
             maxLength={200}
@@ -172,9 +177,9 @@ export default function EditListScreen() {
 
         {/* Visibilidad */}
         <View className="mb-6">
-          <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-2">Visibilidad</Text>
+          <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-2">{t('lists.visibility')}</Text>
           <View className="flex-row rounded-md bg-sh p-1 border border-border">
-            {(['Pública', 'Privada'] as Visibility[]).map((v) => {
+            {(['public', 'private'] as Visibility[]).map((v) => {
               const active = visibility === v;
               return (
                 <Pressable
@@ -183,7 +188,7 @@ export default function EditListScreen() {
                   className="flex-1 items-center py-2 rounded-sm"
                   style={{ backgroundColor: active ? c.accent : 'transparent' }}
                 >
-                  <Text className={cn("text-xs font-body-sb", active ? "text-white" : "text-t3")}>{v}</Text>
+                  <Text className={cn("text-xs font-body-sb", active ? "text-white" : "text-t3")}>{visibilityLabel(v)}</Text>
                 </Pressable>
               );
             })}
@@ -192,7 +197,7 @@ export default function EditListScreen() {
 
         {/* Color */}
         <View className="mb-6">
-          <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-2">Color</Text>
+          <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-2">{t('lists.color')}</Text>
           <View className="flex-row gap-3 flex-wrap">
             {LIST_COLORS.map((col) => {
               const active = color === col;
@@ -216,13 +221,13 @@ export default function EditListScreen() {
         <View className="mb-8">
           <View className="flex-row justify-between items-baseline mb-3">
             <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase">
-              Libros · {list.items.length}
+              {t('lists.booksLabel')} · {list.items.length}
             </Text>
           </View>
 
           {list.items.length === 0 ? (
             <View className="rounded-md border border-border items-center py-8 bg-surface">
-              <Text className="text-xs font-body text-t3">Lista vacía</Text>
+              <Text className="text-xs font-body text-t3">{t('lists.emptyList')}</Text>
             </View>
           ) : (
             <View className="gap-2.5">
@@ -268,7 +273,7 @@ export default function EditListScreen() {
           {updateMutation.isPending ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text className="text-sm font-body-sb text-white">Guardar cambios</Text>
+            <Text className="text-sm font-body-sb text-white">{t('common.saveChanges')}</Text>
           )}
         </Pressable>
 
@@ -278,7 +283,7 @@ export default function EditListScreen() {
           disabled={deleteMutation.isPending}
           className="py-3.5 rounded-md items-center border border-border"
         >
-          <Text className="text-sm font-body-sb text-error">Eliminar lista</Text>
+          <Text className="text-sm font-body-sb text-error">{t('lists.deleteList')}</Text>
         </Pressable>
       </ScrollView>
     </KeyboardAvoidingView>

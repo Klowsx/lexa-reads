@@ -1,4 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import { Avatar } from '~/components/ui/Avatar';
 import { getAvatarColor } from '~/lib/avatar';
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export function IdentityCard({ user, onEditPress }: Props) {
+  const { t } = useTranslation();
   const color = getAvatarColor(user.username);
 
   return (
@@ -65,7 +67,7 @@ export function IdentityCard({ user, onEditPress }: Props) {
             borderColor: alpha(color, 0.22),
           })}
         >
-          <Text className="text-xs font-body-md text-text">Editar perfil</Text>
+          <Text className="text-xs font-body-md text-text">{t('editProfile.title')}</Text>
         </Pressable>
       </LinearGradient>
     </View>

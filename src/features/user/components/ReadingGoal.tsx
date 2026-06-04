@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Animated, Pressable, Text, View } from 'react-native';
 import { useColors } from '~/theme/colors';
 
@@ -11,6 +12,7 @@ interface Props {
 
 export function ReadingGoal({ booksRead, goal, goalYear, onEditGoal }: Props) {
   const c = useColors();
+  const { t } = useTranslation();
   const pct = Math.min(booksRead / goal, 1);
   const anim = useRef(new Animated.Value(0)).current;
 
@@ -30,19 +32,19 @@ export function ReadingGoal({ booksRead, goal, goalYear, onEditGoal }: Props) {
       <View className="flex-row justify-between items-start mb-3.5">
         <View className="flex-1">
           <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-1.5">
-            Meta {goalYear}
+            {t('goal.metaYear', { year: goalYear })}
           </Text>
           <Text className="text-xs font-body text-t2">
             {remaining > 0
-              ? `${remaining} libros más para lograrlo`
-              : '¡Meta cumplida este año!'}
+              ? t('goal.remaining', { count: remaining })
+              : t('goal.done')}
           </Text>
         </View>
         <View className="items-end">
           <Text className="font-display-sb text-accent text-xl leading-8">
             {booksRead}
           </Text>
-          <Text className="text-xs font-body text-t3">de {goal}</Text>
+          <Text className="text-xs font-body text-t3">{t('goal.ofGoal', { goal })}</Text>
         </View>
       </View>
 
@@ -60,10 +62,10 @@ export function ReadingGoal({ booksRead, goal, goalYear, onEditGoal }: Props) {
       </View>
 
       <View className="flex-row justify-between items-center">
-        <Text className="text-xs font-body text-t3">{Math.round(pct * 100)}% completado</Text>
+        <Text className="text-xs font-body text-t3">{t('goal.completed', { pct: Math.round(pct * 100) })}</Text>
         {onEditGoal && (
           <Pressable onPress={onEditGoal} hitSlop={6}>
-            <Text className="text-xs font-body-sb text-accent">Editar meta →</Text>
+            <Text className="text-xs font-body-sb text-accent">{t('goal.editGoal')}</Text>
           </Pressable>
         )}
       </View>

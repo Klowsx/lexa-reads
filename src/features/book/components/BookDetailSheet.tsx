@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Modal,
   Pressable,
@@ -30,6 +31,7 @@ interface BookDetailSheetProps {
 export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSheetProps) {
   const c = useColors();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
 
   const [status, setStatus] = useState<BookStatus | null>(initialUserBook?.status ?? null);
   const [rating, setRating] = useState<number | null>(initialUserBook?.rating ?? null);
@@ -75,7 +77,7 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
                   </Text>
                 </View>
                 <Text className="font-body text-xs text-t3">
-                  {book.page_count} páginas · {book.published_year}
+                  {t('book.pagesLong', { count: book.page_count })} · {book.published_year}
                 </Text>
               </View>
             </View>
@@ -102,7 +104,7 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
                       className={active ? 'font-body-md text-xs' : 'font-body text-xs'}
                       style={{ color: active ? meta.color : c.t2 }}
                     >
-                      {meta.label}
+                      {t(meta.labelKey)}
                     </Text>
                   </Pressable>
                 );
@@ -112,7 +114,7 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
             {/* Rating */}
             <View className="mx-4 mb-3.5 rounded-md p-3 bg-sr border border-border">
               <Text className="font-body-sb text-xs text-t3 tracking-wider uppercase mb-2">
-                Mi rating
+                {t('book.myRatingShort')}
               </Text>
               <View className="flex-row items-center gap-2.5">
                 <View className="flex-row">
@@ -147,7 +149,7 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
                 )}
               </View>
               <Text className="text-xs text-t3 font-body mt-1.5">
-                Toca dos veces para quitar el rating
+                {t('book.doubleTapRemove')}
               </Text>
             </View>
 
@@ -155,7 +157,7 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
             {book.description ? (
               <View className="px-5 pb-3.5">
                 <Text className="font-body-sb text-xs text-t3 tracking-wider uppercase mb-1.5">
-                  Sinopsis
+                  {t('book.synopsis')}
                 </Text>
                 <Text className="font-body text-sm text-t2 leading-relaxed">{book.description}</Text>
               </View>
@@ -180,7 +182,7 @@ export function BookDetailSheet({ book, initialUserBook, onClose }: BookDetailSh
                 activeOpacity={0.85}
               >
                 <Text className="text-sm font-body-sb text-white">
-                  Escribir reseña
+                  {t('book.writeReview')}
                 </Text>
               </TouchableOpacity>
             </View>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCreateList } from '~/features/lists/hooks/useCreateList';
@@ -17,20 +18,24 @@ const LIST_COLORS = [
   '#8B3A3A', '#2A8A8A', '#C4903A', '#6A635C',
 ];
 
-type Visibility = 'Pública' | 'Privada';
+type Visibility = 'public' | 'private';
 
 export default function NewListScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const c = useColors();
+  const { t } = useTranslation();
 
   const [name, setName] = useState('');
   const [desc, setDesc] = useState('');
-  const [visibility, setVisibility] = useState<Visibility>('Pública');
+  const [visibility, setVisibility] = useState<Visibility>('public');
   const [color, setColor] = useState(LIST_COLORS[0]);
 
   const createMutation = useCreateList();
   const canSubmit = name.trim().length >= 2;
+
+  const visibilityLabel = (v: Visibility) =>
+    v === 'public' ? t('lists.public') : t('lists.private');
 
   function handleCreate() {
     if (!canSubmit || createMutation.isPending) return;
@@ -38,7 +43,7 @@ export default function NewListScreen() {
       {
         name: name.trim(),
         description: desc.trim() || undefined,
-        visibility: visibility === 'Pública' ? 'public' : 'private',
+        visibility,
         accentColor: color,
       },
       {
@@ -64,14 +69,14 @@ export default function NewListScreen() {
           <ChevronLeft size={24} color={c.t3} strokeWidth={1.6} />
         </Pressable>
         <Text className="font-display-sb text-xl text-text tracking-tight flex-1">
-          Nueva lista
+          {t('lists.newTitle')}
         </Text>
         <Pressable onPress={handleCreate} disabled={!canSubmit || createMutation.isPending} hitSlop={8}>
           {createMutation.isPending ? (
             <ActivityIndicator size="small" color={c.accent} />
           ) : (
             <Text className={cn("text-sm font-body-sb", canSubmit ? "text-accent" : "text-t3")}>
-              Crear
+              {t('lists.create')}
             </Text>
           )}
         </Pressable>
@@ -90,19 +95,19 @@ export default function NewListScreen() {
           <View className="rounded-sm shrink-0 w-1 h-10" style={{ backgroundColor: color }} />
           <View className="flex-1 min-w-0">
             <Text className="text-sm font-body-sb text-text" numberOfLines={1}>
-              {name.trim() || 'Nombre de la lista'}
+              {name.trim() || t('lists.namePlaceholder')}
             </Text>
-            <Text className="text-xs font-body text-t3 mt-0.5">0 libros · {visibility}</Text>
+            <Text className="text-xs font-body text-t3 mt-0.5">{t('lists.booksCount', { count: 0 })} · {visibilityLabel(visibility)}</Text>
           </View>
         </View>
 
         {/* Nombre */}
         <View className="mb-4">
-          <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-1.5">Nombre</Text>
+          <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-1.5">{t('lists.name')}</Text>
           <TextInput
             value={name}
             onChangeText={setName}
-            placeholder="Ej. Lecturas de verano"
+            placeholder={t('lists.nameExample')}
             maxLength={60}
             className="rounded-md border border-border font-body text-sm text-text px-[14px] py-[11px] bg-surface"
             placeholderTextColor={c.t3}
@@ -113,12 +118,12 @@ export default function NewListScreen() {
         {/* Descripción */}
         <View className="mb-4">
           <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-1.5">
-            Descripción <Text className="normal-case tracking-normal">(opcional)</Text>
+            {t('lists.description')} <Text className="normal-case tracking-normal">{t('lists.optional')}</Text>
           </Text>
           <TextInput
             value={desc}
             onChangeText={setDesc}
-            placeholder="¿De qué trata esta lista?"
+            placeholder={t('lists.descPlaceholder')}
             multiline
             numberOfLines={3}
             maxLength={200}
@@ -133,9 +138,9 @@ export default function NewListScreen() {
 
         {/* Visibilidad */}
         <View className="mb-6">
-          <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-2">Visibilidad</Text>
+          <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-2">{t('lists.visibility')}</Text>
           <View className="flex-row rounded-md bg-sh p-1 border border-border">
-            {(['Pública', 'Privada'] as Visibility[]).map((v) => {
+            {(['public', 'private'] as Visibility[]).map((v) => {
               const active = visibility === v;
               return (
                 <Pressable
@@ -143,19 +148,19 @@ export default function NewListScreen() {
                   onPress={() => setVisibility(v)}
                   className={cn("flex-1 items-center py-2 rounded-sm", active ? "bg-accent" : "bg-transparent")}
                 >
-                  <Text className={cn("text-xs font-body-sb", active ? "text-white" : "text-t3")}>{v}</Text>
+                  <Text className={cn("text-xs font-body-sb", active ? "text-white" : "text-t3")}>{visibilityLabel(v)}</Text>
                 </Pressable>
               );
             })}
           </View>
           <Text className="text-xs font-body text-t3 mt-1.5">
-            {visibility === 'Pública' ? 'Visible para todos los usuarios.' : 'Solo tú puedes verla.'}
+            {visibility === 'public' ? t('lists.publicHint') : t('lists.privateHint')}
           </Text>
         </View>
 
         {/* Color */}
         <View className="mb-8">
-          <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-2">Color</Text>
+          <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-2">{t('lists.color')}</Text>
           <View className="flex-row gap-3 flex-wrap">
             {LIST_COLORS.map((col) => {
               const active = color === col;
@@ -185,7 +190,7 @@ export default function NewListScreen() {
           {createMutation.isPending ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text className="text-sm font-body-sb text-white">Crear lista</Text>
+            <Text className="text-sm font-body-sb text-white">{t('lists.createList')}</Text>
           )}
         </Pressable>
       </ScrollView>

@@ -1,5 +1,6 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { ChevronLeft, MoreHorizontal, Share2 } from "lucide-react-native";
+import { useTranslation } from "react-i18next";
 import { Pressable, Text, View } from "react-native";
 import { BookCover } from "~/components/ui/BookCover";
 import { fixed, rawDark, rawLight } from "~/theme/colors";
@@ -22,6 +23,7 @@ interface BookHeroProps {
 export function BookHero({ book, onBack, onShare }: BookHeroProps) {
   const scheme = useColorScheme();
   const raw = scheme === "dark" ? rawDark : rawLight;
+  const { t } = useTranslation();
 
   const coverH = 170;
   const coverW = Math.round(coverH * 0.667);
@@ -118,9 +120,9 @@ export function BookHero({ book, onBack, onShare }: BookHeroProps) {
         <View className="flex-row justify-center mt-4 z-[4]">
           {(
             [
-              book.page_count ? [`${book.page_count}p`, "páginas"] : null,
+              book.page_count ? [`${book.page_count}p`, t("book.pagesLabel")] : null,
               book.published_year
-                ? [String(book.published_year), "publicado"]
+                ? [String(book.published_year), t("book.publishedLabel")]
                 : null,
             ].filter((x): x is [string, string] => x != null)
           ).map(([value, label], i, arr) => (

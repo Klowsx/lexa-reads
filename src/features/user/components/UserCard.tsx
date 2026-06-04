@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Avatar } from '~/components/ui/Avatar';
@@ -18,6 +19,7 @@ interface Props {
 export function UserCard({ user }: Props) {
   const router = useRouter();
   const c = useColors();
+  const { t } = useTranslation();
   const [followed, setFollowed] = useState(false);
   const { follow, unfollow } = useFollow(
     user.id,
@@ -73,7 +75,7 @@ export function UserCard({ user }: Props) {
           className="text-xs font-body-sb"
           style={{ color: followed ? c.t2 : c.accent }}
         >
-          {followed ? 'Siguiendo' : 'Seguir'}
+          {followed ? t('common.following') : t('common.follow')}
         </Text>
       </Pressable>
     </Pressable>

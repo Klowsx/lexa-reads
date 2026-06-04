@@ -1,4 +1,5 @@
 ﻿import { Search, X } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { Pressable, TextInput, View } from 'react-native';
 import { useColors } from '~/theme/colors';
 
@@ -12,6 +13,7 @@ interface Props {
 
 export function SearchBar({ value, onChangeText, focused, onFocus, onBlur }: Props) {
   const c = useColors();
+  const { t } = useTranslation();
 
   return (
     <View
@@ -24,7 +26,7 @@ export function SearchBar({ value, onChangeText, focused, onFocus, onBlur }: Pro
         onChangeText={onChangeText}
         onFocus={onFocus}
         onBlur={onBlur}
-        placeholder="Título, autor o ISBN..."
+        placeholder={t('book.searchPlaceholder')}
         placeholderTextColor={c.t3}
         className="flex-1 text-text font-body text-base"
         autoCapitalize="none"

@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import { ChevronLeft } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -35,6 +36,7 @@ export default function EditProfileScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const c = useColors();
+  const { t } = useTranslation();
   const { data: me } = useMe();
   const { mutate: updateProfile, isPending } = useUpdateProfile();
 
@@ -86,7 +88,7 @@ export default function EditProfileScreen() {
           <ChevronLeft size={24} color={c.t3} strokeWidth={1.6} />
         </Pressable>
         <Text className="font-display-sb text-xl text-text tracking-tight flex-1">
-          Editar perfil
+          {t('editProfile.title')}
         </Text>
         <Pressable hitSlop={8} onPress={handleSave} disabled={!canSave}>
           {isPending ? (
@@ -95,7 +97,7 @@ export default function EditProfileScreen() {
             <Text
               className={cn("text-sm font-body-sb", canSave ? "text-accent" : "text-t3")}
             >
-              Guardar
+              {t('common.save')}
             </Text>
           )}
         </Pressable>
@@ -119,9 +121,9 @@ export default function EditProfileScreen() {
               size={80}
             />
             <Pressable className="mt-3 px-4 py-2 rounded-md bg-sh border border-border">
-              <Text className="text-xs font-body-md text-text">Cambiar foto</Text>
+              <Text className="text-xs font-body-md text-text">{t('editProfile.changePhoto')}</Text>
             </Pressable>
-            <Text className="text-xs font-body text-t3 mt-1.5">JPG, PNG · Máx. 5 MB</Text>
+            <Text className="text-xs font-body text-t3 mt-1.5">{t('editProfile.photoHint')}</Text>
           </View>
         )}
 
@@ -129,7 +131,7 @@ export default function EditProfileScreen() {
           {/* Nombre */}
           <View className="mb-4">
             <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-1.5">
-              Nombre
+              {t('editProfile.name')}
             </Text>
             <TextInput
               value={name}
@@ -143,7 +145,7 @@ export default function EditProfileScreen() {
           {/* Bio */}
           <View className="mb-6">
             <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-1.5">
-              Bio
+              {t('editProfile.bio')}
             </Text>
             <TextInput
               value={bio}
@@ -151,7 +153,7 @@ export default function EditProfileScreen() {
               multiline
               numberOfLines={3}
               maxLength={160}
-              placeholder="Cuéntanos sobre tus lecturas..."
+              placeholder={t('editProfile.bioPlaceholder')}
               className="rounded-md border border-border font-body text-sm text-text bg-surface px-[14px] py-[11px] leading-[22px]"
               style={{
                 textAlignVertical: 'top',
@@ -166,7 +168,7 @@ export default function EditProfileScreen() {
           {/* Géneros favoritos */}
           <View className="mb-6">
             <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-2">
-              Géneros favoritos
+              {t('editProfile.favoriteGenres')}
             </Text>
             <View className="flex-row flex-wrap gap-2">
               {GENRES.map((g) => {
@@ -197,9 +199,9 @@ export default function EditProfileScreen() {
           {/* Cuenta privada */}
           <View className="flex-row items-center justify-between py-3.5 border-t border-border mb-8">
             <View className="flex-1 mr-4">
-              <Text className="text-sm font-body-md text-text">Cuenta privada</Text>
+              <Text className="text-sm font-body-md text-text">{t('editProfile.privateAccount')}</Text>
               <Text className="text-xs font-body text-t3 mt-0.5">
-                Solo tus seguidores podrán ver tu actividad
+                {t('editProfile.privateAccountSub')}
               </Text>
             </View>
             <Switch
@@ -218,7 +220,7 @@ export default function EditProfileScreen() {
             {isPending ? (
               <ActivityIndicator size="small" color="#fff" />
             ) : (
-              <Text className="text-sm font-body-sb text-white">Guardar cambios</Text>
+              <Text className="text-sm font-body-sb text-white">{t('common.saveChanges')}</Text>
             )}
           </Pressable>
         </View>

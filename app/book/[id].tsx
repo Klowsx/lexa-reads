@@ -1,8 +1,11 @@
 import { useRef, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import ViewShot from "react-native-view-shot";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { QueryBoundary } from "~/components/ui/QueryBoundary";
+import { BookSkeleton } from "~/features/book/components/BookSkeleton";
 import { useBook } from "~/features/book/hooks/useBook";
 import { BookCommunityTab } from "~/features/book/components/BookCommunityTab";
 import { BookCtaBar } from "~/features/book/components/BookCtaBar";
@@ -18,18 +21,18 @@ import { BookShareCard } from "~/features/share/components/BookShareCard";
 import { useShareCard } from "~/features/share/hooks/useShareCard";
 import { useAuthStore } from "~/stores/auth.store";
 import { type BookStatus } from "~/lib/book-status";
-import { fixed, useColors } from "~/theme/colors";
 
 export default function BookDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const c = useColors();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const username = useAuthStore((s) => s.user?.user_metadata?.username as string | undefined);
 
   const [activeTab, setActiveTab] = useState<BookTab>(0);
 
-  const { data: book, isLoading } = useBook(id);
+  const bookQuery = useBook(id);
+  const book = bookQuery.data;
   const { data: userBook } = useUserBook(book?.id ?? "");
   const upsertMutation = useUpsertUserBook(book?.id ?? "");
   const deleteMutation = useDeleteUserBook(book?.id ?? "");
@@ -86,95 +89,90 @@ export default function BookDetailScreen() {
     } as any);
   }
 
-  if (isLoading) {
-    return (
-      <View
-        className="flex-1 bg-bg items-center justify-center"
-        style={{ paddingTop: insets.top }}
-      >
-        <ActivityIndicator color={fixed.accent} />
-      </View>
-    );
-  }
-
-  if (!book) {
-    return (
-      <View
-        className="flex-1 bg-bg items-center justify-center px-8"
-        style={{ paddingTop: insets.top }}
-      >
-        <Text className="font-body text-sm text-t2 text-center">
-          No se encontró el libro.
-        </Text>
-        <Pressable onPress={() => router.back()} className="mt-4">
-          <Text className="font-body-sb text-sm text-accent">Volver</Text>
-        </Pressable>
-      </View>
-    );
-  }
-
   return (
     <View
       className="flex-1 bg-bg"
       style={{ paddingTop: insets.top }}
     >
-      <ScrollView
-        className="flex-1"
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
-        stickyHeaderIndices={[2]}
-      >
-        {/* 0 — scrolls away */}
-        <BookHero book={book} onBack={() => router.back()} onShare={captureBook} />
+      <QueryBoundary query={bookQuery} skeleton={<BookSkeleton />}>
+        {(book) =>
+          book ? (
+            <>
+              <ScrollView
+                className="flex-1"
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
+                stickyHeaderIndices={[2]}
+              >
+                {/* 0 — scrolls away */}
+                <BookHero book={book} onBack={() => router.back()} onShare={captureBook} />
 
-        {/* 1 — scrolls away */}
-        <BookCtaBar
-          book={book}
-          status={status}
-          rating={rating}
-          userBook={userBook ?? null}
-          isPending={isPending}
-          onStatusPress={handleCtaStatusPress}
-          onRatingPress={handleRatingButtonPress}
-          onAddToList={handleAddToList}
-        />
+                {/* 1 — scrolls away */}
+                <BookCtaBar
+                  book={book}
+                  status={status}
+                  rating={rating}
+                  userBook={userBook ?? null}
+                  isPending={isPending}
+                  onStatusPress={handleCtaStatusPress}
+                  onRatingPress={handleRatingButtonPress}
+                  onAddToList={handleAddToList}
+                />
 
-        {/* 2 — sticks to top */}
-        <BookTabBar activeTab={activeTab} onChange={setActiveTab} />
+                {/* 2 — sticks to top */}
+                <BookTabBar activeTab={activeTab} onChange={setActiveTab} />
 
-        {/* 3 — tab content */}
-        <View>
-          {activeTab === 0 && (
-            <BookSummaryTab
-              book={book}
-              status={status}
-              rating={rating}
-              isPending={isPending}
-              onStatusClick={handleStatusClick}
-              onRatingClick={handleRatingClick}
-              // Desde Resumen: cambia al tab de Reseñas antes de abrir el modal
-              // para que el usuario vea su reseña en contexto al volver.
-              onWriteReview={() => { setActiveTab(1); handleWriteReview(); }}
-            />
-          )}
-          {activeTab === 1 && (
-            <BookReviewsTab
-              bookId={book.id}
-              book={book}
-              onWriteReview={handleWriteReview}
-            />
-          )}
-          {activeTab === 2 && <BookCommunityTab bookId={book.id} pageCount={book.page_count} />}
-          {activeTab === 3 && <BookSimilarTab />}
-        </View>
-      </ScrollView>
+                {/* 3 — tab content */}
+                <View>
+                  {activeTab === 0 && (
+                    <BookSummaryTab
+                      book={book}
+                      status={status}
+                      rating={rating}
+                      isPending={isPending}
+                      onStatusClick={handleStatusClick}
+                      onRatingClick={handleRatingClick}
+                      // Desde Resumen: cambia al tab de Reseñas antes de abrir el modal
+                      // para que el usuario vea su reseña en contexto al volver.
+                      onWriteReview={() => { setActiveTab(1); handleWriteReview(); }}
+                    />
+                  )}
+                  {activeTab === 1 && (
+                    <BookReviewsTab
+                      bookId={book.id}
+                      book={book}
+                      onWriteReview={handleWriteReview}
+                    />
+                  )}
+                  {activeTab === 2 && <BookCommunityTab bookId={book.id} pageCount={book.page_count} />}
+                  {activeTab === 3 && <BookSimilarTab />}
+                </View>
+              </ScrollView>
 
-      {/* ViewShot off-screen para capturar BookShareCard */}
-      <View className="absolute left-[-9999px] top-0">
-        <ViewShot ref={shareRef}>
-          <BookShareCard book={book} rating={rating} username={username} />
-        </ViewShot>
-      </View>
+              {/* ViewShot off-screen para capturar BookShareCard */}
+              <View className="absolute left-[-9999px] top-0">
+                <ViewShot ref={shareRef}>
+                  <BookShareCard book={book} rating={rating} username={username} />
+                </ViewShot>
+              </View>
+            </>
+          ) : (
+            <View className="flex-1 items-center justify-center px-8">
+              <Text className="font-body text-sm text-t2 text-center">
+                {t("book.notFound")}
+              </Text>
+              <Pressable
+                onPress={() => router.back()}
+                accessibilityRole="button"
+                accessibilityLabel={t("common.back")}
+                className="mt-4"
+              >
+                <Text className="font-body-sb text-sm text-accent">{t("common.back")}</Text>
+              </Pressable>
+            </View>
+          )
+        }
+      </QueryBoundary>
     </View>
   );
 }

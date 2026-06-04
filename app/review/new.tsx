@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useLocalSearchParams, useRouter, Stack } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
@@ -25,15 +26,12 @@ import { useColors } from "~/theme/colors";
 // El body requiere al menos 10 caracteres para forzar una reseña
 // mínimamente útil en lugar de "muy bueno" o similar, y un tope que
 // refleja el CHECK de DB (016_content_length_limits.sql).
-const reviewSchema = z.object({
-  body: z
-    .string()
-    .min(10, "La reseña debe tener al menos 10 caracteres")
-    .max(MAX_REVIEW_LENGTH, `Máximo ${MAX_REVIEW_LENGTH} caracteres`),
-  containsSpoilers: z.boolean(),
-});
-
-type ReviewFormValues = z.infer<typeof reviewSchema>;
+// El schema se construye dentro del componente (useMemo) para que los
+// mensajes de error pasen por i18n.
+type ReviewFormValues = {
+  body: string;
+  containsSpoilers: boolean;
+};
 
 // ─── Pantalla ─────────────────────────────────────────────────
 
@@ -41,6 +39,19 @@ export default function NewReviewScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const c = useColors();
+  const { t } = useTranslation();
+
+  const reviewSchema = useMemo(
+    () =>
+      z.object({
+        body: z
+          .string()
+          .min(10, t("book.reviewMin"))
+          .max(MAX_REVIEW_LENGTH, t("book.reviewMax", { max: MAX_REVIEW_LENGTH })),
+        containsSpoilers: z.boolean(),
+      }),
+    [t],
+  );
 
   // bookId viene de la URL: /review/new?bookId=xxx
   const { bookId } = useLocalSearchParams<{ bookId: string }>();
@@ -140,7 +151,7 @@ export default function NewReviewScreen() {
           {/* Header */}
           <View className="flex-row justify-between items-center px-5 pt-3 pb-4">
             <Text className="font-display-sb text-md text-text">
-              {isEditing ? "Editar reseña" : "Escribir reseña"}
+              {isEditing ? t("book.editReview") : t("book.writeReview")}
             </Text>
             <Pressable
               onPress={() => router.back()}
@@ -156,7 +167,7 @@ export default function NewReviewScreen() {
             {/* ── Texto de la reseña ──────────────────────── */}
             <View className="mb-4">
               <Text className="text-xs font-body-sb text-t3 uppercase tracking-widest mb-1.5">
-                Tu reseña
+                {t("book.yourReview")}
               </Text>
 
               <Controller
@@ -171,7 +182,7 @@ export default function NewReviewScreen() {
                     maxLength={MAX_REVIEW_LENGTH}
                     // ~8 líneas de altura mínima para invitar a escribir más
                     numberOfLines={8}
-                    placeholder="¿Qué te pareció el libro? Comparte tu opinión..."
+                    placeholder={t("book.reviewPlaceholder")}
                     placeholderTextColor={c.t3}
                     className="rounded-card bg-sr border text-text font-body text-sm px-[14px] py-3 min-h-[160px]"
                     style={{
@@ -194,7 +205,7 @@ export default function NewReviewScreen() {
                   <View />
                 )}
                 <Text className="text-xs font-body text-t3">
-                  {charCount} caracteres
+                  {t("book.charsCount", { count: charCount })}
                 </Text>
               </View>
             </View>
@@ -207,10 +218,10 @@ export default function NewReviewScreen() {
                 <View className="flex-row justify-between items-center mb-6 py-3 px-4 rounded-card bg-sr border border-border">
                   <View className="flex-1 mr-3">
                     <Text className="font-body-md text-sm text-text">
-                      Contiene spoilers
+                      {t("book.spoilers")}
                     </Text>
                     <Text className="font-body text-xs text-t3 mt-0.5">
-                      Avisará a otros lectores antes de mostrar tu reseña
+                      {t("book.spoilerToggleDesc")}
                     </Text>
                   </View>
                   <Switch
@@ -239,14 +250,14 @@ export default function NewReviewScreen() {
                 <ActivityIndicator color="#fff" size="small" />
               ) : (
                 <Text className="font-body-sb text-sm text-white">
-                  {isEditing ? "Guardar cambios" : "Publicar reseña"}
+                  {isEditing ? t("common.saveChanges") : t("book.publishReview")}
                 </Text>
               )}
             </Pressable>
 
             {/* Aviso sobre la política de edición */}
             <Text className="font-body text-xs text-t3 text-center mt-3">
-              Puedes editar o eliminar tu reseña en cualquier momento.
+              {t("book.editReviewPolicy")}
             </Text>
           </View>
         </ScrollView>

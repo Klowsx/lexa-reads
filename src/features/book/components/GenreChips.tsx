@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 
 const GENRES = [
@@ -11,10 +12,11 @@ const GENRES = [
 ];
 
 export function GenreChips() {
+  const { t } = useTranslation();
   return (
     <View className="mb-4">
       <Text className="font-body-sb text-xs text-t3 mb-2 tracking-widest uppercase">
-        Géneros
+        {t('book.genresLabel')}
       </Text>
       <View className="flex-row flex-wrap gap-1.5">
         {GENRES.map((g) => (

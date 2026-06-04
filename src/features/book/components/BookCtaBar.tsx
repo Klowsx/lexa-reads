@@ -1,4 +1,5 @@
 import { ChevronDown, ListPlus } from "lucide-react-native";
+import { useTranslation } from "react-i18next";
 import { Pressable, Text, View } from "react-native";
 import { fixed, useColors } from "~/theme/colors";
 import { type BookStatus, STATUS_META } from "~/lib/book-status";
@@ -31,6 +32,7 @@ export function BookCtaBar({
   onAddToList,
 }: BookCtaBarProps) {
   const c = useColors();
+  const { t } = useTranslation();
 
   const isReading = status === "reading";
   const statusMeta = status ? STATUS_META[status] : null;
@@ -67,7 +69,7 @@ export function BookCtaBar({
             className="font-body-sb text-sm"
             style={{ color: status ? statusColor : "#fff" }}
           >
-            {status ? STATUS_META[status].label : "+ Quiero leer"}
+            {status ? t(STATUS_META[status].labelKey) : t("book.wantToReadCta")}
           </Text>
           {status && (
             <ChevronDown size={12} color={statusColor} strokeWidth={2} />
@@ -105,7 +107,7 @@ export function BookCtaBar({
               >
                 ☆
               </Text>
-              <Text className="font-body text-xs text-t2">Calificar</Text>
+              <Text className="font-body text-xs text-t2">{t("book.rate")}</Text>
             </>
           )}
         </Pressable>
@@ -116,7 +118,7 @@ export function BookCtaBar({
         <View className="mt-2.5">
           <View className="flex-row justify-between mb-[5px]">
             <Text className="font-body text-xs text-t3">
-              Pág. {currentPage} de {pageCount}
+              {t("book.pageProgress", { current: currentPage, total: pageCount })}
             </Text>
             <Text className="font-body-sb text-xs" style={{ color: fixed.status.reading }}>
               {Math.round(progressPct * 100)}%

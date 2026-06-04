@@ -1,5 +1,6 @@
 ﻿import { BookMarked } from 'lucide-react-native';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, Text, View } from 'react-native';
 import { BookCover } from '~/components/ui/BookCover';
 import { useColors } from '~/theme/colors';
@@ -13,6 +14,7 @@ interface Props {
 
 export function BookCard({ book, onPress, onQuickPeek }: Props) {
   const c = useColors();
+  const { t } = useTranslation();
   const [pagesInfoVisible, setPagesInfoVisible] = useState(false);
 
   return (
@@ -35,7 +37,7 @@ export function BookCard({ book, onPress, onQuickPeek }: Props) {
           <View className="flex-row items-center gap-1.5 mb-1">
             {book.page_count ? (
               <>
-                <Text className="font-body text-xs text-t3">{book.page_count} págs.</Text>
+                <Text className="font-body text-xs text-t3">{t('book.pagesShort', { count: book.page_count })}</Text>
                 <Pressable
                   onPress={() => setPagesInfoVisible(true)}
                   hitSlop={8}
@@ -87,19 +89,19 @@ export function BookCard({ book, onPress, onQuickPeek }: Props) {
             onPress={() => {}}
           >
             <Text className="font-display-sb text-lg text-text">
-              Número de páginas
+              {t('book.pagesInfoTitle')}
             </Text>
             <Text className="font-body text-sm text-t2 leading-5">
-              La cantidad de páginas puede variar según la editorial y la edición del libro — tapa dura, bolsillo, ilustrada, etc.
+              {t('book.pagesInfoBody1')}
             </Text>
             <Text className="font-body text-sm text-t2 leading-5">
-              El número que ves aquí corresponde a la edición registrada en nuestra base de datos y es solo orientativo.
+              {t('book.pagesInfoBody2')}
             </Text>
             <Pressable
               onPress={() => setPagesInfoVisible(false)}
               className="mt-2 bg-accent rounded-lg py-3 items-center"
             >
-              <Text className="font-body-sb text-sm text-white">Entendido</Text>
+              <Text className="font-body-sb text-sm text-white">{t('common.gotIt')}</Text>
             </Pressable>
           </Pressable>
         </Pressable>

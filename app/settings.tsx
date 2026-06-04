@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import { ChevronLeft, Monitor, Moon, Sun } from 'lucide-react-native';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Linking, Pressable, ScrollView, Share, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SettingsItem } from '~/features/user/components/SettingsItem';
@@ -29,16 +30,17 @@ const PRIVACY_URL = 'https://lexareads.app/privacy';
 const TERMS_URL   = 'https://lexareads.app/terms';
 const OSS_URL     = 'https://lexareads.app/licenses';
 
-const THEME_OPTIONS: { mode: ThemeMode; label: string; Icon: typeof Sun }[] = [
-  { mode: 'light',  label: 'Claro',   Icon: Sun },
-  { mode: 'system', label: 'Sistema', Icon: Monitor },
-  { mode: 'dark',   label: 'Oscuro',  Icon: Moon },
+const THEME_OPTIONS: { mode: ThemeMode; labelKey: string; Icon: typeof Sun }[] = [
+  { mode: 'light',  labelKey: 'settings.themeLight',  Icon: Sun },
+  { mode: 'system', labelKey: 'settings.themeSystem', Icon: Monitor },
+  { mode: 'dark',   labelKey: 'settings.themeDark',   Icon: Moon },
 ];
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const c = useColors();
+  const { t } = useTranslation();
   const mode = useThemeStore((s) => s.mode);
   const setMode = useThemeStore((s) => s.setMode);
   const addToast = useUIStore((s) => s.addToast);
@@ -67,10 +69,10 @@ export default function SettingsScreen() {
       if (error) throw error;
       await Share.share({
         message: JSON.stringify(data, null, 2),
-        title: 'Lexa — Mis datos',
+        title: t('settings.exportTitle'),
       });
     } catch {
-      addToast('No se pudieron exportar los datos. Intenta de nuevo.', 'error');
+      addToast(t('settings.exportError'), 'error');
     } finally {
       setExportLoading(false);
     }
@@ -89,10 +91,15 @@ export default function SettingsScreen() {
   return (
     <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
       <View className="px-4 py-2.5 flex-row items-center gap-2 border-b border-border">
-        <Pressable hitSlop={8} onPress={() => router.back()}>
+        <Pressable
+          hitSlop={8}
+          onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel={t('common.back')}
+        >
           <ChevronLeft size={24} color={c.t3} strokeWidth={1.6} />
         </Pressable>
-        <Text className="font-display-sb text-xl text-text tracking-tight">Ajustes</Text>
+        <Text className="font-display-sb text-xl text-text tracking-tight">{t('settings.title')}</Text>
       </View>
 
       <ScrollView
@@ -100,15 +107,15 @@ export default function SettingsScreen() {
         contentContainerStyle={{ paddingBottom: 48 }}
       >
         {/* ── Cuenta ── */}
-        <SettingsSection title="Cuenta">
+        <SettingsSection title={t('settings.account')}>
           <SettingsItem
-            label="Editar perfil"
-            subtitle="Nombre, bio, géneros favoritos"
+            label={t('settings.editProfile')}
+            subtitle={t('settings.editProfileSub')}
             onPress={() => router.push('/edit-profile' as any)}
           />
           <SettingsItem
-            label="Meta de lectura"
-            subtitle={`${currentGoal} libros en ${goalYear}`}
+            label={t('settings.readingGoal')}
+            subtitle={t('settings.readingGoalSub', { count: currentGoal, year: goalYear })}
             onPress={() => {
               setGoalVal(goalData?.goal ?? 12);
               setShowGoal(s => !s);
@@ -118,11 +125,13 @@ export default function SettingsScreen() {
           {showGoal && (
             <View className="p-4 bg-sr border-b border-border">
               <Text className="text-xs font-body text-t2 text-center mb-3.5">
-                Libros a leer en {goalYear}
+                {t('settings.booksToReadIn', { year: goalYear })}
               </Text>
               <View className="flex-row items-center justify-center gap-4.5 mb-3.5">
                 <Pressable
                   onPress={() => setGoalVal(g => Math.max(1, (g ?? currentGoal) - 5))}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('settings.reduceGoal')}
                   className="rounded-full bg-sh border border-border items-center justify-center w-[38px] h-[38px]"
                 >
                   <Text className="text-lg font-body text-text">−</Text>
@@ -134,6 +143,8 @@ export default function SettingsScreen() {
                 </Text>
                 <Pressable
                   onPress={() => setGoalVal(g => Math.min(365, (g ?? currentGoal) + 5))}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('settings.increaseGoal')}
                   className="rounded-full bg-sh border border-border items-center justify-center w-[38px] h-[38px]"
                 >
                   <Text className="text-lg font-body text-text">+</Text>
@@ -148,25 +159,29 @@ export default function SettingsScreen() {
               >
                 {updateGoal.isPending
                   ? <ActivityIndicator size="small" color="#fff" />
-                  : <Text className="text-xs font-body-sb text-white">Guardar</Text>
+                  : <Text className="text-xs font-body-sb text-white">{t('common.save')}</Text>
                 }
               </Pressable>
             </View>
           )}
-          <SettingsItem label="Cambiar contraseña" onPress={() => router.push('/change-password' as any)} separator={false} />
+          <SettingsItem label={t('settings.changePassword')} onPress={() => router.push('/change-password' as any)} separator={false} />
         </SettingsSection>
 
         {/* ── Apariencia ── */}
-        <SettingsSection title="Apariencia">
+        <SettingsSection title={t('settings.appearance')}>
           <View className="p-3">
-            <Text className="text-sm font-body-md text-text mb-2.5">Tema</Text>
+            <Text className="text-sm font-body-md text-text mb-2.5">{t('settings.theme')}</Text>
             <View className="flex-row rounded-sm bg-sh p-1">
-              {THEME_OPTIONS.map(({ mode: m, label, Icon }) => {
+              {THEME_OPTIONS.map(({ mode: m, labelKey, Icon }) => {
                 const active = mode === m;
+                const label = t(labelKey);
                 return (
                   <Pressable
                     key={m}
                     onPress={() => setMode(m)}
+                    accessibilityRole="button"
+                    accessibilityLabel={t('settings.themeNamed', { name: label })}
+                    accessibilityState={{ selected: active }}
                     className={cn("flex-1 flex-row items-center justify-center gap-1.5 py-2 rounded-sm", active ? "bg-accent" : "bg-transparent")}
                   >
                     <Icon size={14} color={active ? '#fff' : c.t3} strokeWidth={1.8} />
@@ -183,23 +198,23 @@ export default function SettingsScreen() {
         </SettingsSection>
 
         {/* ── Notificaciones ── */}
-        <SettingsSection title="Notificaciones">
+        <SettingsSection title={t('settings.notifications')}>
           <SettingsItem
-            label="Gestionar notificaciones"
-            subtitle="Push, email y preferencias"
+            label={t('settings.manageNotifications')}
+            subtitle={t('settings.manageNotificationsSub')}
             onPress={() => router.push('/settings-notifications' as any)}
             separator={false}
           />
         </SettingsSection>
 
         {/* ── Privacidad ── */}
-        <SettingsSection title="Privacidad">
+        <SettingsSection title={t('settings.privacy')}>
           <SettingsItem
-            label="Cuenta privada"
+            label={t('settings.privateAccount')}
             subtitle={
               privateOn
-                ? 'Solo seguidores aprobados ven tu perfil'
-                : 'Tu perfil es visible para todos'
+                ? t('settings.privateOn')
+                : t('settings.privateOff')
             }
             trailing={
               <SettingsToggle
@@ -210,17 +225,17 @@ export default function SettingsScreen() {
             }
           />
           <SettingsItem
-            label="Usuarios bloqueados"
+            label={t('settings.blockedUsers')}
             subtitle={
               blockedCount > 0
-                ? `${blockedCount} ${blockedCount === 1 ? 'usuario' : 'usuarios'}`
-                : 'Sin usuarios bloqueados'
+                ? t('settings.blockedCount', { count: blockedCount })
+                : t('settings.noBlocked')
             }
             onPress={() => router.push('/blocked-users' as any)}
           />
           <SettingsItem
-            label="Exportar mis datos"
-            subtitle="Descarga tu biblioteca, reseñas y listas"
+            label={t('settings.exportData')}
+            subtitle={t('settings.exportDataSub')}
             onPress={handleExport}
             trailing={
               exportLoading
@@ -229,7 +244,7 @@ export default function SettingsScreen() {
             }
           />
           <SettingsItem
-            label="Eliminar cuenta"
+            label={t('settings.deleteAccount')}
             danger
             onPress={() => setShowDelete(s => !s)}
             separator={false}
@@ -249,17 +264,17 @@ export default function SettingsScreen() {
               /* Ya hay una solicitud pendiente */
               <>
                 <Text className="text-xs font-body-sb text-error mb-1.5">
-                  Eliminación programada
+                  {t('settings.deletionScheduled')}
                 </Text>
                 <Text className="text-xs font-body text-t2 mb-3">
-                  Tu cuenta se eliminará el {scheduledDate}. Puedes cancelar antes de esa fecha.
+                  {t('settings.deletionScheduledBody', { date: scheduledDate })}
                 </Text>
                 <View className="flex-row gap-2">
                   <Pressable
                     onPress={() => setShowDelete(false)}
                     className="flex-1 py-2.5 rounded-md bg-sh border border-border items-center"
                   >
-                    <Text className="text-xs font-body-md text-text">Cerrar</Text>
+                    <Text className="text-xs font-body-md text-text">{t('common.close')}</Text>
                   </Pressable>
                   <Pressable
                     onPress={() => cancelDeletion.mutate(deletionRequest.id, {
@@ -275,7 +290,7 @@ export default function SettingsScreen() {
                     {cancelDeletion.isPending
                       ? <ActivityIndicator size="small" color={c.error} />
                       : <Text className="text-xs font-body-sb text-error">
-                          Cancelar eliminación
+                          {t('settings.cancelDeletion')}
                         </Text>
                     }
                   </Pressable>
@@ -285,17 +300,17 @@ export default function SettingsScreen() {
               /* Sin solicitud — mostrar confirmación */
               <>
                 <Text className="text-xs font-body-sb text-error mb-1.5">
-                  ¿Eliminar tu cuenta?
+                  {t('settings.deleteConfirmTitle')}
                 </Text>
                 <Text className="text-xs font-body text-t2 mb-3">
-                  Tu cuenta y datos se eliminarán permanentemente después de 30 días. Puedes cancelar antes iniciando sesión de nuevo.
+                  {t('settings.deleteConfirmBody')}
                 </Text>
                 <View className="flex-row gap-2">
                   <Pressable
                     onPress={() => setShowDelete(false)}
                     className="flex-1 py-2.5 rounded-md bg-sh border border-border items-center"
                   >
-                    <Text className="text-xs font-body-md text-text">Cancelar</Text>
+                    <Text className="text-xs font-body-md text-text">{t('common.cancel')}</Text>
                   </Pressable>
                   <Pressable
                     onPress={() => requestDeletion.mutate()}
@@ -309,7 +324,7 @@ export default function SettingsScreen() {
                     {requestDeletion.isPending
                       ? <ActivityIndicator size="small" color={c.error} />
                       : <Text className="text-xs font-body-sb text-error">
-                          Solicitar eliminación
+                          {t('settings.requestDeletion')}
                         </Text>
                     }
                   </Pressable>
@@ -320,26 +335,26 @@ export default function SettingsScreen() {
         )}
 
         {/* ── Legal ── */}
-        <SettingsSection title="Legal">
+        <SettingsSection title={t('settings.legal')}>
           <SettingsItem
-            label="Política de privacidad"
+            label={t('settings.privacyPolicy')}
             onPress={() => Linking.openURL(PRIVACY_URL)}
           />
           <SettingsItem
-            label="Términos de servicio"
+            label={t('settings.termsOfService')}
             onPress={() => Linking.openURL(TERMS_URL)}
           />
           <SettingsItem
-            label="Licencias open source"
+            label={t('settings.ossLicenses')}
             onPress={() => Linking.openURL(OSS_URL)}
             separator={false}
           />
         </SettingsSection>
 
         {/* ── Sesión ── */}
-        <SettingsSection title="Sesión">
+        <SettingsSection title={t('settings.session')}>
           <SettingsItem
-            label="Cerrar sesión"
+            label={t('settings.logout')}
             onPress={() => logout.mutate()}
             separator={false}
           />

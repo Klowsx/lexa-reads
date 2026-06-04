@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Check, ChevronLeft, Plus } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -27,6 +28,7 @@ function ListRow({
   onToggle: () => void;
 }) {
   const c = useColors();
+  const { t } = useTranslation();
   const col = list.accent_color ?? '#4A96B8';
 
   return (
@@ -48,7 +50,7 @@ function ListRow({
       <View className="flex-1 min-w-0">
         <Text className="text-sm font-body-sb text-text" numberOfLines={1}>{list.name}</Text>
         <Text className="text-xs font-body text-t3 mt-0.5">
-          {list.books_count} libros · {list.visibility === 'public' ? 'Pública' : 'Privada'}
+          {t('lists.booksCount', { count: list.books_count })} · {list.visibility === 'public' ? t('lists.public') : t('lists.private')}
         </Text>
       </View>
 
@@ -75,6 +77,7 @@ export default function AddToListScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const c = useColors();
+  const { t } = useTranslation();
 
   const { data: lists = [], isLoading } = useUserLists();
   const addMutation = useAddBookToList();
@@ -108,7 +111,7 @@ export default function AddToListScreen() {
           <ChevronLeft size={24} color={c.t3} strokeWidth={1.6} />
         </Pressable>
         <View className="flex-1 min-w-0">
-          <Text className="font-display-sb text-xl text-text tracking-tight">Agregar a lista</Text>
+          <Text className="font-display-sb text-xl text-text tracking-tight">{t('lists.addToList')}</Text>
           {bookTitle ? (
             <Text className="text-xs font-body text-t3" numberOfLines={1}>{bookTitle}</Text>
           ) : null}
@@ -119,7 +122,7 @@ export default function AddToListScreen() {
             className="px-3.5 py-2 rounded-full"
             style={{ backgroundColor: alpha(c.accent, 0.12) }}
           >
-            <Text className="text-xs font-body-sb text-accent">Listo</Text>
+            <Text className="text-xs font-body-sb text-accent">{t('common.done')}</Text>
           </Pressable>
         )}
       </View>
@@ -136,7 +139,7 @@ export default function AddToListScreen() {
         >
           <Plus size={16} color={c.accent} strokeWidth={2} />
         </View>
-        <Text className="text-sm font-body-md text-accent">Nueva lista</Text>
+        <Text className="text-sm font-body-md text-accent">{t('lists.newTitle')}</Text>
       </Pressable>
 
       {/* Loading */}
@@ -163,7 +166,7 @@ export default function AddToListScreen() {
           contentContainerStyle={{ paddingBottom: 32 }}
           ListEmptyComponent={
             <View className="flex-1 items-center justify-center py-16">
-              <Text className="text-xs font-body text-t3">No tienes listas todavía.</Text>
+              <Text className="text-xs font-body text-t3">{t('lists.noLists')}</Text>
             </View>
           }
         />

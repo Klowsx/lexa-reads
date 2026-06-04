@@ -7,6 +7,7 @@ import {
   View,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import ViewShot from "react-native-view-shot";
 import {
@@ -106,6 +107,7 @@ function ReviewCard({
 }) {
   const router = useRouter();
   const c = useColors();
+  const { t } = useTranslation();
 
   const { liked, count, toggle, isPending } = useToggleReviewLike(
     review.id,
@@ -146,7 +148,7 @@ function ReviewCard({
               }}
             >
               <Text className="font-body-md text-accent text-[10px]">
-                Editada
+                {t("reviews.edited")}
               </Text>
             </View>
           )}
@@ -157,7 +159,7 @@ function ReviewCard({
       {review.contains_spoilers && (
         <View className="bg-warning/10 border border-warning/30 rounded-md px-2.5 py-1.5 mb-2">
           <Text className="font-body-md text-xs text-warning">
-            ⚠ Contiene spoilers
+            ⚠ {t("book.spoilers")}
           </Text>
         </View>
       )}
@@ -184,14 +186,14 @@ function ReviewCard({
               className="flex-row items-center gap-[5px]"
             >
               <Pencil size={13} color={c.t3} strokeWidth={1.8} />
-              <Text className="font-body text-xs text-t3">Editar</Text>
+              <Text className="font-body text-xs text-t3">{t("common.edit")}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={onDelete}
               className="flex-row items-center gap-[5px]"
             >
               <Trash2 size={13} color={c.error} strokeWidth={1.8} />
-              <Text className="font-body text-xs text-error">Eliminar</Text>
+              <Text className="font-body text-xs text-error">{t("common.delete")}</Text>
             </TouchableOpacity>
           </>
         ) : (
@@ -225,7 +227,7 @@ function ReviewCard({
               className="flex-row items-center gap-[5px]"
             >
               <MessageCircle size={14} color={c.t3} strokeWidth={1.8} />
-              <Text className="font-body text-xs text-t3">Responder</Text>
+              <Text className="font-body text-xs text-t3">{t("reviews.reply")}</Text>
             </TouchableOpacity>
           </>
         )}
@@ -255,6 +257,7 @@ export function BookReviewsTab({
   onWriteReview,
 }: BookReviewsTabProps) {
   const c = useColors();
+  const { t } = useTranslation();
   const userId = useAuthStore((s) => s.user?.id ?? "");
   const [sharingReview, setSharingReview] = useState<ReviewWithUser | null>(
     null,
@@ -303,7 +306,7 @@ export function BookReviewsTab({
               <StarRating rating={avgRating} size={12} />
             </View>
             <Text className="font-body text-xs text-t3 mt-[5px] text-center leading-[14px]">
-              {`${ratingsCount.toLocaleString()}\nratings`}
+              {`${ratingsCount.toLocaleString()}\n${t("reviews.ratings")}`}
             </Text>
           </View>
           <View className="flex-1 pt-1">
@@ -328,7 +331,7 @@ export function BookReviewsTab({
           className="py-3.5 rounded-card bg-accent items-center"
         >
           <Text className="font-body-sb text-sm text-white">
-            {myReview ? "Editar mi reseña" : "Escribir mi reseña"}
+            {myReview ? t("book.editMyReview") : t("book.writeMyReview")}
           </Text>
         </TouchableOpacity>
       </View>
@@ -337,7 +340,7 @@ export function BookReviewsTab({
       {myReview && (
         <View className="px-container">
           <Text className="font-body-sb text-xs text-t3 uppercase tracking-widest mb-2">
-            Mi reseña
+            {t("reviews.myReview")}
           </Text>
           <ReviewCard
             review={{ ...myReview, users: null }}
@@ -354,7 +357,7 @@ export function BookReviewsTab({
         {/* Título de sección solo si hay reseñas de otros */}
         {otherReviews.length > 0 && (
           <Text className="font-body-sb text-xs text-t3 uppercase tracking-widest mb-2">
-            Reseñas de lectores
+            {t("reviews.readerReviews")}
           </Text>
         )}
 
@@ -369,7 +372,7 @@ export function BookReviewsTab({
         {!isLoading && otherReviews.length === 0 && !myReview && (
           <View className="items-center py-8">
             <Text className="font-body text-xs text-t3 text-center">
-              Sé el primero en reseñar este libro.
+              {t("reviews.beFirst")}
             </Text>
           </View>
         )}
@@ -394,7 +397,7 @@ export function BookReviewsTab({
               <ActivityIndicator color={c.accent} size="small" />
             ) : (
               <Text className="font-body-md text-xs text-accent">
-                Cargar más reseñas
+                {t("reviews.loadMore")}
               </Text>
             )}
           </Pressable>

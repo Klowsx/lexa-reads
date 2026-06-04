@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import { Check, ChevronLeft, Eye, EyeOff, Lock } from 'lucide-react-native';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -20,10 +21,10 @@ const alpha = (hex: string, op: number) => {
 };
 
 const NEW_PW_REQUIREMENTS = [
-  { label: 'Al menos 8 caracteres',  test: (pw: string) => pw.length >= 8 },
-  { label: 'Contiene un número',      test: (pw: string) => /\d/.test(pw) },
+  { labelKey: 'changePassword.reqMinChars', test: (pw: string) => pw.length >= 8 },
+  { labelKey: 'changePassword.reqNumber',   test: (pw: string) => /\d/.test(pw) },
   {
-    label: 'Las contraseñas coinciden',
+    labelKey: 'changePassword.reqMatch',
     test: (_: string, confirm: string) => _ !== '' && _ === confirm,
   },
 ];
@@ -78,6 +79,7 @@ export default function ChangePasswordScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const c = useColors();
+  const { t } = useTranslation();
 
   const [current, setCurrent] = useState('');
   const [newPw, setNewPw] = useState('');
@@ -101,7 +103,7 @@ export default function ChangePasswordScreen() {
           <ChevronLeft size={24} color={c.t3} strokeWidth={1.6} />
         </Pressable>
         <Text className="font-display-sb text-xl text-text tracking-tight">
-          Cambiar contraseña
+          {t('changePassword.title')}
         </Text>
       </View>
 
@@ -111,12 +113,12 @@ export default function ChangePasswordScreen() {
         contentContainerStyle={{ padding: 20, paddingBottom: 48 }}
       >
         <Text className="text-sm font-body text-t2 mb-6">
-          Ingresa tu contraseña actual y luego elige una nueva.
+          {t('changePassword.intro')}
         </Text>
 
         {/* Contraseña actual */}
         <Field
-          label="Contraseña actual"
+          label={t('changePassword.current')}
           value={current}
           onChange={setCurrent}
           show={showCurrent}
@@ -127,7 +129,7 @@ export default function ChangePasswordScreen() {
 
         {/* Nueva contraseña */}
         <Field
-          label="Nueva contraseña"
+          label={t('changePassword.new')}
           value={newPw}
           onChange={setNewPw}
           show={showNew}
@@ -136,7 +138,7 @@ export default function ChangePasswordScreen() {
 
         {/* Confirmar */}
         <Field
-          label="Confirmar nueva contraseña"
+          label={t('changePassword.confirm')}
           value={confirm}
           onChange={setConfirm}
           show={showNew}
@@ -156,10 +158,10 @@ export default function ChangePasswordScreen() {
         <View
           className="rounded-xl border border-border mt-1 mb-6 p-3 gap-1 bg-sr"
         >
-          {NEW_PW_REQUIREMENTS.map(({ label, test }) => {
+          {NEW_PW_REQUIREMENTS.map(({ labelKey, test }) => {
             const ok = test(newPw, confirm);
             return (
-              <View key={label} className="flex-row items-center gap-2 py-1">
+              <View key={labelKey} className="flex-row items-center gap-2 py-1">
                 {ok ? (
                   <View
                     className="w-4 h-4 rounded-full items-center justify-center"
@@ -175,7 +177,7 @@ export default function ChangePasswordScreen() {
                 <Text
                   className={cn("font-body text-xs", ok ? "text-text" : "text-t2")}
                 >
-                  {label}
+                  {t(labelKey)}
                 </Text>
               </View>
             );
@@ -188,7 +190,7 @@ export default function ChangePasswordScreen() {
           className={cn("py-3.5 rounded-md items-center", allMet ? "bg-accent" : "")}
           style={allMet ? undefined : { backgroundColor: alpha(c.accent, 0.4) }}
         >
-          <Text className="text-sm font-body-sb text-white">Guardar contraseña</Text>
+          <Text className="text-sm font-body-sb text-white">{t('changePassword.save')}</Text>
         </Pressable>
       </ScrollView>
     </KeyboardAvoidingView>

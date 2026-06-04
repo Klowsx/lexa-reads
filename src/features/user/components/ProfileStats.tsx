@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 
 interface Props {
@@ -21,11 +22,12 @@ export function ProfileStats({
   onPressFollowers,
   onPressFollowing,
 }: Props) {
+  const { t } = useTranslation();
   const stats = [
-    { label: 'Libros',     value: books,     onPress: onPressBooks },
-    { label: 'Reseñas',    value: reviews,   onPress: onPressReviews },
-    { label: 'Seguidores', value: followers, onPress: onPressFollowers },
-    { label: 'Siguiendo',  value: following, onPress: onPressFollowing },
+    { label: t('profile.statBooks'),     value: books,     onPress: onPressBooks },
+    { label: t('profile.statReviews'),   value: reviews,   onPress: onPressReviews },
+    { label: t('profile.statFollowers'), value: followers, onPress: onPressFollowers },
+    { label: t('profile.statFollowing'), value: following, onPress: onPressFollowing },
   ];
 
   return (

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ActivityIndicator,
   Modal,
@@ -55,6 +56,7 @@ function Toggle({
 export function ConsentModal() {
   const insets = useSafeAreaInsets();
   const c = useColors();
+  const { t } = useTranslation();
   const { data: prefs } = useNotificationPreferences();
   const upsert = useUpsertNotificationPreferences();
 
@@ -92,10 +94,10 @@ export function ConsentModal() {
 
           <View className="px-5 pt-3 pb-5">
             <Text className="font-display-sb text-lg text-text tracking-tight mb-1">
-              Personaliza tu experiencia
+              {t('consent.title')}
             </Text>
             <Text className="text-xs font-body text-t2 leading-[20px] mb-6">
-              Elige cómo quieres que Lexa te mantenga al día. Puedes cambiar esto en Ajustes en cualquier momento.
+              {t('consent.body')}
             </Text>
 
             {/* Push */}
@@ -110,10 +112,10 @@ export function ConsentModal() {
               </View>
               <View className="flex-1">
                 <Text className="text-xs font-body-sb text-text">
-                  Notificaciones push
+                  {t('consent.pushTitle')}
                 </Text>
                 <Text className="text-xs font-body text-t3 mt-0.5">
-                  Seguidores, likes y comentarios
+                  {t('consent.pushBody')}
                 </Text>
               </View>
               <Toggle on={pushOn} onChange={setPushOn} />
@@ -129,10 +131,10 @@ export function ConsentModal() {
               </View>
               <View className="flex-1">
                 <Text className="text-xs font-body-sb text-text">
-                  Resumen semanal
+                  {t('consent.emailTitle')}
                 </Text>
                 <Text className="text-xs font-body text-t3 mt-0.5">
-                  Novedades y recomendaciones por email
+                  {t('consent.emailBody')}
                 </Text>
               </View>
               <Toggle on={emailOn} onChange={setEmailOn} />
@@ -146,7 +148,7 @@ export function ConsentModal() {
               {upsert.isPending
                 ? <ActivityIndicator size="small" color="#fff" />
                 : <Text className="text-xs font-body-sb text-white">
-                    Continuar
+                    {t('consent.continue')}
                   </Text>
               }
             </Pressable>

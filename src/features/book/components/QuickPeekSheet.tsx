@@ -1,5 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BookCover } from '~/components/ui/BookCover';
@@ -23,6 +24,7 @@ export function QuickPeekSheet({ book, onClose }: Props) {
   const router = useRouter();
   const c = useColors();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
 
   const [status, setStatus] = useState<BookStatus | null>(null);
   const [rating, setRating] = useState<number | null>(null);
@@ -61,7 +63,7 @@ export function QuickPeekSheet({ book, onClose }: Props) {
                   {book.authors?.join(', ')}
                 </Text>
                 {book.page_count ? (
-                  <Text className="font-body text-xs text-t3">{book.page_count} páginas</Text>
+                  <Text className="font-body text-xs text-t3">{t('book.pagesLong', { count: book.page_count })}</Text>
                 ) : null}
               </View>
             </View>
@@ -88,7 +90,7 @@ export function QuickPeekSheet({ book, onClose }: Props) {
                       className={active ? 'font-body-md text-xs' : 'font-body text-xs'}
                       style={{ color: active ? meta.color : c.t2 }}
                     >
-                      {meta.label}
+                      {t(meta.labelKey)}
                     </Text>
                   </Pressable>
                 );
@@ -98,7 +100,7 @@ export function QuickPeekSheet({ book, onClose }: Props) {
             {/* Rating */}
             <View className="mx-4 mb-4 rounded-md p-3 bg-sr border border-border">
               <Text className="font-body-sb text-xs text-t3 tracking-wider uppercase mb-2">
-                Mi rating
+                {t('book.myRatingShort')}
               </Text>
               <View className="flex-row items-center gap-2.5">
                 <View className="flex-row">
@@ -136,7 +138,7 @@ export function QuickPeekSheet({ book, onClose }: Props) {
                 className="rounded-md items-center py-3.5 border border-border bg-sh"
                 activeOpacity={0.85}
               >
-                <Text className="text-sm font-body-sb text-text">Ver libro completo</Text>
+                <Text className="text-sm font-body-sb text-text">{t('book.viewFullBook')}</Text>
               </TouchableOpacity>
             </View>
           </ScrollView>

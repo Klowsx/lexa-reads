@@ -1,4 +1,5 @@
 import { ChevronRight, Star } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import { useColors } from '~/theme/colors';
 import type { ListRow } from '~/features/lists/list.queries';
@@ -23,26 +24,28 @@ export function ProfileLists({
   onNewList,
   onPress,
   onToggleFeatured,
-  title = 'Mis listas',
+  title,
 }: Props) {
   const c = useColors();
+  const { t } = useTranslation();
+  const sectionTitle = title ?? t('profile.myLists');
 
   return (
     <View className="px-4 pb-7">
       <View className="flex-row justify-between items-baseline mb-2.5">
         <Text className="font-body-sb text-xs text-t3 tracking-widest uppercase">
-          {title}
+          {sectionTitle}
         </Text>
         {onNewList && (
           <Pressable onPress={onNewList} hitSlop={6}>
-            <Text className="text-xs font-body-sb text-accent">+ Nueva</Text>
+            <Text className="text-xs font-body-sb text-accent">{t('profile.newList')}</Text>
           </Pressable>
         )}
       </View>
 
       {lists.length === 0 && (
         <View className="py-6 items-center">
-          <Text className="text-xs font-body text-t3">Sin listas todavía.</Text>
+          <Text className="text-xs font-body text-t3">{t('profile.noLists')}</Text>
         </View>
       )}
 
@@ -84,7 +87,7 @@ export function ProfileLists({
                   )}
                 </View>
                 <Text className="text-xs font-body text-t3 mt-0.5">
-                  {list.books_count ?? 0} libros · {list.visibility === 'public' ? 'Pública' : 'Privada'}
+                  {t('lists.booksCount', { count: list.books_count ?? 0 })} · {list.visibility === 'public' ? t('lists.public') : t('lists.private')}
                 </Text>
               </View>
 

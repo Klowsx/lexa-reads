@@ -1,6 +1,7 @@
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Star } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import type { ListRow } from '~/features/lists/list.queries';
 
@@ -23,6 +24,7 @@ interface Props {
 }
 
 export function FeaturedLists({ lists, onPress, onManage }: Props) {
+  const { t } = useTranslation();
   const featured = lists.filter((l) => l.is_featured);
 
   if (featured.length === 0) return null;
@@ -31,11 +33,11 @@ export function FeaturedLists({ lists, onPress, onManage }: Props) {
     <View className="mb-5">
       <View className="flex-row justify-between items-baseline px-4 mb-3">
         <Text className="font-body-sb text-xs text-t3 tracking-widest uppercase">
-          Destacadas
+          {t('profile.featured')}
         </Text>
         {onManage && (
           <Pressable onPress={onManage} hitSlop={6}>
-            <Text className="text-xs font-body-sb text-accent">Gestionar</Text>
+            <Text className="text-xs font-body-sb text-accent">{t('profile.manage')}</Text>
           </Pressable>
         )}
       </View>
@@ -128,7 +130,7 @@ export function FeaturedLists({ lists, onPress, onManage }: Props) {
                   {list.name}
                 </Text>
                 <Text style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.68)' }}>
-                  {list.books_count ?? 0} libros
+                  {t('lists.booksCount', { count: list.books_count ?? 0 })}
                 </Text>
               </View>
             </Pressable>

@@ -1,5 +1,6 @@
 import { useRouter } from 'expo-router';
 import { Bell, Users } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FlashList } from '@shopify/flash-list';
@@ -15,6 +16,7 @@ export default function FeedScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const c = useColors();
+  const { t } = useTranslation();
 
   const feedQuery = useFeed();
   const { isFetchingNextPage, hasNextPage, fetchNextPage } = feedQuery;
@@ -23,12 +25,12 @@ export default function FeedScreen() {
     <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
       {/* Header */}
       <View className="px-4 py-2.5 border-b border-border flex-row items-center justify-between">
-        <Text className="font-display-sb text-xl text-text tracking-tight">lexa</Text>
+        <Text className="font-display-sb text-xl text-text tracking-tight">{t('feed.title')}</Text>
         <Pressable
           hitSlop={8}
           onPress={() => router.push('/notifications' as any)}
           accessibilityRole="button"
-          accessibilityLabel="Notificaciones"
+          accessibilityLabel={t('feed.notifications')}
         >
           <Bell size={20} color={c.t3} strokeWidth={1.6} />
         </Pressable>
@@ -48,18 +50,18 @@ export default function FeedScreen() {
                   <Users size={28} color={fixed.accent} strokeWidth={1.6} />
                 </View>
                 <Text className="font-display-sb text-lg text-text text-center tracking-tight">
-                  Tu feed está vacío
+                  {t('feed.emptyTitle')}
                 </Text>
                 <Text className="font-body text-sm text-t3 text-center leading-[20px]">
-                  Sigue a otras lectoras para ver su actividad aquí.
+                  {t('feed.emptySubtitle')}
                 </Text>
                 <Pressable
                   onPress={() => router.push('/(tabs)/search' as any)}
                   accessibilityRole="button"
-                  accessibilityLabel="Buscar personas"
+                  accessibilityLabel={t('feed.findPeople')}
                   className="mt-2 px-6 py-3 rounded-full bg-accent"
                 >
-                  <Text className="font-body-sb text-sm text-white">Buscar personas</Text>
+                  <Text className="font-body-sb text-sm text-white">{t('feed.findPeople')}</Text>
                 </Pressable>
               </View>
             );

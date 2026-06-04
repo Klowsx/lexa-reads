@@ -1,4 +1,5 @@
 import { ActivityIndicator, View, Text } from "react-native";
+import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { Avatar } from "~/components/ui/Avatar";
 import { StarRating } from "~/components/ui/StarRating";
@@ -31,6 +32,7 @@ function RatingBar({ star, pct }: { star: number; pct: number }) {
 
 function FriendRow({ friend, pageCount }: { friend: FriendActivity; pageCount?: number | null }) {
   const c = useColors();
+  const { t } = useTranslation();
   const meta = STATUS_META[friend.status as keyof typeof STATUS_META];
   if (!meta) return null;
 
@@ -61,7 +63,7 @@ function FriendRow({ friend, pageCount }: { friend: FriendActivity; pageCount?: 
               <View className="h-full rounded-full" style={{ width: `${progressPct}%`, backgroundColor: fixed.status.reading }} />
             </View>
             <Text className="font-body text-[9px] text-t3 mt-[2px]">
-              Pág. {friend.currentPage} · {progressPct}%
+              {t("book.pageProgressShort", { current: friend.currentPage, pct: progressPct })}
             </Text>
           </View>
         )}
@@ -75,7 +77,7 @@ function FriendRow({ friend, pageCount }: { friend: FriendActivity; pageCount?: 
         }}
       >
         <Text className="font-body-md text-xs" style={{ color: meta.color }}>
-          {meta.label}
+          {t(meta.labelKey)}
         </Text>
       </View>
     </View>
@@ -84,6 +86,7 @@ function FriendRow({ friend, pageCount }: { friend: FriendActivity; pageCount?: 
 
 export function BookCommunityTab({ bookId, pageCount }: { bookId: string; pageCount?: number | null }) {
   const c = useColors();
+  const { t } = useTranslation();
   const userId = useAuthStore((s) => s.user?.id ?? "");
   const { data, isLoading } = useQuery(bookCommunityStatsQueryOptions(bookId, userId));
 
@@ -96,12 +99,12 @@ export function BookCommunityTab({ bookId, pageCount }: { bookId: string; pageCo
   }
 
   const stats = [
-    { value: data.totalReaders.toLocaleString(), label: "Lectores" },
-    { value: data.readingCount.toLocaleString(), label: "Leyendo" },
-    { value: data.wantCount.toLocaleString(), label: "Por leer" },
+    { value: data.totalReaders.toLocaleString(), label: t("community.readers") },
+    { value: data.readingCount.toLocaleString(), label: t("community.reading") },
+    { value: data.wantCount.toLocaleString(), label: t("community.toRead") },
     {
       value: data.avgRating > 0 ? `${data.avgRating} ★` : "—",
-      label: "Rating",
+      label: t("community.rating"),
       isRating: true,
     },
   ];
@@ -135,7 +138,7 @@ export function BookCommunityTab({ bookId, pageCount }: { bookId: string; pageCo
       {data.friendActivity.length > 0 && (
         <View className="mx-container mb-3.5 bg-surface rounded-card p-4 border border-border">
           <Text className="font-body-sb text-xs text-t3 uppercase tracking-wider mb-3">
-            Actividad de amigos
+            {t("community.friendsActivity")}
           </Text>
           {data.friendActivity.map((friend) => (
             <FriendRow key={friend.userId} friend={friend} pageCount={pageCount} />
@@ -147,7 +150,7 @@ export function BookCommunityTab({ bookId, pageCount }: { bookId: string; pageCo
       {data.ratingsCount > 0 && (
         <View className="mx-container bg-surface rounded-card p-4 border border-border">
           <Text className="font-body-sb text-xs text-t3 uppercase tracking-wider mb-3">
-            Distribución de ratings
+            {t("community.ratingDistribution")}
           </Text>
           <View className="flex-row gap-container items-start">
             <View className="items-center shrink-0">
@@ -172,7 +175,7 @@ export function BookCommunityTab({ bookId, pageCount }: { bookId: string; pageCo
       {data.totalReaders === 0 && (
         <View className="mx-container bg-surface rounded-card p-8 border border-border items-center">
           <Text className="font-body text-xs text-t3 text-center">
-            Sé el primero en agregar este libro a tu biblioteca.
+            {t("community.beFirstLibrary")}
           </Text>
         </View>
       )}

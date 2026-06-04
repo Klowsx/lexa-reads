@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Alert, Pressable, Text, View } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
 import { ChevronLeft } from "lucide-react-native";
@@ -22,6 +23,7 @@ export default function NotificationsScreen() {
   const insets = useSafeAreaInsets();
   const c = useColors();
   const router = useRouter();
+  const { t } = useTranslation();
   const canGoBack = router.canGoBack();
   const markRead = useMarkNotificationsRead();
   const savePushToken = useSavePushToken();
@@ -62,16 +64,16 @@ export default function NotificationsScreen() {
 
   async function showPushOptIn() {
     Alert.alert(
-      "Activar notificaciones",
-      "¿Quieres recibir avisos cuando alguien te siga, comente o le dé me gusta a tus publicaciones?",
+      t("notifications.pushTitle"),
+      t("notifications.pushBody"),
       [
         {
-          text: "Ahora no",
+          text: t("notifications.pushNotNow"),
           style: "cancel",
           onPress: () => savePushToken.savePushToken("declined"),
         },
         {
-          text: "Activar",
+          text: t("notifications.pushEnable"),
           onPress: async () => {
             const token = await registerPushToken();
             await savePushToken.savePushToken(token);
@@ -91,7 +93,7 @@ export default function NotificationsScreen() {
           </Pressable>
         )}
         <Text className="font-display-sb text-xl text-text tracking-tight">
-          Notificaciones
+          {t("notifications.title")}
         </Text>
       </View>
 
@@ -108,10 +110,10 @@ export default function NotificationsScreen() {
             <Bell size={24} color={c.t3} strokeWidth={1.5} />
           </View>
           <Text className="text-sm font-body-sb text-text text-center">
-            Sin notificaciones
+            {t("notifications.emptyTitle")}
           </Text>
           <Text className="text-xs font-body text-t3 text-center leading-[20px]">
-            Aquí aparecerán los me gusta, seguidores y comentarios que recibas.
+            {t("notifications.emptySubtitle")}
           </Text>
         </View>
       ) : (

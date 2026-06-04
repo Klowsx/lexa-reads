@@ -153,14 +153,14 @@ query = query.or(`created_at.lt.${c.created_at},and(created_at.eq.${c.created_at
 **Problema:** botones de solo ícono (corazón, "...", compartir, tabs, estrellas) son invisibles para VoiceOver/TalkBack. Es causa común de rechazo en App Store y riesgo legal (ADA/EAA).
 **Fix:** añadir `accessibilityRole="button"` + `accessibilityLabel` a cada `Pressable` de ícono; `accessibilityState={{ selected }}` en tabs/segmented; `accessibilityLabel` con el rating en `StarRating`.
 - [x] Pase de accesibilidad en superficies núcleo — ✅ Hecho: tab bar (`role="tab"` + `selected`), `StarRating` (`accessible` + label con rating), `FeedCard` (like con `selected`+conteo, comentar, compartir, vistazo, menú, avatar, cover), pantalla de comentarios (volver, enviar, eliminar), `ErrorState`/`ErrorBoundary`. **De paso** se corrigió un bug real: `className` duplicado en el badge de notificaciones del tab bar (y en `login.tsx`/`list/edit`).
-  - [ ] Pendiente: replicar el patrón en book, profile, search, library, settings (la convención ya está establecida).
+- [x] Replicar el patrón en book, profile, search, library, settings — ✅ Hecho (2026-06-03): chips de tag y CTA de biblioteca (`role="button"` + `selected`), botón de Ajustes en perfil, `SegmentedControl` de búsqueda (`role="tab"` + `selected`) + botón "i" de info + cierre del modal NYT, y en ajustes el botón volver, el segmented de tema (`selected`) y el stepper +/- de la meta.
 
 ### UX-2 · No existe `QueryBoundary` ni skeletons consistentes
 **Archivo esperado:** `src/components/ui/QueryBoundary.tsx` (no existe)
 **Problema:** CLAUDE.md lo define como el wrapper estándar de pantallas con datos, pero no está. Cada pantalla maneja loading/error ad-hoc → inconsistencia y estados de error que dependen solo del toast global.
 **Fix:** crear `QueryBoundary` + `ErrorState` + skeletons por feature y migrar las pantallas principales (feed, library, book, profile).
 - [x] Crear `QueryBoundary` + `ErrorState` + `Skeleton` — ✅ Hecho (`src/components/ui/`), `feed.tsx` migrado + `FeedSkeleton`.
-  - [ ] Pendiente: migrar library, book y profile al mismo patrón.
+- [x] Migrar library, book y profile al mismo patrón — ✅ Hecho (2026-06-03): `library.tsx` (+ `LibrarySkeleton`), `profile.tsx` (+ `ProfileSkeleton`) y `book/[id].tsx` (+ `BookSkeleton`) ahora usan `QueryBoundary`; el "no encontrado" del libro se conserva como render del `children` cuando `data` es `null`.
 
 ### UX-3 · i18n incompleto
 **Problema:** i18n está cableado pero quedan strings hardcodeados (el roadmap lo admite). Los mensajes de `send-push` están fijos en español.
@@ -231,9 +231,9 @@ De `roadmap.md`, siguen `[ ]`:
 | ~~–~~ | ~~**C-4** moderación de reportes~~ | S | ✅ Resuelto vía migración 015 + runbook |
 | ~~1~~ | ~~**D-2** cursor compuesto~~ | S | ✅ Resuelto (feed + comentarios) |
 | ~~2~~ | ~~**O-1** ErrorBoundary~~ | S | ✅ ErrorBoundary hecho; crash reporting sin Sentry (PostHog pendiente de init) |
-| ~~3~~ | ~~**UX-1** accesibilidad~~ | M | ✅ Superficies núcleo; resto de pantallas pendiente |
+| ~~3~~ | ~~**UX-1** accesibilidad~~ | M | ✅ Núcleo + book/profile/search/library/settings |
 | ~~4~~ | ~~**D-1 / P-1** optimistic sobre caché~~ | M | ✅ Resuelto |
-| ~~5~~ | ~~**UX-2** QueryBoundary + skeletons~~ | M | ✅ Infra + feed; resto de pantallas pendiente |
+| ~~5~~ | ~~**UX-2** QueryBoundary + skeletons~~ | M | ✅ Infra + feed + library/book/profile |
 | ~~6~~ | ~~**D-3, D-4, A-1..A-3**~~ + i18n | — | ✅ D-3/D-4/A-1/A-2/A-3 hechos; i18n parcial |
 
 > **Sentry:** excluido a propósito (decisión del usuario). El crash reporting se cableó vía `ErrorBoundary` + `logError` con un reporter PostHog enchufable.

@@ -1,5 +1,6 @@
 import { useRouter } from "expo-router";
 import { ChevronLeft } from "lucide-react-native";
+import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SettingsItem } from "~/features/user/components/SettingsItem";
@@ -16,6 +17,7 @@ export default function NotificationSettingsScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const c = useColors();
+  const { t } = useTranslation();
   const { data: prefs, isLoading } = useNotificationPreferences();
   const upsert = useUpsertNotificationPreferences();
   const savePushToken = useSavePushToken();
@@ -55,15 +57,15 @@ export default function NotificationSettingsScreen() {
           <ChevronLeft size={24} color={c.t3} strokeWidth={1.6} />
         </Pressable>
         <Text className="font-display-sb text-xl text-text tracking-tight">
-          Notificaciones
+          {t("settings.notifications")}
         </Text>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 48 }}>
-        <SettingsSection title="Push">
+        <SettingsSection title={t("notifSettings.push")}>
           <SettingsItem
-            label="Notificaciones push"
-            subtitle={pushEnabled ? "Activas" : "Desactivadas"}
+            label={t("notifSettings.pushNotifications")}
+            subtitle={pushEnabled ? t("notifSettings.on") : t("notifSettings.off")}
             trailing={
               <SettingsToggle
                 on={pushEnabled}
@@ -73,7 +75,7 @@ export default function NotificationSettingsScreen() {
             }
           />
           <SettingsItem
-            label="Nuevos seguidores"
+            label={t("notifSettings.newFollowers")}
             trailing={
               <SettingsToggle
                 on={(prefs?.push_new_follower ?? true) && pushEnabled}
@@ -83,7 +85,7 @@ export default function NotificationSettingsScreen() {
             }
           />
           <SettingsItem
-            label="Me gusta en publicaciones"
+            label={t("notifSettings.likesOnPosts")}
             trailing={
               <SettingsToggle
                 on={(prefs?.push_activity_like ?? true) && pushEnabled}
@@ -93,7 +95,7 @@ export default function NotificationSettingsScreen() {
             }
           />
           <SettingsItem
-            label="Me gusta en reseñas"
+            label={t("notifSettings.likesOnReviews")}
             trailing={
               <SettingsToggle
                 on={(prefs?.push_review_like ?? true) && pushEnabled}
@@ -103,7 +105,7 @@ export default function NotificationSettingsScreen() {
             }
           />
           <SettingsItem
-            label="Comentarios"
+            label={t("notifSettings.comments")}
             trailing={
               <SettingsToggle
                 on={(prefs?.push_comment ?? true) && pushEnabled}
@@ -113,7 +115,7 @@ export default function NotificationSettingsScreen() {
             }
           />
           <SettingsItem
-            label="Recomendaciones"
+            label={t("notifSettings.recommendations")}
             trailing={
               <SettingsToggle
                 on={(prefs?.push_recommendation ?? true) && pushEnabled}
@@ -125,10 +127,10 @@ export default function NotificationSettingsScreen() {
           />
         </SettingsSection>
 
-        <SettingsSection title="Email">
+        <SettingsSection title={t("notifSettings.email")}>
           <SettingsItem
-            label="Resumen semanal"
-            subtitle="Recibe un correo con tu actividad de la semana"
+            label={t("notifSettings.weeklyDigest")}
+            subtitle={t("notifSettings.weeklyDigestSub")}
             trailing={
               <SettingsToggle
                 on={prefs?.email_weekly_digest ?? false}

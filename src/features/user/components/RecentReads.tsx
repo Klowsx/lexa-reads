@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { BookCover } from '~/components/ui/BookCover';
 import { StarRating } from '~/components/ui/StarRating';
@@ -11,13 +12,14 @@ interface Props {
 
 export function RecentReads({ books, onViewAll }: Props) {
   const router = useRouter();
+  const { t } = useTranslation();
 
   if (books.length === 0) return null;
 
   return (
     <View className="mb-5">
       <Text className="font-body-sb text-xs text-t3 tracking-widest uppercase mb-2.5 px-4">
-        Leídos recientemente
+        {t('profile.recentReads')}
       </Text>
       <ScrollView
         horizontal
@@ -52,7 +54,7 @@ export function RecentReads({ books, onViewAll }: Props) {
             className="w-12 items-center justify-center gap-1 opacity-70"
           >
             <Text className="text-t3 text-[24px] leading-[26px]">›</Text>
-            <Text className="text-xs font-body text-t3 text-center">Ver todo</Text>
+            <Text className="text-xs font-body text-t3 text-center">{t('common.viewAll')}</Text>
           </Pressable>
         )}
       </ScrollView>

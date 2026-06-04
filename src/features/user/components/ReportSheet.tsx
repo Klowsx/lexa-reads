@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -20,13 +21,13 @@ const alpha = (hex: string, op: number) => {
   return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})`;
 };
 
-const REASONS: { id: string; label: string }[] = [
-  { id: 'spam',          label: 'Spam o publicidad' },
-  { id: 'inappropriate', label: 'Contenido inapropiado' },
-  { id: 'harassment',    label: 'Acoso o intimidación' },
-  { id: 'false_info',    label: 'Información falsa' },
-  { id: 'hate_speech',   label: 'Discurso de odio' },
-  { id: 'other',         label: 'Otro' },
+const REASONS: { id: string; labelKey: string }[] = [
+  { id: 'spam',          labelKey: 'report.reasonSpam' },
+  { id: 'inappropriate', labelKey: 'report.reasonInappropriate' },
+  { id: 'harassment',    labelKey: 'report.reasonHarassment' },
+  { id: 'false_info',    labelKey: 'report.reasonFalse' },
+  { id: 'hate_speech',   labelKey: 'report.reasonHate' },
+  { id: 'other',         labelKey: 'report.reasonOther' },
 ];
 
 interface Props {
@@ -39,6 +40,7 @@ interface Props {
 export function ReportSheet({ targetType, targetId, targetName, onClose }: Props) {
   const insets = useSafeAreaInsets();
   const c = useColors();
+  const { t } = useTranslation();
   const [selected, setSelected] = useState<string | null>(null);
   const [details, setDetails] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -74,15 +76,15 @@ export function ReportSheet({ targetType, targetId, targetName, onClose }: Props
 
           {submitted ? (
             <View className="items-center px-6 py-8 gap-3">
-              <Text className="text-lg font-display-sb text-text">Reporte enviado</Text>
+              <Text className="text-lg font-display-sb text-text">{t('report.sent')}</Text>
               <Text className="text-xs font-body text-t2 text-center leading-[20px]">
-                Gracias por tu reporte. Nuestro equipo lo revisará en menos de 24 horas.
+                {t('report.sentBody')}
               </Text>
               <Pressable
                 onPress={onClose}
                 className="mt-2 py-2.5 px-8 rounded-md bg-accent"
               >
-                <Text className="text-xs font-body-sb text-white">Cerrar</Text>
+                <Text className="text-xs font-body-sb text-white">{t('common.close')}</Text>
               </Pressable>
             </View>
           ) : (
@@ -92,14 +94,14 @@ export function ReportSheet({ targetType, targetId, targetName, onClose }: Props
               contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 8 }}
             >
               <Text className="font-display-sb text-md text-text mb-0.5 pt-1">
-                Reportar {targetType === 'user' ? 'usuario' : 'contenido'}
+                {targetType === 'user' ? t('report.reportUser') : t('report.reportContent')}
               </Text>
               {targetName && (
                 <Text className="text-xs font-body text-t2 mb-4">{targetName}</Text>
               )}
 
               <Text className="text-xs font-body-sb text-t2 tracking-widest uppercase mb-2">
-                Motivo
+                {t('report.reason')}
               </Text>
 
               {REASONS.map((r) => (
@@ -131,17 +133,17 @@ export function ReportSheet({ targetType, targetId, targetName, onClose }: Props
                       />
                     )}
                   </View>
-                  <Text className="text-xs font-body text-text">{r.label}</Text>
+                  <Text className="text-xs font-body text-text">{t(r.labelKey)}</Text>
                 </Pressable>
               ))}
 
               <Text className="text-xs font-body-sb text-t2 tracking-widest uppercase mt-4 mb-2">
-                Detalles adicionales (opcional)
+                {t('report.details')}
               </Text>
               <TextInput
                 value={details}
                 onChangeText={setDetails}
-                placeholder="Describe el problema..."
+                placeholder={t('report.detailsPlaceholder')}
                 placeholderTextColor={c.t3}
                 multiline
                 numberOfLines={3}
@@ -154,7 +156,7 @@ export function ReportSheet({ targetType, targetId, targetName, onClose }: Props
                   onPress={onClose}
                   className="flex-1 py-3 rounded-md items-center border border-border bg-sh"
                 >
-                  <Text className="text-xs font-body-md text-text">Cancelar</Text>
+                  <Text className="text-xs font-body-md text-text">{t('common.cancel')}</Text>
                 </Pressable>
                 <Pressable
                   onPress={handleSubmit}
@@ -165,7 +167,7 @@ export function ReportSheet({ targetType, targetId, targetName, onClose }: Props
                   {report.isPending
                     ? <ActivityIndicator size="small" color="#fff" />
                     : <Text className="text-xs font-body-sb text-white">
-                        Enviar reporte
+                        {t('report.submit')}
                       </Text>
                   }
                 </Pressable>

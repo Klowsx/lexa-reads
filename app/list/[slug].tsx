@@ -3,6 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ChevronLeft, Heart, MoreHorizontal, Star } from 'lucide-react-native';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BookDetailSheet } from '~/features/book/components/BookDetailSheet';
@@ -64,6 +65,7 @@ export default function ListDetailScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const c = useColors();
+  const { t } = useTranslation();
 
   const currentUserId = useAuthStore((s) => s.user?.id);
   const { data: list, isLoading } = useList(slug ?? '');
@@ -84,12 +86,12 @@ export default function ListDetailScreen() {
   function handleDelete() {
     if (!list) return;
     Alert.alert(
-      'Eliminar lista',
-      `¿Eliminar "${list.name}"? Esta acción no se puede deshacer.`,
+      t('lists.deleteList'),
+      t('lists.deleteConfirm', { name: list.name }),
       [
-        { text: 'Cancelar', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Eliminar',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: () => deleteMutation.mutate(list.id, { onSuccess: () => router.back() }),
         },
@@ -103,11 +105,11 @@ export default function ListDetailScreen() {
   }
 
   function openMenu() {
-    Alert.alert(list?.name ?? 'Lista', undefined, [
-      { text: 'Editar lista', onPress: () => router.push({ pathname: '/list/edit/[slug]', params: { slug: slug ?? '' } } as any) },
-      { text: list?.is_featured ? 'Quitar de destacadas' : 'Destacar en perfil', onPress: handleToggleFeatured },
-      { text: 'Eliminar lista', style: 'destructive', onPress: handleDelete },
-      { text: 'Cancelar', style: 'cancel' },
+    Alert.alert(list?.name ?? t('lists.listFallback'), undefined, [
+      { text: t('lists.editTitle'), onPress: () => router.push({ pathname: '/list/edit/[slug]', params: { slug: slug ?? '' } } as any) },
+      { text: list?.is_featured ? t('lists.unfeature') : t('lists.feature'), onPress: handleToggleFeatured },
+      { text: t('lists.deleteList'), style: 'destructive', onPress: handleDelete },
+      { text: t('common.cancel'), style: 'cancel' },
     ]);
   }
 
@@ -122,18 +124,18 @@ export default function ListDetailScreen() {
   if (!list) {
     return (
       <View className="flex-1 bg-bg items-center justify-center" style={{ paddingTop: insets.top }}>
-        <Text className="font-body text-sm text-t3">Lista no encontrada.</Text>
+        <Text className="font-body text-sm text-t3">{t('lists.notFound')}</Text>
         <Pressable onPress={() => router.back()} className="mt-4">
-          <Text className="font-body-sb text-sm text-accent">Volver</Text>
+          <Text className="font-body-sb text-sm text-accent">{t('common.back')}</Text>
         </Pressable>
       </View>
     );
   }
 
   const pills = [
-    `${list.books_count} libros`,
-    list.visibility === 'public' ? 'Pública' : 'Privada',
-    list.is_featured ? '★ Destacada' : null,
+    t('lists.booksCount', { count: list.books_count }),
+    list.visibility === 'public' ? t('lists.public') : t('lists.private'),
+    list.is_featured ? t('lists.featured') : null,
   ].filter(Boolean) as string[];
 
   return (
@@ -249,13 +251,13 @@ export default function ListDetailScreen() {
 
         {/* ── Books header ── */}
         <View className="flex-row justify-between items-center px-4 pt-5 pb-3.5">
-          <Text className="font-body-sb text-xs text-t3 tracking-widest uppercase">Libros</Text>
+          <Text className="font-body-sb text-xs text-t3 tracking-widest uppercase">{t('lists.booksLabel')}</Text>
           {isOwner && (
             <Pressable
               onPress={() => router.push({ pathname: '/book/add-to-list', params: { listSlug: slug ?? '' } } as any)}
               hitSlop={6}
             >
-              <Text className="text-xs font-body-sb text-accent">+ Agregar</Text>
+              <Text className="text-xs font-body-sb text-accent">{t('lists.add')}</Text>
             </Pressable>
           )}
         </View>
@@ -266,8 +268,8 @@ export default function ListDetailScreen() {
             className="mx-4 rounded-lg border border-border bg-surface items-center py-9 px-5 mb-10"
           >
             <Text className="text-[32px] mb-2.5">📚</Text>
-            <Text className="text-sm font-body-md text-t2 mb-1.5">Lista vacía</Text>
-            <Text className="text-xs font-body text-t3">Toca «+ Agregar» para añadir libros</Text>
+            <Text className="text-sm font-body-md text-t2 mb-1.5">{t('lists.emptyList')}</Text>
+            <Text className="text-xs font-body text-t3">{t('lists.emptyHint')}</Text>
           </View>
         ) : (
           <View className="flex-row flex-wrap px-4 gap-3 pb-10">

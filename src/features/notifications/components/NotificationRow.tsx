@@ -1,5 +1,6 @@
 import { useRouter } from "expo-router";
 import { Bell, Heart, MessageCircle, UserPlus } from "lucide-react-native";
+import { useTranslation } from "react-i18next";
 import { Pressable, Text, View } from "react-native";
 import { Avatar } from "~/components/ui/Avatar";
 import { fixed, useColors } from "~/theme/colors";
@@ -11,16 +12,17 @@ const alpha = (hex: string, op: number) => {
   return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})`;
 };
 
+// El texto vive en i18n (notif.*); aquí solo el icono y el color por tipo.
 const TYPE_CONFIG: Record<
   NotificationType,
-  { label: (actor: string) => string; IconComp: typeof Bell; color: string }
+  { IconComp: typeof Bell; color: string }
 > = {
-  new_follower:                { label: (a) => `@${a} te empezó a seguir`,                   IconComp: UserPlus,      color: fixed.accentAlt.blue  },
-  review_like:                 { label: (a) => `@${a} le dio me gusta a tu reseña`,          IconComp: Heart,         color: fixed.accent          },
-  activity_like:               { label: (a) => `@${a} le dio me gusta a tu publicación`,     IconComp: Heart,         color: fixed.accent          },
-  comment_received:            { label: (a) => `@${a} comentó en tu publicación`,            IconComp: MessageCircle, color: fixed.accentAlt.green },
-  reading_challenge_completed: { label: ()  => "¡Completaste tu meta de lectura este año!",  IconComp: Bell,          color: fixed.star            },
-  recommendation_received:     { label: (a) => `@${a} te recomendó un libro`,                IconComp: Bell,          color: fixed.accentAlt.rose  },
+  new_follower:                { IconComp: UserPlus,      color: fixed.accentAlt.blue  },
+  review_like:                 { IconComp: Heart,         color: fixed.accent          },
+  activity_like:               { IconComp: Heart,         color: fixed.accent          },
+  comment_received:            { IconComp: MessageCircle, color: fixed.accentAlt.green },
+  reading_challenge_completed: { IconComp: Bell,          color: fixed.star            },
+  recommendation_received:     { IconComp: Bell,          color: fixed.accentAlt.rose  },
 };
 
 function notificationTarget(
@@ -48,10 +50,11 @@ interface NotificationRowProps {
 export function NotificationRow({ item }: NotificationRowProps) {
   const c = useColors();
   const router = useRouter();
+  const { t } = useTranslation();
   const config = TYPE_CONFIG[item.type] ?? TYPE_CONFIG.new_follower;
-  const actorName = item.actor?.display_name ?? item.actor?.username ?? "Alguien";
+  const actorName = item.actor?.display_name ?? item.actor?.username ?? t("notif.someone");
   const actorUsername = item.actor?.username;
-  const label = config.label(actorName);
+  const label = t(`notif.${item.type}`, { actor: actorName });
   const isUnread = item.read_at === null;
   const target = notificationTarget(item.type, item.reference_id, item.reference_type, actorUsername);
 

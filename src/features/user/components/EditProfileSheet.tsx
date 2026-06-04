@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ActivityIndicator,
   Modal,
@@ -33,6 +34,7 @@ interface Props {
 export function EditProfileSheet({ user, onClose }: Props) {
   const c = useColors();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const color = getAvatarColor(user.username);
   const { mutate: updateProfile, isPending } = useUpdateProfile();
 
@@ -87,7 +89,7 @@ export function EditProfileSheet({ user, onClose }: Props) {
           </View>
 
           <View className="flex-row justify-between items-center px-5 pt-3 pb-4">
-            <Text className="font-display-sb text-md text-text">Editar perfil</Text>
+            <Text className="font-display-sb text-md text-text">{t('editProfile.title')}</Text>
             <Pressable onPress={onClose} hitSlop={8} className="w-8 h-8 items-center justify-center">
               <Text className="text-lg font-body text-t2">×</Text>
             </Pressable>
@@ -103,16 +105,16 @@ export function EditProfileSheet({ user, onClose }: Props) {
               />
               <View>
                 <Pressable className="px-4 py-2 rounded-md bg-sh border border-border mb-1.5">
-                  <Text className="text-xs font-body-md text-text">Cambiar foto</Text>
+                  <Text className="text-xs font-body-md text-text">{t('editProfile.changePhoto')}</Text>
                 </Pressable>
-                <Text className="text-xs font-body text-t3">JPG, PNG o GIF · Máx. 5 MB</Text>
+                <Text className="text-xs font-body text-t3">{t('editProfile.photoHintGif')}</Text>
               </View>
             </View>
 
             <View className="px-5">
               <View className="mb-3.5">
                 <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-1.5">
-                  Nombre
+                  {t('editProfile.name')}
                 </Text>
                 <TextInput
                   value={name}
@@ -125,7 +127,7 @@ export function EditProfileSheet({ user, onClose }: Props) {
 
               <View className="mb-[18px]">
                 <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-1.5">
-                  Bio
+                  {t('editProfile.bio')}
                 </Text>
                 <TextInput
                   value={bio}
@@ -133,7 +135,7 @@ export function EditProfileSheet({ user, onClose }: Props) {
                   multiline
                   numberOfLines={3}
                   maxLength={160}
-                  placeholder="Cuéntanos sobre tus lecturas..."
+                  placeholder={t('editProfile.bioPlaceholder')}
                   className="rounded-md bg-sr border border-border text-text font-body text-sm"
                   style={{
                     paddingHorizontal: 14,
@@ -150,7 +152,7 @@ export function EditProfileSheet({ user, onClose }: Props) {
 
               <View className="mb-6">
                 <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-2">
-                  Géneros favoritos
+                  {t('editProfile.favoriteGenres')}
                 </Text>
                 <View className="flex-row flex-wrap gap-1.5">
                   {GENRES.map((g) => {
@@ -186,7 +188,7 @@ export function EditProfileSheet({ user, onClose }: Props) {
                 {isPending ? (
                   <ActivityIndicator size="small" color="#fff" />
                 ) : (
-                  <Text className="text-sm font-body-sb text-white">Guardar cambios</Text>
+                  <Text className="text-sm font-body-sb text-white">{t('common.saveChanges')}</Text>
                 )}
               </Pressable>
             </View>

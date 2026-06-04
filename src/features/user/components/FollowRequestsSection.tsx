@@ -1,5 +1,6 @@
 import { useRouter } from 'expo-router';
 import { Check, UserCheck, X } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { Avatar } from '~/components/ui/Avatar';
 import { useRespondToFollow } from '../hooks/useRespondToFollow';
@@ -75,6 +76,7 @@ interface Props {
 }
 
 export function FollowRequestsSection({ requests }: Props) {
+  const { t } = useTranslation();
   if (requests.length === 0) return null;
 
   return (
@@ -85,7 +87,7 @@ export function FollowRequestsSection({ requests }: Props) {
           <UserCheck size={12} color="#fff" strokeWidth={2.2} />
         </View>
         <Text className="text-xs font-body-sb text-text">
-          Solicitudes de seguimiento
+          {t('profile.followRequests')}
         </Text>
         <View className="ml-auto bg-accent rounded-full px-2 py-0.5">
           <Text className="text-xs font-body-sb text-white">{requests.length}</Text>

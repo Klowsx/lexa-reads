@@ -1,11 +1,12 @@
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import { type BookStatus, STATUS_META } from '~/lib/book-status';
 
-const TABS: { status: BookStatus; shortLabel: string }[] = [
-  { status: 'reading',      shortLabel: 'Leyendo'  },
-  { status: 'read',         shortLabel: 'Leídos'   },
-  { status: 'want_to_read', shortLabel: 'Por leer' },
-  { status: 'abandoned',    shortLabel: 'Abandon.' },
+const TABS: { status: BookStatus; labelKey: string }[] = [
+  { status: 'reading',      labelKey: 'library.tabReading'    },
+  { status: 'read',         labelKey: 'library.tabRead'       },
+  { status: 'want_to_read', labelKey: 'library.tabWantToRead' },
+  { status: 'abandoned',    labelKey: 'library.tabAbandoned'  },
 ];
 
 interface Props {
@@ -15,9 +16,10 @@ interface Props {
 }
 
 export function LibraryTabs({ activeTab, countByStatus, onTabChange }: Props) {
+  const { t } = useTranslation();
   return (
     <View className="flex-row border-b border-border">
-      {TABS.map(({ status, shortLabel }) => {
+      {TABS.map(({ status, labelKey }) => {
         const meta = STATUS_META[status];
         const active = activeTab === status;
 
@@ -45,7 +47,7 @@ export function LibraryTabs({ activeTab, countByStatus, onTabChange }: Props) {
                 color: active ? meta.color : undefined,
               }}
             >
-              {shortLabel}
+              {t(labelKey)}
             </Text>
           </Pressable>
         );
