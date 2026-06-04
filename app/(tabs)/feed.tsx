@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { Bell, Users } from 'lucide-react-native';
+import { Bell, MessageCircle, Users } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -26,14 +26,32 @@ export default function FeedScreen() {
       {/* Header */}
       <View className="px-4 py-2.5 border-b border-border flex-row items-center justify-between">
         <Text className="font-display-sb text-xl text-text tracking-tight">{t('feed.title')}</Text>
-        <Pressable
-          hitSlop={8}
-          onPress={() => router.push('/notifications' as any)}
-          accessibilityRole="button"
-          accessibilityLabel={t('feed.notifications')}
-        >
-          <Bell size={20} color={c.t3} strokeWidth={1.6} />
-        </Pressable>
+        <View className="flex-row items-center gap-4">
+          <Pressable
+            hitSlop={8}
+            onPress={() => router.push('/clubs' as any)}
+            accessibilityRole="button"
+            accessibilityLabel="Clubes de lectura"
+          >
+            <Users size={20} color={c.t3} strokeWidth={1.6} />
+          </Pressable>
+          <Pressable
+            hitSlop={8}
+            onPress={() => router.push('/messages' as any)}
+            accessibilityRole="button"
+            accessibilityLabel="Mensajes"
+          >
+            <MessageCircle size={20} color={c.t3} strokeWidth={1.6} />
+          </Pressable>
+          <Pressable
+            hitSlop={8}
+            onPress={() => router.push('/notifications' as any)}
+            accessibilityRole="button"
+            accessibilityLabel={t('feed.notifications')}
+          >
+            <Bell size={20} color={c.t3} strokeWidth={1.6} />
+          </Pressable>
+        </View>
       </View>
 
       <QueryBoundary query={feedQuery} skeleton={<FeedSkeleton />}>

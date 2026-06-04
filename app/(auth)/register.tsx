@@ -155,6 +155,13 @@ export default function RegisterScreen() {
             >
               Términos
             </Text>
+            ,{" "}
+            <Text
+              className="text-accent"
+              onPress={() => Linking.openURL('https://lexareads.app/eula')}
+            >
+              la Licencia de uso
+            </Text>
             {" "}y la{" "}
             <Text
               className="text-accent"
@@ -162,7 +169,14 @@ export default function RegisterScreen() {
             >
               Política de privacidad
             </Text>
-            {" "}de Lexa.
+            , y me comprometo a respetar las{" "}
+            <Text
+              className="text-accent"
+              onPress={() => Linking.openURL('https://lexareads.app/community')}
+            >
+              Normas de la comunidad
+            </Text>
+            : Lexa tiene tolerancia cero con el contenido ofensivo y los usuarios abusivos.
           </Text>
         </Pressable>
 

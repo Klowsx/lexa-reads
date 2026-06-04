@@ -359,6 +359,8 @@
     "legal": "Legal",
     "privacyPolicy": "Política de privacidad",
     "termsOfService": "Términos de servicio",
+    "eula": "Licencia de uso (EULA)",
+    "communityGuidelines": "Normas de la comunidad",
     "ossLicenses": "Licencias open source",
     "session": "Sesión",
     "logout": "Cerrar sesión"

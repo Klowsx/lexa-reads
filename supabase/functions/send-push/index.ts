@@ -11,7 +11,11 @@ type NotificationType =
   | "activity_like"
   | "comment_received"
   | "reading_challenge_completed"
-  | "recommendation_received";
+  | "recommendation_received"
+  | "dm_request"
+  | "dm_message"
+  | "club_message"
+  | "club_join_request";
 
 function buildMessage(
   type: NotificationType,
@@ -25,6 +29,10 @@ function buildMessage(
     comment_received:            { title: "Lexa", body: `${actor} comentó en tu publicación`            },
     reading_challenge_completed: { title: "¡Meta cumplida! 🎉", body: "Completaste tu desafío de lectura" },
     recommendation_received:     { title: "Lexa", body: `${actor} te recomendó un libro`                },
+    dm_request:                  { title: "Lexa", body: `${actor} quiere enviarte mensajes`             },
+    dm_message:                  { title: actor,  body: "Te envió un mensaje"                            },
+    club_message:                { title: "Lexa", body: `Nuevo mensaje en tu club`                       },
+    club_join_request:           { title: "Lexa", body: `${actor} quiere unirse a tu club`              },
   };
   return map[type] ?? { title: "Lexa", body: "Tienes una nueva notificación" };
 }
@@ -55,7 +63,7 @@ Deno.serve(async (req) => {
     // Fetch recipient push token and preference for this notification type
     const { data: prefs } = await supabaseAdmin
       .from("notification_preferences")
-      .select("push_token, push_new_follower, push_activity_like, push_review_like, push_comment, push_recommendation")
+      .select("push_token, push_new_follower, push_activity_like, push_review_like, push_comment, push_recommendation, push_dm, push_club")
       .eq("user_id", recipient_id)
       .single();
 
@@ -72,6 +80,10 @@ Deno.serve(async (req) => {
       comment_received:            "push_comment",
       reading_challenge_completed: "push_recommendation",
       recommendation_received:     "push_recommendation",
+      dm_request:                  "push_dm",
+      dm_message:                  "push_dm",
+      club_message:                "push_club",
+      club_join_request:           "push_club",
     };
     const prefField = prefKey[type as NotificationType];
     if (prefField && (prefs as any)?.[prefField] === false) {
@@ -104,6 +116,25 @@ Deno.serve(async (req) => {
     });
 
     const result = await res.json();
+
+    // Ciclo de vida del token: Expo devuelve un "ticket" por mensaje. Si el
+    // ticket viene con error DeviceNotRegistered / InvalidCredentials, el token
+    // está muerto → lo limpiamos para no seguir intentando (token rot).
+    // Nota: DeviceNotRegistered también puede llegar DESPUÉS, en el "receipt"
+    // (asíncrono). Limpiarlo del todo requiere un job programado que consulte
+    // los receipts por ticket-id; aquí cubrimos el caso síncrono del ticket.
+    const ticket = Array.isArray((result as any)?.data)
+      ? (result as any).data[0]
+      : (result as any)?.data;
+    const deadTokenErrors = ["DeviceNotRegistered", "InvalidCredentials", "MismatchSenderId"];
+    if (ticket?.status === "error" && deadTokenErrors.includes(ticket?.details?.error)) {
+      await supabaseAdmin
+        .from("notification_preferences")
+        .update({ push_token: null })
+        .eq("user_id", recipient_id)
+        .eq("push_token", pushToken);
+    }
+
     return new Response(JSON.stringify(result), {
       status: 200,
       headers: { "Content-Type": "application/json" },

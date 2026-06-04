@@ -34,7 +34,20 @@ Deno.serve(async (req) => {
 
   const uid = user.id
 
-  const [profile, userBooks, reviews, lists, comments] = await Promise.all([
+  // Rate-limit: el export escanea varias tablas → máx. 3 por hora por usuario.
+  const { data: allowed } = await supabase.rpc('hit_rate_limit', {
+    p_key: `export:${uid}`,
+    p_max: 3,
+    p_window_seconds: 3600,
+  })
+  if (allowed === false) {
+    return new Response(JSON.stringify({ error: 'Demasiadas solicitudes. Inténtalo más tarde.' }), {
+      status: 429,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+
+  const [profile, userBooks, reviews, lists, comments, messages] = await Promise.all([
     supabase
       .from('users')
       .select('username, display_name, bio, favorite_genres, created_at')
@@ -67,6 +80,14 @@ Deno.serve(async (req) => {
       .eq('user_id', uid)
       .is('deleted_at', null)
       .then(r => r.data ?? []),
+
+    // Mensajes enviados (DMs + chat de club). Derecho de portabilidad (GDPR).
+    supabase
+      .from('messages')
+      .select('body, conversation_id, created_at')
+      .eq('sender_id', uid)
+      .is('deleted_at', null)
+      .then(r => r.data ?? []),
   ])
 
   const exportData = {
@@ -76,6 +97,7 @@ Deno.serve(async (req) => {
     reviews,
     lists,
     comments,
+    messages,
   }
 
   return new Response(JSON.stringify(exportData), {

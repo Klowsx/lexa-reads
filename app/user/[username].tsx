@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ChevronLeft, Lock, MoreHorizontal, UserMinus, UserPlus } from 'lucide-react-native';
+import { ChevronLeft, Lock, MessageCircle, MoreHorizontal, UserMinus, UserPlus } from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -21,6 +21,7 @@ import { ProfileStats } from '~/features/user/components/ProfileStats';
 import { RecentReads } from '~/features/user/components/RecentReads';
 import { ReportSheet } from '~/features/user/components/ReportSheet';
 import { useBlockUser } from '~/features/user/hooks/useBlockUser';
+import { useStartDM } from '~/features/chat/hooks/useStartDM';
 import { useFollow } from '~/features/user/hooks/useFollow';
 import { useProfile } from '~/features/user/hooks/useProfile';
 import { userRecentReadsQueryOptions } from '~/features/user/user.queries';
@@ -101,9 +102,17 @@ export default function UserProfileScreen() {
     username,
   );
 
+  const startDM = useStartDM();
   const [showReport, setShowReport] = useState(false);
 
   const blocked = profile?.is_blocked_by_me ?? false;
+
+  function handleMessage() {
+    if (!profile?.id) return;
+    startDM.mutate(profile.id, {
+      onSuccess: (conversationId) => router.push(`/messages/${conversationId}`),
+    });
+  }
   const followStatus = profile?.follow_status ?? null;
   const isFollowing = followStatus === 'accepted';
   const isPending = followStatus === 'pending';
@@ -270,6 +279,21 @@ export default function UserProfileScreen() {
                     : 'Seguir'}
               </Text>
             </Pressable>
+
+            {/* Message button */}
+            {!blocked && (
+              <Pressable
+                onPress={handleMessage}
+                disabled={startDM.isPending}
+                className="py-2.5 mt-2 rounded-xl items-center border flex-row justify-center gap-2"
+                style={{ borderColor: alpha(color, 0.22), backgroundColor: alpha(c.text, 0.05) }}
+                accessibilityRole="button"
+                accessibilityLabel={`Enviar mensaje a ${profile.username}`}
+              >
+                <MessageCircle size={14} color={c.t2} strokeWidth={2} />
+                <Text className="text-xs font-body-sb text-t2">Mensaje</Text>
+              </Pressable>
+            )}
           </LinearGradient>
         </View>
 

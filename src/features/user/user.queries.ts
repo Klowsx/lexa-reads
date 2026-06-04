@@ -467,7 +467,9 @@ export type ReportTargetType =
   | "comment"
   | "user"
   | "list"
-  | "activity";
+  | "activity"
+  | "message"
+  | "club";
 
 export async function createReportFn(params: {
   reporterId: string;
@@ -476,9 +478,11 @@ export async function createReportFn(params: {
   reason: string;
   details?: string;
 }): Promise<void> {
+  // target_type 'message'/'club' se añaden al enum en la migración 019; el tipo
+  // generado aún no los incluye → cast hasta `pnpm gen:types`.
   const { error } = await supabase.from("reports").insert({
     reporter_id: params.reporterId,
-    target_type: params.targetType,
+    target_type: params.targetType as any,
     target_id: params.targetId,
     reason: params.reason,
     details: params.details ?? null,

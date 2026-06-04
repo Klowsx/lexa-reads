@@ -55,6 +55,39 @@ describe("RLS: users table", () => {
     expect(data?.bio).not.toBe("hacked");
   });
 
+  // NEW-1 (migración 017): un usuario no puede auto-promoverse a admin ni
+  // inflar sus contadores desnormalizados (REVOKE UPDATE por columna).
+  (SKIP ? it.skip : it)("usuario NO puede auto-promoverse a admin", async () => {
+    await userA.client
+      .from("users")
+      // @ts-expect-error is_admin aún no está en los tipos generados
+      .update({ is_admin: true })
+      .eq("id", userA.user.id);
+
+    const { data } = await adminClient
+      .from("users")
+      .select("is_admin")
+      .eq("id", userA.user.id)
+      .single();
+
+    expect((data as any)?.is_admin).not.toBe(true);
+  });
+
+  (SKIP ? it.skip : it)("usuario NO puede inflar followers_count", async () => {
+    await userA.client
+      .from("users")
+      .update({ followers_count: 9999 })
+      .eq("id", userA.user.id);
+
+    const { data } = await adminClient
+      .from("users")
+      .select("followers_count")
+      .eq("id", userA.user.id)
+      .single();
+
+    expect(data?.followers_count).not.toBe(9999);
+  });
+
   (SKIP ? it.skip : it)("bloqueador NO ve el perfil del usuario bloqueado", async () => {
     const { error: blockError } = await adminClient.from("user_blocks").insert({
       blocker_id: userA.user.id,

@@ -25,10 +25,12 @@ const alpha = (hex: string, op: number) => {
   return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})`;
 };
 
-// URLs de documentos legales — actualizar cuando los docs estén publicados
-const PRIVACY_URL = 'https://lexareads.app/privacy';
-const TERMS_URL   = 'https://lexareads.app/terms';
-const OSS_URL     = 'https://lexareads.app/licenses';
+// URLs de documentos legales — fuente en public/legal/, publicar en el dominio.
+const PRIVACY_URL   = 'https://lexareads.app/privacy';
+const TERMS_URL     = 'https://lexareads.app/terms';
+const EULA_URL      = 'https://lexareads.app/eula';
+const COMMUNITY_URL = 'https://lexareads.app/community';
+const OSS_URL       = 'https://lexareads.app/licenses';
 
 const THEME_OPTIONS: { mode: ThemeMode; labelKey: string; Icon: typeof Sun }[] = [
   { mode: 'light',  labelKey: 'settings.themeLight',  Icon: Sun },
@@ -343,6 +345,14 @@ export default function SettingsScreen() {
           <SettingsItem
             label={t('settings.termsOfService')}
             onPress={() => Linking.openURL(TERMS_URL)}
+          />
+          <SettingsItem
+            label={t('settings.eula')}
+            onPress={() => Linking.openURL(EULA_URL)}
+          />
+          <SettingsItem
+            label={t('settings.communityGuidelines')}
+            onPress={() => Linking.openURL(COMMUNITY_URL)}
           />
           <SettingsItem
             label={t('settings.ossLicenses')}
