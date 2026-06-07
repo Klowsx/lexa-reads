@@ -6,7 +6,6 @@ import {
   Platform,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   View,
 } from "react-native";
@@ -16,9 +15,11 @@ import {
   BackBar,
   GhostButton,
   PrimaryButton,
+  GoogleIcon,
 } from "../../src/features/auth/components";
 import { useColors } from "~/theme/colors";
 import { useLogin } from "@/src/features/auth/hooks/useLogin";
+import { useOAuthLogin } from "@/src/features/auth/hooks/useOAuthLogin";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -29,6 +30,7 @@ export default function LoginScreen() {
   const [showPw, setShowPw] = useState(false);
 
   const { mutate: login, isPending, error } = useLogin();
+  const { mutate: oauthLogin, isPending: isOAuthPending } = useOAuthLogin();
 
   return (
     <KeyboardAvoidingView
@@ -122,7 +124,10 @@ export default function LoginScreen() {
 
         <View className="flex-row mb-2">
           <View className="w-[10px]" />
-          <GhostButton>
+          <GhostButton
+            loading={isOAuthPending}
+            onPress={() => oauthLogin("google")}
+          >
             <GoogleIcon />
             <Text className="font-body-md text-text text-sm">Google</Text>
           </GhostButton>
@@ -143,58 +148,4 @@ export default function LoginScreen() {
   );
 }
 
-function GoogleIcon() {
-  return (
-    <View style={googleStyles.svg}>
-      <View
-        style={[
-          googleStyles.quarter,
-          { backgroundColor: "#4285F4", top: 0, left: "50%" },
-        ]}
-      />
-      <View
-        style={[
-          googleStyles.quarter,
-          { backgroundColor: "#34A853", bottom: 0, left: "50%" },
-        ]}
-      />
-      <View
-        style={[
-          googleStyles.quarter,
-          { backgroundColor: "#FBBC04", bottom: 0, left: 0 },
-        ]}
-      />
-      <View
-        style={[
-          googleStyles.quarter,
-          { backgroundColor: "#EA4335", top: 0, left: 0 },
-        ]}
-      />
-      <View
-        className="bg-surface absolute rounded-[3.5px]"
-        style={googleStyles.hole}
-      />
-    </View>
-  );
-}
 
-const googleStyles = StyleSheet.create({
-  svg: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    overflow: "hidden",
-    position: "relative",
-  },
-  quarter: {
-    position: "absolute",
-    width: "50%",
-    height: "50%",
-  },
-  hole: {
-    width: 7,
-    height: 7,
-    top: 3.5,
-    left: 3.5,
-  },
-});

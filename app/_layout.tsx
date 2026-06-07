@@ -19,6 +19,7 @@ import { Stack, useRouter, useSegments } from "expo-router";
 import { QueryClientProvider, focusManager } from "@tanstack/react-query";
 import { I18nextProvider } from "react-i18next";
 import { useFonts } from "expo-font";
+import * as Linking from "expo-linking";
 import { supabase } from "~/lib/supabase";
 import { useAuthStore } from "~/stores/auth.store";
 import { useThemeStore } from "~/stores/theme.store";
@@ -26,6 +27,7 @@ import { queryClient } from "~/lib/query-client";
 import i18n from "~/lib/i18n";
 import { ConsentModal } from "~/features/user/components/ConsentModal";
 import { ErrorBoundary } from "~/components/ErrorBoundary";
+import { createSessionFromUrl } from "~/features/auth/oauth";
 
 function AuthGate() {
   const session = useAuthStore((s) => s.session);
@@ -90,6 +92,20 @@ function RootLayout() {
     const sub = AppState.addEventListener("change", (state) => {
       if (Platform.OS !== "web") focusManager.setFocused(state === "active");
     });
+    return () => sub.remove();
+  }, []);
+
+  useEffect(() => {
+    const handleUrl = async (url: string) => {
+      if (!url.includes("access_token")) return;
+      await createSessionFromUrl(url);
+    };
+
+    Linking.getInitialURL().then((url) => {
+      if (url) handleUrl(url);
+    });
+
+    const sub = Linking.addEventListener("url", ({ url }) => handleUrl(url));
     return () => sub.remove();
   }, []);
 

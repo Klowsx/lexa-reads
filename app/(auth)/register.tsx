@@ -15,8 +15,11 @@ import {
   AuthField,
   BackBar,
   PrimaryButton,
+  GhostButton,
+  GoogleIcon,
 } from "../../src/features/auth/components";
 import { useRegister } from "@/src/features/auth/hooks/useRegister";
+import { useOAuthLogin } from "@/src/features/auth/hooks/useOAuthLogin";
 import { useColors } from "~/theme/colors";
 
 export default function RegisterScreen() {
@@ -29,6 +32,7 @@ export default function RegisterScreen() {
   const [terms, setTerms] = useState(false);
 
   const { mutate: register, isPending, error } = useRegister();
+  const { mutate: oauthLogin, isPending: isOAuthPending } = useOAuthLogin();
   const c = useColors();
 
   const strengthLevels = [
@@ -193,6 +197,27 @@ export default function RegisterScreen() {
         >
           Crear cuenta
         </PrimaryButton>
+
+        <View className="flex-row items-center gap-[10px] my-[22px]">
+          <View className="flex-1 h-px bg-border" />
+          <Text
+            className="font-body text-xs text-t3 uppercase tracking-[0.9px]"
+          >
+            o continúa con
+          </Text>
+          <View className="flex-1 h-px bg-border" />
+        </View>
+
+        <View className="flex-row mb-2">
+          <View className="w-[10px]" />
+          <GhostButton
+            loading={isOAuthPending}
+            onPress={() => oauthLogin("google")}
+          >
+            <GoogleIcon />
+            <Text className="font-body-md text-text text-sm">Google</Text>
+          </GhostButton>
+        </View>
 
         <Link href="/(auth)/login" asChild>
           <Pressable className="pt-[18px] items-center">

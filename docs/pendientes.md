@@ -11,14 +11,18 @@ Leyenda: 🔴 estructural / bloqueante real · 🟠 debería entrar antes de lan
 ## Features de MVP que faltan
 
 ### 🟠 Google OAuth (login)
-Hoy solo hay email/contraseña; `STACK §2` lo marca como MVP. Es el método de registro #1 en móvil → sin él se pierde conversión en onboarding. No hay `signInWithOAuth`/`signInWithIdToken` en el código.
+Hoy solo hay email/contraseña; `STACK §2` lo marca como MVP. Es el método de registro #1 en móvil → sin él se pierde conversión en onboarding.
 
-**Implementación (cliente):** botón "Continuar con Google" en `app/(auth)/login.tsx` → `expo-auth-session` / `supabase.auth.signInWithIdToken`. Redirect `lexa://auth/callback` (el scheme ya está en `app.json`).
+**Implementación (cliente):** ✅ Hecho. Flujo con `expo-web-browser` + `supabase.auth.signInWithOAuth` en `src/features/auth/auth.queries.ts`, botón conectado en `login.tsx`/`register.tsx`, deep link handler en `app/_layout.tsx`. Redirect `lexa://auth/callback` (el scheme ya está en `app.json`).
 
-**Setup de dashboard (one-time):**
-1. **Supabase** → Authentication → Providers → Google: activar y pegar `Client ID` + `Client Secret`. En Redirect URLs: `exp://localhost:8081/--/auth/callback` (dev) y `lexa://auth/callback` (prod).
-2. **Google Cloud Console** → APIs & Services → Credentials → OAuth 2.0 Client ID (Web). Authorized redirect URIs: el callback de Supabase (`https://<project>.supabase.co/auth/v1/callback`).
-3. Para iOS nativo: client ID adicional tipo iOS con el `bundleIdentifier` `com.lexareads.app`.
+> ⚠️ **No funciona en Expo Go Android** — Google OAuth requiere el SHA-1 del certificado de firma de la app. Expo Go usa el certificado de Expo, no el de `com.lexareads.app`. Para probar en Android se necesita un **development build** (`npx eas build --profile development`). En iOS simulator funciona sin configuración extra.
+
+**Setup de dashboard (one-time) — ⏸️ BLOQUEADO hasta builds reales:**
+1. **Supabase** → Authentication → Providers → Google: activar y pegar `Client ID` + `Client Secret`. En Redirect URLs: `lexa://auth/callback` (prod) y `https://<project>.supabase.co/auth/v1/callback` (web).
+2. **Google Cloud Console** → APIs & Services → Credentials:
+   - **Web client**: Authorized redirect URIs → callback de Supabase (`https://<project>.supabase.co/auth/v1/callback`).
+   - **iOS client** (tipo iOS): Bundle ID = `com.lexareads.app`.
+   - **Android client** (tipo Android): Package name = `com.lexareads.app`. **SHA-1 certificate fingerprint**: generar con `npx eas build --profile development --platform android` (EAS lo muestra al final del build) o con `eas credentials`.
 
 ### 🟠 Escaneo de ISBN por cámara
 `expo-camera` ya está en deps y `getBookByIsbn()` (en `google-books.ts`) está listo y validado — **solo falta la UI**. Diferenciador real vs. teclear títulos; `STACK §2` lo lista como MVP.

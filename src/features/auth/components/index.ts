@@ -7,4 +7,5 @@ export { OnboardHeader } from './OnboardHeader';
 export { PrimaryButton } from './PrimaryButton';
 export { StepBar } from './StepBar';
 export { Wordmark } from './Wordmark';
+export { GoogleIcon } from './GoogleIcon';
 export { AUTH, alpha } from './tokens';
