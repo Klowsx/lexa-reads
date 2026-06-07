@@ -1,11 +1,11 @@
 import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 import { supabase } from "~/lib/supabase";
 
-// NOTA: las tablas de mensajería (conversations, messages, conversation_members)
-// aún no están en `database.ts` (se generan con `pnpm gen:types` tras aplicar las
-// migraciones 019/020). Hasta entonces accedemos por un cliente sin tipar y
-// devolvemos tipos de dominio definidos aquí. Al regenerar, cambiar `sb` por
-// `supabase` y quitar los casts.
+// supabase-js no infiere correctamente los nested foreign-key selects
+// (p. ej. `sender:users!messages_sender_id_fkey(...)`). El tipado de
+// database.ts es correcto pero el cliente no lo resuelve en runtime →
+// usamos `as any` localmente, devolviendo tipos de dominio definidos
+// manualmente.
 const sb = supabase as any;
 
 // ── Tipos de dominio ───────────────────────────────────────────

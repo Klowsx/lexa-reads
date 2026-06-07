@@ -1,8 +1,11 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "~/lib/supabase";
 
-// Tablas/columnas de mensajería y los nuevos campos de club (state/last_read_at)
-// no están aún en database.ts → cliente sin tipar hasta `pnpm gen:types`.
+// supabase-js no infiere correctamente los nested foreign-key selects
+// (p. ej. `current_book:books!reading_clubs_current_book_id_fkey(...)`).
+// El tipado de database.ts es correcto pero el cliente no lo resuelve en
+// runtime → usamos `as any` localmente, devolviendo tipos de dominio
+// definidos manualmente.
 const sb = supabase as any;
 
 export type ClubVisibility = "public" | "private";

@@ -18,23 +18,26 @@ export type Database = {
         Row: {
           cancelled_at: string | null
           id: string
+          processed_at: string | null
           requested_at: string | null
           scheduled_delete_at: string | null
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           cancelled_at?: string | null
           id?: string
+          processed_at?: string | null
           requested_at?: string | null
           scheduled_delete_at?: string | null
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           cancelled_at?: string | null
           id?: string
+          processed_at?: string | null
           requested_at?: string | null
           scheduled_delete_at?: string | null
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -262,6 +265,7 @@ export type Database = {
       }
       books: {
         Row: {
+          added_by: string | null
           authors: string[] | null
           cover_url: string | null
           created_at: string | null
@@ -281,6 +285,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          added_by?: string | null
           authors?: string[] | null
           cover_url?: string | null
           created_at?: string | null
@@ -300,6 +305,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          added_by?: string | null
           authors?: string[] | null
           cover_url?: string | null
           created_at?: string | null
@@ -318,7 +324,15 @@ export type Database = {
           title?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "books_added_by_fkey"
+            columns: ["added_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       buddy_reads: {
         Row: {
@@ -366,6 +380,61 @@ export type Database = {
           {
             foreignKeyName: "buddy_reads_partner_id_fkey"
             columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_topics: {
+        Row: {
+          book_id: string | null
+          club_id: string
+          created_at: string | null
+          created_by: string | null
+          id: string
+          kind: string
+          spoiler_after_chapter: number | null
+          title: string
+        }
+        Insert: {
+          book_id?: string | null
+          club_id: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          kind?: string
+          spoiler_after_chapter?: number | null
+          title: string
+        }
+        Update: {
+          book_id?: string | null
+          club_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          kind?: string
+          spoiler_after_chapter?: number | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_topics_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_topics_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "reading_clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_topics_created_by_fkey"
+            columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
@@ -427,6 +496,113 @@ export type Database = {
           {
             foreignKeyName: "comments_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversation_members: {
+        Row: {
+          archived: boolean
+          conversation_id: string
+          joined_at: string | null
+          last_read_at: string | null
+          muted: boolean
+          user_id: string
+        }
+        Insert: {
+          archived?: boolean
+          conversation_id: string
+          joined_at?: string | null
+          last_read_at?: string | null
+          muted?: boolean
+          user_id: string
+        }
+        Update: {
+          archived?: boolean
+          conversation_id?: string
+          joined_at?: string | null
+          last_read_at?: string | null
+          muted?: boolean
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_members_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversation_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversations: {
+        Row: {
+          club_id: string | null
+          created_at: string | null
+          dm_user_high: string | null
+          dm_user_low: string | null
+          id: string
+          kind: Database["public"]["Enums"]["conversation_kind"]
+          last_message_at: string | null
+          request_state: Database["public"]["Enums"]["dm_request_state"]
+          requested_by: string | null
+        }
+        Insert: {
+          club_id?: string | null
+          created_at?: string | null
+          dm_user_high?: string | null
+          dm_user_low?: string | null
+          id?: string
+          kind: Database["public"]["Enums"]["conversation_kind"]
+          last_message_at?: string | null
+          request_state?: Database["public"]["Enums"]["dm_request_state"]
+          requested_by?: string | null
+        }
+        Update: {
+          club_id?: string | null
+          created_at?: string | null
+          dm_user_high?: string | null
+          dm_user_low?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["conversation_kind"]
+          last_message_at?: string | null
+          request_state?: Database["public"]["Enums"]["dm_request_state"]
+          requested_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "reading_clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_dm_user_high_fkey"
+            columns: ["dm_user_high"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_dm_user_low_fkey"
+            columns: ["dm_user_low"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_requested_by_fkey"
+            columns: ["requested_by"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
@@ -600,34 +776,111 @@ export type Database = {
           },
         ]
       }
+      messages: {
+        Row: {
+          body: string
+          conversation_id: string
+          created_at: string | null
+          deleted_at: string | null
+          edited_at: string | null
+          id: string
+          reply_to_id: string | null
+          sender_id: string
+          topic_id: string | null
+        }
+        Insert: {
+          body: string
+          conversation_id: string
+          created_at?: string | null
+          deleted_at?: string | null
+          edited_at?: string | null
+          id?: string
+          reply_to_id?: string | null
+          sender_id: string
+          topic_id?: string | null
+        }
+        Update: {
+          body?: string
+          conversation_id?: string
+          created_at?: string | null
+          deleted_at?: string | null
+          edited_at?: string | null
+          id?: string
+          reply_to_id?: string | null
+          sender_id?: string
+          topic_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_reply_to_id_fkey"
+            columns: ["reply_to_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "club_topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notification_preferences: {
         Row: {
+          consent_given_at: string | null
           email_weekly_digest: boolean | null
           push_activity_like: boolean | null
+          push_club: boolean
           push_comment: boolean | null
+          push_dm: boolean
           push_new_follower: boolean | null
           push_recommendation: boolean | null
           push_review_like: boolean | null
+          push_token: string | null
           updated_at: string | null
           user_id: string
         }
         Insert: {
+          consent_given_at?: string | null
           email_weekly_digest?: boolean | null
           push_activity_like?: boolean | null
+          push_club?: boolean
           push_comment?: boolean | null
+          push_dm?: boolean
           push_new_follower?: boolean | null
           push_recommendation?: boolean | null
           push_review_like?: boolean | null
+          push_token?: string | null
           updated_at?: string | null
           user_id: string
         }
         Update: {
+          consent_given_at?: string | null
           email_weekly_digest?: boolean | null
           push_activity_like?: boolean | null
+          push_club?: boolean
           push_comment?: boolean | null
+          push_dm?: boolean
           push_new_follower?: boolean | null
           push_recommendation?: boolean | null
           push_review_like?: boolean | null
+          push_token?: string | null
           updated_at?: string | null
           user_id?: string
         }
@@ -689,26 +942,50 @@ export type Database = {
           },
         ]
       }
+      rate_limits: {
+        Row: {
+          count: number
+          key: string
+          window_start: string
+        }
+        Insert: {
+          count?: number
+          key: string
+          window_start?: string
+        }
+        Update: {
+          count?: number
+          key?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
       reading_club_members: {
         Row: {
           club_id: string
           id: string
           joined_at: string | null
+          last_read_at: string | null
           role: string | null
+          state: string
           user_id: string
         }
         Insert: {
           club_id: string
           id?: string
           joined_at?: string | null
+          last_read_at?: string | null
           role?: string | null
+          state?: string
           user_id: string
         }
         Update: {
           club_id?: string
           id?: string
           joined_at?: string | null
+          last_read_at?: string | null
           role?: string | null
+          state?: string
           user_id?: string
         }
         Relationships: [
@@ -1094,6 +1371,7 @@ export type Database = {
           followers_count: number | null
           following_count: number | null
           id: string
+          is_admin: boolean
           is_private: boolean | null
           onboarding_completed: boolean | null
           reading_goal: number | null
@@ -1113,6 +1391,7 @@ export type Database = {
           followers_count?: number | null
           following_count?: number | null
           id: string
+          is_admin?: boolean
           is_private?: boolean | null
           onboarding_completed?: boolean | null
           reading_goal?: number | null
@@ -1132,6 +1411,7 @@ export type Database = {
           followers_count?: number | null
           following_count?: number | null
           id?: string
+          is_admin?: boolean
           is_private?: boolean | null
           onboarding_completed?: boolean | null
           reading_goal?: number | null
@@ -1147,9 +1427,35 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_club_invite: { Args: { p_club: string }; Returns: undefined }
+      accept_message_request: { Args: { p_conv: string }; Returns: undefined }
+      approve_club_member: {
+        Args: { p_club: string; p_user: string }
+        Returns: undefined
+      }
+      ban_club_member: {
+        Args: { p_club: string; p_user: string }
+        Returns: undefined
+      }
+      can_view_user_content: { Args: { target: string }; Returns: boolean }
+      conversation_send_allowed: { Args: { conv: string }; Returns: boolean }
+      hard_delete_due_accounts: { Args: never; Returns: undefined }
+      hit_rate_limit: {
+        Args: { p_key: string; p_max: number; p_window_seconds: number }
+        Returns: boolean
+      }
       immutable_array_to_string: {
         Args: { arr: string[]; sep: string }
         Returns: string
+      }
+      is_blocked_with: { Args: { other: string }; Returns: boolean }
+      is_club_member: { Args: { club: string }; Returns: boolean }
+      is_club_mod: { Args: { club: string }; Returns: boolean }
+      is_conversation_member: { Args: { conv: string }; Returns: boolean }
+      mod_delete_message: { Args: { p_msg: string }; Returns: undefined }
+      set_club_member_role: {
+        Args: { p_club: string; p_role: string; p_user: string }
+        Returns: undefined
       }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
@@ -1165,6 +1471,8 @@ export type Database = {
       book_note_type: "note" | "quote"
       buddy_read_status: "pending" | "active" | "completed" | "declined"
       comment_target_type: "review" | "activity"
+      conversation_kind: "dm" | "club"
+      dm_request_state: "open" | "pending"
       follow_status: "pending" | "accepted"
       list_visibility: "public" | "private"
       notification_type:
@@ -1175,8 +1483,20 @@ export type Database = {
         | "recommendation_received"
         | "buddy_read_invite"
         | "club_invite"
+        | "comment_received"
+        | "dm_request"
+        | "dm_message"
+        | "club_message"
+        | "club_join_request"
       report_status: "pending" | "reviewing" | "resolved" | "dismissed"
-      report_target_type: "review" | "comment" | "user" | "list" | "activity"
+      report_target_type:
+        | "review"
+        | "comment"
+        | "user"
+        | "list"
+        | "activity"
+        | "message"
+        | "club"
       user_book_status: "reading" | "read" | "want_to_read" | "abandoned"
     }
     CompositeTypes: {
@@ -1316,6 +1636,8 @@ export const Constants = {
       book_note_type: ["note", "quote"],
       buddy_read_status: ["pending", "active", "completed", "declined"],
       comment_target_type: ["review", "activity"],
+      conversation_kind: ["dm", "club"],
+      dm_request_state: ["open", "pending"],
       follow_status: ["pending", "accepted"],
       list_visibility: ["public", "private"],
       notification_type: [
@@ -1326,9 +1648,22 @@ export const Constants = {
         "recommendation_received",
         "buddy_read_invite",
         "club_invite",
+        "comment_received",
+        "dm_request",
+        "dm_message",
+        "club_message",
+        "club_join_request",
       ],
       report_status: ["pending", "reviewing", "resolved", "dismissed"],
-      report_target_type: ["review", "comment", "user", "list", "activity"],
+      report_target_type: [
+        "review",
+        "comment",
+        "user",
+        "list",
+        "activity",
+        "message",
+        "club",
+      ],
       user_book_status: ["reading", "read", "want_to_read", "abandoned"],
     },
   },

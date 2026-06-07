@@ -478,11 +478,9 @@ export async function createReportFn(params: {
   reason: string;
   details?: string;
 }): Promise<void> {
-  // target_type 'message'/'club' se añaden al enum en la migración 019; el tipo
-  // generado aún no los incluye → cast hasta `pnpm gen:types`.
-  const { error } = await supabase.from("reports").insert({
-    reporter_id: params.reporterId,
-    target_type: params.targetType as any,
+    const { error } = await supabase.from("reports").insert({
+      reporter_id: params.reporterId,
+      target_type: params.targetType,
     target_id: params.targetId,
     reason: params.reason,
     details: params.details ?? null,
@@ -535,8 +533,11 @@ export type NotificationPreferences = {
   push_review_like: boolean;
   push_comment: boolean;
   push_recommendation: boolean;
+  push_dm: boolean;
+  push_club: boolean;
   email_weekly_digest: boolean;
-  consent_given_at: string | null; // agregado en migración 010
+  consent_given_at: string | null;
+  push_token: string | null;
   updated_at: string;
 };
 
@@ -566,12 +567,11 @@ export async function upsertNotificationPreferencesFn(
   > & { markConsent?: boolean },
 ): Promise<void> {
   const { markConsent, ...prefs } = data;
-  // consent_given_at no está en los tipos generados aún (migración 010) — cast necesario
   const payload = {
     user_id: userId,
     ...prefs,
     ...(markConsent ? { consent_given_at: new Date().toISOString() } : {}),
-  } as any;
+  };
   const { error } = await supabase.from("notification_preferences").upsert(payload);
   if (error) throw error;
 }

@@ -60,7 +60,6 @@ describe("RLS: users table", () => {
   (SKIP ? it.skip : it)("usuario NO puede auto-promoverse a admin", async () => {
     await userA.client
       .from("users")
-      // @ts-expect-error is_admin aún no está en los tipos generados
       .update({ is_admin: true })
       .eq("id", userA.user.id);
 
@@ -70,7 +69,7 @@ describe("RLS: users table", () => {
       .eq("id", userA.user.id)
       .single();
 
-    expect((data as any)?.is_admin).not.toBe(true);
+    expect(data?.is_admin).not.toBe(true);
   });
 
   (SKIP ? it.skip : it)("usuario NO puede inflar followers_count", async () => {

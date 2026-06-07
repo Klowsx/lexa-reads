@@ -34,8 +34,7 @@ export function useSavePushToken() {
   const upsert = useUpsertNotificationPreferences();
 
   async function savePushToken(token: string) {
-    // push_token not yet in generated types (added in migration 011)
-    await upsert.mutateAsync({ push_token: token } as any);
+    await upsert.mutateAsync({ push_token: token });
   }
 
   return { savePushToken };
