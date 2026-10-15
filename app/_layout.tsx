@@ -26,30 +26,42 @@ import { queryClient } from "~/lib/query-client";
 import i18n from "~/lib/i18n";
 import { ConsentModal } from "~/features/user/components/ConsentModal";
 import { ErrorBoundary } from "~/components/ErrorBoundary";
+import { useMe } from "~/features/user/hooks/useMe";
 
+// Dirige la sesión según el estado persistido del perfil y no según un flag temporal del cliente.
 function AuthGate() {
   const session = useAuthStore((s) => s.session);
   const isLoading = useAuthStore((s) => s.isLoading);
-  const onboardingStarted = useAuthStore((s) => s.onboardingStarted);
   const isRecoveryMode = useAuthStore((s) => s.isRecoveryMode);
   const segments = useSegments();
   const router = useRouter();
+  const { data: profile, isPending: isProfilePending, isError: hasProfileError } = useMe();
 
   useEffect(() => {
     if (isLoading) return;
 
-    const inAuthGroup = segments[0] === "(auth)";
+    const routeSegments = segments as string[];
+    const inAuthGroup = routeSegments[0] === "(auth)";
+    const inOnboarding = inAuthGroup && routeSegments[1] === "onboarding";
 
     if (!session && !inAuthGroup) {
       router.replace("/(auth)/login");
-    } else if (session && inAuthGroup && !isRecoveryMode && !onboardingStarted) {
-      router.replace("/(tabs)/feed");
+      return;
     }
-  }, [session, segments, isLoading, onboardingStarted, isRecoveryMode]);
+
+    if (!session || isRecoveryMode || isProfilePending || hasProfileError) return;
+
+    if (profile?.onboarding_completed && inAuthGroup) {
+      router.replace("/(tabs)/feed");
+    } else if (!profile?.onboarding_completed && !inOnboarding) {
+      router.replace("/(auth)/onboarding/genres");
+    }
+  }, [session, segments, isLoading, isRecoveryMode, profile, isProfilePending, hasProfileError, router]);
 
   return null;
 }
 
+// Inicializa sesión, fuentes y proveedores globales de la aplicación.
 function RootLayout() {
   const setSession = useAuthStore((s) => s.setSession);
   const setLoading = useAuthStore((s) => s.setLoading);
@@ -70,10 +82,10 @@ function RootLayout() {
   });
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setLoading(false);
-    });
+    supabase.auth
+      .getSession()
+      .then(({ data }) => setSession(data.session))
+      .finally(() => setLoading(false));
 
     const {
       data: { subscription },

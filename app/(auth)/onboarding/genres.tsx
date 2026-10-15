@@ -1,41 +1,77 @@
-﻿import { Link, useRouter } from 'expo-router';
-import { useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from "expo-router";
+import { useEffect, useRef, useState } from "react";
+import { Pressable, ScrollView, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   OnboardHeader,
   PrimaryButton,
   StepBar,
   alpha,
-} from '../../../src/features/auth/components';
-import { cn } from '~/lib/utils';
-import { useColors } from '~/theme/colors';
+} from "../../../src/features/auth/components";
+import { useSaveOnboardingPreferences } from "~/features/auth/hooks/useOnboarding";
+import { useMe } from "~/features/user/hooks/useMe";
+import { cn } from "~/lib/utils";
+import { useColors } from "~/theme/colors";
+import { toAppError } from "~/types";
 
 const GENRES = [
-  { id: 'fantasia',  label: 'Fantasía' },
-  { id: 'realismo',  label: 'Realismo mágico' },
-  { id: 'dark',      label: 'Dark Academia' },
-  { id: 'romance',   label: 'Romance' },
-  { id: 'misterio',  label: 'Misterio' },
-  { id: 'scifi',     label: 'Ciencia ficción' },
-  { id: 'memorias',  label: 'Memorias' },
-  { id: 'ensayo',    label: 'Ensayo' },
-  { id: 'clasico',   label: 'Clásicos' },
-  { id: 'historico', label: 'Histórico' },
-  { id: 'poesia',    label: 'Poesía' },
-  { id: 'terror',    label: 'Terror' },
+  { id: "fantasia", label: "Fantasía" },
+  { id: "realismo", label: "Realismo mágico" },
+  { id: "dark", label: "Dark Academia" },
+  { id: "romance", label: "Romance" },
+  { id: "misterio", label: "Misterio" },
+  { id: "scifi", label: "Ciencia ficción" },
+  { id: "memorias", label: "Memorias" },
+  { id: "ensayo", label: "Ensayo" },
+  { id: "clasico", label: "Clásicos" },
+  { id: "historico", label: "Histórico" },
+  { id: "poesia", label: "Poesía" },
+  { id: "terror", label: "Terror" },
 ];
 
+// Permite elegir géneros y guardar este primer paso antes de continuar.
 export default function OnboardGenresScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const c = useColors();
-  const [selected, setSelected] = useState(['fantasia', 'realismo', 'dark', 'memorias']);
+  const { data: profile } = useMe();
+  const savePreferences = useSaveOnboardingPreferences();
+  const hasHydrated = useRef(false);
+  const [selected, setSelected] = useState<string[]>([]);
 
-  const toggle = (id: string) =>
-    setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
+  // Recupera los géneros guardados si la persona cerró la aplicación antes de terminar.
+  useEffect(() => {
+    if (!profile || hasHydrated.current) return;
+    setSelected(profile.favorite_genres ?? []);
+    hasHydrated.current = true;
+  }, [profile]);
+
+  // Añade o quita un género de la selección actual.
+  function toggle(id: string) {
+    setSelected((current) =>
+      current.includes(id)
+        ? current.filter((genre) => genre !== id)
+        : [...current, id],
+    );
+  }
 
   const enough = selected.length >= 3;
+  const error = savePreferences.error
+    ? toAppError(savePreferences.error).message
+    : undefined;
+
+  // Persiste el primer paso antes de avanzar para que el onboarding se pueda reanudar.
+  function handleContinue() {
+    if (!enough || savePreferences.isPending) return;
+
+    savePreferences.mutate(
+      {
+        favoriteGenres: selected,
+        readingGoal: profile?.reading_goal ?? 12,
+      },
+      { onSuccess: () => router.push("/(auth)/onboarding/goal") },
+    );
+  }
 
   return (
     <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
@@ -53,22 +89,42 @@ export default function OnboardGenresScreen() {
       </View>
 
       <ScrollView
-        contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: 20, paddingBottom: 16 }}
+        contentContainerStyle={{
+          flexDirection: "row",
+          flexWrap: "wrap",
+          gap: 8,
+          paddingHorizontal: 20,
+          paddingBottom: 16,
+        }}
         showsVerticalScrollIndicator={false}
       >
-        {GENRES.map((g) => {
-          const on = selected.includes(g.id);
+        {GENRES.map((genre) => {
+          const selectedGenre = selected.includes(genre.id);
           return (
             <Pressable
-              key={g.id}
-              onPress={() => toggle(g.id)}
+              key={genre.id}
+              onPress={() => toggle(genre.id)}
               className="py-[10px] px-[14px] rounded-full bg-surface border-[1.5px] border-border"
-              style={on ? { borderColor: c.accent, backgroundColor: alpha(c.accent, 0.14) } : undefined}
+              style={
+                selectedGenre
+                  ? {
+                      borderColor: c.accent,
+                      backgroundColor: alpha(c.accent, 0.14),
+                    }
+                  : undefined
+              }
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: selectedGenre }}
+              accessibilityLabel={genre.label}
             >
               <Text
-                className={cn("font-body-md text-sm", on ? "text-text" : "text-t2", on && "text-accent")}
+                className={cn(
+                  "font-body-md text-sm",
+                  selectedGenre ? "text-text" : "text-t2",
+                  selectedGenre && "text-accent",
+                )}
               >
-                {g.label}
+                {genre.label}
               </Text>
             </Pressable>
           );
@@ -82,11 +138,19 @@ export default function OnboardGenresScreen() {
         <Text className="font-body text-t3 text-center mb-3 text-xs">
           {selected.length} de 3 mínimo seleccionados
         </Text>
-        <Link href="/(auth)/onboarding/goal" asChild>
-          <PrimaryButton disabled={!enough}>Continuar</PrimaryButton>
-        </Link>
+        {error ? (
+          <Text className="font-body text-error text-center mb-3 text-xs">
+            {error}
+          </Text>
+        ) : null}
+        <PrimaryButton
+          disabled={!enough}
+          loading={savePreferences.isPending}
+          onPress={handleContinue}
+        >
+          Continuar
+        </PrimaryButton>
       </View>
     </View>
   );
 }
-

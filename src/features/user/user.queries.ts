@@ -2,6 +2,7 @@ import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 import { supabase } from "~/lib/supabase";
 import type { Tables } from "~/types";
 import type { ProfileData, UpdateProfileData, UserProfile } from "~/types/user";
+import type { OnboardingPreferences } from "~/types/user";
 import type { LibraryRow } from "~/features/library/library.queries";
 
 // Reading goal
@@ -151,6 +152,27 @@ export async function updateProfileFn(
     .eq("id", userId)
     .select(PROFILE_COLUMNS)
     .single();
+  if (error) throw error;
+  return updated as UserProfile;
+}
+
+// Guarda las preferencias intermedias para que el onboarding pueda reanudarse tras cerrar la aplicación.
+export async function saveOnboardingPreferencesFn(
+  userId: string,
+  data: OnboardingPreferences,
+): Promise<UserProfile> {
+  const currentYear = new Date().getFullYear();
+  const { data: updated, error } = await supabase
+    .from("users")
+    .update({
+      favorite_genres: data.favoriteGenres,
+      reading_goal: data.readingGoal,
+      reading_goal_year: currentYear,
+    })
+    .eq("id", userId)
+    .select(PROFILE_COLUMNS)
+    .single();
+
   if (error) throw error;
   return updated as UserProfile;
 }

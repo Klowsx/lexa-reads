@@ -60,7 +60,6 @@ describe("RLS: users table", () => {
   (SKIP ? it.skip : it)("usuario NO puede auto-promoverse a admin", async () => {
     await userA.client
       .from("users")
-      // @ts-expect-error is_admin aún no está en los tipos generados
       .update({ is_admin: true })
       .eq("id", userA.user.id);
 

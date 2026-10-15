@@ -32,3 +32,8 @@ export type UpdateProfileData = {
   favorite_genres?: string[] | null;
   is_private?: boolean;
 };
+
+export type OnboardingPreferences = {
+  favoriteGenres: string[];
+  readingGoal: number;
+};

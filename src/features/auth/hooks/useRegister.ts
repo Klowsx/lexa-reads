@@ -7,17 +7,17 @@ import type { AuthResponse } from "@supabase/supabase-js";
 import type { RegisterParams } from "~/types";
 import { registerFn } from "../auth.queries";
 
+// Registra una cuenta y la dirige al siguiente paso permitido del acceso.
 export function useRegister() {
   const router = useRouter();
   const setSession = useAuthStore((state) => state.setSession);
-  const setOnboardingStarted = useAuthStore((state) => state.setOnboardingStarted);
   const addToast = useUIStore((s) => s.addToast);
 
+  // Inicia el onboarding cuando Supabase devuelve una sesión; el perfil persistido decide el acceso al reabrir.
   return useMutation<AuthResponse["data"], AppError, RegisterParams>({
     mutationFn: registerFn,
     onSuccess: (data) => {
       if (data.session) {
-        setOnboardingStarted(true);
         setSession(data.session);
         router.replace("/(auth)/onboarding/genres");
       } else {
