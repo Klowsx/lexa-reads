@@ -104,7 +104,7 @@ export default function OnboardGenresScreen() {
             <Pressable
               key={genre.id}
               onPress={() => toggle(genre.id)}
-              className="py-[10px] px-[14px] rounded-full bg-surface border-[1.5px] border-border"
+              className="min-h-11 justify-center py-2 px-[14px] rounded-full bg-surface border-[1.5px] border-border"
               style={
                 selectedGenre
                   ? {

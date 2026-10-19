@@ -116,7 +116,7 @@ export default function OnboardGoalScreen() {
             <Pressable
               key={quickGoal}
               onPress={() => setGoal(quickGoal)}
-              className="py-[7px] px-[14px] rounded-full bg-surface border border-border"
+              className="min-h-11 justify-center py-2 px-[14px] rounded-full bg-surface border border-border"
               style={
                 selectedGoal
                   ? {
@@ -131,7 +131,7 @@ export default function OnboardGoalScreen() {
             >
               <Text
                 className={cn(
-                  "font-body-md text-t2 text-[12px]",
+                  "font-body-md text-t2 text-xs",
                   selectedGoal && "text-accent",
                 )}
               >

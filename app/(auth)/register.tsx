@@ -1,4 +1,4 @@
-﻿import { Check, Eye, EyeOff, Lock, Mail, User } from "lucide-react-native";
+import { Check, Eye, EyeOff, Lock, Mail, User } from "lucide-react-native";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -19,6 +19,7 @@ import {
 import { useRegister } from "@/src/features/auth/hooks/useRegister";
 import { useColors } from "~/theme/colors";
 
+// Recoge los datos de registro y muestra requisitos claros antes de crear una cuenta.
 export default function RegisterScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -103,7 +104,9 @@ export default function RegisterScreen() {
           trailing={
             <Pressable
               onPress={() => setShowPassword(!showPassword)}
-              hitSlop={8}
+              className="w-11 h-11 -mr-3 items-center justify-center"
+              accessibilityRole="button"
+              accessibilityLabel={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
             >
               {showPassword ? (
                 <EyeOff size={16} color={c.t3} />
@@ -145,7 +148,7 @@ export default function RegisterScreen() {
           <View
             className={`w-[18px] h-[18px] rounded-sm border-[1.5px] mt-0.5 items-center justify-center ${terms ? "bg-accent border-accent" : "border-border"}`}
           >
-            {terms && <Check size={11} color="#fff" />}
+            {terms && <Check size={11} color={c.onAccent} />}
           </View>
           <Text className="flex-1 text-xs text-t2 leading-[18px] font-body">
             Acepto los{" "}

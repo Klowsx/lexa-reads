@@ -21,7 +21,7 @@ function FlowGuard() {
     if (screen === "onboarding" && !session) {
       router.replace("/(auth)/login");
     }
-  }, [segments, isRecoveryMode, session]);
+  }, [segments, isRecoveryMode, router, session]);
 
   return null;
 }

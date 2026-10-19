@@ -1,4 +1,4 @@
-﻿import { Check, Eye, EyeOff, Lock } from "lucide-react-native";
+import { Check, Eye, EyeOff, Lock } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { useUpdatePassword } from "@/src/features/auth/hooks/useResetPassword";
@@ -28,6 +28,7 @@ const REQUIREMENTS = [
   },
 ];
 
+// Permite definir una contraseña nueva con controles visibles y requisitos verificables.
 export default function NewPasswordScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -72,9 +73,16 @@ export default function NewPasswordScreen() {
           onChangeText={setPassword}
           secureTextEntry={!show}
           autoCapitalize="none"
+          textContentType="newPassword"
+          autoComplete="new-password"
           icon={Lock}
           trailing={
-            <Pressable onPress={() => setShow(!show)} hitSlop={8}>
+            <Pressable
+              onPress={() => setShow(!show)}
+              className="w-11 h-11 -mr-3 items-center justify-center"
+              accessibilityRole="button"
+              accessibilityLabel={show ? "Ocultar contraseña" : "Mostrar contraseña"}
+            >
               {show ? (
                 <EyeOff size={16} color={c.t3} />
               ) : (
@@ -90,6 +98,8 @@ export default function NewPasswordScreen() {
           onChangeText={setConfirm}
           secureTextEntry={!show}
           autoCapitalize="none"
+          textContentType="newPassword"
+          autoComplete="new-password"
           icon={Lock}
           trailing={
             password && password === confirm ? (

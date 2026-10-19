@@ -1,4 +1,4 @@
-﻿import { Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { alpha, useColors } from '~/theme/colors';
 
 type Props = { value: string; length?: number };

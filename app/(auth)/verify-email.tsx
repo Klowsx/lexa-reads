@@ -1,4 +1,4 @@
-﻿import { Mail } from "lucide-react-native";
+import { Mail } from "lucide-react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
@@ -17,6 +17,7 @@ import {
 
 const RESEND_SECONDS = 60;
 
+// Verifica el código de recuperación y ofrece un reenvío con tiempo visible.
 export default function VerifyEmailScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -41,6 +42,7 @@ export default function VerifyEmailScreen() {
     return () => clearInterval(id);
   }, [countdown]);
 
+  // Reinicia el contador solo después de solicitar otro código para el correo actual.
   const handleResend = () => {
     resend({ email });
     setCode("");
@@ -79,7 +81,11 @@ export default function VerifyEmailScreen() {
           </Text>
         </View>
 
-        <Pressable onPress={() => inputRef.current?.focus()}>
+        <Pressable
+          onPress={() => inputRef.current?.focus()}
+          accessibilityRole="button"
+          accessibilityLabel="Ingresar código de verificación de seis dígitos"
+        >
           <CodeInput value={code} />
           <TextInput
             ref={inputRef}
@@ -88,31 +94,41 @@ export default function VerifyEmailScreen() {
             keyboardType="number-pad"
             maxLength={6}
             className="absolute opacity-0 w-full h-full"
+            textContentType="oneTimeCode"
+            autoComplete="one-time-code"
+            accessibilityLabel="Código de verificación"
           />
         </Pressable>
 
         {error && (
-          <Text className="font-body text-error text-xs text-center mt-3">
+          <Text className="font-body text-error text-xs text-center mt-3" accessibilityLiveRegion="polite">
             {error.message}
           </Text>
         )}
 
-        <Text className="font-body text-t3 text-center mt-[22px] mb-6 text-xs">
+        <View className="items-center mt-[22px] mb-6">
           {countdown > 0 ? (
-            <>
-              {"¿No recibiste el código? Reenviar en "}
+            <Text className="font-body text-t3 text-center text-xs">
+              ¿No recibiste el código? Reenviar en {" "}
               <Text className="font-body-md text-text">
                 {mm}:{ss}
               </Text>
-            </>
+            </Text>
           ) : (
-            <Pressable onPress={handleResend} disabled={isResending}>
+            <Pressable
+              onPress={handleResend}
+              disabled={isResending}
+              className="min-h-11 justify-center"
+              accessibilityRole="button"
+              accessibilityLabel="Reenviar código"
+              accessibilityState={{ disabled: isResending, busy: isResending }}
+            >
               <Text className="font-body-sb text-accent text-xs">
                 {isResending ? "Reenviando…" : "Reenviar código"}
               </Text>
             </Pressable>
           )}
-        </Text>
+        </View>
 
         <PrimaryButton
           disabled={code.length < 6}

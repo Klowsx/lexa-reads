@@ -10,7 +10,7 @@ export const rawDark = {
   "border": "#35302B",
   "text": "#F0EAE2",
   "t2": "#9E9488",
-  "t3": "#6A635C"
+  "t3": "#867D74"
 } as const;
 
 export const rawLight = {
@@ -21,7 +21,7 @@ export const rawLight = {
   "border": "#C2BAB0",
   "text": "#1A1512",
   "t2": "#685E55",
-  "t3": "#9E9488"
+  "t3": "#746A61"
 } as const;
 
 // Colores semánticos que no cambian entre tema claro y oscuro.

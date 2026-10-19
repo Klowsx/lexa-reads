@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "~/lib/supabase";
-import { normalizeUsername, USERNAME_PATTERN } from "~/lib/username";
+import { USERNAME_PATTERN } from "~/lib/username";
 import { useAuthStore } from "~/stores/auth.store";
 import type { OnboardingPreferences, UserProfile } from "~/types/user";
 import {
