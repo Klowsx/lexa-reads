@@ -37,6 +37,17 @@ export const fixed = {
   "warning": "#C49A20",
   "success": "#5CAF7E",
   "onAccent": "#FFFFFF",
+  "cover": {
+    "ink": "#F0EAE2",
+    "backgrounds": [
+      "#3D2B1F",
+      "#1F3D2B",
+      "#1F2B3D",
+      "#3D1F2B",
+      "#2B3D1F",
+      "#2B1F3D"
+    ]
+  },
   "status": {
     "reading": "#4A96B8",
     "read": "#5CAF7E",

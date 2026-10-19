@@ -1,379 +1,445 @@
-import { useRouter } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Animated, LayoutChangeEvent, Modal, Pressable, ScrollView, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { FlashList } from '@shopify/flash-list';
-import { BookCard } from '~/features/book/components/BookCard';
-import { GenreChips } from '~/features/book/components/GenreChips';
-import { QuickPeekSheet } from '~/features/book/components/QuickPeekSheet';
-import { SearchBar } from '~/features/book/components/SearchBar';
-import { UserCard } from '~/features/user/components/UserCard';
-import { useSearchBooks } from '~/features/book/hooks/useSearchBook';
-import { useTrendingBooks } from '~/features/book/hooks/useTrendingBooks';
-import { useSearchUsers } from '~/features/user/hooks/useSearchUsers';
-import { cn } from '~/lib/utils';
-import { useColors } from '~/theme/colors';
-import { useDebounce } from '~/lib/useDebounce';
-import type { Tables } from '~/types/database';
+import { useRouter } from 'expo-router'
+import { Info } from 'lucide-react-native'
+import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import {
+  Animated,
+  Easing,
+  Keyboard,
+  SectionList,
+  Text,
+  View,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent
+} from 'react-native'
+import { useReducedMotion } from 'react-native-reanimated'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { BookCard } from '~/features/book/components/BookCard'
+import {
+  GenreChips,
+  type SearchGenre
+} from '~/features/book/components/GenreChips'
+import { QuickPeekSheet } from '~/features/book/components/QuickPeekSheet'
+import { SearchBar } from '~/features/book/components/SearchBar'
+import { useSearchBooks } from '~/features/book/hooks/useSearchBook'
+import { useTrendingBooks } from '~/features/book/hooks/useTrendingBooks'
+import {
+  SearchAction,
+  SearchIconButton,
+  SearchTabs,
+  type SearchTab
+} from '~/features/search/components/SearchControls'
+import {
+  SearchFeedback,
+  SearchLoading
+} from '~/features/search/components/SearchFeedback'
+import { SearchSheet } from '~/features/search/components/SearchSheet'
+import { UserCard } from '~/features/user/components/UserCard'
+import { useSearchUsers } from '~/features/user/hooks/useSearchUsers'
+import type { SearchUser } from '~/features/user/user.queries'
+import { useDebounce } from '~/lib/useDebounce'
+import { useColors } from '~/theme/colors'
+import type { Tables } from '~/types/database'
 
-// ─── NYT info modal ───────────────────────────────────────────
-
-function NytInfoModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
-  const { t } = useTranslation();
-  return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <Pressable className="flex-1 bg-black/50 justify-end" onPress={onClose}>
-        <Pressable className="bg-surface rounded-t-xl px-6 pt-6 pb-10 gap-3" onPress={() => {}}>
-          <Text className="font-display-sb text-lg text-text">{t('search.nytTitle')}</Text>
-          <Text className="font-body text-sm text-t2 leading-5">
-            {t('search.nytBody1')}
-          </Text>
-          <Text className="font-body text-sm text-t2 leading-5">
-            {t('search.nytBody2')}
-          </Text>
-          <Text className="font-body-md text-xs text-t3 mt-1">
-            {t('search.nytBody3')}
-          </Text>
-          <Pressable
-            onPress={onClose}
-            accessibilityRole="button"
-            accessibilityLabel={t('common.gotIt')}
-            className="mt-2 bg-accent rounded-lg py-3 items-center"
-          >
-            <Text className="font-body-sb text-sm text-white">{t('common.gotIt')}</Text>
-          </Pressable>
-        </Pressable>
-      </Pressable>
-    </Modal>
-  );
+type SearchItem =
+  { kind: 'book'; value: Tables<'books'> } | { kind: 'user'; value: SearchUser }
+type SearchSection = {
+  key: 'books' | 'users'
+  title: string
+  data: SearchItem[]
+  loading: boolean
+  error: boolean
+  total: number
+  retry: () => void
 }
 
-// ─── Segmented control ────────────────────────────────────────
-
-type SearchTab = 'all' | 'books' | 'users';
-
-const TABS: { id: SearchTab; labelKey: string }[] = [
-  { id: 'all',   labelKey: 'search.tabAll'   },
-  { id: 'books', labelKey: 'search.tabBooks' },
-  { id: 'users', labelKey: 'search.tabUsers' },
-];
-
-interface SegmentedControlProps {
-  active: SearchTab;
-  onChange: (tab: SearchTab) => void;
+const GENRE_SUBJECTS: Record<SearchGenre, string> = {
+  fantasy: 'Fantasy',
+  mystery: 'Mystery',
+  romance: 'Romance',
+  fiction: 'Science Fiction',
+  memoir: 'Memoir',
+  magic: 'Magical Realism'
 }
 
-function SegmentedControl({ active, onChange }: SegmentedControlProps) {
-  const c = useColors();
-  const { t } = useTranslation();
-  const [containerWidth, setContainerWidth] = useState(0);
-  const slideX = useRef(new Animated.Value(0)).current;
-
-  const activeIndex = TABS.findIndex((t) => t.id === active);
-  const segW = containerWidth / TABS.length;
-
-  useEffect(() => {
-    if (!containerWidth) return;
-    Animated.spring(slideX, {
-      toValue: activeIndex * segW,
-      useNativeDriver: true,
-      damping: 18,
-      stiffness: 220,
-      mass: 0.8,
-    }).start();
-  }, [activeIndex, segW]);
-
-  function onLayout(e: LayoutChangeEvent) {
-    setContainerWidth(e.nativeEvent.layout.width);
-  }
-
-  return (
-    <View
-      onLayout={onLayout}
-      className="flex-row rounded-md mx-4 mb-3 relative overflow-hidden h-[34px] border border-border bg-sh"
-    >
-      {/* Sliding pill */}
-      {containerWidth > 0 && (
-        <Animated.View
-          style={{
-            position: 'absolute',
-            top: 3,
-            bottom: 3,
-            width: segW - 6,
-            left: 3,
-            backgroundColor: c.accent,
-            borderRadius: 6,
-            transform: [{ translateX: slideX }],
-          }}
-        />
-      )}
-      {TABS.map(({ id, labelKey }) => {
-        const isActive = active === id;
-        const label = t(labelKey);
-        return (
-          <Pressable
-            key={id}
-            onPress={() => onChange(id)}
-            accessibilityRole="tab"
-            accessibilityLabel={label}
-            accessibilityState={{ selected: isActive }}
-            className="flex-1 items-center justify-center"
-          >
-            <Text
-              className={cn("text-xs font-body-sb", isActive ? "text-white" : "text-t2")}
-            >
-              {label}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </View>
-  );
-}
-
-// ─── Screen ───────────────────────────────────────────────────
-
+// Reúne descubrimiento, libros y lectores en una sola lista con estados coherentes.
 export default function SearchScreen() {
-  const router = useRouter();
-  const insets = useSafeAreaInsets();
-  const c = useColors();
-  const { t } = useTranslation();
+  const router = useRouter()
+  const insets = useSafeAreaInsets()
+  const c = useColors()
+  const { t } = useTranslation()
+  const [query, setQuery] = useState('')
+  const [genre, setGenre] = useState<SearchGenre | null>(null)
+  const [activeTab, setActiveTab] = useState<SearchTab>('all')
+  const [quickPeekBook, setQuickPeekBook] = useState<Tables<'books'> | null>(
+    null
+  )
+  const [infoVisible, setInfoVisible] = useState(false)
+  const [headerHeight, setHeaderHeight] = useState(0)
+  const [floatingHeaderVisible, setFloatingHeaderVisible] = useState(false)
+  const headerOffset = useRef(new Animated.Value(0)).current
+  const headerOpacity = useRef(new Animated.Value(0)).current
+  const previousScrollY = useRef(0)
+  const directionDistance = useRef(0)
+  const lastDirection = useRef<'up' | 'down' | 'none'>('none')
+  const reduceMotion = useReducedMotion()
 
-  const [query, setQuery] = useState('');
-  const [focused, setFocused] = useState(false);
-  const [activeTab, setActiveTab] = useState<SearchTab>('all');
-  const [quickPeekBook, setQuickPeekBook] = useState<Tables<'books'> | null>(null);
-  const [infoVisible, setInfoVisible] = useState(false);
+  // Muestra la barra fija al subir y la oculta al bajar.
+  function handleScroll(event: NativeSyntheticEvent<NativeScrollEvent>) {
+    const currentY = Math.max(0, event.nativeEvent.contentOffset.y)
+    const difference = currentY - previousScrollY.current
+    previousScrollY.current = currentY
+    if (currentY <= 1) {
+      directionDistance.current = 0
+      lastDirection.current = 'none'
+      setFloatingHeaderVisible(false)
+      return
+    }
+    if (Math.abs(difference) < 0.5) return
 
-  function handleTabChange(tab: SearchTab) {
-    setActiveTab(tab);
-    setInfoVisible(false);
+    const direction = difference > 0 ? 'down' : 'up'
+    if (direction !== lastDirection.current) {
+      directionDistance.current = 0
+      lastDirection.current = direction
+    }
+    directionDistance.current += Math.abs(difference)
+
+    if (directionDistance.current >= 10) {
+      setFloatingHeaderVisible(direction === 'up')
+      directionDistance.current = 0
+    }
   }
 
-  const debouncedQuery = useDebounce(query, 400);
-  const { data: results = [], isLoading } = useSearchBooks(debouncedQuery);
-  const { data: trending, isLoading: isTrendingLoading } = useTrendingBooks();
-  const { data: userResults = [], isLoading: isUsersLoading } = useSearchUsers(debouncedQuery);
-  const trendingBooks = trending?.books ?? [];
-  const trendingSource = trending?.source;
+  // Anima la barra fija y respeta la preferencia de movimiento reducido.
+  useEffect(() => {
+    const duration = reduceMotion ? 0 : 180
+    const animation = Animated.parallel([
+      Animated.timing(headerOffset, {
+        toValue: floatingHeaderVisible ? 0 : -headerHeight,
+        duration,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: true
+      }),
+      Animated.timing(headerOpacity, {
+        toValue: floatingHeaderVisible ? 1 : 0,
+        duration,
+        useNativeDriver: true
+      })
+    ])
+    animation.start()
+    return () => animation.stop()
+  }, [
+    floatingHeaderVisible,
+    headerHeight,
+    headerOffset,
+    headerOpacity,
+    reduceMotion
+  ])
 
+  const trimmedQuery = query.trim()
+  const debouncedQuery = useDebounce(trimmedQuery, 400)
+  const showingSearch = trimmedQuery.length >= 3
+  const tooShort = trimmedQuery.length > 0 && !showingSearch
+  const waiting = showingSearch && trimmedQuery !== debouncedQuery
+  const bookTerm = genre
+    ? 'subject:"' + GENRE_SUBJECTS[genre] + '"'
+    : debouncedQuery
+  const books = useSearchBooks(showingSearch ? bookTerm : '')
+  const trending = useTrendingBooks()
+  const users = useSearchUsers(
+    showingSearch ? debouncedQuery.replace(/^@/, '') : ''
+  )
+  const bookQuery = showingSearch ? books : trending
+  const bookData = showingSearch
+    ? (books.data ?? [])
+    : (trending.data?.books ?? [])
+  const userData = users.data ?? []
   const discoverLabel =
-    trendingSource === 'community' ? t('search.inLexaNow') : t('search.popularThisWeek');
+    trending.data?.source === 'community'
+      ? t('search.inLexaNow')
+      : t('search.popularThisWeek')
+  const sections: SearchSection[] = []
 
-  const bookData = debouncedQuery.length > 2 ? results : trendingBooks;
-  const showingSearch = debouncedQuery.length > 2;
+  if (!tooShort && activeTab !== 'users') {
+    sections.push({
+      key: 'books',
+      title: showingSearch ? t('search.tabBooks') : discoverLabel,
+      data:
+        waiting || bookQuery.isLoading
+          ? []
+          : (activeTab === 'all' ? bookData.slice(0, 3) : bookData).map(
+              (value) => ({ kind: 'book', value })
+            ),
+      loading: waiting || bookQuery.isLoading,
+      error: bookQuery.isError,
+      total: bookData.length,
+      retry: () => {
+        void bookQuery.refetch()
+      }
+    })
+  }
+  if (!tooShort && activeTab !== 'books') {
+    sections.push({
+      key: 'users',
+      title: showingSearch
+        ? t('search.tabUsers')
+        : t('search.suggestedReaders'),
+      data:
+        waiting || users.isLoading
+          ? []
+          : (activeTab === 'all' ? userData.slice(0, 3) : userData).map(
+              (value) => ({ kind: 'user', value })
+            ),
+      loading: waiting || users.isLoading,
+      error: users.isError,
+      total: userData.length,
+      retry: () => {
+        void users.refetch()
+      }
+    })
+  }
 
-  // ── Render for "Usuarios" tab ──────────────────────────────
-  if (activeTab === 'users') {
+  // Una edición manual deja de aplicar el género y vuelve a la búsqueda libre.
+  function changeQuery(value: string) {
+    setGenre(null)
+    setQuery(value)
+  }
+
+  // Busca por categoría del catálogo y muestra un nombre legible en el campo.
+  function selectGenre(value: SearchGenre) {
+    Keyboard.dismiss()
+    setGenre(value)
+    setQuery(t('search.genres.' + value))
+    setActiveTab('books')
+  }
+
+  // Conserva el texto al cambiar de alcance y cierra ayudas que ya no aplican.
+  function changeTab(value: SearchTab) {
+    setActiveTab(value)
+    setInfoVisible(false)
+    if (value === 'users') setGenre(null)
+  }
+
+  // Abre la hoja rápida después de liberar el espacio ocupado por el teclado.
+  function openQuickPeek(book: Tables<'books'>) {
+    Keyboard.dismiss()
+    setQuickPeekBook(book)
+  }
+
+  // Separa las acciones del libro y del lector sin anidar controles interactivos.
+  function renderResult({ item }: { item: SearchItem }) {
+    return item.kind === 'book' ? (
+      <BookCard
+        book={item.value}
+        onPress={() => router.push('/book/' + item.value.google_books_id)}
+        onQuickPeek={() => openQuickPeek(item.value)}
+      />
+    ) : (
+      <UserCard user={item.value} />
+    )
+  }
+
+  // Mantiene el título visible también cuando una sección no devuelve resultados.
+  function renderSectionHeader({ section }: { section: SearchSection }) {
     return (
-      <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
-        <View className="px-4 pt-2.5 pb-3">
-          <Text className="font-display-sb text-xl text-text tracking-tight mb-3">{t('search.title')}</Text>
-          <SearchBar
-            value={query}
-            onChangeText={setQuery}
-            focused={focused}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
-          />
-        </View>
-        <SegmentedControl active={activeTab} onChange={handleTabChange} />
-
-        {isUsersLoading ? (
-          <View className="flex-1 items-center justify-center">
-            <ActivityIndicator color={c.accent} />
-          </View>
-        ) : userResults.length === 0 && showingSearch ? (
-          <View className="flex-1 items-center justify-center px-8 gap-2">
-            <Text className="text-xs font-body text-t3 text-center">
-              {t('search.noResultsFor', { query: debouncedQuery })}
-            </Text>
-          </View>
-        ) : (
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 72 }}
+      <View className="mb-3 flex-row items-center gap-2">
+        <View className="min-w-0 flex-1">
+          <Text
+            accessibilityRole="header"
+            className="font-display-sb text-md text-text"
           >
-            {!showingSearch && (
-              <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-1 mt-1">
-                {t('search.suggested')}
-              </Text>
-            )}
-            {userResults.map((user) => (
-              <UserCard key={user.id} user={user} />
-            ))}
-          </ScrollView>
-        )}
-      </View>
-    );
-  }
-
-  // ── Render for "Todo" tab (mixed) ──────────────────────────
-  if (activeTab === 'all') {
-    return (
-      <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
-        <View className="px-4 pt-2.5 pb-3">
-          <Text className="font-display-sb text-xl text-text tracking-tight mb-3">{t('search.title')}</Text>
-          <SearchBar
-            value={query}
-            onChangeText={setQuery}
-            focused={focused}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
-          />
-        </View>
-        <SegmentedControl active={activeTab} onChange={handleTabChange} />
-
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 72 }}
-        >
-          {/* Genres — only when not searching */}
-          {!showingSearch && (
-            <View className="px-4 mb-2">
-              <GenreChips />
-            </View>
-          )}
-
-          {/* Books section */}
-          <View className="px-4">
-            <View className="flex-row items-center gap-1.5 mb-2">
-              <Text
-                className="text-xs text-t3 tracking-widest flex-1 font-body-sb uppercase"
-              >
-                {showingSearch
-                  ? isLoading ? t('search.searching') : t('search.booksCount', { count: results.length })
-                  : discoverLabel}
-              </Text>
-              {!showingSearch && trendingSource === 'bestsellers' && (
-                <Pressable
-                  onPress={() => setInfoVisible(true)}
-                  hitSlop={8}
-                  accessibilityRole="button"
-                  accessibilityLabel={t('search.moreInfo')}
-                  className="w-4 h-4 rounded-full border border-t3 items-center justify-center"
-                >
-                  <Text className="text-t3 text-[9px] font-body-sb leading-[12px]">i</Text>
-                </Pressable>
-              )}
-            </View>
-
-            {(isLoading && debouncedQuery.length > 2) || (isTrendingLoading && !query) ? (
-              <ActivityIndicator color={c.accent} className="my-4" />
-            ) : (
-              bookData.map((item) => (
-                <BookCard
-                  key={item.google_books_id}
-                  book={item}
-                  onPress={() => router.push(`/book/${item.google_books_id}`)}
-                  onQuickPeek={() => setQuickPeekBook(item)}
-                />
-              ))
-            )}
-          </View>
-
-          {/* Users section */}
-          <View className="px-4 mt-3">
+            {section.title}
+          </Text>
+          {showingSearch && !section.loading && !section.error && (
             <Text
-              className="text-xs text-t3 tracking-widest mb-2 font-body-sb uppercase"
+              accessibilityLiveRegion="polite"
+              className="mt-1 font-body text-xs text-t2"
             >
-              {showingSearch
-                ? t('search.usersCount', { count: userResults.length })
-                : t('search.suggestedReaders')}
+              {t(
+                section.key === 'books'
+                  ? 'search.booksCount'
+                  : 'search.usersCount',
+                { count: section.total }
+              )}
             </Text>
-
-            {isUsersLoading ? (
-              <ActivityIndicator color={c.accent} className="my-2" />
-            ) : (
-              userResults.map((user) => (
-                <UserCard key={user.id} user={user} />
-              ))
-            )}
-          </View>
-        </ScrollView>
-
-        {quickPeekBook && (
-          <QuickPeekSheet
-            book={quickPeekBook}
-            onClose={() => setQuickPeekBook(null)}
-          />
-        )}
-
-        <NytInfoModal visible={infoVisible} onClose={() => setInfoVisible(false)} />
+          )}
+        </View>
+        {!showingSearch &&
+          section.key === 'books' &&
+          trending.data?.source === 'bestsellers' && (
+            <SearchIconButton
+              label={t('search.moreInfo')}
+              onPress={() => setInfoVisible(true)}
+            >
+              <Info size={20} color={c.t2} />
+            </SearchIconButton>
+          )}
       </View>
-    );
+    )
   }
 
-  // ── "Libros" tab — original full book list ─────────────────
-  return (
-    <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
-      <View className="px-4 pt-2.5 pb-3">
-        <Text className="font-display-sb text-xl text-text tracking-tight mb-3">{t('search.title')}</Text>
-        <SearchBar
-          value={query}
-          onChangeText={setQuery}
-          focused={focused}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
+  // Cada fuente puede fallar o cargar de forma independiente sin ocultar la otra.
+  function renderSectionFooter({ section }: { section: SearchSection }) {
+    if (section.loading)
+      return <SearchLoading readers={section.key === 'users'} />
+    if (section.error)
+      return (
+        <SearchFeedback
+          title={t('search.loadError')}
+          message={t('search.loadErrorHint')}
+          action={t('common.retry')}
+          onAction={section.retry}
         />
-      </View>
-      <SegmentedControl active={activeTab} onChange={handleTabChange} />
-
-      <FlashList
-        data={bookData}
-        keyExtractor={(item) => item.google_books_id}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 72 }}
-        ListHeaderComponent={
-          <View className="mb-3">
-            {!query && <GenreChips />}
-            <View className="flex-row items-center gap-1.5 mb-2.5">
-              <Text
-                className="text-xs text-t3 tracking-widest font-body-sb uppercase"
-              >
-                {!query
-                  ? discoverLabel
-                  : isLoading
-                    ? t('search.searching')
-                    : t('search.resultsFor', { count: results.length, query })}
-              </Text>
-              {!query && trendingSource === 'bestsellers' && (
-                <Pressable
-                  onPress={() => setInfoVisible(true)}
-                  hitSlop={8}
-                  accessibilityRole="button"
-                  accessibilityLabel={t('search.moreInfo')}
-                  className="w-4 h-4 rounded-full border border-t3 items-center justify-center"
-                >
-                  <Text className="text-t3 text-[9px] font-body-sb leading-[12px]">i</Text>
-                </Pressable>
-              )}
-            </View>
-          </View>
-        }
-        ListEmptyComponent={
-          (isLoading && debouncedQuery.length > 2) || (isTrendingLoading && !query)
-            ? <ActivityIndicator color={c.accent} className="mt-8" />
-            : null
-        }
-        renderItem={({ item }) => (
-          <BookCard
-            book={item}
-            onPress={() => router.push(`/book/${item.google_books_id}`)}
-            onQuickPeek={() => setQuickPeekBook(item)}
+      )
+    if (section.total === 0)
+      return (
+        <SearchFeedback
+          title={t(
+            showingSearch ? 'search.noResultsFor' : 'search.discoveryEmpty',
+            { query: trimmedQuery }
+          )}
+          message={t(
+            showingSearch
+              ? section.key === 'books'
+                ? 'search.noBooksHint'
+                : 'search.noReadersHint'
+              : 'search.discoveryEmptyHint'
+          )}
+          action={showingSearch ? t('search.clear') : undefined}
+          onAction={() => changeQuery('')}
+        />
+      )
+    return (
+      <View className="mb-8">
+        {activeTab === 'all' && section.total > 3 && (
+          <SearchAction
+            label={t(
+              section.key === 'books' ? 'search.seeBooks' : 'search.seeReaders'
+            )}
+            onPress={() => changeTab(section.key)}
           />
+        )}
+      </View>
+    )
+  }
+
+  const searchHeader = (
+    <View className="gap-3 px-container pb-5 pt-4">
+      <View className="gap-1">
+        <Text
+          accessibilityRole="header"
+          className="font-display-sb text-xl tracking-tight text-text"
+        >
+          {t('search.title')}
+        </Text>
+        <Text className="font-body text-xs text-t2">
+          {t('search.subtitle')}
+        </Text>
+      </View>
+      <SearchBar
+        value={query}
+        onChangeText={changeQuery}
+        placeholder={t(
+          activeTab === 'users'
+            ? 'search.readersPlaceholder'
+            : activeTab === 'books'
+              ? 'book.searchPlaceholder'
+              : 'search.placeholder'
         )}
       />
+      <SearchTabs active={activeTab} onChange={changeTab} />
+    </View>
+  )
 
+  return (
+    <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
+      <View className="w-full max-w-3xl flex-1 self-center">
+        <Animated.View
+          pointerEvents={floatingHeaderVisible ? 'auto' : 'none'}
+          accessibilityElementsHidden={!floatingHeaderVisible}
+          importantForAccessibility={
+            floatingHeaderVisible ? 'auto' : 'no-hide-descendants'
+          }
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 1,
+            backgroundColor: c.bg,
+            transform: [{ translateY: headerOffset }],
+            opacity: headerOpacity
+          }}
+        >
+          {searchHeader}
+        </Animated.View>
+        <View className="flex-1 px-container">
+          <SectionList<SearchItem, SearchSection>
+            key={activeTab + (showingSearch ? ':search' : ':discover')}
+            sections={sections}
+            keyExtractor={(item) => item.kind + ':' + item.value.id}
+            renderItem={renderResult}
+            renderSectionHeader={renderSectionHeader}
+            renderSectionFooter={renderSectionFooter}
+            stickySectionHeadersEnabled={false}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 32 }}
+            ListHeaderComponent={
+              <View>
+                <View
+                  onLayout={(event) =>
+                    setHeaderHeight(event.nativeEvent.layout.height)
+                  }
+                  accessibilityElementsHidden={floatingHeaderVisible}
+                  importantForAccessibility={
+                    floatingHeaderVisible ? 'no-hide-descendants' : 'auto'
+                  }
+                >
+                  {searchHeader}
+                </View>
+                {tooShort ? (
+                  <SearchFeedback
+                    title={t('search.keepTyping')}
+                    message={t('search.minimumQuery')}
+                  />
+                ) : !trimmedQuery && activeTab !== 'users' ? (
+                  <GenreChips onSelect={selectGenre} />
+                ) : null}
+              </View>
+            }
+          />
+        </View>
+      </View>
       {quickPeekBook && (
         <QuickPeekSheet
           book={quickPeekBook}
           onClose={() => setQuickPeekBook(null)}
         />
       )}
-
-      <NytInfoModal visible={infoVisible} onClose={() => setInfoVisible(false)} />
+      {infoVisible && (
+        <SearchSheet
+          title={t('search.nytTitle')}
+          onClose={() => setInfoVisible(false)}
+        >
+          <Text className="font-body text-xs text-text">
+            {t('search.nytBody1')}
+          </Text>
+          <Text className="font-body text-xs text-t2">
+            {t('search.nytBody2')}
+          </Text>
+          <Text className="font-body text-xs text-t2">
+            {t('search.nytBody3')}
+          </Text>
+          <SearchAction
+            label={t('common.gotIt')}
+            onPress={() => setInfoVisible(false)}
+          />
+        </SearchSheet>
+      )}
     </View>
-  );
+  )
 }
