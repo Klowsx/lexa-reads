@@ -1,41 +1,38 @@
-import { AppError } from "~/types";
-import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "expo-router";
-import {
-  requestResetPasswordFn,
-  verifyPasswordResetCodeFn,
-  updatePasswordFn,
-} from "../auth.queries";
+import { AppError } from '~/types'
+import { useMutation } from '@tanstack/react-query'
+import { useRouter } from 'expo-router'
+import { requestResetPasswordFn, updatePasswordFn } from '../auth.queries'
 
+// Envía el enlace de recuperación y muestra los siguientes pasos sin revelar si el correo existe.
 export function useRequestResetPassword() {
-  const router = useRouter();
+  const router = useRouter()
 
   return useMutation<void, AppError, { email: string }>({
     mutationFn: requestResetPasswordFn,
     onSuccess: (_, { email }) => {
-      router.push({ pathname: "/(auth)/verify-email", params: { email } });
-    },
-  });
+      router.push({
+        pathname: '/(auth)/recovery-sent',
+        params: { email: email.trim() }
+      })
+    }
+  })
 }
 
-export function useVerifyPasswordResetCode() {
-  const router = useRouter();
-
-  return useMutation<void, AppError, { email: string; token: string }>({
-    mutationFn: verifyPasswordResetCodeFn,
-    onSuccess: () => {
-      router.push("/(auth)/new-password");
-    },
-  });
-}
-
+// Guarda la contraseña y lleva a la confirmación después de cerrar la sesión temporal.
 export function useUpdatePassword() {
-  const router = useRouter();
+  const router = useRouter()
 
   return useMutation<void, AppError, { password: string }>({
     mutationFn: updatePasswordFn,
     onSuccess: () => {
-      router.replace("/(auth)/success");
-    },
-  });
+      router.replace('/(auth)/success')
+    }
+  })
+}
+
+// Reenvía el enlace desde la confirmación sin apilar otra pantalla de recuperación.
+export function useResendPasswordRecoveryLink() {
+  return useMutation<void, AppError, { email: string }>({
+    mutationFn: requestResetPasswordFn
+  })
 }

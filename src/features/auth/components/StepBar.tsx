@@ -1,10 +1,10 @@
-import { View } from 'react-native';
-import { useColors } from '~/theme/colors';
+import { View } from 'react-native'
+import { useColors } from '~/theme/colors'
 
-type Props = { step: number; total: number };
+type Props = { step: number; total: number }
 
 export function StepBar({ step, total }: Props) {
-  const c = useColors();
+  const c = useColors()
   return (
     <View className="flex-row gap-[5px] px-6 mb-6">
       {Array.from({ length: total }).map((_, i) => (
@@ -15,5 +15,5 @@ export function StepBar({ step, total }: Props) {
         />
       ))}
     </View>
-  );
+  )
 }

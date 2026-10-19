@@ -1,8 +1,7 @@
 import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 import { supabase } from "~/lib/supabase";
 import type { Tables } from "~/types";
-import type { ProfileData, UpdateProfileData, UserProfile } from "~/types/user";
-import type { OnboardingPreferences } from "~/types/user";
+import type { ProfileData, UpdateProfileData, UserProfile, OnboardingPreferences } from "~/types/user";
 import type { LibraryRow } from "~/features/library/library.queries";
 
 // Reading goal
@@ -66,7 +65,7 @@ export async function updateReadingGoalFn(
 // Own profile (by userId)
 
 const PROFILE_COLUMNS =
-  "id, username, display_name, avatar_url, bio, favorite_genres, books_read_count, reviews_count, followers_count, following_count, is_private, reading_goal, reading_goal_year, onboarding_completed, created_at";
+  "id, username, display_name, avatar_url, bio, favorite_genres, books_read_count, reviews_count, followers_count, following_count, is_private, reading_goal, reading_goal_year, onboarding_completed, onboarding_step, created_at";
 
 async function fetchMe(userId: string): Promise<UserProfile> {
   const { data, error } = await supabase
@@ -168,6 +167,7 @@ export async function saveOnboardingPreferencesFn(
       favorite_genres: data.favoriteGenres,
       reading_goal: data.readingGoal,
       reading_goal_year: currentYear,
+      onboarding_step: data.nextStep,
     })
     .eq("id", userId)
     .select(PROFILE_COLUMNS)

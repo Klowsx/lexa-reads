@@ -1374,6 +1374,7 @@ export type Database = {
           is_admin: boolean
           is_private: boolean | null
           onboarding_completed: boolean | null
+          onboarding_step: number
           reading_goal: number | null
           reading_goal_year: number | null
           reviews_count: number | null
@@ -1394,6 +1395,7 @@ export type Database = {
           is_admin?: boolean
           is_private?: boolean | null
           onboarding_completed?: boolean | null
+          onboarding_step?: number
           reading_goal?: number | null
           reading_goal_year?: number | null
           reviews_count?: number | null
@@ -1414,6 +1416,7 @@ export type Database = {
           is_admin?: boolean
           is_private?: boolean | null
           onboarding_completed?: boolean | null
+          onboarding_step?: number
           reading_goal?: number | null
           reading_goal_year?: number | null
           reviews_count?: number | null
@@ -1454,6 +1457,7 @@ export type Database = {
           is_admin: boolean
           is_private: boolean | null
           onboarding_completed: boolean | null
+          onboarding_step: number
           reading_goal: number | null
           reading_goal_year: number | null
           reviews_count: number | null

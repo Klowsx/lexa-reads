@@ -1,42 +1,21 @@
-import { Link } from 'expo-router';
-import { Pressable, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BookFan, PrimaryButton, Wordmark } from '../../src/features/auth/components';
+import { Link } from "expo-router";
+import { Pressable, ScrollView, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { BookFan, PrimaryButton, Wordmark } from "~/features/auth/components";
 
+// Recibe a lectores nuevos y habituales con dos destinos claros antes de personalizar el perfil.
 export default function WelcomeScreen() {
   const insets = useSafeAreaInsets();
-
   return (
-    <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
-      <View className="flex-1 items-center justify-center">
-        <BookFan />
+    <ScrollView className="flex-1 bg-bg" contentContainerStyle={{ flexGrow: 1, paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24, paddingHorizontal: 24 }}>
+      <Wordmark size={32} />
+      <View className="flex-1 justify-center min-h-[250px]"><BookFan /></View>
+      <View className="pb-7">
+        <Text accessibilityRole="header" className="font-display-sb text-text text-[36px] leading-[43px]">Haz sitio a tus lecturas.</Text>
+        <Text className="font-body text-t2 text-xs leading-6 mt-4">Guarda lo que lees, encuentra tu próxima historia y conversa con quienes también la han vivido.</Text>
       </View>
-
-      <View
-        className="px-7 pt-2 relative z-20"
-        style={{ paddingBottom: insets.bottom + 24 }}
-      >
-        <Wordmark size={36} />
-        <Text className="font-display-i text-text text-xl mt-2 mb-2.5">
-          {'Tu vida lectora,\nen un solo lugar.'}
-        </Text>
-        <Text className="font-body text-t2 text-sm leading-5 mb-7">
-          Registra lo que lees, descubre tu próxima historia y compártela con otros lectores.
-        </Text>
-
-        <Link href="/(auth)/register" asChild>
-          <PrimaryButton>Crear cuenta</PrimaryButton>
-        </Link>
-
-        <Link href="/(auth)/login" asChild>
-          <Pressable className="w-full py-3.5 items-center">
-            <Text className="font-body text-t2 text-sm">
-              ¿Ya tienes cuenta?{' '}
-              <Text className="font-body-sb text-accent">Iniciar sesión</Text>
-            </Text>
-          </Pressable>
-        </Link>
-      </View>
-    </View>
+      <Link href="/(auth)/register" asChild><PrimaryButton>Crear mi cuenta</PrimaryButton></Link>
+      <Link href="/(auth)/login" asChild><Pressable className="min-h-12 items-center justify-center mt-2"><Text className="font-body-md text-text text-xs">Ya tengo cuenta · Iniciar sesión</Text></Pressable></Link>
+    </ScrollView>
   );
 }

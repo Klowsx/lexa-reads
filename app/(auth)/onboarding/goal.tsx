@@ -1,11 +1,8 @@
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
-  OnboardHeader,
   PrimaryButton,
-  StepBar,
   alpha,
 } from "../../../src/features/auth/components";
 import { useSaveOnboardingPreferences } from "~/features/auth/hooks/useOnboarding";
@@ -13,6 +10,7 @@ import { useMe } from "~/features/user/hooks/useMe";
 import { cn } from "~/lib/utils";
 import { useColors } from "~/theme/colors";
 import { toAppError } from "~/types";
+import { OnboardingScreen } from "~/features/auth/components/onboarding-screen";
 
 const QUICK_GOALS = [12, 24, 50, 100];
 
@@ -28,13 +26,12 @@ function getLabel(goal: number) {
         : goal < 60
           ? "lector activo"
           : "lector intenso";
-  return `Aprox. ${perMonth} libros al mes — ${pace}`;
+  return `Aprox. ${perMonth} libros al mes, ${pace}.`;
 }
 
 // Permite elegir una meta y guardarla antes de pedir el nombre de usuario.
 export default function OnboardGoalScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const c = useColors();
   const { data: profile } = useMe();
   const savePreferences = useSaveOnboardingPreferences();
@@ -53,32 +50,29 @@ export default function OnboardGoalScreen() {
   }, [profile]);
 
   // Guarda la meta antes del último paso sin borrar los géneros ya elegidos.
-  function handleContinue() {
-    if (savePreferences.isPending) return;
+  function handleContinue(skip = false) {
+    if (!profile || savePreferences.isPending) return;
 
     savePreferences.mutate(
       {
         favoriteGenres: profile?.favorite_genres ?? [],
-        readingGoal: goal,
+        readingGoal: skip ? (profile.reading_goal ?? 12) : goal,
+        nextStep: 3,
       },
       { onSuccess: () => router.push("/(auth)/onboarding/username") },
     );
   }
 
   return (
-    <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
-      <OnboardHeader step={2} total={3} onBack={() => router.back()} />
-      <View className="h-3" />
-      <StepBar step={2} total={3} />
-
-      <View className="px-6 mb-4">
-        <Text className="font-display-sb text-text text-lg tracking-[-0.3px]">
-          Tu meta para {currentYear}
-        </Text>
-        <Text className="font-body text-t2 text-sm mt-2">
-          ¿Cuántos libros quieres leer este año? Puedes cambiarla cuando quieras.
-        </Text>
-      </View>
+    <OnboardingScreen step={2} title={`Tu ritmo para ${currentYear}`}
+      description={`Una meta que te acompañe. Si saltas este paso, conservaremos ${profile?.reading_goal ?? 12} libros como punto de partida. Puedes cambiarla en Ajustes.`}
+      onBack={() => router.replace("/(auth)/onboarding/genres")}
+      onSkip={() => handleContinue(true)} busy={savePreferences.isPending || !profile}
+      footer={<>
+        {error && <Text accessibilityLiveRegion="polite" className="font-body text-error text-xs mb-3">{error}</Text>}
+        <PrimaryButton disabled={!profile} loading={savePreferences.isPending} onPress={() => handleContinue()}>Guardar meta</PrimaryButton>
+      </>}
+    >
 
       <View className="flex-row items-center justify-center gap-7 mt-4 mb-9">
         <Pressable
@@ -91,10 +85,10 @@ export default function OnboardGoalScreen() {
         </Pressable>
 
         <View className="items-center min-w-[120px]">
-          <Text className="font-display-sb text-[88px] leading-[88px] tracking-[-4px] text-accent">
+          <Text className="font-display-sb text-[64px] leading-[76px] text-text">
             {goal}
           </Text>
-          <Text className="font-body text-t3 uppercase mt-1.5 text-[12px] tracking-[0.7px]">
+          <Text className="font-body text-t2 mt-1.5 text-xs">
             libros
           </Text>
         </View>
@@ -109,7 +103,7 @@ export default function OnboardGoalScreen() {
         </Pressable>
       </View>
 
-      <View className="flex-row justify-center gap-2">
+      <View className="flex-row flex-wrap justify-center gap-2">
         {QUICK_GOALS.map((quickGoal) => {
           const selectedGoal = goal === quickGoal;
           return (
@@ -132,7 +126,7 @@ export default function OnboardGoalScreen() {
               <Text
                 className={cn(
                   "font-body-md text-t2 text-xs",
-                  selectedGoal && "text-accent",
+                  selectedGoal && "text-text",
                 )}
               >
                 {quickGoal}
@@ -142,24 +136,10 @@ export default function OnboardGoalScreen() {
         })}
       </View>
 
-      <Text className="font-body text-t3 text-center mt-7 px-8 text-[12px] leading-[19px]">
+      <Text className="font-body text-t2 text-center mt-7 text-xs leading-6">
         {getLabel(goal)}
       </Text>
 
-      <View className="flex-1" />
-      <View
-        className="px-6 pt-5 border-t border-border/50"
-        style={{ paddingBottom: insets.bottom + 24 }}
-      >
-        {error ? (
-          <Text className="font-body text-error text-center mb-3 text-xs">
-            {error}
-          </Text>
-        ) : null}
-        <PrimaryButton loading={savePreferences.isPending} onPress={handleContinue}>
-          Continuar
-        </PrimaryButton>
-      </View>
-    </View>
+    </OnboardingScreen>
   );
 }

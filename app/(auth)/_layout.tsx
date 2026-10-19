@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { useAuthStore } from "~/stores/auth.store";
+import { View } from "react-native";
 
 // Protege rutas de autenticación cuyo acceso depende de una sesión o recuperación activa.
 function FlowGuard() {
@@ -26,11 +27,14 @@ function FlowGuard() {
   return null;
 }
 
+// Limita el ancho de lectura de los formularios también al abrir Lexa en escritorio.
 export default function AuthLayout() {
   return (
-    <>
+    <View className="flex-1 bg-bg items-center">
       <FlowGuard />
-      <Stack screenOptions={{ headerShown: false }} />
-    </>
+      <View style={{ flex: 1, width: "100%", maxWidth: 560 }}>
+        <Stack screenOptions={{ headerShown: false }} />
+      </View>
+    </View>
   );
 }
