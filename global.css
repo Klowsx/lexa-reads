@@ -1,31 +1,5 @@
+@import "./src/theme/generated-colors.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@layer base {
-  /* Light theme — :root es el default que espera NativeWind */
-  :root {
-    --color-bg:      245 240 234;
-    --color-surface: 235 229 222;
-    --color-sr:      224 217 209;
-    --color-sh:      213 206 197;
-    --color-border:  194 186 176;
-    --color-text:    26 21 18;
-    --color-t2:      104 94 85;
-    --color-t3:      158 148 136;
-    --color-accent:  196 120 58;
-    --color-star:    232 192 90;
-  }
-
-  /* Dark theme — NativeWind aplica .dark automáticamente según useColorScheme() */
-  .dark {
-    --color-bg:      16 13 10;
-    --color-surface: 28 24 21;
-    --color-sr:      37 33 24;
-    --color-sh:      45 41 34;
-    --color-border:  53 48 43;
-    --color-text:    240 234 226;
-    --color-t2:      158 148 136;
-    --color-t3:      106 99 92;
-  }
-}

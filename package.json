@@ -13,6 +13,12 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "gen:types": "supabase gen types typescript --project-id nvgygpsuqltjfexsjwoq > src/types/database.ts",
+    "gen:theme": "node scripts/generate-theme-tokens.mjs",
+    "check:theme": "node scripts/generate-theme-tokens.mjs --check",
+    "prestart": "pnpm gen:theme",
+    "preandroid": "pnpm gen:theme",
+    "preios": "pnpm gen:theme",
+    "preweb": "pnpm gen:theme",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"

@@ -19,17 +19,17 @@ module.exports = {
         accent:  'rgb(var(--color-accent)  / <alpha-value>)',
         star:    'rgb(var(--color-star)    / <alpha-value>)',
 
-        // Feedback — fijos, no cambian con el tema
-        success: '#5CAF7E',
-        error:   '#C43A3A',
-        warning: '#C49A20',
+        // Feedback — se resuelve desde las variables generadas por tokens.json
+        success: 'rgb(var(--color-success) / <alpha-value>)',
+        error:   'rgb(var(--color-error)   / <alpha-value>)',
+        warning: 'rgb(var(--color-warning) / <alpha-value>)',
 
-        // Status — fijos, no cambian con el tema
+        // Status — se resuelve desde las variables generadas por tokens.json
         status: {
-          reading:   '#4A96B8',
-          read:      '#5CAF7E',
-          want:      '#8A6CD8',
-          abandoned: '#787068',
+          reading:   'rgb(var(--color-status-reading)   / <alpha-value>)',
+          read:      'rgb(var(--color-status-read)      / <alpha-value>)',
+          want:      'rgb(var(--color-status-want)      / <alpha-value>)',
+          abandoned: 'rgb(var(--color-status-abandoned) / <alpha-value>)',
         },
       },
 

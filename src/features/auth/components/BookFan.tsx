@@ -1,6 +1,5 @@
 ﻿import { StyleSheet, View } from 'react-native';
-import { useColors } from '~/theme/colors';
-import { alpha } from './tokens';
+import { alpha, useColors } from '~/theme/colors';
 
 const BOOKS = [
   { c1: '#1E0808', c2: '#C43A3A' }, // Babel
