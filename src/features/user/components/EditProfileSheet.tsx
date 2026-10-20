@@ -7,6 +7,7 @@ import {
   Platform,
   Pressable,
   ScrollView,
+  Switch,
   Text,
   TextInput,
   View
@@ -25,6 +26,7 @@ interface Props {
   onClose: () => void
 }
 
+// Edita identidad, gustos y privacidad sin perder el formulario si el guardado falla.
 export function EditProfileSheet({ user, onClose }: Props) {
   const c = useColors()
   const insets = useSafeAreaInsets()
@@ -33,18 +35,21 @@ export function EditProfileSheet({ user, onClose }: Props) {
   const { mutate: updateProfile, isPending, isError } = useUpdateProfile()
   const [name, setName] = useState(user.display_name)
   const [bio, setBio] = useState(user.bio ?? '')
+  const [isPrivate, setIsPrivate] = useState(user.is_private ?? false)
   const [selectedGenres, setSelectedGenres] = useState<string[]>(
     normalizeProfileGenres(user.favorite_genres)
   )
   const [focusedField, setFocusedField] = useState<'name' | 'bio' | null>(null)
 
+  // Envía los campos editados y cierra únicamente después de confirmar el guardado.
   function handleSave() {
     if (isPending || !name.trim()) return
     updateProfile(
       {
         display_name: name.trim(),
         bio: bio.trim() || null,
-        favorite_genres: selectedGenres.length ? selectedGenres : null
+        favorite_genres: selectedGenres.length ? selectedGenres : null,
+        is_private: isPrivate
       },
       { onSuccess: onClose }
     )
@@ -102,6 +107,24 @@ export function EditProfileSheet({ user, onClose }: Props) {
             keyboardDismissMode="on-drag"
             contentContainerStyle={{ padding: 18, gap: 24 }}
           >
+            <View className="gap-3 border-b border-border pb-5">
+              <View className="min-h-12 flex-row items-center justify-between gap-3">
+                <Text className="font-body-sb text-sm text-text flex-1">
+                  {t('social.privateAccount')}
+                </Text>
+                <Switch
+                  value={isPrivate}
+                  onValueChange={setIsPrivate}
+                  disabled={isPending}
+                  accessibilityLabel={t('social.privateAccount')}
+                  trackColor={{ false: c.sh, true: c.accent }}
+                  thumbColor={c.text}
+                />
+              </View>
+              <Text className="font-body text-xs text-t2">
+                {t('social.privacyHint')}
+              </Text>
+            </View>
             <View className="flex-row items-center gap-3">
               <Avatar
                 displayName={name || user.display_name}

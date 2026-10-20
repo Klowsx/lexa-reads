@@ -615,7 +615,7 @@ export type Database = {
       follows: {
         Row: {
           accepted_at: string | null
-          created_at: string | null
+          created_at: string
           follower_id: string
           following_id: string
           id: string
@@ -623,7 +623,7 @@ export type Database = {
         }
         Insert: {
           accepted_at?: string | null
-          created_at?: string | null
+          created_at?: string
           follower_id: string
           following_id: string
           id?: string
@@ -631,7 +631,7 @@ export type Database = {
         }
         Update: {
           accepted_at?: string | null
-          created_at?: string | null
+          created_at?: string
           follower_id?: string
           following_id?: string
           id?: string

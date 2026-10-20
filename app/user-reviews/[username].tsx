@@ -3,14 +3,15 @@ import { useLocalSearchParams, useRouter } from 'expo-router'
 import { ChevronLeft, Heart, MessageCircle } from 'lucide-react-native'
 import { ActivityIndicator, Pressable, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useQuery } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
+import { ErrorState } from '~/components/ui/ErrorState'
 import { SpoilerText } from '~/features/reviews/components/SpoilerText'
 import { BookCover } from '~/components/ui/BookCover'
 import { StarRating } from '~/components/ui/StarRating'
 import { useToggleReviewLike } from '~/features/feed/hooks/useToggleReviewLike'
 import { useUserReviews } from '~/features/reviews/hooks/useUserReviews'
 import type { ReviewWithBook } from '~/features/reviews/reviews.queries'
-import { profileQueryOptions } from '~/features/user/user.queries'
+import { useProfile } from '~/features/user/hooks/useProfile'
 import { formatRelativeTime } from '~/lib/utils'
 import { fixed, useColors } from '~/theme/colors'
 import { useAuthStore } from '~/stores/auth.store'
@@ -119,27 +120,37 @@ function ReviewCard({
   )
 }
 
+// Comprueba la relación antes de consultar reseñas y distingue privacidad, errores y ausencia de publicaciones.
 export default function UserReviewsScreen() {
   const { username } = useLocalSearchParams<{ username: string }>()
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const c = useColors()
   const currentUserId = useAuthStore((s) => s.user?.id)
-
-  const { data: profile, isLoading: profileLoading } = useQuery(
-    profileQueryOptions(username, currentUserId)
-  )
+  const { t } = useTranslation()
+  const profileQuery = useProfile(username)
+  const { data: profile, isLoading: profileLoading } = profileQuery
+  const visible =
+    !!profile &&
+    (profile.id === currentUserId ||
+      !profile.is_private ||
+      (profile.follow_status === 'accepted' &&
+        !profileQuery.isFetching &&
+        !profileQuery.isError))
 
   const {
     reviews,
     isLoading: reviewsLoading,
     isFetchingNextPage,
     hasNextPage,
-    fetchNextPage
-  } = useUserReviews(profile?.id ?? '')
+    fetchNextPage,
+    isError,
+    refetch
+  } = useUserReviews(visible ? (profile?.id ?? '') : '')
 
   const isLoading = profileLoading || (!!profile && reviewsLoading)
 
+  // Abre la ficha usando el identificador externo esperado por la ruta del catálogo.
   function handleBookPress(review: ReviewWithBook) {
     const googleId = review.books?.google_books_id
     if (googleId) router.push(`/book/${googleId}` as any)
@@ -173,6 +184,25 @@ export default function UserReviewsScreen() {
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator color={c.accent} />
         </View>
+      ) : profileQuery.isError ? (
+        <ErrorState onRetry={() => void profileQuery.refetch()} />
+      ) : !profile ? (
+        <View className="px-container py-10">
+          <Text className="font-body text-sm text-text">
+            {t('social.unavailable')}
+          </Text>
+        </View>
+      ) : !visible ? (
+        <View className="px-container py-10 gap-3">
+          <Text className="font-display-sb text-lg text-text text-center">
+            {t('social.privateAccount')}
+          </Text>
+          <Text className="font-body text-sm text-t2 text-center">
+            {t('social.privateHint')}
+          </Text>
+        </View>
+      ) : isError ? (
+        <ErrorState onRetry={() => void refetch()} />
       ) : reviews.length === 0 ? (
         <View className="flex-1 items-center justify-center gap-2 px-8">
           <Text className="text-sm font-body-sb text-text text-center">

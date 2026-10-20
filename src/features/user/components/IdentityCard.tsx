@@ -1,4 +1,4 @@
-import { Pencil } from 'lucide-react-native'
+import { Lock, Pencil } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'
 import { Pressable, Text, View } from 'react-native'
 import { Avatar } from '~/components/ui/Avatar'
@@ -8,20 +8,16 @@ import { normalizeProfileGenres } from '../profile-genres'
 
 interface Props {
   user: UserProfile
-  onEditPress: () => void
-  embedded?: boolean
+  onEditPress?: () => void
 }
 
-export function IdentityCard({ user, onEditPress, embedded = false }: Props) {
+// Comparte la identidad editorial del lector en su perfil propio y en la visita a otros perfiles.
+export function IdentityCard({ user, onEditPress }: Props) {
   const { t } = useTranslation()
   const c = useColors()
 
   return (
-    <View
-      className={
-        embedded ? 'px-5 pt-6 pb-5 gap-5' : 'px-container pt-5 pb-6 gap-5'
-      }
-    >
+    <View className="px-container pt-5 pb-6 gap-5">
       <View className="flex-row items-start gap-4">
         <View className="rounded-full bg-bg p-1">
           <Avatar
@@ -43,14 +39,24 @@ export function IdentityCard({ user, onEditPress, embedded = false }: Props) {
             @{user.username}
           </Text>
         </View>
-        <Pressable
-          onPress={onEditPress}
-          accessibilityRole="button"
-          accessibilityLabel={t('editProfile.title')}
-          className="min-h-11 min-w-11 rounded-md border border-border items-center justify-center active:bg-sr"
-        >
-          <Pencil size={18} color={c.text} strokeWidth={1.6} />
-        </Pressable>
+        {onEditPress && (
+          <Pressable
+            onPress={onEditPress}
+            accessibilityRole="button"
+            accessibilityLabel={t('editProfile.title')}
+            className="min-h-11 min-w-11 rounded-md border border-border items-center justify-center active:bg-sr"
+          >
+            <Pencil size={18} color={c.text} strokeWidth={1.6} />
+          </Pressable>
+        )}
+      </View>
+      <View className="flex-row items-center gap-2">
+        {user.is_private && <Lock size={16} color={c.t2} accessible={false} />}
+        <Text className="font-body text-xs text-t2">
+          {t(
+            user.is_private ? 'social.privateAccount' : 'social.publicAccount'
+          )}
+        </Text>
       </View>
       {user.bio ? (
         <Text selectable className="font-body text-sm text-text leading-7">

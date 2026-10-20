@@ -4,7 +4,13 @@ DO $$ DECLARE owner_id uuid:=gen_random_uuid(); reader_id uuid:=gen_random_uuid(
   PERFORM set_config('lexa.qa_owner',owner_id::text,true); PERFORM set_config('lexa.qa_reader',reader_id::text,true); PERFORM set_config('lexa.qa_follower',follower_id::text,true); PERFORM set_config('lexa.qa_book',book_id::text,true);
   INSERT INTO auth.users(id) VALUES(owner_id),(reader_id),(follower_id);
   UPDATE public.users SET is_private=true WHERE id=owner_id;
-  INSERT INTO public.follows(follower_id,following_id,status) VALUES(follower_id,owner_id,'accepted'),(reader_id,owner_id,'pending');
+  -- Crea relaciones por el mismo flujo autorizado que usa la aplicación.
+  PERFORM set_config('request.jwt.claim.sub',follower_id::text,true);
+  INSERT INTO public.follows(follower_id,following_id) VALUES(follower_id,owner_id);
+  PERFORM set_config('request.jwt.claim.sub',owner_id::text,true);
+  UPDATE public.follows SET status='accepted' WHERE following_id=owner_id;
+  PERFORM set_config('request.jwt.claim.sub',reader_id::text,true);
+  INSERT INTO public.follows(follower_id,following_id) VALUES(reader_id,owner_id);
   INSERT INTO public.books(id,google_books_id,title) VALUES(book_id,'qa_'||substr(replace(book_id::text,'-',''),1,16),'Reseñas de prueba');
 END; $$;
 SET LOCAL ROLE authenticated;

@@ -10,9 +10,9 @@ interface Props {
   onPressReviews?: () => void
   onPressFollowers?: () => void
   onPressFollowing?: () => void
-  embedded?: boolean
 }
 
+// Presenta contadores legibles y solo habilita las rutas disponibles para el acceso actual.
 export function ProfileStats({
   books,
   reviews,
@@ -21,8 +21,7 @@ export function ProfileStats({
   onPressBooks,
   onPressReviews,
   onPressFollowers,
-  onPressFollowing,
-  embedded = false
+  onPressFollowing
 }: Props) {
   const { t, i18n } = useTranslation()
   const { width, fontScale } = useWindowDimensions()
@@ -47,13 +46,7 @@ export function ProfileStats({
   ]
 
   return (
-    <View
-      className={
-        embedded
-          ? 'border-t border-border flex-row flex-wrap px-2 py-3'
-          : 'mx-container mb-8 border-y border-border flex-row flex-wrap py-2'
-      }
-    >
+    <View className="mx-container mb-8 border-y border-border flex-row flex-wrap py-2">
       {stats.map(({ label, value, onPress }) => (
         <Pressable
           key={label}
@@ -61,7 +54,7 @@ export function ProfileStats({
           disabled={!onPress}
           accessibilityRole={onPress ? 'button' : 'text'}
           accessibilityLabel={value.toLocaleString(i18n.language) + ' ' + label}
-          className="items-center justify-center py-3 rounded-sm gap-1 active:bg-sr"
+          className="min-h-12 items-center justify-center py-3 rounded-sm gap-1 active:bg-sr focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
           style={{ width: `${100 / columns}%` }}
         >
           <Text

@@ -10,15 +10,15 @@ import { ProfileEmptyState, ProfileSectionHeading } from './ProfileSection'
 interface Props {
   books: LibraryRow[]
   onViewAll?: () => void
+  emptyMessage?: string
 }
 
 // Enlaza las lecturas terminadas con su ficha del catálogo para poder editarlas.
-export function RecentReads({ books, onViewAll }: Props) {
+export function RecentReads({ books, onViewAll, emptyMessage }: Props) {
   const router = useRouter()
   const { t } = useTranslation()
   const c = useColors()
   const availableBooks = books.filter((row) => row.books)
-  if (!availableBooks.length && !onViewAll) return null
 
   return (
     <View className="mb-8">
@@ -32,7 +32,7 @@ export function RecentReads({ books, onViewAll }: Props) {
       {!availableBooks.length ? (
         <View className="px-container">
           <ProfileEmptyState
-            message={t('profile.recentEmpty')}
+            message={emptyMessage ?? t('profile.recentEmpty')}
             action={t('profile.viewLibrary')}
             onAction={onViewAll}
           />

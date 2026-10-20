@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { View, useWindowDimensions } from 'react-native'
 import { Skeleton } from '~/components/ui/Skeleton'
 
+// Reserva el espacio de la identidad abierta, sus contadores y las primeras lecturas del perfil.
 export function ProfileSkeleton() {
   const { t } = useTranslation()
   const { width, fontScale } = useWindowDimensions()
@@ -13,8 +14,8 @@ export function ProfileSkeleton() {
       accessibilityState={{ busy: true }}
       aria-busy
     >
-      <View className="mx-container overflow-hidden rounded-card bg-surface">
-        <View className="px-5 pt-6 pb-5 gap-5">
+      <View className="mx-container">
+        <View className="pt-5 pb-6 gap-5">
           <View className="flex-row items-center gap-4">
             <Skeleton width={84} height={84} radius={42} animate={false} />
             <View className="flex-1 gap-2">

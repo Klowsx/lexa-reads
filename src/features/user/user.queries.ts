@@ -101,18 +101,20 @@ export const meQueryOptions = (userId: string) =>
 
 // Public profile (by username)
 
+// Recupera la identidad visible y comprueba cada consulta de relación antes de conceder acceso en la UI.
 async function fetchProfile(
   username: string,
   currentUserId?: string
-): Promise<ProfileData> {
+): Promise<ProfileData | null> {
   const { data: profile, error } = await supabase
     .from('users')
     .select(PROFILE_COLUMNS)
     .eq('username', username)
     .is('deleted_at', null)
-    .single()
+    .maybeSingle()
 
   if (error) throw error
+  if (!profile) return null
 
   let follow_status: 'accepted' | 'pending' | null = null
   let is_blocked_by_me = false
@@ -133,6 +135,8 @@ async function fetchProfile(
         .maybeSingle()
     ])
 
+    if (followResult.error) throw followResult.error
+    if (blockResult.error) throw blockResult.error
     follow_status =
       (followResult.data?.status as 'accepted' | 'pending' | null) ?? null
     is_blocked_by_me = !!blockResult.data
@@ -193,19 +197,18 @@ export async function saveOnboardingPreferencesFn(
 
 // Follow / Unfollow
 
-export async function followFn(
-  followerId: string,
-  followingId: string,
-  isPrivate: boolean = false
-): Promise<void> {
-  const { error } = await supabase.from('follows').insert({
-    follower_id: followerId,
-    following_id: followingId,
-    status: isPrivate ? 'pending' : 'accepted'
-  })
+// El servidor decide si el seguimiento se acepta o queda pendiente según la privacidad actual.
+export async function followFn(followerId: string, followingId: string) {
+  const { data, error } = await supabase
+    .from('follows')
+    .insert({ follower_id: followerId, following_id: followingId })
+    .select('status')
+    .single()
   if (error) throw error
+  return data.status
 }
 
+// Retira un seguimiento aceptado o cancela una solicitud propia.
 export async function unfollowFn(
   followerId: string,
   followingId: string
@@ -244,90 +247,72 @@ export type FollowUser = {
 
 export type FollowListPage = {
   items: FollowUser[]
-  nextCursor: string | null
+  nextCursor: FollowCursor | null
 }
 
-async function fetchFollowers(
+type FollowCursor = { createdAt: string; id: string }
+
+// Consulta solamente relaciones aceptadas y resuelve empates con un cursor compuesto.
+async function fetchConnections(
   userId: string,
-  cursor?: string
+  kind: 'followers' | 'following',
+  cursor?: FollowCursor
 ): Promise<FollowListPage> {
+  const followers = kind === 'followers'
+  const relation = followers
+    ? 'follows_follower_id_fkey'
+    : 'follows_following_id_fkey'
   let query = supabase
     .from('follows')
-    .select(
-      `id, created_at, follower:users!follows_follower_id_fkey(${FOLLOW_USER_COLUMNS})`
-    )
-    .eq('following_id', userId)
+    .select(`id, created_at, person:users!${relation}(${FOLLOW_USER_COLUMNS})`)
+    .eq(followers ? 'following_id' : 'follower_id', userId)
     .eq('status', 'accepted')
     .order('created_at', { ascending: false })
-    .limit(PAGE_SIZE)
-
-  if (cursor) query = query.lt('created_at', cursor)
-
+    .order('id', { ascending: false })
+    .limit(PAGE_SIZE + 1)
+  if (cursor)
+    query = query.or(
+      `created_at.lt.${cursor.createdAt},and(created_at.eq.${cursor.createdAt},id.lt.${cursor.id})`
+    )
   const { data, error } = await query
   if (error) throw error
-
-  const items: FollowUser[] = (data ?? []).map((row: any) => ({
-    follow_id: row.id,
-    created_at: row.created_at,
-    user: row.follower
-  }))
-
+  const rows = (data ?? []) as unknown as {
+    id: string
+    created_at: string
+    person: FollowUser['user'] | null
+  }[]
+  const visible = rows.slice(0, PAGE_SIZE)
+  const last = visible.at(-1)
   return {
-    items,
+    items: visible.flatMap((row) =>
+      row.person
+        ? [{ follow_id: row.id, created_at: row.created_at, user: row.person }]
+        : []
+    ),
     nextCursor:
-      items.length === PAGE_SIZE ? items[items.length - 1].created_at : null
+      rows.length > PAGE_SIZE && last
+        ? { createdAt: last.created_at, id: last.id }
+        : null
   }
 }
 
-async function fetchFollowing(
-  userId: string,
-  cursor?: string
-): Promise<FollowListPage> {
-  let query = supabase
-    .from('follows')
-    .select(
-      `id, created_at, following:users!follows_following_id_fkey(${FOLLOW_USER_COLUMNS})`
-    )
-    .eq('follower_id', userId)
-    .eq('status', 'accepted')
-    .order('created_at', { ascending: false })
-    .limit(PAGE_SIZE)
-
-  if (cursor) query = query.lt('created_at', cursor)
-
-  const { data, error } = await query
-  if (error) throw error
-
-  const items: FollowUser[] = (data ?? []).map((row: any) => ({
-    follow_id: row.id,
-    created_at: row.created_at,
-    user: row.following
-  }))
-
-  return {
-    items,
-    nextCursor:
-      items.length === PAGE_SIZE ? items[items.length - 1].created_at : null
-  }
-}
-
+// Mantiene cachés separadas de seguidores y seguidos, con el mismo contrato de paginación.
 export const followersInfiniteOptions = (userId: string) =>
   infiniteQueryOptions({
     queryKey: ['followers', userId],
+    initialPageParam: undefined as FollowCursor | undefined,
     queryFn: ({ pageParam }) =>
-      fetchFollowers(userId, pageParam as string | undefined),
-    initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+      fetchConnections(userId, 'followers', pageParam),
+    getNextPageParam: (page) => page.nextCursor ?? undefined,
     enabled: !!userId
   })
-
 export const followingInfiniteOptions = (userId: string) =>
   infiniteQueryOptions({
     queryKey: ['following', userId],
+    initialPageParam: undefined as FollowCursor | undefined,
     queryFn: ({ pageParam }) =>
-      fetchFollowing(userId, pageParam as string | undefined),
-    initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+      fetchConnections(userId, 'following', pageParam),
+    getNextPageParam: (page) => page.nextCursor ?? undefined,
     enabled: !!userId
   })
 
@@ -348,6 +333,7 @@ export type PendingRequest = {
   >
 }
 
+// Recupera solicitudes recibidas sin exponer relaciones pendientes a terceros.
 async function fetchPendingRequests(userId: string): Promise<PendingRequest[]> {
   const { data, error } = await supabase
     .from('follows')
@@ -360,11 +346,13 @@ async function fetchPendingRequests(userId: string): Promise<PendingRequest[]> {
 
   if (error) throw error
 
-  return (data ?? []).map((row: any) => ({
-    follow_id: row.id,
-    created_at: row.created_at,
-    requester: row.requester
-  }))
+  return (data ?? [])
+    .map((row: any) => ({
+      follow_id: row.id,
+      created_at: row.created_at,
+      requester: row.requester
+    }))
+    .filter((row) => row.requester)
 }
 
 export const pendingRequestsQueryOptions = (userId: string) =>
@@ -374,14 +362,18 @@ export const pendingRequestsQueryOptions = (userId: string) =>
     enabled: !!userId
   })
 
+// Aprueba una solicitud recibida; exige una fila para detectar permisos perdidos o solicitudes retiradas.
 export async function acceptFollowFn(followId: string): Promise<void> {
   const { error } = await supabase
     .from('follows')
-    .update({ status: 'accepted', accepted_at: new Date().toISOString() })
+    .update({ status: 'accepted' })
     .eq('id', followId)
+    .select('id')
+    .single()
   if (error) throw error
 }
 
+// Rechaza una solicitud recibida sin modificar los contadores de seguimientos aceptados.
 export async function rejectFollowFn(followId: string): Promise<void> {
   const { error } = await supabase.from('follows').delete().eq('id', followId)
   if (error) throw error

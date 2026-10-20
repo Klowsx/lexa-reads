@@ -584,5 +584,43 @@
     "deleteError": "No se pudo eliminar el comentario. Puedes reintentarlo.",
     "placeholder": "Escribe un comentario",
     "send": "Enviar comentario"
+  },
+  "social": {
+    "privateAccount": "Cuenta privada",
+    "publicAccount": "Perfil público",
+    "privacyHint": "Tu nombre, biografía y contadores siguen visibles. Solo tus seguidores aceptados podrán ver lecturas, reseñas, listas públicas y comunidad. Tus seguidores actuales conservarán el acceso.",
+    "requestFollow": "Solicitar seguimiento",
+    "cancelRequest": "Cancelar solicitud",
+    "unfollow": "Dejar de seguir",
+    "unfollowTitle": "¿Dejar de seguir a @{{username}}?",
+    "unfollowHint": "Su actividad dejará de aparecer en tu inicio.",
+    "unfollowPrivateHint": "Perderás acceso a sus lecturas y listas. Para volver, necesitarás que acepte otra solicitud.",
+    "followError": "No pudimos actualizar el seguimiento. Vuelve a intentarlo.",
+    "acceptRequest": "Aceptar solicitud de @{{username}}",
+    "rejectRequest": "Rechazar solicitud de @{{username}}",
+    "requestError": "No pudimos responder. La solicitud sigue aquí para reintentar.",
+    "requestsHint": "Aceptar da acceso a tu contenido privado. Rechazar no avisa al solicitante.",
+    "unavailable": "Perfil no disponible",
+    "unavailableHint": "Puede que esta cuenta ya no esté disponible o que no tengas acceso.",
+    "profileOptions": "Opciones del perfil",
+    "openOwnProfile": "Ir a mi perfil",
+    "message": "Enviar mensaje",
+    "messageError": "No pudimos abrir la conversación. Vuelve a intentarlo.",
+    "publicLists": "Listas del lector",
+    "privateHint": "Sus lecturas, reseñas y listas están reservadas a seguidores aceptados. Solicita seguir esta cuenta para verlas.",
+    "pendingHint": "Tu solicitud está pendiente. Podrás ver su contenido cuando la acepte.",
+    "checkingAccess": "Comprobando el acceso a este perfil…",
+    "blockHint": "Se retirarán los seguimientos entre ambas cuentas y dejarán de tener acceso a su contenido.",
+    "community": "Comunidad",
+    "followers": "Seguidores",
+    "following": "Siguiendo",
+    "empty": {
+      "followers": "Todavía no hay seguidores",
+      "following": "Todavía no sigue a nadie"
+    },
+    "communityHint": "Las conexiones aceptadas aparecerán aquí.",
+    "pageError": "No pudimos cargar más lectores. Puedes reintentarlo.",
+    "loadMore": "Ver más lectores",
+    "noRecentReads": "Todavía no hay lecturas terminadas para mostrar."
   }
 }

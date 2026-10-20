@@ -104,7 +104,7 @@ Esta es una propuesta de alcance, no un cambio ya aprobado del producto descrito
 - [x] Editar o quitar puntuación; registrar al menos fechas básicas para que la meta anual sea consistente.
 - [x] Biblioteca con filtros útiles, estados vacíos y carga incremental.
 - [x] Reseñas, protección de spoilers y comentarios si se mantienen en el lanzamiento.
-- [ ] Perfil, seguir/dejar de seguir y privacidad consistente. Si se ofrece cuenta privada, debe estar protegida en el servidor.
+- [x] Perfil, seguir/dejar de seguir y privacidad consistente. Si se ofrece cuenta privada, debe estar protegida en el servidor.
 - [ ] Feed pequeño pero útil, con una alternativa cuando todavía no existan contactos.
 - [ ] Listas básicas: crear, editar y añadir/quitar libros. Funciones más elaboradas pueden esperar.
 - [ ] Notificaciones internas de los eventos incluidos y push solamente si está probado de extremo a extremo.
@@ -117,6 +117,7 @@ Los puntos marcados corresponden a implementación y comprobaciones automatizada
 - **Estados, puntuación y fechas:** [registro de lectura](registro-de-lectura.md), RPC y RLS verificadas en Supabase, pruebas unitarias y recorrido de las entradas con navegador. Pendiente: teclado y áreas seguras en Android/iOS instalado.
 - **Reseñas, spoilers y comentarios:** se mantienen en el MVP. [Contrato y pruebas](resenas-spoilers-comentarios.md): crear, editar y retirar reseñas; spoilers ocultos también en previews y tarjetas compartidas; comentarios con su propia marca de spoiler, permisos heredados del padre, errores recuperables y confirmación al eliminar. Verificado con SQL real, pruebas de componentes y navegador. Pendiente: recorrido y exportación nativa de tarjetas en una compilación instalada.
 - **Biblioteca:** [contrato y comprobaciones](biblioteca.md): filtros combinables por estado, título/autor, puntuación y etiquetas; páginas por cursor de 24 libros; totales independientes; vacíos específicos y errores recuperables sin perder lo cargado. Verificado con SQL real y navegador. Pendiente: recorrido instalado y gestos nativos en Android/iOS.
+- **Perfiles, seguimiento y privacidad:** [contrato y pruebas](perfiles-seguimiento-privacidad.md): perfil propio/ajeno coherente, edición y privacidad, solicitudes recibidas operativas, relaciones decididas por servidor, contadores de aceptados, listas y comunidad protegidas, y revalidación de caché al perder acceso. Verificado con SQL real, navegador y regresiones de lectura/reseñas. Pendiente: recorrido instalado y accesibilidad con lectores de pantalla nativos.
 - La búsqueda recibió mejoras de UI/UX, pero el punto completo continúa abierto hasta verificar expresamente título, autor e ISBN.
 
 ### Opcional para la primera beta, con decisión explícita
@@ -201,6 +202,8 @@ Esfuerzo orientativo por tarea: S = menos de 1 día; M = 1–3 días; L = 3–5 
 **Aceptación:** una base vacía puede aplicar el historial previsto; una copia representativa puede actualizarse sin perder datos. Quedan documentados esquema, extensiones, secretos, funciones, trabajos programados y orden de despliegue.
 
 #### A05 · P0 · Aprobación de seguidores de cuentas privadas · L
+
+**Estado al 20 de octubre: resuelto en servidor y cliente.** El servidor normaliza solicitudes privadas a `pending`, solo el destinatario puede aprobar, la identidad es inmutable y las listas/comunidad respetan la privacidad. Los contadores incluyen únicamente aceptados. SQL real comprueba los permisos y navegador recorre solicitudes, errores, cancelación y pérdida de acceso. Ver [evidencia y límites](perfiles-seguimiento-privacidad.md). La evidencia siguiente describe el estado anterior.
 
 **Evidencia:** en `001_initial_schema.sql` la inserción de seguimientos comprueba la identidad del seguidor y el estado tiene valor predeterminado `accepted`. En `src/features/user/user.queries.ts` es el cliente quien elige `pending` o `accepted`. Las políticas de `014_privacy_and_blocks.sql` confían en ese estado. No se encontró una normalización de servidor que obligue a solicitar aprobación para una cuenta privada, ni una política UPDATE que explique el flujo legítimo de aceptación.
 

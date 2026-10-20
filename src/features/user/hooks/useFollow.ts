@@ -1,76 +1,62 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuthStore } from "~/stores/auth.store";
-import type { ProfileData } from "~/types/user";
-import { followFn, unfollowFn } from "../user.queries";
+import {
+  useIsMutating,
+  useMutation,
+  useQueryClient
+} from '@tanstack/react-query'
+import { useAuthStore } from '~/stores/auth.store'
+import type { ProfileData } from '~/types/user'
+import { followFn, unfollowFn, profileQueryOptions } from '../user.queries'
+import { refreshProfileAccess } from '../profile-cache'
 
-export function useFollow(
-  targetUserId: string,
-  targetUsername: string,
-  isTargetPrivate: boolean = false,
-) {
-  const queryClient = useQueryClient();
-  const currentUserId = useAuthStore((s) => s.user?.id);
-
-  const profileKey = ["profile", targetUsername, currentUserId];
-
-  const invalidate = () =>
-    queryClient.invalidateQueries({ queryKey: ["profile", targetUsername] });
-
+// Comparte el bloqueo entre entradas y nunca concede acceso privado antes de la respuesta del servidor.
+export function useFollow(targetUserId: string, targetUsername: string) {
+  const client = useQueryClient()
+  const userId = useAuthStore((s) => s.user?.id ?? '')
+  const key = profileQueryOptions(targetUsername, userId).queryKey
+  const mutationKey = [...key, 'follow']
+  const busy = useIsMutating({ mutationKey }) > 0
+  // Actualiza la relación en caché sin convertir una solicitud optimista en acceso concedido.
+  async function optimistic(status: 'pending' | null) {
+    await client.cancelQueries({ queryKey: key })
+    const previous = client.getQueryData<ProfileData | null>(key)
+    client.setQueryData<ProfileData | null>(key, (old) =>
+      old ? { ...old, follow_status: status, is_following: false } : old
+    )
+    return { previous }
+  }
+  // Restaura la relación si la escritura falla; el refresco posterior vuelve a comprobar permisos.
+  function rollback(
+    _error: unknown,
+    _variables: void,
+    context: { previous: ProfileData | null | undefined } | undefined
+  ) {
+    if (context?.previous) client.setQueryData(key, context.previous)
+  }
+  const shared = {
+    mutationKey,
+    scope: { id: `follow:${userId}:${targetUserId}` },
+    onError: rollback,
+    onSettled: () => refreshProfileAccess(client, userId)
+  }
   const follow = useMutation({
-    mutationFn: () => {
-      if (!currentUserId) throw new Error("Not authenticated");
-      return followFn(currentUserId, targetUserId, isTargetPrivate);
-    },
-    onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: profileKey });
-      const prev = queryClient.getQueryData<ProfileData>(profileKey);
-      queryClient.setQueryData<ProfileData>(profileKey, (old) => {
-        if (!old) return old;
-        const newStatus = isTargetPrivate ? "pending" : "accepted";
-        return {
-          ...old,
-          follow_status: newStatus,
-          is_following: newStatus === "accepted",
-          followers_count: isTargetPrivate
-            ? old.followers_count
-            : (old.followers_count ?? 0) + 1,
-        };
-      });
-      return { prev };
-    },
-    onError: (_err, _vars, ctx) => {
-      if (ctx?.prev) queryClient.setQueryData(profileKey, ctx.prev);
-    },
-    onSettled: invalidate,
-  });
-
+    ...shared,
+    mutationFn: () => followFn(userId, targetUserId),
+    onMutate: () => optimistic('pending'),
+    onSuccess: (status) =>
+      client.setQueryData<ProfileData | null>(key, (old) =>
+        old
+          ? {
+              ...old,
+              follow_status: status,
+              is_following: status === 'accepted'
+            }
+          : old
+      )
+  })
   const unfollow = useMutation({
-    mutationFn: () => {
-      if (!currentUserId) throw new Error("Not authenticated");
-      return unfollowFn(currentUserId, targetUserId);
-    },
-    onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: profileKey });
-      const prev = queryClient.getQueryData<ProfileData>(profileKey);
-      queryClient.setQueryData<ProfileData>(profileKey, (old) => {
-        if (!old) return old;
-        const wasAccepted = old.follow_status === "accepted";
-        return {
-          ...old,
-          follow_status: null,
-          is_following: false,
-          followers_count: wasAccepted
-            ? Math.max(0, (old.followers_count ?? 1) - 1)
-            : old.followers_count,
-        };
-      });
-      return { prev };
-    },
-    onError: (_err, _vars, ctx) => {
-      if (ctx?.prev) queryClient.setQueryData(profileKey, ctx.prev);
-    },
-    onSettled: invalidate,
-  });
-
-  return { follow, unfollow };
+    ...shared,
+    mutationFn: () => unfollowFn(userId, targetUserId),
+    onMutate: () => optimistic(null)
+  })
+  return { follow, unfollow, busy }
 }

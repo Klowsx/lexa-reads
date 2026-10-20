@@ -584,5 +584,43 @@
     "deleteError": "The comment could not be deleted. Try again.",
     "placeholder": "Write a comment",
     "send": "Send comment"
+  },
+  "social": {
+    "privateAccount": "Private account",
+    "publicAccount": "Public profile",
+    "privacyHint": "Your name, bio and counts stay visible. Only accepted followers can see your reads, reviews, public lists and community. Existing followers keep access.",
+    "requestFollow": "Request to follow",
+    "cancelRequest": "Cancel request",
+    "unfollow": "Unfollow",
+    "unfollowTitle": "Unfollow @{{username}}?",
+    "unfollowHint": "Their activity will no longer appear in your feed.",
+    "unfollowPrivateHint": "You will lose access to their reads and lists. To return, they will need to accept another request.",
+    "followError": "Could not update the follow. Please try again.",
+    "acceptRequest": "Accept request from @{{username}}",
+    "rejectRequest": "Reject request from @{{username}}",
+    "requestError": "Could not respond. The request is still here so you can retry.",
+    "requestsHint": "Accepting grants access to your private content. Rejecting does not notify the requester.",
+    "unavailable": "Profile unavailable",
+    "unavailableHint": "This account may no longer be available or you may not have access.",
+    "profileOptions": "Profile options",
+    "openOwnProfile": "Go to my profile",
+    "message": "Send message",
+    "messageError": "Could not open the conversation. Please try again.",
+    "publicLists": "Reader lists",
+    "privateHint": "Reads, reviews and lists are reserved for accepted followers. Request to follow this account to see them.",
+    "pendingHint": "Your request is pending. You can see their content once they accept it.",
+    "checkingAccess": "Checking access to this profile…",
+    "blockHint": "Follows between both accounts will be removed and access to each other’s content will end.",
+    "community": "Community",
+    "followers": "Followers",
+    "following": "Following",
+    "empty": {
+      "followers": "No followers yet",
+      "following": "Not following anyone yet"
+    },
+    "communityHint": "Accepted connections will appear here.",
+    "pageError": "Could not load more readers. Please try again.",
+    "loadMore": "Load more readers",
+    "noRecentReads": "No finished reads to show yet."
   }
 }
