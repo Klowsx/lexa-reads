@@ -19,7 +19,7 @@ import {
   GenreChips,
   type SearchGenre
 } from '~/features/book/components/GenreChips'
-import { QuickPeekSheet } from '~/features/book/components/QuickPeekSheet'
+import { BookReadingSheet } from '~/features/book/components/BookReadingSheet'
 import { SearchBar } from '~/features/book/components/SearchBar'
 import { useSearchBooks } from '~/features/book/hooks/useSearchBook'
 import { useTrendingBooks } from '~/features/book/hooks/useTrendingBooks'
@@ -33,7 +33,7 @@ import {
   SearchFeedback,
   SearchLoading
 } from '~/features/search/components/SearchFeedback'
-import { SearchSheet } from '~/features/search/components/SearchSheet'
+import { BottomSheet } from '~/components/ui/BottomSheet'
 import { UserCard } from '~/features/user/components/UserCard'
 import { useSearchUsers } from '~/features/user/hooks/useSearchUsers'
 import type { SearchUser } from '~/features/user/user.queries'
@@ -415,13 +415,14 @@ export default function SearchScreen() {
         </View>
       </View>
       {quickPeekBook && (
-        <QuickPeekSheet
+        <BookReadingSheet
           book={quickPeekBook}
           onClose={() => setQuickPeekBook(null)}
+          showSynopsis={false}
         />
       )}
       {infoVisible && (
-        <SearchSheet
+        <BottomSheet
           title={t('search.nytTitle')}
           onClose={() => setInfoVisible(false)}
         >
@@ -438,7 +439,7 @@ export default function SearchScreen() {
             label={t('common.gotIt')}
             onPress={() => setInfoVisible(false)}
           />
-        </SearchSheet>
+        </BottomSheet>
       )}
     </View>
   )

@@ -1,28 +1,41 @@
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { ActionSheetIOS, Alert, Platform, Pressable, Share, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
-import { BookOpen, Heart, MessageCircle, MoreHorizontal, Share2 } from 'lucide-react-native';
-import { Image } from 'expo-image';
-import { Avatar } from '~/components/ui/Avatar';
-import { StarRating } from '~/components/ui/StarRating';
-import { BookDetailSheet } from '~/features/book/components/BookDetailSheet';
-import { ReportSheet } from '~/features/user/components/ReportSheet';
-import { useToggleActivityLike } from '~/features/feed/hooks/useToggleActivityLike';
-import type { ActivityType, FeedItem } from '~/features/feed/feed.queries';
-import { fixed, useColors } from '~/theme/colors';
-import { formatRelativeTime } from '~/lib/utils';
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import {
+  ActionSheetIOS,
+  Alert,
+  Platform,
+  Pressable,
+  Share,
+  Text,
+  View
+} from 'react-native'
+import { useRouter } from 'expo-router'
+import {
+  BookOpen,
+  Heart,
+  MessageCircle,
+  MoreHorizontal,
+  Share2
+} from 'lucide-react-native'
+import { Image } from 'expo-image'
+import { Avatar } from '~/components/ui/Avatar'
+import { BookReadingSheet } from '~/features/book/components/BookReadingSheet'
+import { ReportSheet } from '~/features/user/components/ReportSheet'
+import { useToggleActivityLike } from '~/features/feed/hooks/useToggleActivityLike'
+import type { ActivityType, FeedItem } from '~/features/feed/feed.queries'
+import { fixed, useColors } from '~/theme/colors'
+import { formatRelativeTime } from '~/lib/utils'
 
 // ─── Constants ────────────────────────────────────────────────
 
 const ACTIVITY_COLOR: Record<ActivityType, string> = {
-  finished_book:  fixed.status.read,
-  started_book:   fixed.status.reading,
-  wrote_review:   fixed.accent,
-  added_to_list:  fixed.status.want,
+  finished_book: fixed.status.read,
+  started_book: fixed.status.reading,
+  wrote_review: fixed.accent,
+  added_to_list: fixed.status.want,
   abandoned_book: fixed.status.abandoned,
-  want_to_read:   fixed.status.want,
-};
+  want_to_read: fixed.status.want
+}
 
 // Paleta de pares de colores para la cover band — derivada del ID del libro.
 const COLOR_PAIRS: [string, string][] = [
@@ -37,71 +50,78 @@ const COLOR_PAIRS: [string, string][] = [
   ['#0F180F', '#5A8A5A'],
   ['#1E1408', '#D4902A'],
   ['#1A0820', '#9B5FC0'],
-  ['#081A14', '#3A9B7A'],
-];
+  ['#081A14', '#3A9B7A']
+]
 
 function bookColors(bookId: string): [string, string] {
-  let h = 0;
+  let h = 0
   for (let i = 0; i < bookId.length; i++) {
-    h = (h * 31 + bookId.charCodeAt(i)) >>> 0;
+    h = (h * 31 + bookId.charCodeAt(i)) >>> 0
   }
-  return COLOR_PAIRS[h % COLOR_PAIRS.length];
+  return COLOR_PAIRS[h % COLOR_PAIRS.length]
 }
 
 const alpha = (hex: string, op: number) => {
-  const n = parseInt(hex.replace('#', ''), 16);
-  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})`;
-};
+  const n = parseInt(hex.replace('#', ''), 16)
+  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})`
+}
 
 // ─── FeedCard ─────────────────────────────────────────────────
 
 interface FeedCardProps {
-  item: FeedItem;
+  item: FeedItem
 }
 
+// Presenta la actividad y abre directamente el editor compartido para gestionar su libro.
 export function FeedCard({ item }: FeedCardProps) {
-  const router = useRouter();
-  const c = useColors();
-  const { t } = useTranslation();
-  const [isPeeking, setIsPeeking] = useState(false);
-  const [showReport, setShowReport] = useState(false);
+  const router = useRouter()
+  const c = useColors()
+  const { t } = useTranslation()
+  const [isPeeking, setIsPeeking] = useState(false)
+  const [showReport, setShowReport] = useState(false)
 
   // El estado de like vive en la caché del feed (D-1): leemos directo del item
   // y el optimistic setQueryData re-renderiza esta card.
-  const liked = item.liked;
-  const count = item.likes_count;
-  const { toggle, isPending } = useToggleActivityLike(item.id);
+  const liked = item.liked
+  const count = item.likes_count
+  const { toggle, isPending } = useToggleActivityLike(item.id)
 
-  const displayName = item.user.display_name ?? item.user.username;
-  const author = item.book.authors[0] ?? t('feed.unknownAuthor');
-  const [c1, c2] = bookColors(item.book.id);
-  const activityColor = ACTIVITY_COLOR[item.activity_type];
+  const displayName = item.user.display_name ?? item.user.username
+  const author = item.book.authors[0] ?? t('feed.unknownAuthor')
+  const [c1, c2] = bookColors(item.book.id)
+  const activityColor = ACTIVITY_COLOR[item.activity_type]
 
   function openMenu() {
     if (Platform.OS === 'ios') {
       ActionSheetIOS.showActionSheetWithOptions(
         {
-          options: [t('common.cancel'), t('feed.viewProfileOf', { username: item.user.username }), t('feed.reportPost')],
-          cancelButtonIndex: 0,
+          options: [
+            t('common.cancel'),
+            t('feed.viewProfileOf', { username: item.user.username }),
+            t('feed.reportPost')
+          ],
+          cancelButtonIndex: 0
         },
         (index) => {
-          if (index === 1) router.push(`/user/${item.user.username}` as any);
-          if (index === 2) setShowReport(true);
+          if (index === 1) router.push(`/user/${item.user.username}` as any)
+          if (index === 2) setShowReport(true)
         }
-      );
+      )
     } else {
       Alert.alert(`@${item.user.username}`, undefined, [
-        { text: t('feed.viewProfile'), onPress: () => router.push(`/user/${item.user.username}` as any) },
+        {
+          text: t('feed.viewProfile'),
+          onPress: () => router.push(`/user/${item.user.username}` as any)
+        },
         { text: t('feed.reportPost'), onPress: () => setShowReport(true) },
-        { text: t('common.cancel'), style: 'cancel' },
-      ]);
+        { text: t('common.cancel'), style: 'cancel' }
+      ])
     }
   }
 
   return (
     <>
       <View className="bg-surface mb-px">
-
         {/* ── Header ─────────────────────────────────── */}
         <View className="flex-row items-center px-3.5 pt-3 pb-2.5 gap-2.5">
           <Pressable
@@ -122,8 +142,13 @@ export function FeedCard({ item }: FeedCardProps) {
             onPress={() => router.push(`/user/${item.user.username}` as any)}
           >
             <Text numberOfLines={1}>
-              <Text className="font-body-sb text-sm text-text">{displayName}</Text>
-              <Text className="font-body text-xs text-t3">{'  @'}{item.user.username}</Text>
+              <Text className="font-body-sb text-sm text-text">
+                {displayName}
+              </Text>
+              <Text className="font-body text-xs text-t3">
+                {'  @'}
+                {item.user.username}
+              </Text>
             </Text>
           </Pressable>
 
@@ -143,15 +168,23 @@ export function FeedCard({ item }: FeedCardProps) {
 
         {/* ── Book Cover Band ─────────────────────────── */}
         <Pressable
-          onPress={() => router.push(`/book/${item.book.google_books_id}` as any)}
+          onPress={() =>
+            router.push(`/book/${item.book.google_books_id}` as any)
+          }
           accessibilityRole="button"
           accessibilityLabel={t('feed.viewBook', { title: item.book.title })}
           className="items-center justify-center py-7"
           style={{ backgroundColor: c1 }}
         >
           {/* Side accent stripes */}
-          <View className="absolute left-0 top-0 bottom-0 w-[5px]" style={{ backgroundColor: alpha(c2, 0.55) }} />
-          <View className="absolute right-0 top-0 bottom-0 w-[3px]" style={{ backgroundColor: alpha(c2, 0.18) }} />
+          <View
+            className="absolute left-0 top-0 bottom-0 w-[5px]"
+            style={{ backgroundColor: alpha(c2, 0.55) }}
+          />
+          <View
+            className="absolute right-0 top-0 bottom-0 w-[3px]"
+            style={{ backgroundColor: alpha(c2, 0.18) }}
+          />
 
           {/* Book cover */}
           <View
@@ -162,7 +195,7 @@ export function FeedCard({ item }: FeedCardProps) {
               shadowOpacity: 0.65,
               shadowRadius: 14,
               shadowOffset: { width: 2, height: 8 },
-              elevation: 16,
+              elevation: 16
             }}
           >
             {item.book.cover_url ? (
@@ -174,7 +207,10 @@ export function FeedCard({ item }: FeedCardProps) {
             ) : (
               <>
                 {/* Spine */}
-                <View className="absolute left-0 top-0 bottom-0 w-[5px]" style={{ backgroundColor: c2 }} />
+                <View
+                  className="absolute left-0 top-0 bottom-0 w-[5px]"
+                  style={{ backgroundColor: c2 }}
+                />
                 {/* Text content */}
                 <View className="flex-1 justify-end pl-3 pr-2 pb-3">
                   <Text
@@ -201,10 +237,13 @@ export function FeedCard({ item }: FeedCardProps) {
             className="absolute bottom-[11px] left-[14px] rounded-full px-2.5 py-[5px] border"
             style={{
               backgroundColor: alpha(activityColor, 0.2),
-              borderColor: alpha(activityColor, 0.65),
+              borderColor: alpha(activityColor, 0.65)
             }}
           >
-            <Text className="font-body-md text-xs" style={{ color: activityColor }}>
+            <Text
+              className="font-body-md text-xs"
+              style={{ color: activityColor }}
+            >
               {t(`feed.label.${item.activity_type}`)}
             </Text>
           </View>
@@ -230,7 +269,9 @@ export function FeedCard({ item }: FeedCardProps) {
             disabled={isPending}
             accessibilityRole="button"
             accessibilityState={{ selected: liked }}
-            accessibilityLabel={liked ? t('feed.unlike', { count }) : t('feed.like', { count })}
+            accessibilityLabel={
+              liked ? t('feed.unlike', { count }) : t('feed.like', { count })
+            }
             className="flex-row items-center gap-[5px]"
             hitSlop={8}
           >
@@ -240,17 +281,22 @@ export function FeedCard({ item }: FeedCardProps) {
               fill={liked ? fixed.accent : 'none'}
               strokeWidth={1.7}
             />
-            <Text className="font-body-md text-xs" style={{ color: liked ? fixed.accent : c.t2 }}>
+            <Text
+              className="font-body-md text-xs"
+              style={{ color: liked ? fixed.accent : c.t2 }}
+            >
               {count}
             </Text>
           </Pressable>
 
           {/* Comment */}
           <Pressable
-            onPress={() => router.push({
-              pathname: '/comments/[id]',
-              params: { id: item.id, type: 'activity' },
-            } as any)}
+            onPress={() =>
+              router.push({
+                pathname: '/comments/[id]',
+                params: { id: item.id, type: 'activity' }
+              } as any)
+            }
             className="flex-row items-center gap-[5px]"
             hitSlop={8}
             accessibilityRole="button"
@@ -268,8 +314,8 @@ export function FeedCard({ item }: FeedCardProps) {
               Share.share({
                 message: t('feed.shareMessage', {
                   title: item.book.title,
-                  url: `https://lexareads.app/book/${item.book.google_books_id}`,
-                }),
+                  url: `https://lexareads.app/book/${item.book.google_books_id}`
+                })
               }).catch(() => {})
             }
           >
@@ -284,7 +330,7 @@ export function FeedCard({ item }: FeedCardProps) {
             className="ml-auto flex-row items-center gap-[5px] rounded-full px-2.5 py-[5px] border"
             style={{
               backgroundColor: alpha(fixed.accent, 0.1),
-              borderColor: alpha(fixed.accent, 0.3),
+              borderColor: alpha(fixed.accent, 0.3)
             }}
             hitSlop={8}
           >
@@ -301,13 +347,19 @@ export function FeedCard({ item }: FeedCardProps) {
           <Text className="font-body text-xs text-t2 leading-[19px]">
             <Text className="font-body-sb text-text">{item.user.username}</Text>
             {'  '}
-            <Text className="text-t2">{t(`feed.verb.${item.activity_type}`)}</Text>
+            <Text className="text-t2">
+              {t(`feed.verb.${item.activity_type}`)}
+            </Text>
             {'  '}
-            <Text className="font-display-i text-text">&ldquo;{item.book.title}&rdquo;</Text>
+            <Text className="font-display-i text-text">
+              &ldquo;{item.book.title}&rdquo;
+            </Text>
             {item.activity_type === 'added_to_list' && item.list_name ? (
               <Text className="text-t2">
                 {`  ${t('feed.addedToConnector').trim()}  `}
-                <Text className="text-accent">&ldquo;{item.list_name}&rdquo;</Text>
+                <Text className="text-accent">
+                  &ldquo;{item.list_name}&rdquo;
+                </Text>
               </Text>
             ) : null}
           </Text>
@@ -326,7 +378,7 @@ export function FeedCard({ item }: FeedCardProps) {
 
       {/* Peek sheet */}
       {isPeeking ? (
-        <BookDetailSheet
+        <BookReadingSheet
           book={item.book as any}
           onClose={() => setIsPeeking(false)}
         />
@@ -341,5 +393,5 @@ export function FeedCard({ item }: FeedCardProps) {
         />
       )}
     </>
-  );
+  )
 }

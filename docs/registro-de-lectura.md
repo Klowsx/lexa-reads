@@ -2,7 +2,7 @@
 
 ## Entradas y componentes
 
-Búsqueda (`QuickPeekSheet`), biblioteca, listas y feed (`BookDetailSheet`) abren `BookReadingSheet`. La ficha completa usa el mismo `ReadingRecordControls` en Resumen y abre la hoja desde sus acciones superiores. Los enlaces a libros del perfil, reseñas y similares desembocan en esa ficha. Los componentes comparten tipografía, colores semánticos, geometría, foco y áreas táctiles del design system, con textos en español e inglés.
+Búsqueda, biblioteca, listas y feed usan directamente `BookReadingSheet`; búsqueda indica `showSynopsis={false}` para conservar su presentación breve. Las ayudas de búsqueda usan directamente `BottomSheet`. La ficha completa usa el mismo `ReadingRecordControls` en Resumen y abre la hoja desde sus acciones superiores. Los enlaces a libros del perfil, reseñas y similares desembocan en esa ficha. Los componentes comparten tipografía, colores semánticos, geometría, foco y áreas táctiles del design system, con textos en español e inglés.
 
 `app/book/[id].tsx` solo exporta la pantalla de `src/features/book/screens`. La lógica de consultas y escrituras vive en `src/features/library`, separada de los componentes visuales.
 
