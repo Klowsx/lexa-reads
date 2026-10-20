@@ -23,13 +23,12 @@ export function PrimaryButton({
     <Pressable
       onPress={onPress}
       disabled={isDisabled}
-      className="w-full min-h-12 items-center justify-center rounded-md bg-accent"
-      style={({ pressed }) => ({
-        opacity: isDisabled ? 0.42 : pressed ? 0.84 : 1
-      })}
+      className="w-full min-h-12 items-center justify-center rounded-md bg-accent active:opacity-80"
+      style={isDisabled ? { opacity: 0.42 } : undefined}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       accessibilityState={{ disabled: isDisabled, busy: Boolean(loading) }}
+      aria-busy={Boolean(loading)}
     >
       <View className="flex-row items-center gap-2">
         {loading && <ActivityIndicator size="small" color={fixed.onAccent} />}

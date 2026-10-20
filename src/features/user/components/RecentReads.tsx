@@ -1,63 +1,97 @@
-import { useRouter } from 'expo-router';
-import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, Text, View } from 'react-native';
-import { BookCover } from '~/components/ui/BookCover';
-import { StarRating } from '~/components/ui/StarRating';
-import type { LibraryRow } from '~/features/library/library.queries';
+import { useRouter } from 'expo-router'
+import { Star } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
+import { Pressable, ScrollView, Text, View } from 'react-native'
+import { BookCover } from '~/components/ui/BookCover'
+import type { LibraryRow } from '~/features/library/library.queries'
+import { useColors } from '~/theme/colors'
+import { ProfileEmptyState, ProfileSectionHeading } from './ProfileSection'
 
 interface Props {
-  books: LibraryRow[];
-  onViewAll?: () => void;
+  books: LibraryRow[]
+  onViewAll?: () => void
 }
 
 export function RecentReads({ books, onViewAll }: Props) {
-  const router = useRouter();
-  const { t } = useTranslation();
-
-  if (books.length === 0) return null;
+  const router = useRouter()
+  const { t } = useTranslation()
+  const c = useColors()
+  const availableBooks = books.filter((row) => row.books)
+  if (!availableBooks.length && !onViewAll) return null
 
   return (
-    <View className="mb-5">
-      <Text className="font-body-sb text-xs text-t3 tracking-widest uppercase mb-2.5 px-4">
-        {t('profile.recentReads')}
-      </Text>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16, gap: 12, paddingVertical: 2 }}
-      >
-        {books.map((row) => {
-          if (!row.books) return null;
-          return (
-            <Pressable
-              key={row.id}
-              onPress={() =>
-                router.push({
-                  pathname: '/book/[id]',
-                  params: { id: row.books!.id },
-                })
-              }
-            >
-              <BookCover book={row.books} width={72} height={108} />
-              {row.rating != null && (
-                <View className="mt-1.5">
-                  <StarRating rating={row.rating} size={9} />
-                </View>
-              )}
-            </Pressable>
-          );
-        })}
-
-        {onViewAll && (
-          <Pressable
-            onPress={onViewAll}
-            className="w-12 items-center justify-center gap-1 opacity-70"
-          >
-            <Text className="text-t3 text-[24px] leading-[26px]">›</Text>
-            <Text className="text-xs font-body text-t3 text-center">{t('common.viewAll')}</Text>
-          </Pressable>
-        )}
-      </ScrollView>
+    <View className="mb-8">
+      <View className="px-container">
+        <ProfileSectionHeading
+          title={t('profile.recentReads')}
+          action={availableBooks.length ? t('common.viewAll') : undefined}
+          onAction={onViewAll}
+        />
+      </View>
+      {!availableBooks.length ? (
+        <View className="px-container">
+          <ProfileEmptyState
+            message={t('profile.recentEmpty')}
+            action={t('profile.viewLibrary')}
+            onAction={onViewAll}
+          />
+        </View>
+      ) : (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingHorizontal: 18,
+            gap: 16,
+            paddingVertical: 2
+          }}
+        >
+          {availableBooks.map((row) => {
+            const book = row.books!
+            return (
+              <Pressable
+                key={row.id}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  book.title +
+                  (row.rating != null
+                    ? ', ' + t('profile.rating', { rating: row.rating })
+                    : '')
+                }
+                onPress={() =>
+                  router.push({
+                    pathname: '/book/[id]',
+                    params: { id: book.id }
+                  })
+                }
+                className="gap-2 rounded-sm active:opacity-70"
+                style={{ width: 108 }}
+              >
+                <BookCover book={book} width={108} height={162} />
+                <Text
+                  className="font-body-md text-xs text-text"
+                  numberOfLines={2}
+                >
+                  {book.title}
+                </Text>
+                {row.rating != null ? (
+                  <View className="flex-row gap-1 items-center">
+                    <Star
+                      size={16}
+                      color={c.t2}
+                      fill={c.star}
+                      strokeWidth={1.4}
+                    />
+                    <Text className="font-body text-xs text-t2">
+                      {row.rating.toString()} / 5
+                    </Text>
+                  </View>
+                ) : null}
+              </Pressable>
+            )
+          })}
+        </ScrollView>
+      )}
     </View>
-  );
+  )
 }

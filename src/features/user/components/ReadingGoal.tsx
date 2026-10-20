@@ -1,74 +1,59 @@
-import { useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Animated, Pressable, Text, View } from 'react-native';
-import { useColors } from '~/theme/colors';
+import { useTranslation } from 'react-i18next'
+import { Text, View } from 'react-native'
+import { ProfileSectionHeading } from './ProfileSection'
 
 interface Props {
-  booksRead: number;
-  goal: number;
-  goalYear: number;
-  onEditGoal?: () => void;
+  booksRead: number
+  goal: number
+  goalYear: number
+  onEditGoal?: () => void
 }
 
 export function ReadingGoal({ booksRead, goal, goalYear, onEditGoal }: Props) {
-  const c = useColors();
-  const { t } = useTranslation();
-  const pct = Math.min(booksRead / goal, 1);
-  const anim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.timing(anim, {
-      toValue: 1,
-      duration: 1000,
-      delay: 150,
-      useNativeDriver: false,
-    }).start();
-  }, []);
-
-  const remaining = goal - booksRead;
+  const { t } = useTranslation()
+  const hasGoal = goal > 0
+  const pct = hasGoal ? Math.min(Math.max(booksRead / goal, 0), 1) : 0
+  const remaining = Math.max(0, goal - booksRead)
 
   return (
-    <View className="mx-4 mb-5 rounded-md border border-border bg-surface p-4">
-      <View className="flex-row justify-between items-start mb-3.5">
-        <View className="flex-1">
-          <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-1.5">
-            {t('goal.metaYear', { year: goalYear })}
-          </Text>
-          <Text className="text-xs font-body text-t2">
-            {remaining > 0
-              ? t('goal.remaining', { count: remaining })
-              : t('goal.done')}
-          </Text>
+    <View className="mx-container mb-8 rounded-card bg-sr p-5">
+      <ProfileSectionHeading
+        title={t('goal.metaYear', { year: goalYear })}
+        action={t('common.edit')}
+        onAction={onEditGoal}
+      />
+      <Text
+        className="font-body-sb text-md text-text mb-3"
+        style={{ fontVariant: ['tabular-nums'] }}
+      >
+        {hasGoal
+          ? t('goal.booksProgress', { count: booksRead, goal })
+          : t('goal.noGoal')}
+      </Text>
+      {hasGoal ? (
+        <View
+          accessible
+          accessibilityRole="progressbar"
+          accessibilityLabel={t('goal.metaYear', { year: goalYear })}
+          accessibilityValue={{ min: 0, max: 100, now: Math.round(pct * 100) }}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(pct * 100)}
+          className="h-1.5 rounded-full bg-sh overflow-hidden mb-3"
+        >
+          <View
+            className="h-full rounded-full bg-accent"
+            style={{ width: `${pct * 100}%` }}
+          />
         </View>
-        <View className="items-end">
-          <Text className="font-display-sb text-accent text-xl leading-8">
-            {booksRead}
-          </Text>
-          <Text className="text-xs font-body text-t3">{t('goal.ofGoal', { goal })}</Text>
-        </View>
-      </View>
-
-      <View className="h-1.5 rounded-full bg-sh overflow-hidden mb-2">
-        <Animated.View
-          className="h-full rounded-full"
-          style={{
-            backgroundColor: c.accent,
-            width: anim.interpolate({
-              inputRange: [0, 1],
-              outputRange: ['2%', `${Math.round(pct * 100)}%`],
-            }),
-          }}
-        />
-      </View>
-
-      <View className="flex-row justify-between items-center">
-        <Text className="text-xs font-body text-t3">{t('goal.completed', { pct: Math.round(pct * 100) })}</Text>
-        {onEditGoal && (
-          <Pressable onPress={onEditGoal} hitSlop={6}>
-            <Text className="text-xs font-body-sb text-accent">{t('goal.editGoal')}</Text>
-          </Pressable>
-        )}
-      </View>
+      ) : null}
+      <Text className="font-body text-xs text-t2 leading-6">
+        {!hasGoal
+          ? t('goal.setGoalHint')
+          : remaining > 0
+            ? t('goal.remaining', { count: remaining })
+            : t('goal.done')}
+      </Text>
     </View>
-  );
+  )
 }

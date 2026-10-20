@@ -1,39 +1,54 @@
-import { View } from "react-native";
-import { Skeleton } from "~/components/ui/Skeleton";
+import { useTranslation } from 'react-i18next'
+import { View, useWindowDimensions } from 'react-native'
+import { Skeleton } from '~/components/ui/Skeleton'
 
-/** Skeleton del perfil (UX-2): cabecera de identidad + stats + secciones. */
 export function ProfileSkeleton() {
+  const { t } = useTranslation()
+  const { width, fontScale } = useWindowDimensions()
+  const columns = Math.min(width, 720) / fontScale < 390 ? 2 : 4
   return (
-    <View className="px-4 pt-4 gap-6">
-      {/* Identidad */}
-      <View className="flex-row items-center gap-4">
-        <Skeleton width={72} height={72} radius={36} />
-        <View className="flex-1 gap-2">
-          <Skeleton width="55%" height={16} />
-          <Skeleton width="35%" height={12} />
-          <Skeleton width="80%" height={12} />
-        </View>
-      </View>
-
-      {/* Stats */}
-      <View className="flex-row justify-between">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <View key={i} className="items-center gap-1.5">
-            <Skeleton width={36} height={18} />
-            <Skeleton width={52} height={10} />
+    <View
+      className="pt-3 gap-6"
+      accessibilityLabel={t('common.loading')}
+      accessibilityState={{ busy: true }}
+      aria-busy
+    >
+      <View className="mx-container overflow-hidden rounded-card bg-surface">
+        <View className="px-5 pt-6 pb-5 gap-5">
+          <View className="flex-row items-center gap-4">
+            <Skeleton width={84} height={84} radius={42} animate={false} />
+            <View className="flex-1 gap-2">
+              <Skeleton width="80%" height={32} animate={false} />
+              <Skeleton width="55%" height={20} animate={false} />
+            </View>
           </View>
-        ))}
-      </View>
-
-      {/* Sección — currently reading */}
-      <View className="gap-3">
-        <Skeleton width="40%" height={12} />
-        <View className="flex-row gap-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} width={96} height={146} radius={6} />
+          <Skeleton width="72%" height={24} animate={false} />
+        </View>
+        <View className="flex-row flex-wrap border-t border-border px-2 py-3">
+          {[0, 1, 2, 3].map((i) => (
+            <View
+              key={i}
+              className="items-center gap-2 py-3"
+              style={{ width: `${100 / columns}%` }}
+            >
+              <Skeleton width={32} height={30} animate={false} />
+              <Skeleton width={64} height={20} animate={false} />
+            </View>
           ))}
         </View>
       </View>
+      <View className="px-container gap-3">
+        <Skeleton width="60%" height={32} animate={false} />
+        <View className="rounded-card bg-surface p-4 flex-row gap-4">
+          <Skeleton width={80} height={120} radius={5} animate={false} />
+          <View className="flex-1 justify-center gap-3">
+            <Skeleton width="90%" height={24} animate={false} />
+            <Skeleton width="60%" height={20} animate={false} />
+            <Skeleton height={6} radius={99} animate={false} />
+          </View>
+        </View>
+      </View>
+      <Skeleton height={176} radius={14} animate={false} />
     </View>
-  );
+  )
 }

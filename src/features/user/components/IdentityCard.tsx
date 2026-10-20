@@ -1,75 +1,76 @@
-import { LinearGradient } from 'expo-linear-gradient';
-import { useTranslation } from 'react-i18next';
-import { Pressable, Text, View } from 'react-native';
-import { Avatar } from '~/components/ui/Avatar';
-import { getAvatarColor } from '~/lib/avatar';
-import type { UserProfile } from '~/types/user';
-
-const alpha = (hex: string, op: number) => {
-  const n = parseInt(hex.replace('#', ''), 16);
-  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})`;
-};
+import { Pencil } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
+import { Pressable, Text, View } from 'react-native'
+import { Avatar } from '~/components/ui/Avatar'
+import { useColors } from '~/theme/colors'
+import type { UserProfile } from '~/types/user'
+import { normalizeProfileGenres } from '../profile-genres'
 
 interface Props {
-  user: UserProfile;
-  onEditPress: () => void;
+  user: UserProfile
+  onEditPress: () => void
+  embedded?: boolean
 }
 
-export function IdentityCard({ user, onEditPress }: Props) {
-  const { t } = useTranslation();
-  const color = getAvatarColor(user.username);
+export function IdentityCard({ user, onEditPress, embedded = false }: Props) {
+  const { t } = useTranslation()
+  const c = useColors()
 
   return (
     <View
-      className="mx-4 mb-5 rounded-lg overflow-hidden border"
-      style={{ borderColor: alpha(color, 0.22) }}
+      className={
+        embedded ? 'px-5 pt-6 pb-5 gap-5' : 'px-container pt-5 pb-6 gap-5'
+      }
     >
-      <LinearGradient
-        colors={[alpha(color, 0.1), alpha(color, 0.04)]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        className="p-4"
-      >
-        <View className="flex-row gap-3.5 items-start mb-4">
-          <View
-            style={{
-              shadowColor: color,
-              shadowOpacity: 0.3,
-              shadowRadius: 10,
-              shadowOffset: { width: 0, height: 0 },
-              elevation: 6,
-            }}
-          >
-            <Avatar
-              displayName={user.display_name}
-              username={user.username}
-              avatarUrl={user.avatar_url}
-              size={72}
-            />
-          </View>
-
-          <View className="flex-1 pt-1">
-            <Text className="text-md font-body-sb text-text leading-tight">
-              {user.display_name}
-            </Text>
-            <Text className="text-sm font-body text-t2 mt-1">@{user.username}</Text>
-            {user.bio ? (
-              <Text className="text-xs font-body text-t3 mt-2">{user.bio}</Text>
-            ) : null}
-          </View>
+      <View className="flex-row items-start gap-4">
+        <View className="rounded-full bg-bg p-1">
+          <Avatar
+            displayName={user.display_name}
+            username={user.username}
+            avatarUrl={user.avatar_url}
+            size={84}
+            neutral
+          />
         </View>
-
+        <View className="flex-1 min-w-0 gap-1 pt-1">
+          <Text
+            selectable
+            className="font-display-sb text-xl text-text tracking-tight"
+          >
+            {user.display_name || user.username}
+          </Text>
+          <Text selectable className="font-body text-xs text-t2">
+            @{user.username}
+          </Text>
+        </View>
         <Pressable
           onPress={onEditPress}
-          className="py-2.5 rounded-xl items-center border"
-          style={({ pressed }) => ({
-            backgroundColor: pressed ? alpha(color, 0.08) : alpha(color, 0.05),
-            borderColor: alpha(color, 0.22),
-          })}
+          accessibilityRole="button"
+          accessibilityLabel={t('editProfile.title')}
+          className="min-h-11 min-w-11 rounded-md border border-border items-center justify-center active:bg-sr"
         >
-          <Text className="text-xs font-body-md text-text">{t('editProfile.title')}</Text>
+          <Pencil size={18} color={c.text} strokeWidth={1.6} />
         </Pressable>
-      </LinearGradient>
+      </View>
+      {user.bio ? (
+        <Text selectable className="font-body text-sm text-text leading-7">
+          {user.bio}
+        </Text>
+      ) : null}
+      {user.favorite_genres?.length ? (
+        <View
+          className="flex-row flex-wrap gap-2"
+          accessibilityLabel={t('editProfile.favoriteGenres')}
+        >
+          {normalizeProfileGenres(user.favorite_genres).map((genre) => (
+            <View key={genre} className="rounded-full bg-surface px-3 py-1.5">
+              <Text className="font-body text-xs text-t2">
+                {t(`profileGenres.${genre}`, { defaultValue: genre })}
+              </Text>
+            </View>
+          ))}
+        </View>
+      ) : null}
     </View>
-  );
+  )
 }

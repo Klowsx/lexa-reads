@@ -6,7 +6,8 @@ import { fixed } from '~/theme/colors'
 import { bookCoverTokens } from '~/theme/media'
 
 interface BookCoverProps {
-  book: Tables<'books'>
+  book: Pick<Tables<'books'>, 'id' | 'title' | 'cover_url'> &
+    Partial<Pick<Tables<'books'>, 'google_books_id'>>
   width?: number
   height?: number
 }
@@ -39,7 +40,7 @@ export function BookCover({ book, width = 60, height = 90 }: BookCoverProps) {
       accessibilityLabel={book.title}
       style={{
         ...style,
-        backgroundColor: colorFromId(book.google_books_id ?? ''),
+        backgroundColor: colorFromId(book.google_books_id ?? book.id),
         overflow: 'hidden'
       }}
     >

@@ -1,200 +1,246 @@
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Check, X } from 'lucide-react-native'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
-  ActivityIndicator,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   Text,
   TextInput,
-  View,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Avatar } from '~/components/ui/Avatar';
-import { getAvatarColor } from '~/lib/avatar';
-import { useColors } from '~/theme/colors';
-import type { UserProfile } from '~/types/user';
-import { useUpdateProfile } from '../hooks/useUpdateProfile';
-
-const alpha = (hex: string, op: number) => {
-  const n = parseInt(hex.replace('#', ''), 16);
-  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})`;
-};
-
-const GENRES = [
-  'Fantasía', 'Realismo mágico', 'Ciencia ficción', 'Misterio',
-  'Romance', 'Dark Academia', 'Clásicos', 'Memorias', 'Historia', 'Thriller',
-];
+  View
+} from 'react-native'
+import { useReducedMotion } from 'react-native-reanimated'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Avatar } from '~/components/ui/Avatar'
+import { PrimaryButton } from '~/features/auth/components/PrimaryButton'
+import { useColors } from '~/theme/colors'
+import type { UserProfile } from '~/types/user'
+import { useUpdateProfile } from '../hooks/useUpdateProfile'
+import { normalizeProfileGenres, PROFILE_GENRES } from '../profile-genres'
 
 interface Props {
-  user: UserProfile;
-  onClose: () => void;
+  user: UserProfile
+  onClose: () => void
 }
 
 export function EditProfileSheet({ user, onClose }: Props) {
-  const c = useColors();
-  const insets = useSafeAreaInsets();
-  const { t } = useTranslation();
-  const color = getAvatarColor(user.username);
-  const { mutate: updateProfile, isPending } = useUpdateProfile();
-
-  const [name, setName] = useState(user.display_name);
-  const [bio, setBio] = useState(user.bio ?? '');
+  const c = useColors()
+  const insets = useSafeAreaInsets()
+  const { t } = useTranslation()
+  const reduceMotion = useReducedMotion()
+  const { mutate: updateProfile, isPending, isError } = useUpdateProfile()
+  const [name, setName] = useState(user.display_name)
+  const [bio, setBio] = useState(user.bio ?? '')
   const [selectedGenres, setSelectedGenres] = useState<string[]>(
-    user.favorite_genres ?? [],
-  );
-
-  useEffect(() => {
-    setName(user.display_name);
-    setBio(user.bio ?? '');
-    setSelectedGenres(user.favorite_genres ?? []);
-  }, [user]);
-
-  const toggleGenre = (g: string) =>
-    setSelectedGenres((prev) =>
-      prev.includes(g) ? prev.filter((x) => x !== g) : [...prev, g],
-    );
+    normalizeProfileGenres(user.favorite_genres)
+  )
+  const [focusedField, setFocusedField] = useState<'name' | 'bio' | null>(null)
 
   function handleSave() {
+    if (isPending || !name.trim()) return
     updateProfile(
       {
         display_name: name.trim(),
         bio: bio.trim() || null,
-        favorite_genres: selectedGenres.length > 0 ? selectedGenres : null,
+        favorite_genres: selectedGenres.length ? selectedGenres : null
       },
-      { onSuccess: onClose },
-    );
+      { onSuccess: onClose }
+    )
   }
 
   return (
     <Modal
       visible
       transparent
-      animationType="slide"
-      onRequestClose={onClose}
+      animationType={reduceMotion ? 'none' : 'slide'}
+      onRequestClose={isPending ? undefined : onClose}
       statusBarTranslucent
     >
-      <View className="flex-1 justify-end">
+      <KeyboardAvoidingView
+        className="flex-1 justify-end"
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
         <Pressable
           onPress={onClose}
-          className="absolute inset-0 bg-black/[0.72]"
+          disabled={isPending}
+          accessible={false}
+          importantForAccessibility="no"
+          className="absolute inset-0 bg-black/60"
         />
-
         <View
-          className="rounded-t-xl overflow-hidden bg-surface"
-          style={{ maxHeight: '90%', paddingBottom: insets.bottom + 12 }}
+          accessibilityViewIsModal
+          className="w-full max-w-[720px] self-center rounded-t-card bg-bg overflow-hidden"
+          style={{
+            maxHeight: '92%',
+            paddingBottom: Math.max(insets.bottom, 12)
+          }}
         >
-          <View className="items-center pt-3 pb-1">
-            <View className="w-10 h-1 rounded-full bg-border" />
-          </View>
-
-          <View className="flex-row justify-between items-center px-5 pt-3 pb-4">
-            <Text className="font-display-sb text-md text-text">{t('editProfile.title')}</Text>
-            <Pressable onPress={onClose} hitSlop={8} className="w-8 h-8 items-center justify-center">
-              <Text className="text-lg font-body text-t2">×</Text>
+          <View className="flex-row items-center justify-between gap-3 px-container py-3 border-b border-border">
+            <Text
+              accessibilityRole="header"
+              className="flex-1 font-display-sb text-lg text-text"
+            >
+              {t('editProfile.title')}
+            </Text>
+            <Pressable
+              onPress={onClose}
+              disabled={isPending}
+              accessibilityRole="button"
+              accessibilityLabel={t('common.close')}
+              accessibilityState={{ disabled: isPending }}
+              className="min-w-11 min-h-11 rounded-md items-center justify-center active:bg-sr"
+              style={{ opacity: isPending ? 0.5 : 1 }}
+            >
+              <X size={22} color={c.text} strokeWidth={1.6} />
             </Pressable>
           </View>
-
-          <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-            <View className="flex-row items-center gap-4 px-5 pb-5">
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+            contentContainerStyle={{ padding: 18, gap: 24 }}
+          >
+            <View className="flex-row items-center gap-3">
               <Avatar
-                displayName={user.display_name}
+                displayName={name || user.display_name}
                 username={user.username}
                 avatarUrl={user.avatar_url}
-                size={66}
+                size={56}
+                neutral
               />
-              <View>
-                <Pressable className="px-4 py-2 rounded-md bg-sh border border-border mb-1.5">
-                  <Text className="text-xs font-body-md text-text">{t('editProfile.changePhoto')}</Text>
-                </Pressable>
-                <Text className="text-xs font-body text-t3">{t('editProfile.photoHintGif')}</Text>
-              </View>
+              <Text className="flex-1 font-body text-xs text-t2">
+                @{user.username}
+              </Text>
             </View>
-
-            <View className="px-5">
-              <View className="mb-3.5">
-                <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-1.5">
-                  {t('editProfile.name')}
-                </Text>
-                <TextInput
-                  value={name}
-                  onChangeText={setName}
-                  maxLength={50}
-                  className="rounded-md bg-sr border border-border text-text font-body text-sm px-[14px] py-[11px]"
-                  placeholderTextColor={c.t3}
-                />
-              </View>
-
-              <View className="mb-[18px]">
-                <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-1.5">
-                  {t('editProfile.bio')}
-                </Text>
-                <TextInput
-                  value={bio}
-                  onChangeText={setBio}
-                  multiline
-                  numberOfLines={3}
-                  maxLength={160}
-                  placeholder={t('editProfile.bioPlaceholder')}
-                  className="rounded-md bg-sr border border-border text-text font-body text-sm"
-                  style={{
-                    paddingHorizontal: 14,
-                    paddingVertical: 11,
-                    lineHeight: 22,
-                    textAlignVertical: 'top',
-                  }}
-                  placeholderTextColor={c.t3}
-                />
-                <Text className="text-xs font-body text-t3 text-right mt-1">
-                  {bio.length}/160
-                </Text>
-              </View>
-
-              <View className="mb-6">
-                <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-2">
-                  {t('editProfile.favoriteGenres')}
-                </Text>
-                <View className="flex-row flex-wrap gap-1.5">
-                  {GENRES.map((g) => {
-                    const active = selectedGenres.includes(g);
-                    return (
-                      <Pressable
-                        key={g}
-                        onPress={() => toggleGenre(g)}
-                        className="px-3 py-1.5 rounded-full border"
-                        style={{
-                          backgroundColor: active ? alpha(color, 0.14) : undefined,
-                          borderColor: active ? color : undefined,
-                        }}
-                      >
-                        <Text
-                          className={`text-xs font-body ${active ? '' : 'text-t2'}`}
-                          style={active ? { color } : undefined}
-                        >
-                          {g}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-              </View>
-
-              <Pressable
-                onPress={handleSave}
-                disabled={isPending || !name.trim()}
-                className="py-3 rounded-md items-center mb-1 bg-accent"
-                style={{ opacity: isPending || !name.trim() ? 0.6 : 1 }}
+            <View className="gap-2">
+              <Text
+                nativeID="profile-name-label"
+                className="font-body-sb text-xs text-text"
               >
-                {isPending ? (
-                  <ActivityIndicator size="small" color="#fff" />
-                ) : (
-                  <Text className="text-sm font-body-sb text-white">{t('common.saveChanges')}</Text>
-                )}
-              </Pressable>
+                {t('editProfile.name')}
+              </Text>
+              <TextInput
+                value={name}
+                onChangeText={setName}
+                maxLength={50}
+                editable={!isPending}
+                accessibilityLabel={t('editProfile.name')}
+                accessibilityLabelledBy="profile-name-label"
+                autoCapitalize="words"
+                autoComplete="name"
+                returnKeyType="next"
+                onFocus={() => setFocusedField('name')}
+                onBlur={() => setFocusedField(null)}
+                className="rounded-md bg-surface text-text font-body text-sm px-3 py-3 min-h-12"
+                style={{
+                  borderWidth: 2,
+                  borderColor: focusedField === 'name' ? c.accent : c.border
+                }}
+                placeholderTextColor={c.t2}
+              />
+            </View>
+            <View className="gap-2">
+              <Text
+                nativeID="profile-bio-label"
+                className="font-body-sb text-xs text-text"
+              >
+                {t('editProfile.bio')}
+              </Text>
+              <TextInput
+                value={bio}
+                onChangeText={setBio}
+                multiline
+                numberOfLines={3}
+                maxLength={160}
+                editable={!isPending}
+                accessibilityLabel={t('editProfile.bio')}
+                accessibilityLabelledBy="profile-bio-label"
+                placeholder={t('editProfile.bioPlaceholder')}
+                placeholderTextColor={c.t2}
+                onFocus={() => setFocusedField('bio')}
+                onBlur={() => setFocusedField(null)}
+                className="rounded-md bg-surface text-text font-body text-sm px-3 py-3"
+                style={{
+                  minHeight: 112,
+                  textAlignVertical: 'top',
+                  borderWidth: 2,
+                  borderColor: focusedField === 'bio' ? c.accent : c.border
+                }}
+              />
+              <Text className="font-body text-xs text-t2 text-right">
+                {bio.length}/160
+              </Text>
+            </View>
+            <View className="gap-3">
+              <Text className="font-body-sb text-xs text-text">
+                {t('editProfile.favoriteGenres')}
+              </Text>
+              <View className="flex-row flex-wrap gap-2">
+                {Array.from(
+                  new Set([...PROFILE_GENRES, ...selectedGenres])
+                ).map((genre) => {
+                  const active = selectedGenres.includes(genre)
+                  return (
+                    <Pressable
+                      key={genre}
+                      disabled={isPending}
+                      onPress={() =>
+                        setSelectedGenres((prev) =>
+                          prev.includes(genre)
+                            ? prev.filter((item) => item !== genre)
+                            : [...prev, genre]
+                        )
+                      }
+                      accessibilityRole="checkbox"
+                      accessibilityLabel={t(`profileGenres.${genre}`, {
+                        defaultValue: genre
+                      })}
+                      accessibilityState={{
+                        checked: active,
+                        disabled: isPending
+                      }}
+                      aria-checked={active}
+                      aria-disabled={isPending}
+                      className="min-h-11 flex-row items-center gap-2 px-3 py-2 rounded-full border active:opacity-70"
+                      style={{
+                        backgroundColor: active ? c.sr : 'transparent',
+                        borderColor: active ? c.text : c.border
+                      }}
+                    >
+                      {active ? (
+                        <Check size={16} color={c.text} strokeWidth={1.8} />
+                      ) : null}
+                      <Text className="font-body text-xs text-text">
+                        {t(`profileGenres.${genre}`, { defaultValue: genre })}
+                      </Text>
+                    </Pressable>
+                  )
+                })}
+              </View>
             </View>
           </ScrollView>
+          <View className="px-container pt-3 border-t border-border gap-3">
+            {isError ? (
+              <Text
+                accessibilityRole="alert"
+                accessibilityLiveRegion="polite"
+                className="font-body text-xs text-text"
+              >
+                {t('editProfile.saveError')}
+              </Text>
+            ) : null}
+            <PrimaryButton
+              onPress={handleSave}
+              disabled={!name.trim()}
+              loading={isPending}
+            >
+              {t('common.saveChanges')}
+            </PrimaryButton>
+          </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
-  );
+  )
 }
