@@ -101,7 +101,21 @@
     "myReview": "My review",
     "readerReviews": "Reader reviews",
     "beFirst": "Be the first to review this book.",
-    "loadMore": "Load more reviews"
+    "loadMore": "Load more reviews",
+    "spoilerHint": "The text is hidden so you can choose whether to read it.",
+    "showSpoiler": "Show spoiler",
+    "hideSpoiler": "Hide spoiler",
+    "sharedSpoiler": "Review with spoilers. Open the book in Lexa to choose whether to read it.",
+    "editorLoadError": "We could not load the review and its book. Retry before writing.",
+    "saveError": "The review was not saved. Your text is kept; try again. If another review already exists for this book, reopen the editor.",
+    "loadError": "We could not load the reviews.",
+    "shareError": "We could not share the card. Try again.",
+    "deleteTitle": "Delete review",
+    "deleteHint": "The review and its conversation will become unavailable. Your book rating is kept.",
+    "deleteError": "The review could not be deleted. Try again.",
+    "leaveTitle": "Leave without saving?",
+    "leaveHint": "Your changes to this review have not been saved yet.",
+    "discard": "Discard changes"
   },
   "community": {
     "readers": "Readers",
@@ -521,5 +535,24 @@
     "add": "Save book",
     "editRating": "Edit rating",
     "addToList": "Add to a list"
+  },
+  "comments": {
+    "title": "Comments",
+    "unavailable": "Content unavailable",
+    "unavailableHint": "It may have been deleted or its privacy changed. You can only comment on content you can access.",
+    "spoilerThread": "This conversation may reveal spoilers",
+    "spoilerThreadHint": "The review contains spoilers and its comments may discuss them.",
+    "showThread": "Show conversation",
+    "loadError": "We could not load the comments. Your draft is kept.",
+    "sendError": "Could not send. Your comment is kept; try again.",
+    "empty": "No comments yet",
+    "emptyHint": "Share your opinion respectfully. Mark your comment if it reveals parts of the story.",
+    "loadMore": "Load more comments",
+    "reader": "Reader",
+    "delete": "Delete comment",
+    "deleteHint": "This comment will become unavailable.",
+    "deleteError": "The comment could not be deleted. Try again.",
+    "placeholder": "Write a comment",
+    "send": "Send comment"
   }
 }

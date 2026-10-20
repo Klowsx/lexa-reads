@@ -20,6 +20,7 @@ import {
 import { Image } from 'expo-image'
 import { Avatar } from '~/components/ui/Avatar'
 import { BookReadingSheet } from '~/features/book/components/BookReadingSheet'
+import { SpoilerText } from '~/features/reviews/components/SpoilerText'
 import { ReportSheet } from '~/features/user/components/ReportSheet'
 import { useToggleActivityLike } from '~/features/feed/hooks/useToggleActivityLike'
 import type { ActivityType, FeedItem } from '~/features/feed/feed.queries'
@@ -366,12 +367,12 @@ export function FeedCard({ item }: FeedCardProps) {
 
           {/* Review preview */}
           {item.review_preview ? (
-            <Text
-              className="font-body text-xs text-t2 leading-[19px]"
+            <SpoilerText
+              body={item.review_preview}
+              containsSpoilers={item.review_contains_spoilers}
+              contentId={item.review_id ?? item.id}
               numberOfLines={3}
-            >
-              {item.review_preview}
-            </Text>
+            />
           ) : null}
         </View>
       </View>

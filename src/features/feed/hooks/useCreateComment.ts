@@ -1,18 +1,32 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuthStore } from "~/stores/auth.store";
-import { createCommentFn, type CommentTargetType } from "../feed.queries";
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useAuthStore } from '~/stores/auth.store'
+import {
+  commentsInfiniteOptions,
+  createCommentFn,
+  type CommentTargetType
+} from '../feed.queries'
+import { refreshReviewQueries } from '~/features/reviews/reviews-cache'
 
-export function useCreateComment(targetType: CommentTargetType, targetId: string) {
-  const queryClient = useQueryClient();
-  const userId = useAuthStore((s) => s.user?.id);
+// Publica una sola vez por envío y refresca el hilo y los contadores visibles.
+export function useCreateComment(
+  targetType: CommentTargetType,
+  targetId: string
+) {
+  const queryClient = useQueryClient()
+  const userId = useAuthStore((s) => s.user?.id)
 
   return useMutation({
-    mutationFn: (body: string) => {
-      if (!userId) throw new Error("Not authenticated");
-      return createCommentFn({ userId, targetType, targetId, body });
+    mutationFn: (values: { body: string; containsSpoilers: boolean }) => {
+      if (!userId) throw new Error('Not authenticated')
+      return createCommentFn({ userId, targetType, targetId, ...values })
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["comments", targetType, targetId] });
-    },
-  });
+      return Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: commentsInfiniteOptions(targetType, targetId).queryKey
+        }),
+        refreshReviewQueries(queryClient, userId ?? '')
+      ])
+    }
+  })
 }

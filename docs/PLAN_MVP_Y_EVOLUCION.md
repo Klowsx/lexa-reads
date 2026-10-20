@@ -4,6 +4,8 @@ Fecha: 15 de octubre de 2026.
 
 Estado del documento: propuesta de trabajo basada en el repositorio actual. No se han implementado correcciones ni modificado la base de datos como parte de esta revisión.
 
+**Seguimiento actualizado el 20 de octubre de 2026:** la auditoría anterior se conserva como diagnóstico del 15 de octubre. La lista de «Dentro del MVP» y las notas de estado posteriores reflejan las implementaciones verificadas desde entonces; no significan que todo el lanzamiento esté validado en dispositivos físicos.
+
 ## 1. Conclusión ejecutiva
 
 Lexa ya tiene una base considerable: biblioteca, fichas de libros, reseñas, feed, perfiles, listas, notificaciones y código para clubes y mensajes. La arquitectura por funcionalidades, los hooks de datos y varias optimizaciones existentes permiten seguir construyendo sin empezar de nuevo.
@@ -32,16 +34,16 @@ Se revisaron rutas, componentes, hooks, consultas, políticas SQL, funciones de 
 
 ### Comprobaciones ejecutadas
 
-| Comprobación | Resultado | Interpretación |
-| --- | --- | --- |
-| Node y pnpm locales | Node 24.15.0 y pnpm 10.33.2 | La versión local de Node ya no coincide con la versión antigua del error compartido anteriormente. |
-| TypeScript: `pnpm exec tsc --noEmit` | Correcto | El código incluido en esta configuración pasa tipos. Las funciones de Supabase están excluidas. |
-| Compatibilidad: `pnpm exec expo install --check` | Falló: 11 dependencias fuera del rango esperado | Hay que alinear el proyecto con su SDK antes de confiar en una compilación nativa. |
-| Pruebas: `pnpm exec jest --runInBand` | 1 suite pasó; 4 fallaron al inicializarse | Pasaron 3 pruebas del store de autenticación. Las otras suites no llegaron a comprobar sus casos por falta de configuración de Supabase. |
-| Exportación web de Expo | Correcta | La exportación compila; no prueba el comportamiento nativo ni los flujos autenticados. |
-| Tamaño de la exportación | JS principal: 4,61 MB sin comprimir; CSS: 22,2 kB; 30 fuentes: 3,29 MB; total aproximado: 7,97 MB | Es una referencia de peso del artefacto web, no del APK/IPA ni del tráfico inicial efectivo. |
-| Tiempo de Metro en esa exportación | 36,7 segundos | Es tiempo de compilación, no tiempo de respuesta de la aplicación. |
-| Contraste de colores | Calculado sobre los valores del tema | Hay combinaciones insuficientes para texto normal; se detallan más adelante. |
+| Comprobación                                     | Resultado                                                                                         | Interpretación                                                                                                                           |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Node y pnpm locales                              | Node 24.15.0 y pnpm 10.33.2                                                                       | La versión local de Node ya no coincide con la versión antigua del error compartido anteriormente.                                       |
+| TypeScript: `pnpm exec tsc --noEmit`             | Correcto                                                                                          | El código incluido en esta configuración pasa tipos. Las funciones de Supabase están excluidas.                                          |
+| Compatibilidad: `pnpm exec expo install --check` | Falló: 11 dependencias fuera del rango esperado                                                   | Hay que alinear el proyecto con su SDK antes de confiar en una compilación nativa.                                                       |
+| Pruebas: `pnpm exec jest --runInBand`            | 1 suite pasó; 4 fallaron al inicializarse                                                         | Pasaron 3 pruebas del store de autenticación. Las otras suites no llegaron a comprobar sus casos por falta de configuración de Supabase. |
+| Exportación web de Expo                          | Correcta                                                                                          | La exportación compila; no prueba el comportamiento nativo ni los flujos autenticados.                                                   |
+| Tamaño de la exportación                         | JS principal: 4,61 MB sin comprimir; CSS: 22,2 kB; 30 fuentes: 3,29 MB; total aproximado: 7,97 MB | Es una referencia de peso del artefacto web, no del APK/IPA ni del tráfico inicial efectivo.                                             |
+| Tiempo de Metro en esa exportación               | 36,7 segundos                                                                                     | Es tiempo de compilación, no tiempo de respuesta de la aplicación.                                                                       |
+| Contraste de colores                             | Calculado sobre los valores del tema                                                              | Hay combinaciones insuficientes para texto normal; se detallan más adelante.                                                             |
 
 La exportación quedó en `.expo/audit-web`, una carpeta ignorada por Git. El servidor temporal usado para intentar inspeccionarla se detuvo.
 
@@ -73,21 +75,21 @@ La inversión más rentable ahora es conectar, proteger y verificar lo existente
 
 ## 4. Inventario funcional
 
-| Área | Situación observada | Decisión recomendada |
-| --- | --- | --- |
-| Registro, acceso y recuperación | Implementados parcialmente; falta verificar confirmaciones y enlaces reales | MVP obligatorio. |
-| Onboarding | Pantallas construidas, finalización y persistencia incompletas | Bloqueador del recorrido inicial. |
-| Búsqueda y ficha de libro | Base funcional; errores poco claros y dependencia de proveedores | MVP obligatorio con estados y fallback. |
-| Biblioteca y estados de lectura | Hay consultas y mutaciones, pero las hojas rápidas mantienen cambios locales | Unificar antes de beta. |
-| Puntuaciones y reseñas | Implementadas; interacción inconsistente y spoilers no protegidos en todo el recorrido | MVP obligatorio. |
-| Fechas, etiquetas y meta anual | Modelo/parcialidades presentes; flujo de edición incompleto | Completar lo mínimo o retirar lo que no funcione. |
-| Feed, seguidores y perfiles | Construidos; privacidad y arranque sin contactos necesitan trabajo | Comunidad básica del MVP. |
-| Listas | Construidas; revisar ordenamiento y carga de portadas | Mantener listas básicas si no retrasa los bloqueadores. |
-| Notificaciones | Base existente; tipos recientes y navegación incompletos | Solo eventos completamente soportados. |
-| Bloqueo, reportes, eliminación y exportación | Código presente, no validación integral | Requisito de salida, no funcionalidad futura. |
-| Clubes y mensajes | Ya hay implementación, aunque la documentación los sitúa después | Activación posterior a pruebas específicas. |
-| Estadísticas, importación y recomendaciones avanzadas | Ausentes o parciales | Priorizar después de validar retención. |
-| Operación, métricas y automatización de calidad | Insuficientes para un lanzamiento confiable | Parte del trabajo del MVP. |
+| Área                                                  | Situación observada                                                                    | Decisión recomendada                                    |
+| ----------------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| Registro, acceso y recuperación                       | Implementados parcialmente; falta verificar confirmaciones y enlaces reales            | MVP obligatorio.                                        |
+| Onboarding                                            | Pantallas construidas, finalización y persistencia incompletas                         | Bloqueador del recorrido inicial.                       |
+| Búsqueda y ficha de libro                             | Base funcional; errores poco claros y dependencia de proveedores                       | MVP obligatorio con estados y fallback.                 |
+| Biblioteca y estados de lectura                       | Hay consultas y mutaciones, pero las hojas rápidas mantienen cambios locales           | Unificar antes de beta.                                 |
+| Puntuaciones y reseñas                                | Implementadas; interacción inconsistente y spoilers no protegidos en todo el recorrido | MVP obligatorio.                                        |
+| Fechas, etiquetas y meta anual                        | Modelo/parcialidades presentes; flujo de edición incompleto                            | Completar lo mínimo o retirar lo que no funcione.       |
+| Feed, seguidores y perfiles                           | Construidos; privacidad y arranque sin contactos necesitan trabajo                     | Comunidad básica del MVP.                               |
+| Listas                                                | Construidas; revisar ordenamiento y carga de portadas                                  | Mantener listas básicas si no retrasa los bloqueadores. |
+| Notificaciones                                        | Base existente; tipos recientes y navegación incompletos                               | Solo eventos completamente soportados.                  |
+| Bloqueo, reportes, eliminación y exportación          | Código presente, no validación integral                                                | Requisito de salida, no funcionalidad futura.           |
+| Clubes y mensajes                                     | Ya hay implementación, aunque la documentación los sitúa después                       | Activación posterior a pruebas específicas.             |
+| Estadísticas, importación y recomendaciones avanzadas | Ausentes o parciales                                                                   | Priorizar después de validar retención.                 |
+| Operación, métricas y automatización de calidad       | Insuficientes para un lanzamiento confiable                                            | Parte del trabajo del MVP.                              |
 
 ## 5. Definición de MVP propuesta
 
@@ -95,19 +97,26 @@ Esta es una propuesta de alcance, no un cambio ya aprobado del producto descrito
 
 ### Dentro del MVP
 
-- Acceso por correo completo: registro, confirmación según configuración, recuperación, cierre de sesión y reanudación segura.
-- Onboarding corto, con nombre de usuario validado realmente; géneros y meta opcionales o posponibles.
-- Búsqueda de libros por título/autor y soporte claro de ISBN; portada o alternativa cuando falte.
-- Guardar un libro como pendiente, leyendo, leído o abandonado desde cualquier entrada disponible.
-- Editar o quitar puntuación; registrar al menos fechas básicas para que la meta anual sea consistente.
-- Biblioteca con filtros útiles, estados vacíos y carga incremental.
-- Reseñas, protección de spoilers y comentarios si se mantienen en el lanzamiento.
-- Perfil, seguir/dejar de seguir y privacidad consistente. Si se ofrece cuenta privada, debe estar protegida en el servidor.
-- Feed pequeño pero útil, con una alternativa cuando todavía no existan contactos.
-- Listas básicas: crear, editar y añadir/quitar libros. Funciones más elaboradas pueden esperar.
-- Notificaciones internas de los eventos incluidos y push solamente si está probado de extremo a extremo.
-- Bloquear, reportar, exportar datos y solicitar eliminación de cuenta.
-- Accesibilidad básica, errores visibles, controles operativos, documentación pública y una versión instalable verificada.
+- [x] Acceso por correo completo: registro, confirmación según configuración, recuperación, cierre de sesión y reanudación segura.
+- [x] Onboarding corto, con nombre de usuario validado realmente; géneros y meta opcionales o posponibles.
+- [ ] Búsqueda de libros por título/autor y soporte claro de ISBN; portada o alternativa cuando falte.
+- [x] Guardar un libro como pendiente, leyendo, leído o abandonado desde cualquier entrada disponible.
+- [x] Editar o quitar puntuación; registrar al menos fechas básicas para que la meta anual sea consistente.
+- [ ] Biblioteca con filtros útiles, estados vacíos y carga incremental.
+- [x] Reseñas, protección de spoilers y comentarios si se mantienen en el lanzamiento.
+- [ ] Perfil, seguir/dejar de seguir y privacidad consistente. Si se ofrece cuenta privada, debe estar protegida en el servidor.
+- [ ] Feed pequeño pero útil, con una alternativa cuando todavía no existan contactos.
+- [ ] Listas básicas: crear, editar y añadir/quitar libros. Funciones más elaboradas pueden esperar.
+- [ ] Notificaciones internas de los eventos incluidos y push solamente si está probado de extremo a extremo.
+- [ ] Bloquear, reportar, exportar datos y solicitar eliminación de cuenta.
+- [ ] Accesibilidad básica, errores visibles, controles operativos, documentación pública y una versión instalable verificada.
+
+Los puntos marcados corresponden a implementación y comprobaciones automatizadas realizadas. Evidencia y límites:
+
+- **Acceso y onboarding:** [documentación del flujo](acceso-correo-y-onboarding.md), pruebas unitarias, navegador con HTTP simulado y prueba SQL transaccional. Pendientes de lanzamiento: entrega real del correo, enlaces y reanudación en una compilación instalada.
+- **Estados, puntuación y fechas:** [registro de lectura](registro-de-lectura.md), RPC y RLS verificadas en Supabase, pruebas unitarias y recorrido de las entradas con navegador. Pendiente: teclado y áreas seguras en Android/iOS instalado.
+- **Reseñas, spoilers y comentarios:** se mantienen en el MVP. [Contrato y pruebas](resenas-spoilers-comentarios.md): crear, editar y retirar reseñas; spoilers ocultos también en previews y tarjetas compartidas; comentarios con su propia marca de spoiler, permisos heredados del padre, errores recuperables y confirmación al eliminar. Verificado con SQL real, pruebas de componentes y navegador. Pendiente: recorrido y exportación nativa de tarjetas en una compilación instalada.
+- La búsqueda recibió mejoras de UI/UX, pero el punto completo continúa abierto hasta verificar expresamente título, autor e ISBN. Tampoco se marca la biblioteca completa mientras siga pendiente su carga incremental.
 
 ### Opcional para la primera beta, con decisión explícita
 
@@ -162,19 +171,19 @@ Esfuerzo orientativo por tarea: S = menos de 1 día; M = 1–3 días; L = 3–5 
 
 **Evidencia:** el chequeo de Expo detectó estos desajustes para el SDK instalado:
 
-| Paquete | Instalado | Esperado por el chequeo |
-| --- | --- | --- |
-| expo | 54.0.34 | ~54.0.37 |
-| expo-constants | 18.0.13 | ~18.0.14 |
-| expo-device | 56.0.4 | ~8.0.10 |
-| expo-font | 14.0.11 | ~14.0.12 |
-| expo-linear-gradient | 56.0.4 | ~15.0.8 |
-| expo-localization | 17.0.8 | ~17.0.9 |
-| expo-notifications | 56.0.15 | ~0.32.17 |
-| expo-router | 6.0.23 | ~6.0.24 |
-| expo-sharing | 56.0.15 | ~14.0.8 |
-| react-native-view-shot | 5.1.0 | 4.0.3 |
-| jest-expo | 55.0.17 | ~54.0.18 |
+| Paquete                | Instalado | Esperado por el chequeo |
+| ---------------------- | --------- | ----------------------- |
+| expo                   | 54.0.34   | ~54.0.37                |
+| expo-constants         | 18.0.13   | ~18.0.14                |
+| expo-device            | 56.0.4    | ~8.0.10                 |
+| expo-font              | 14.0.11   | ~14.0.12                |
+| expo-linear-gradient   | 56.0.4    | ~15.0.8                 |
+| expo-localization      | 17.0.8    | ~17.0.9                 |
+| expo-notifications     | 56.0.15   | ~0.32.17                |
+| expo-router            | 6.0.23    | ~6.0.24                 |
+| expo-sharing           | 56.0.15   | ~14.0.8                 |
+| react-native-view-shot | 5.1.0     | 4.0.3                   |
+| jest-expo              | 55.0.17   | ~54.0.18                |
 
 **Acción:** elegir y mantener una combinación soportada, sin actualizar todo a la última versión indiscriminadamente. Alinear Node de desarrollo y EAS: `eas.json` conserva Node 20.18.0, mientras el entorno local ya usa 24.15.0 y existen dependencias con requisitos superiores. Revisar también el cliente de desarrollo requerido por la configuración.
 
@@ -246,13 +255,19 @@ Implementar un canal visible y accesible de feedback, diferenciar errores recupe
 
 #### B02 · P1 · Spoilers en el feed · M
 
+**Estado al 20 de octubre: resuelto en el recorrido de reseñas del MVP.** Se conserva y consume `contains_spoilers` en el feed, con revelado explícito en todas las vistas de reseñas y comentarios. Las tarjetas compartidas sustituyen el cuerpo sensible; las notificaciones actuales de comentarios guardan referencias, sin copiar ese cuerpo. Ver [evidencia](resenas-spoilers-comentarios.md).
+
 `src/features/feed/feed.queries.ts` trae el cuerpo de la reseña, pero no el indicador necesario para proteger spoilers; `FeedCard.tsx` lo muestra directamente. Extender el contrato y aplicar el mismo tratamiento que en la ficha. Aceptación: un spoiler está oculto por defecto en todas las vistas, incluidas previews y notificaciones que contengan texto.
 
 #### B03 · P1 · Cambiar estado no debería borrar por sorpresa · M
 
+**Estado al 20 de octubre: resuelto.** Elegir el estado activo no elimina el registro; los controles compartidos permiten medias estrellas y una retirada explícita de puntuación. Ver [registro de lectura](registro-de-lectura.md).
+
 En `app/book/[id].tsx`, pulsar el estado ya seleccionado elimina el registro de biblioteca. Separar «cambiar estado» de «quitar de mi biblioteca» y explicar qué ocurre con puntuación, etiquetas y fechas. Usar confirmación o deshacer verificable para la acción destructiva. Unificar además medios puntos, retirada de puntuación y selección de estrellas entre componentes.
 
 #### B04 · P1 · Fechas y meta anual coherentes · M/L
+
+**Estado al 20 de octubre: resuelto.** Se proponen fechas al comenzar/finalizar, se pueden corregir y el contador anual se sincroniza por `finished_at`. Las lecturas antiguas sin fecha conservan esa ausencia. Ver [registro de lectura](registro-de-lectura.md).
 
 La meta cuenta libros mediante `finished_at`, pero las acciones habituales de estado no proporcionan esa fecha y no se encontró un flujo completo que la mantenga. Establecer reglas explícitas: sugerir hoy al terminar, permitir corregir fechas históricas y definir qué pasa al reabrir una lectura. Invalidar biblioteca, meta, perfil y actividad relevante después de guardar. Aceptación: marcar un libro como leído actualiza la meta según el año y la fecha elegida, sin duplicar lecturas.
 
@@ -275,6 +290,8 @@ Hacer que cada control cumpla su promesa o presentarlo como información no inte
 Las políticas de `014_privacy_and_blocks.sql` ocultan perfiles bloqueados, mientras `app/blocked-users.tsx` espera poder leer `item.blocked.id` de una relación con usuarios. Esa relación puede resultar nula bajo las propias políticas. Usar el identificador conservado de la relación y una representación mínima autorizada, o un endpoint seguro. Invalidar también contenido afectado del feed y otras vistas al bloquear. Aceptación: bloquear oculta el contenido, no rompe la pantalla de bloqueados y permite desbloquear.
 
 #### B09 · P1 · Comentarios y visibilidad del contenido padre · M/L
+
+**Estado al 20 de octubre: resuelto para reseñas y actividades.** Las políticas comprueban acceso al padre, privacidad, bloqueos y eliminación; la prueba SQL incluye un seguidor pendiente, uno aceptado, contenido retirado y acciones ajenas. Conocer un ID no concede acceso. Ver [evidencia](resenas-spoilers-comentarios.md).
 
 La selección de comentarios en `014_privacy_and_blocks.sql` comprueba eliminación y bloqueo del autor, pero no muestra una condición equivalente de acceso al contenido comentado. Auditar lectura e inserción contra reseñas o actividades privadas, eliminadas y bloqueadas. Aceptación: conocer el ID de un contenido no permite acceder a sus comentarios si no se puede acceder al contenido.
 
@@ -372,13 +389,13 @@ Revisar textos mezclados entre traducciones y literales, abreviaturas como «Not
 
 Relaciones calculadas con los colores declarados, sin considerar transparencias o fondos no inspeccionados en ejecución:
 
-| Combinación | Contraste aproximado | Evaluación para texto normal |
-| --- | --- | --- |
-| `#9E9488` sobre `#F5F0EA` | 2,63:1 | Insuficiente. |
-| `#9E9488` sobre `#EBE5DE` | 2,38:1 | Insuficiente. |
-| `#6A635C` sobre `#100D0A` | 3,28:1 | Insuficiente. |
-| `#6A635C` sobre `#1C1815` | 2,98:1 | Insuficiente. |
-| Blanco sobre acento `#C4783A` | 3,45:1 | Insuficiente para texto normal; revisar tamaño/peso reales. |
+| Combinación                   | Contraste aproximado | Evaluación para texto normal                                |
+| ----------------------------- | -------------------- | ----------------------------------------------------------- |
+| `#9E9488` sobre `#F5F0EA`     | 2,63:1               | Insuficiente.                                               |
+| `#9E9488` sobre `#EBE5DE`     | 2,38:1               | Insuficiente.                                               |
+| `#6A635C` sobre `#100D0A`     | 3,28:1               | Insuficiente.                                               |
+| `#6A635C` sobre `#1C1815`     | 2,98:1               | Insuficiente.                                               |
+| Blanco sobre acento `#C4783A` | 3,45:1               | Insuficiente para texto normal; revisar tamaño/peso reales. |
 
 WCAG establece 4,5:1 para texto normal y 3:1 para texto grande, con condiciones y excepciones específicas. Se usa aquí como referencia de accesibilidad; esta revisión no certifica cumplimiento completo.
 
@@ -400,18 +417,18 @@ Validación visual pendiente: teléfonos de 320/360/390/430 unidades de ancho, u
 
 ### 8.1 Problemas estructurales observados
 
-| Área | Patrón actual | Mejora propuesta | Prioridad |
-| --- | --- | --- | --- |
-| Biblioteca | Descarga todos los registros del estado seleccionado | Paginación por cursor; totales separados; carga limitada de metadatos | P1 |
-| Bandeja de mensajes | Aproximadamente `2 + 2 × N` consultas para N conversaciones: datos base, perfiles, último mensaje y no leídos por conversación | Consulta/RPC agregada autorizada con último mensaje y contador | P1 antes de activar chat |
-| Mensajes en tiempo real | Invalidación amplia al recibir eventos y tras mutaciones | Actualizar caché por ID, deduplicar y resincronizar de forma acotada | P1/P2 según medición |
-| Búsqueda sin caché | Consulta local → Google → inserción → nueva consulta | Cancelación, timeout, deduplicación, mejor búsqueda local y revisión de la cascada | P1 |
-| Tendencias | Consulta al proveedor y búsqueda individual de cada ISBN, potencialmente con varias llamadas por libro | Resolver libros en lote, caché del servidor, concurrencia limitada y resultados parciales | P1/P2 |
-| Comunidad de un libro | Varias consultas y muestras limitadas para agregados | RPC de agregados con semántica de privacidad definida | P1 |
-| Listas del usuario | Se cargan relaciones de libros y luego se recortan portadas en cliente | Respuesta limitada a previews y conteos necesarios | P2 |
-| Notificaciones | Cursor solo por fecha | Cursor compuesto estable fecha/ID | P1 por integridad |
-| Arranque web | Artefacto pesado y fuentes exportadas | Medir lo que realmente se descarga; reducir familias/pesos e imports de iconos si aporta | P2; P1 si afecta el canal elegido |
-| Modo sin conexión | No se identificó integración de NetInfo con el gestor de conexión ni persistencia de consultas | Aviso claro, lecturas cacheadas cuando existan y reintento seguro | P1 básico; sincronización completa futura |
+| Área                    | Patrón actual                                                                                                                  | Mejora propuesta                                                                          | Prioridad                                 |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- | ----------------------------------------- |
+| Biblioteca              | Descarga todos los registros del estado seleccionado                                                                           | Paginación por cursor; totales separados; carga limitada de metadatos                     | P1                                        |
+| Bandeja de mensajes     | Aproximadamente `2 + 2 × N` consultas para N conversaciones: datos base, perfiles, último mensaje y no leídos por conversación | Consulta/RPC agregada autorizada con último mensaje y contador                            | P1 antes de activar chat                  |
+| Mensajes en tiempo real | Invalidación amplia al recibir eventos y tras mutaciones                                                                       | Actualizar caché por ID, deduplicar y resincronizar de forma acotada                      | P1/P2 según medición                      |
+| Búsqueda sin caché      | Consulta local → Google → inserción → nueva consulta                                                                           | Cancelación, timeout, deduplicación, mejor búsqueda local y revisión de la cascada        | P1                                        |
+| Tendencias              | Consulta al proveedor y búsqueda individual de cada ISBN, potencialmente con varias llamadas por libro                         | Resolver libros en lote, caché del servidor, concurrencia limitada y resultados parciales | P1/P2                                     |
+| Comunidad de un libro   | Varias consultas y muestras limitadas para agregados                                                                           | RPC de agregados con semántica de privacidad definida                                     | P1                                        |
+| Listas del usuario      | Se cargan relaciones de libros y luego se recortan portadas en cliente                                                         | Respuesta limitada a previews y conteos necesarios                                        | P2                                        |
+| Notificaciones          | Cursor solo por fecha                                                                                                          | Cursor compuesto estable fecha/ID                                                         | P1 por integridad                         |
+| Arranque web            | Artefacto pesado y fuentes exportadas                                                                                          | Medir lo que realmente se descarga; reducir familias/pesos e imports de iconos si aporta  | P2; P1 si afecta el canal elegido         |
+| Modo sin conexión       | No se identificó integración de NetInfo con el gestor de conexión ni persistencia de consultas                                 | Aviso claro, lecturas cacheadas cuando existan y reintento seguro                         | P1 básico; sincronización completa futura |
 
 Ejemplo del coste de la bandeja: 100 conversaciones pueden generar aproximadamente 202 consultas con el patrón actual. Esto no permite deducir su latencia exacta, pero sí identifica una multiplicación evitable del trabajo.
 
@@ -425,17 +442,17 @@ No cambiaría automáticamente el chat de FlatList a FlashList: la lista inverti
 
 Se proponen como presupuestos para una primera campaña en dispositivo Android de gama media y un iPhone representativo, build de producción, región documentada y red móvil controlada. Deben ajustarse después de la línea base.
 
-| Operación | Meta inicial propuesta | Qué medir |
-| --- | --- | --- |
-| Arranque en frío | p95 ≤ 3 s | Desde abrir hasta poder interactuar con la pantalla útil. |
-| Reanudación en caliente | p95 ≤ 1 s | Volver a interactuar; separar recuperación de red. |
-| Feed/biblioteca con caché en memoria | p95 ≤ 200 ms | Mostrar contenido previo al navegar. |
-| Primera página de feed/biblioteca en red | p95 ≤ 1,5 s | Contenido útil, no solo skeleton. |
-| Búsqueda resuelta localmente | p95 ≤ 1 s | Desde terminar de escribir; incluye debounce. |
-| Búsqueda que requiere proveedor | p95 ≤ 3 s | Resultados útiles o fallo recuperable; mantener feedback mientras espera. |
-| Guardado de estado/puntuación | Respuesta visual ≤ 100 ms; confirmación p95 ≤ 1,5 s | Distinguir actualización optimista de persistencia confirmada. |
-| Carga incremental | Sin bloqueos perceptibles del scroll | Frames lentos, tiempo por página y memoria acumulada. |
-| Errores y estabilidad | Objetivo inicial ≥ 99,5% de sesiones sin cierre inesperado | Muestra y periodo explícitos; no inferirlo de tres tests. |
+| Operación                                | Meta inicial propuesta                                     | Qué medir                                                                 |
+| ---------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Arranque en frío                         | p95 ≤ 3 s                                                  | Desde abrir hasta poder interactuar con la pantalla útil.                 |
+| Reanudación en caliente                  | p95 ≤ 1 s                                                  | Volver a interactuar; separar recuperación de red.                        |
+| Feed/biblioteca con caché en memoria     | p95 ≤ 200 ms                                               | Mostrar contenido previo al navegar.                                      |
+| Primera página de feed/biblioteca en red | p95 ≤ 1,5 s                                                | Contenido útil, no solo skeleton.                                         |
+| Búsqueda resuelta localmente             | p95 ≤ 1 s                                                  | Desde terminar de escribir; incluye debounce.                             |
+| Búsqueda que requiere proveedor          | p95 ≤ 3 s                                                  | Resultados útiles o fallo recuperable; mantener feedback mientras espera. |
+| Guardado de estado/puntuación            | Respuesta visual ≤ 100 ms; confirmación p95 ≤ 1,5 s        | Distinguir actualización optimista de persistencia confirmada.            |
+| Carga incremental                        | Sin bloqueos perceptibles del scroll                       | Frames lentos, tiempo por página y memoria acumulada.                     |
+| Errores y estabilidad                    | Objetivo inicial ≥ 99,5% de sesiones sin cierre inesperado | Muestra y periodo explícitos; no inferirlo de tres tests.                 |
 
 No se dispone aún de valores p50/p95 reales. No se deben publicar estas metas como prestaciones de la app.
 
@@ -565,17 +582,17 @@ No se estima esta fase como un bloque único: debe dividirse en experimentos con
 
 Probar con cuentas y sesiones separadas: anónimo, propietario del dato, extraño autenticado, seguidor pendiente, seguidor aceptado, bloqueado, moderador y administrador. Para clubes: extraño, solicitante, miembro, moderador y propietario.
 
-| Recurso/acción | Casos indispensables |
-| --- | --- |
-| Perfil y biblioteca privados | Acceso directo por ID; seguimiento pendiente/aceptado; cambio de privacidad; bloqueo en ambas direcciones. |
-| Reseñas, actividad y comentarios | El permiso del contenido padre se mantiene; datos eliminados no reaparecen por otra ruta. |
-| Seguimientos | No autoconceder aceptación; no cambiar participantes; rechazo y revocación autorizados. |
-| Perfil editable | No modificar rol, contadores o campos internos usando una petición manual. |
-| Clubes y miembros | No autoconceder propietario/moderador; invitaciones y expulsiones autorizadas. |
-| Mensajes | Solo participantes autorizados; solicitud pendiente; bloqueo; paginación y tiempo real sin fugas. |
-| Listas | Lectura/escritura privadas y públicas; ordenamiento atómico; no añadir a listas ajenas. |
-| Cuenta y exportación | Solo datos propios; sesión vencida; exportación extensa; fallos parciales; archivos asociados. |
-| Funciones de servidor | Permisos EXECUTE, validación de identidad, parámetros acotados y ausencia de secretos en respuestas/logs. |
+| Recurso/acción                   | Casos indispensables                                                                                       |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Perfil y biblioteca privados     | Acceso directo por ID; seguimiento pendiente/aceptado; cambio de privacidad; bloqueo en ambas direcciones. |
+| Reseñas, actividad y comentarios | El permiso del contenido padre se mantiene; datos eliminados no reaparecen por otra ruta.                  |
+| Seguimientos                     | No autoconceder aceptación; no cambiar participantes; rechazo y revocación autorizados.                    |
+| Perfil editable                  | No modificar rol, contadores o campos internos usando una petición manual.                                 |
+| Clubes y miembros                | No autoconceder propietario/moderador; invitaciones y expulsiones autorizadas.                             |
+| Mensajes                         | Solo participantes autorizados; solicitud pendiente; bloqueo; paginación y tiempo real sin fugas.          |
+| Listas                           | Lectura/escritura privadas y públicas; ordenamiento atómico; no añadir a listas ajenas.                    |
+| Cuenta y exportación             | Solo datos propios; sesión vencida; exportación extensa; fallos parciales; archivos asociados.             |
+| Funciones de servidor            | Permisos EXECUTE, validación de identidad, parámetros acotados y ausencia de secretos en respuestas/logs.  |
 
 Estas pruebas deben llamar directamente a la API: ocultar botones no comprueba seguridad.
 
@@ -626,18 +643,18 @@ Responsabilidades mínimas, aunque las asuma una sola persona: desarrollo/releas
 
 ## 12. Primer backlog ejecutable
 
-| Orden | Trabajo | Dependencia | Resultado verificable |
-| --- | --- | --- | --- |
-| 1 | Fijar entorno y alinear Expo | Ninguna | Instalación y build nativo reproducibles. |
-| 2 | Crear staging y reconciliar migraciones | Acceso autorizado al esquema | Base reconstruible sin tocar producción. |
-| 3 | Probar/corregir seguidores, columnas y roles | 2 | Matriz de permisos en verde. |
-| 4 | Habilitar pruebas unitarias/integración y CI mínimo | 1–2 | Resultados confiables, sin falsos éxitos. |
-| 5 | Terminar onboarding y confirmación | 1–3 | Cuenta nueva llega a su primera lectura y puede retomar. |
-| 6 | Unificar guardar libro, puntuación y fechas | 3–5 | Persistencia consistente desde todas las entradas. |
-| 7 | Añadir feedback, spoilers y acciones seguras | 6 | Errores visibles y contenido protegido. |
-| 8 | Paginar biblioteca y mejorar búsqueda/estados vacíos | 6–7 | Datos completos, carga acotada y fallos distinguibles. |
-| 9 | Cerrar eliminación/exportación, moderación y publicación | 2–4 | Operación sensible probada y documentación real. |
-| 10 | Medir, corregir accesibilidad y lanzar beta acotada | 5–9 | Evidencia de uso, estabilidad y rendimiento. |
+| Orden | Trabajo                                                  | Dependencia                  | Resultado verificable                                    |
+| ----- | -------------------------------------------------------- | ---------------------------- | -------------------------------------------------------- |
+| 1     | Fijar entorno y alinear Expo                             | Ninguna                      | Instalación y build nativo reproducibles.                |
+| 2     | Crear staging y reconciliar migraciones                  | Acceso autorizado al esquema | Base reconstruible sin tocar producción.                 |
+| 3     | Probar/corregir seguidores, columnas y roles             | 2                            | Matriz de permisos en verde.                             |
+| 4     | Habilitar pruebas unitarias/integración y CI mínimo      | 1–2                          | Resultados confiables, sin falsos éxitos.                |
+| 5     | Terminar onboarding y confirmación                       | 1–3                          | Cuenta nueva llega a su primera lectura y puede retomar. |
+| 6     | Unificar guardar libro, puntuación y fechas              | 3–5                          | Persistencia consistente desde todas las entradas.       |
+| 7     | Añadir feedback, spoilers y acciones seguras             | 6                            | Errores visibles y contenido protegido.                  |
+| 8     | Paginar biblioteca y mejorar búsqueda/estados vacíos     | 6–7                          | Datos completos, carga acotada y fallos distinguibles.   |
+| 9     | Cerrar eliminación/exportación, moderación y publicación | 2–4                          | Operación sensible probada y documentación real.         |
+| 10    | Medir, corregir accesibilidad y lanzar beta acotada      | 5–9                          | Evidencia de uso, estabilidad y rendimiento.             |
 
 Las tareas de documentación, diseño de estados y preparación de soporte pueden avanzar junto al desarrollo. Las dependencias de permisos y datos no deberían omitirse para adelantar una pantalla.
 

@@ -101,7 +101,21 @@
     "myReview": "Mi reseña",
     "readerReviews": "Reseñas de lectores",
     "beFirst": "Sé el primero en reseñar este libro.",
-    "loadMore": "Cargar más reseñas"
+    "loadMore": "Cargar más reseñas",
+    "spoilerHint": "El texto está oculto para que elijas si quieres leerlo.",
+    "showSpoiler": "Mostrar spoiler",
+    "hideSpoiler": "Ocultar spoiler",
+    "sharedSpoiler": "Reseña con spoilers. Abre el libro en Lexa para decidir si quieres leerla.",
+    "editorLoadError": "No pudimos cargar la reseña y su libro. Reintenta antes de escribir.",
+    "saveError": "No se guardó la reseña. Conservamos tu texto; vuelve a intentarlo. Si ya existe otra reseña de este libro, vuelve a abrir el editor.",
+    "loadError": "No pudimos cargar las reseñas.",
+    "shareError": "No pudimos compartir la tarjeta. Intenta de nuevo.",
+    "deleteTitle": "Eliminar reseña",
+    "deleteHint": "La reseña y su conversación dejarán de estar disponibles. Tu puntuación del libro se conserva.",
+    "deleteError": "No se pudo eliminar la reseña. Puedes reintentarlo.",
+    "leaveTitle": "¿Salir sin guardar?",
+    "leaveHint": "Los cambios de esta reseña todavía no se han guardado.",
+    "discard": "Descartar cambios"
   },
   "community": {
     "readers": "Lectores",
@@ -521,5 +535,24 @@
     "add": "Guardar libro",
     "editRating": "Editar puntuación",
     "addToList": "Añadir a una lista"
+  },
+  "comments": {
+    "title": "Comentarios",
+    "unavailable": "Contenido no disponible",
+    "unavailableHint": "Puede haberse eliminado o cambiado su privacidad. Solo puedes comentar contenido al que tengas acceso.",
+    "spoilerThread": "Esta conversación puede revelar spoilers",
+    "spoilerThreadHint": "La reseña contiene spoilers y sus comentarios pueden hablar de ellos.",
+    "showThread": "Mostrar conversación",
+    "loadError": "No pudimos cargar los comentarios. Tu borrador se conserva.",
+    "sendError": "No se pudo enviar. Conservamos tu comentario; vuelve a intentarlo.",
+    "empty": "Todavía no hay comentarios",
+    "emptyHint": "Comparte tu opinión con respeto. Marca el comentario si revela partes de la historia.",
+    "loadMore": "Cargar más comentarios",
+    "reader": "Lector",
+    "delete": "Eliminar comentario",
+    "deleteHint": "Este comentario dejará de estar disponible.",
+    "deleteError": "No se pudo eliminar el comentario. Puedes reintentarlo.",
+    "placeholder": "Escribe un comentario",
+    "send": "Enviar comentario"
   }
 }

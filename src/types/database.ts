@@ -444,6 +444,7 @@ export type Database = {
       comments: {
         Row: {
           body: string
+          contains_spoilers: boolean
           created_at: string | null
           deleted_at: string | null
           edited_at: string | null
@@ -456,6 +457,7 @@ export type Database = {
         }
         Insert: {
           body: string
+          contains_spoilers?: boolean
           created_at?: string | null
           deleted_at?: string | null
           edited_at?: string | null
@@ -468,6 +470,7 @@ export type Database = {
         }
         Update: {
           body?: string
+          contains_spoilers?: boolean
           created_at?: string | null
           deleted_at?: string | null
           edited_at?: string | null
@@ -1440,6 +1443,13 @@ export type Database = {
         Args: { p_club: string; p_user: string }
         Returns: undefined
       }
+      can_access_comment_target: {
+        Args: {
+          p_id: string
+          p_type: Database['public']['Enums']['comment_target_type']
+        }
+        Returns: boolean
+      }
       can_view_user_content: { Args: { target: string }; Returns: boolean }
       complete_onboarding: {
         Args: { p_username: string }
@@ -1487,6 +1497,10 @@ export type Database = {
       is_conversation_member: { Args: { conv: string }; Returns: boolean }
       is_username_available: { Args: { p_username: string }; Returns: boolean }
       mod_delete_message: { Args: { p_msg: string }; Returns: undefined }
+      remove_own_content: {
+        Args: { p_id: string; p_type: string }
+        Returns: boolean
+      }
       save_reading_record: {
         Args: { p_book_id: string; p_changes: Json; p_today?: string }
         Returns: {
