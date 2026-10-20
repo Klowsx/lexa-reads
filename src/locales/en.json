@@ -237,7 +237,37 @@
     "tabReading": "Reading",
     "tabRead": "Read",
     "tabWantToRead": "To read",
-    "tabAbandoned": "Dropped"
+    "tabAbandoned": "Abandoned",
+    "searchPlaceholder": "Search by title or author",
+    "clearSearch": "Clear search",
+    "clearFilters": "Clear filters",
+    "recentFirst": "Recently added first",
+    "rating": {
+      "all": "All books",
+      "rated": "Rated",
+      "unrated": "Unrated"
+    },
+    "noMatches": "No matching books",
+    "noMatchesHint": "Try another title or author, or clear the filters on this shelf.",
+    "emptyTitle": {
+      "reading": "What are you reading?",
+      "read": "Your next finished reads",
+      "want_to_read": "Save your next read",
+      "abandoned": "Books you put down belong here too"
+    },
+    "emptyHint": {
+      "reading": "Find a book and mark it as Reading to keep it close.",
+      "read": "Mark a book as Read to collect your finished reads and ratings here.",
+      "want_to_read": "Mark a book as Want to read to find it here when the time comes.",
+      "abandoned": "If you put a book down, mark it as Abandoned to keep your record."
+    },
+    "loadingMore": "Loading more books…",
+    "loadMore": "Load more books",
+    "moreError": "We could not load more books. Your loaded books are still here.",
+    "summaryError": "We could not update totals and tags.",
+    "refreshError": "Could not refresh. Tap to try again.",
+    "endOfShelf_one": "{{count}} book in this selection",
+    "endOfShelf_other": "{{count}} books in this selection"
   },
   "lists": {
     "editTitle": "Edit list",

@@ -237,7 +237,37 @@
     "tabReading": "Leyendo",
     "tabRead": "Leídos",
     "tabWantToRead": "Por leer",
-    "tabAbandoned": "Abandon."
+    "tabAbandoned": "Abandonados",
+    "searchPlaceholder": "Buscar por título o autor",
+    "clearSearch": "Borrar búsqueda",
+    "clearFilters": "Limpiar filtros",
+    "recentFirst": "Añadidos más recientes primero",
+    "rating": {
+      "all": "Todos",
+      "rated": "Con puntuación",
+      "unrated": "Sin puntuación"
+    },
+    "noMatches": "No encontramos coincidencias",
+    "noMatchesHint": "Prueba otro título o autor, o limpia los filtros de esta estantería.",
+    "emptyTitle": {
+      "reading": "¿Qué estás leyendo?",
+      "read": "Tus próximas lecturas terminadas",
+      "want_to_read": "Guarda tu próxima lectura",
+      "abandoned": "Aquí también caben los libros que dejas"
+    },
+    "emptyHint": {
+      "reading": "Busca un libro y márcalo como «Leyendo» para tenerlo a mano.",
+      "read": "Marca un libro como «Leído» para reunir aquí tus lecturas y puntuaciones.",
+      "want_to_read": "Marca un libro como «Por leer» para encontrarlo aquí cuando llegue su momento.",
+      "abandoned": "Si dejas un libro, márcalo como «Abandonado» y conserva tu registro."
+    },
+    "loadingMore": "Cargando más libros…",
+    "loadMore": "Cargar más libros",
+    "moreError": "No pudimos cargar más libros. Los que ya tienes siguen aquí.",
+    "summaryError": "No pudimos actualizar los totales y las etiquetas.",
+    "refreshError": "No pudimos actualizar. Toca para reintentar.",
+    "endOfShelf_one": "{{count}} libro en esta selección",
+    "endOfShelf_other": "{{count}} libros en esta selección"
   },
   "lists": {
     "editTitle": "Editar lista",

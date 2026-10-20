@@ -1,6 +1,6 @@
 import type { Tables, UpsertUserBookParams } from '~/types'
 import type { Database } from '~/types/database'
-import { queryOptions } from '@tanstack/react-query'
+import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query'
 import { supabase } from '~/lib/supabase'
 import { localReadingDate } from './reading-record'
 
@@ -78,7 +78,7 @@ async function fetchLibrary(
 
 // La query key incluye userId y status para que cada tab (Leyendo,
 // Leído, etc.) tenga su propia entrada en el cache y no se pisen.
-// Prefijo ["library", userId] compartido con libraryCountsQueryOptions
+// Prefijo ["library", userId] compartido con librarySummaryQueryOptions
 // para que un invalidateQueries({ queryKey: ["library", userId] })
 // refresque tanto la lista como los contadores a la vez.
 export const libraryQueryOptions = (userId: string, status: UserBookStatus) =>
@@ -88,36 +88,69 @@ export const libraryQueryOptions = (userId: string, status: UserBookStatus) =>
     enabled: !!userId
   })
 
-// Cuenta cuántos libros hay por estado en un solo round trip.
-async function fetchLibraryCounts(
-  userId: string
-): Promise<Record<UserBookStatus, number>> {
-  const { data, error } = await supabase
-    .from('user_books')
-    .select('status')
-    .eq('user_id', userId)
-
-  if (error) throw error
-
-  // Agrupamos en memoria (biblioteca personal)
-  const counts: Record<UserBookStatus, number> = {
-    reading: 0,
-    read: 0,
-    want_to_read: 0,
-    abandoned: 0
-  }
-  for (const row of data ?? []) {
-    counts[row.status]++
-  }
-  return counts
+export interface LibraryFilters {
+  status: UserBookStatus
+  search: string
+  rating: 'all' | 'rated' | 'unrated'
+  tag: string | null
 }
 
-// Clave ["library", userId, "counts"] — mismo prefijo que libraryQueryOptions
-// para que un invalidateQueries({ queryKey: ["library", userId] }) refresque ambos.
-export const libraryCountsQueryOptions = (userId: string) =>
+type LibraryCursor = { createdAt: string; id: string } | null
+const LIBRARY_PAGE_SIZE = 24
+
+// Consulta una página ya filtrada; el libro adicional permite detectar el final sin contar coincidencias.
+async function fetchLibraryPage(
+  filters: LibraryFilters,
+  cursor: LibraryCursor,
+  signal: AbortSignal
+) {
+  const { data, error } = await supabase
+    .rpc('search_library', {
+      p_status: filters.status,
+      p_search: filters.search,
+      p_rating: filters.rating,
+      p_tag: filters.tag ?? undefined,
+      p_before_created_at: cursor?.createdAt,
+      p_before_id: cursor?.id
+    })
+    .select('*, books(*)')
+    .abortSignal(signal)
+  if (error) throw error
+  const rows = (data ?? []) as LibraryRow[]
+  const items = rows.slice(0, LIBRARY_PAGE_SIZE)
+  const last = items.at(-1)
+  return {
+    items,
+    nextCursor:
+      rows.length > LIBRARY_PAGE_SIZE && last
+        ? { createdAt: last.created_at ?? '1970-01-01T00:00:00Z', id: last.id }
+        : null
+  }
+}
+
+// Separa la forma paginada de las consultas simples usadas por el perfil, conservando la invalidación común.
+export const libraryInfiniteOptions = (
+  userId: string,
+  filters: LibraryFilters
+) =>
+  infiniteQueryOptions({
+    queryKey: ['library', userId, 'pages', filters],
+    initialPageParam: null as LibraryCursor,
+    queryFn: ({ pageParam, signal }) =>
+      fetchLibraryPage(filters, pageParam, signal),
+    getNextPageParam: (page) => page.nextCursor ?? undefined,
+    enabled: !!userId
+  })
+
+// Mantiene las etiquetas de toda la estantería aunque una página o un filtro no las contengan.
+export const librarySummaryQueryOptions = (userId: string) =>
   queryOptions({
-    queryKey: ['library', userId, 'counts'],
-    queryFn: () => fetchLibraryCounts(userId),
+    queryKey: ['library', userId, 'summary'],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('library_summary')
+      if (error) throw error
+      return data
+    },
     enabled: !!userId
   })
 

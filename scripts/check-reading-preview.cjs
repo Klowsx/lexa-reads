@@ -87,6 +87,22 @@ async function readingFixture(browser, width = 390) {
       state.record = next
       f.state.profile.books_read_count = nextStatus === 'read' ? 1 : 0
       body = next
+    } else if (name === 'library_summary') {
+      body = state.record
+        ? [
+            {
+              status: state.record.status,
+              total: 1,
+              tags: state.record.tags ?? []
+            }
+          ]
+        : []
+    } else if (name === 'search_library') {
+      const filters = request.postDataJSON()
+      body =
+        state.record?.status === filters.p_status
+          ? [{ ...state.record, books: book }]
+          : []
     } else if (name === 'books') body = isObject ? book : [book]
     else if (name === 'user_books') {
       if (state.failLoad) {

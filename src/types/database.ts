@@ -1496,6 +1496,14 @@ export type Database = {
       is_club_mod: { Args: { club: string }; Returns: boolean }
       is_conversation_member: { Args: { conv: string }; Returns: boolean }
       is_username_available: { Args: { p_username: string }; Returns: boolean }
+      library_summary: {
+        Args: never
+        Returns: {
+          status: Database['public']['Enums']['user_book_status']
+          tags: string[]
+          total: number
+        }[]
+      }
       mod_delete_message: { Args: { p_msg: string }; Returns: undefined }
       remove_own_content: {
         Args: { p_id: string; p_type: string }
@@ -1524,6 +1532,38 @@ export type Database = {
           to: 'user_books'
           isOneToOne: true
           isSetofReturn: false
+        }
+      }
+      search_library: {
+        Args: {
+          p_before_created_at?: string
+          p_before_id?: string
+          p_rating?: string
+          p_search?: string
+          p_status: Database['public']['Enums']['user_book_status']
+          p_tag?: string
+        }
+        Returns: {
+          book_id: string
+          created_at: string | null
+          current_page: number | null
+          finished_at: string | null
+          goodreads_id: string | null
+          id: string
+          is_reread: boolean | null
+          rating: number | null
+          reread_count: number | null
+          started_at: string | null
+          status: Database['public']['Enums']['user_book_status']
+          tags: string[] | null
+          updated_at: string | null
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: '*'
+          to: 'user_books'
+          isOneToOne: false
+          isSetofReturn: true
         }
       }
       set_club_member_role: {
