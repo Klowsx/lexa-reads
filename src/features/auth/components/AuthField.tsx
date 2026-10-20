@@ -3,7 +3,7 @@ import { Text, TextInput, TextInputProps, View } from 'react-native'
 import type { LucideIcon } from 'lucide-react-native'
 
 import type { ReactNode } from 'react'
-import { alpha, useColors } from '~/theme/colors'
+import { useColors } from '~/theme/colors'
 
 type Props = {
   label?: string
@@ -42,7 +42,7 @@ export function AuthField({
   const [focused, setFocused] = useState(false)
   const c = useColors()
 
-  const focusedBorder = alpha(c.accent, 0.55)
+  const focusedBorder = c.accent
   const borderColor = error ? c.error : focused ? focusedBorder : undefined
 
   // forwardRef components (como LucideIcon) son objetos, no funciones
@@ -73,11 +73,11 @@ export function AuthField({
           </View>
         )}
         <TextInput
-          className="flex-1 text-text text-xs font-body min-w-0"
+          className="flex-1 text-text text-xs font-body min-w-0 web:outline-none"
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor={c.t3}
+          placeholderTextColor={c.t2}
           secureTextEntry={secureTextEntry}
           keyboardType={keyboardType}
           autoCapitalize={autoCapitalize}
@@ -87,6 +87,7 @@ export function AuthField({
           spellCheck={autoCapitalize !== 'none'}
           accessibilityLabel={accessibilityLabel ?? label ?? placeholder}
           accessibilityHint={error}
+          aria-invalid={Boolean(error)}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
         />

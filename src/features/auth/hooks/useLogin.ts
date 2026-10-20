@@ -4,6 +4,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useAuthStore } from '~/stores/auth.store'
 import type { LoginParams } from '~/types'
 import { loginFn } from '../auth.queries'
+import { saveRecoveryContext } from '../recovery-context'
 
 // Establece la sesión; el guard global decide el destino cuando el perfil está disponible.
 export function useLogin() {
@@ -12,7 +13,8 @@ export function useLogin() {
 
   return useMutation<AuthResponse['data'], AppError, LoginParams>({
     mutationFn: loginFn,
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      await saveRecoveryContext(null)
       setRecoveryMode(false)
       setSession(data.session)
     }

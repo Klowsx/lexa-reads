@@ -25,6 +25,9 @@ DO $$
 DECLARE
   result public.users;
 BEGIN
+  IF public.is_username_available(NULL) OR public.is_username_available('') OR public.is_username_available('no valido') THEN
+    RAISE EXCEPTION 'Se aceptó un nombre inválido en la comprobación';
+  END IF;
   UPDATE public.users SET favorite_genres = '{}', reading_goal = 12, onboarding_step = 3
   WHERE id = auth.uid();
   SELECT * INTO result FROM public.complete_onboarding(upper(current_setting('lexa.test_username')));
@@ -39,6 +42,12 @@ $$;
 SELECT set_config('request.jwt.claim.sub', current_setting('lexa.test_second'), true);
 DO $$
 BEGIN
+  -- Un bloqueo no libera el nombre único que la otra cuenta ya reservó.
+  INSERT INTO public.user_blocks (blocker_id, blocked_id)
+  VALUES (auth.uid(), current_setting('lexa.test_first')::uuid);
+  IF public.is_username_available(upper(current_setting('lexa.test_username'))) THEN
+    RAISE EXCEPTION 'Se ofreció un nombre ocupado por un perfil oculto';
+  END IF;
   BEGIN
     PERFORM public.complete_onboarding(current_setting('lexa.test_username'));
     RAISE EXCEPTION 'Se permitió un nombre duplicado';
@@ -51,6 +60,17 @@ BEGIN
   END;
   UPDATE public.users SET onboarding_step = 1 WHERE id = current_setting('lexa.test_first')::uuid;
   IF FOUND THEN RAISE EXCEPTION 'RLS permitió modificar otra cuenta'; END IF;
+END;
+$$;
+RESET ROLE;
+SET LOCAL ROLE anon;
+DO $$
+BEGIN
+  BEGIN
+    PERFORM public.is_username_available('lectura_anonima');
+    RAISE EXCEPTION 'Se permitió consultar nombres sin sesión';
+  EXCEPTION WHEN insufficient_privilege THEN NULL;
+  END;
 END;
 $$;
 RESET ROLE;

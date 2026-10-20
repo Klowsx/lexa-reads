@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '~/lib/supabase'
-import { USERNAME_PATTERN } from '~/lib/username'
+import { usernameAvailabilityQueryOptions } from '../auth.queries'
 import { useAuthStore } from '~/stores/auth.store'
 import type { OnboardingPreferences, UserProfile } from '~/types/user'
 import {
@@ -10,25 +10,9 @@ import {
 
 export { normalizeUsername } from '~/lib/username'
 
-// Comprueba la disponibilidad en servidor; la restricción única sigue siendo la protección ante carreras.
-async function checkUsernameAvailability(username: string): Promise<boolean> {
-  const { data, error } = await supabase.rpc('is_username_available', {
-    p_username: username
-  })
-  if (error) throw error
-  return data
-}
-
 // Consulta un nombre válido después de una pausa para no pedir datos por cada pulsación.
 export function useUsernameAvailability(username: string) {
-  const isValid = USERNAME_PATTERN.test(username)
-
-  return useQuery({
-    queryKey: ['username_availability', username],
-    queryFn: () => checkUsernameAvailability(username),
-    enabled: isValid,
-    staleTime: 30_000
-  })
+  return useQuery(usernameAvailabilityQueryOptions(username))
 }
 
 // Persiste géneros y meta antes del último paso para reanudar el flujo desde cualquier reinicio.
@@ -62,6 +46,12 @@ export function useCompleteOnboarding() {
       })
       if (error) throw error
       return data as UserProfile
+    },
+    // Revalida la disponibilidad si otra cuenta reservó el nombre mientras se completaba el formulario.
+    onError: (_error, username) => {
+      void queryClient.invalidateQueries({
+        queryKey: usernameAvailabilityQueryOptions(username).queryKey
+      })
     },
     onSuccess: (profile) => {
       queryClient.setQueryData<UserProfile>(

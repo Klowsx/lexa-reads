@@ -1,8 +1,33 @@
 import { supabase } from '~/lib/supabase'
+import { queryOptions } from '@tanstack/react-query'
+import { USERNAME_PATTERN } from '~/lib/username'
 import { toAppError } from '~/types'
 import type { LoginParams, RegisterParams } from '~/types'
 import type { AuthResponse } from '@supabase/supabase-js'
-import { getPasswordRecoveryRedirectUrl } from './password-recovery'
+import {
+  getAuthRedirectUrl,
+  getPasswordRecoveryRedirectUrl
+} from './password-recovery'
+import { saveRecoveryContext } from './recovery-context'
+
+// Consulta el servidor; la restricción única decide el nombre definitivo si hay una carrera.
+async function checkUsernameAvailability(username: string): Promise<boolean> {
+  const { data, error } = await supabase.rpc('is_username_available', {
+    p_username: username
+  })
+  if (error) throw error
+  return data
+}
+
+// Comparte la clave y las reglas de disponibilidad entre la consulta y su invalidación.
+export function usernameAvailabilityQueryOptions(username: string) {
+  return queryOptions({
+    queryKey: ['username_availability', username],
+    queryFn: () => checkUsernameAvailability(username),
+    enabled: USERNAME_PATTERN.test(username),
+    staleTime: 30_000
+  })
+}
 
 // Autentica con el correo normalizado y conserva intacta la contraseña.
 export async function loginFn({
@@ -26,7 +51,10 @@ export async function registerFn({
   const { data, error } = await supabase.auth.signUp({
     email: email.trim(),
     password,
-    options: { data: { display_name: displayName.trim() } }
+    options: {
+      data: { display_name: displayName.trim() },
+      emailRedirectTo: getAuthRedirectUrl('signup')
+    }
   })
   if (error) throw toAppError(error)
   return data
@@ -44,6 +72,7 @@ export async function requestResetPasswordFn({
   if (error) throw toAppError(error)
 }
 
+// Verifica un código de recuperación cuando la plantilla de correo usa OTP.
 export async function verifyPasswordResetCodeFn({
   email,
   token
@@ -59,7 +88,7 @@ export async function verifyPasswordResetCodeFn({
   if (error) throw toAppError(error)
 }
 
-// Actualiza la contraseña y verifica que la sesión temporal se haya cerrado.
+// Actualiza la contraseña una sola vez dentro de la sesión validada por el enlace.
 export async function updatePasswordFn({
   password
 }: {
@@ -67,11 +96,20 @@ export async function updatePasswordFn({
 }): Promise<void> {
   const { error } = await supabase.auth.updateUser({ password })
   if (error) throw toAppError(error)
-  const { error: signOutError } = await supabase.auth.signOut()
-  if (signOutError) throw toAppError(signOutError)
 }
 
+// Revoca las sesiones tras la recuperación; su reintento no vuelve a modificar la contraseña.
+export async function finishPasswordRecoveryFn(): Promise<void> {
+  const { error: signOutError } = await supabase.auth.signOut({
+    scope: 'global'
+  })
+  if (signOutError) throw toAppError(signOutError)
+  await saveRecoveryContext(null)
+}
+
+// Cierra la sesión de este dispositivo y retira su contexto de recuperación.
 export async function logoutFn(): Promise<void> {
-  const { error } = await supabase.auth.signOut()
+  const { error } = await supabase.auth.signOut({ scope: 'local' })
   if (error) throw toAppError(error)
+  await saveRecoveryContext(null)
 }

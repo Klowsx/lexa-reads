@@ -1,5 +1,2 @@
-import { Redirect } from "expo-router";
-
-export default function Index() {
-  return <Redirect href="/(auth)/login" />;
-}
+// El guard global decide el destino de entrada sin competir con los enlaces de correo.
+export { SessionStatus as default } from '~/features/auth/components/session-status'

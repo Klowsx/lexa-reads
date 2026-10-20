@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { supabase } from '~/lib/supabase'
 import { toAppError } from '~/types'
+import { getAuthRedirectUrl } from '../password-recovery'
 
 // Reenvía solo la confirmación de registro sin navegar ni iniciar una recuperación.
 export function useResendConfirmation() {
@@ -8,7 +9,8 @@ export function useResendConfirmation() {
     mutationFn: async (email: string) => {
       const { error } = await supabase.auth.resend({
         type: 'signup',
-        email: email.trim()
+        email: email.trim(),
+        options: { emailRedirectTo: getAuthRedirectUrl('signup') }
       })
       if (error) throw toAppError(error)
     }

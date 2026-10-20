@@ -1,8 +1,12 @@
 import * as Linking from 'expo-linking'
+import type { AuthFlow } from './auth-links'
 
-const PASSWORD_RECOVERY_CALLBACK_PATH = 'auth-callback'
+// Incluye el propósito del enlace para separar registro, recuperación y proveedores externos.
+export function getAuthRedirectUrl(flow: AuthFlow) {
+  return Linking.createURL('auth-callback', { queryParams: { flow } })
+}
 
-// Construye la URL de retorno que Supabase abre después de validar el enlace del correo.
+// Mantiene una única URL de retorno para los correos de recuperación.
 export function getPasswordRecoveryRedirectUrl() {
-  return Linking.createURL(PASSWORD_RECOVERY_CALLBACK_PATH)
+  return getAuthRedirectUrl('recovery')
 }

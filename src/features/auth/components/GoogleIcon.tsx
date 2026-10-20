@@ -1,30 +1,31 @@
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet } from 'react-native'
 
+// Representa la marca del proveedor cuando se habilita el acceso externo.
 export function GoogleIcon() {
   return (
     <View style={googleStyles.svg}>
       <View
         style={[
           googleStyles.quarter,
-          { backgroundColor: "#4285F4", top: 0, left: "50%" },
+          { backgroundColor: '#4285F4', top: 0, left: '50%' }
         ]}
       />
       <View
         style={[
           googleStyles.quarter,
-          { backgroundColor: "#34A853", bottom: 0, left: "50%" },
+          { backgroundColor: '#34A853', bottom: 0, left: '50%' }
         ]}
       />
       <View
         style={[
           googleStyles.quarter,
-          { backgroundColor: "#FBBC04", bottom: 0, left: 0 },
+          { backgroundColor: '#FBBC04', bottom: 0, left: 0 }
         ]}
       />
       <View
         style={[
           googleStyles.quarter,
-          { backgroundColor: "#EA4335", top: 0, left: 0 },
+          { backgroundColor: '#EA4335', top: 0, left: 0 }
         ]}
       />
       <View
@@ -32,7 +33,7 @@ export function GoogleIcon() {
         style={googleStyles.hole}
       />
     </View>
-  );
+  )
 }
 
 const googleStyles = StyleSheet.create({
@@ -40,18 +41,18 @@ const googleStyles = StyleSheet.create({
     width: 14,
     height: 14,
     borderRadius: 7,
-    overflow: "hidden",
-    position: "relative",
+    overflow: 'hidden',
+    position: 'relative'
   },
   quarter: {
-    position: "absolute",
-    width: "50%",
-    height: "50%",
+    position: 'absolute',
+    width: '50%',
+    height: '50%'
   },
   hole: {
     width: 7,
     height: 7,
     top: 3.5,
-    left: 3.5,
-  },
-});
+    left: 3.5
+  }
+})
