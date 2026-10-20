@@ -1,9 +1,9 @@
-import type { ReactNode } from 'react';
-import { Text, View } from 'react-native';
+import type { ReactNode } from 'react'
+import { Text, View } from 'react-native'
 
 interface Props {
-  title: string;
-  children: ReactNode;
+  title: string
+  children: ReactNode
 }
 
 export function SettingsSection({ title, children }: Props) {
@@ -16,5 +16,5 @@ export function SettingsSection({ title, children }: Props) {
         {children}
       </View>
     </View>
-  );
+  )
 }

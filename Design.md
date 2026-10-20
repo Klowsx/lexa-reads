@@ -2,81 +2,81 @@
 name: Lexa
 description: Biblioteca personal y comunidad de lectura con una calma editorial.
 colors:
-  accent: "#C4783A"
-  star: "#E8C05A"
-  light-bg: "#F5F0EA"
-  light-surface: "#EBE5DE"
-  light-raised: "#E0D9D1"
-  light-text: "#1A1512"
-  dark-bg: "#100D0A"
-  dark-surface: "#1C1815"
-  dark-raised: "#252118"
-  dark-text: "#F0EAE2"
-  border-light: "#C2BAB0"
-  border-dark: "#35302B"
-  muted-light: "#685E55"
-  muted-dark: "#9E9488"
-  success: "#5CAF7E"
-  error: "#C43A3A"
-  warning: "#C49A20"
-  status-reading: "#4A96B8"
-  status-want: "#8A6CD8"
-  status-abandoned: "#787068"
+  accent: '#C4783A'
+  star: '#E8C05A'
+  light-bg: '#F5F0EA'
+  light-surface: '#EBE5DE'
+  light-raised: '#E0D9D1'
+  light-text: '#1A1512'
+  dark-bg: '#100D0A'
+  dark-surface: '#1C1815'
+  dark-raised: '#252118'
+  dark-text: '#F0EAE2'
+  border-light: '#C2BAB0'
+  border-dark: '#35302B'
+  muted-light: '#685E55'
+  muted-dark: '#9E9488'
+  success: '#5CAF7E'
+  error: '#C43A3A'
+  warning: '#C49A20'
+  status-reading: '#4A96B8'
+  status-want: '#8A6CD8'
+  status-abandoned: '#787068'
 typography:
   display:
-    fontFamily: "Playfair Display, Georgia, serif"
-    fontSize: "30px"
+    fontFamily: 'Playfair Display, Georgia, serif'
+    fontSize: '30px'
     fontWeight: 600
-    lineHeight: "38px"
-    letterSpacing: "-0.02em"
+    lineHeight: '38px'
+    letterSpacing: '-0.02em'
   headline:
-    fontFamily: "Playfair Display, Georgia, serif"
-    fontSize: "26px"
+    fontFamily: 'Playfair Display, Georgia, serif'
+    fontSize: '26px'
     fontWeight: 600
-    lineHeight: "32px"
-    letterSpacing: "-0.02em"
+    lineHeight: '32px'
+    letterSpacing: '-0.02em'
   body:
-    fontFamily: "DM Sans, system-ui, sans-serif"
-    fontSize: "20px"
+    fontFamily: 'DM Sans, system-ui, sans-serif'
+    fontSize: '20px'
     fontWeight: 400
-    lineHeight: "28px"
+    lineHeight: '28px'
   label:
-    fontFamily: "DM Sans, system-ui, sans-serif"
-    fontSize: "16px"
+    fontFamily: 'DM Sans, system-ui, sans-serif'
+    fontSize: '16px'
     fontWeight: 600
-    lineHeight: "20px"
+    lineHeight: '20px'
 rounded:
-  cover: "5px"
-  sm: "6px"
-  md: "12px"
-  card: "14px"
-  lg: "20px"
-  xl: "28px"
-  full: "999px"
+  cover: '5px'
+  sm: '6px'
+  md: '12px'
+  card: '14px'
+  lg: '20px'
+  xl: '28px'
+  full: '999px'
 spacing:
-  xs: "4px"
-  sm: "8px"
-  md: "12px"
-  container: "18px"
-  lg: "20px"
-  xl: "24px"
-  xxl: "32px"
+  xs: '4px'
+  sm: '8px'
+  md: '12px'
+  container: '18px'
+  lg: '20px'
+  xl: '24px'
+  xxl: '32px'
 components:
   button-primary:
-    backgroundColor: "{colors.accent}"
-    textColor: "#FFFFFF"
-    typography: "{typography.label}"
-    rounded: "{rounded.md}"
-    padding: "15px 24px"
+    backgroundColor: '{colors.accent}'
+    textColor: '#FFFFFF'
+    typography: '{typography.label}'
+    rounded: '{rounded.md}'
+    padding: '15px 24px'
   chip-selected:
-    backgroundColor: "{colors.light-raised}"
-    textColor: "{colors.accent}"
-    rounded: "{rounded.full}"
-    padding: "6px 14px"
+    backgroundColor: '{colors.light-raised}'
+    textColor: '{colors.accent}'
+    rounded: '{rounded.full}'
+    padding: '6px 14px'
   tab-navigation:
-    backgroundColor: "{colors.light-surface}"
-    textColor: "{colors.muted-light}"
-    height: "56px"
+    backgroundColor: '{colors.light-surface}'
+    textColor: '{colors.muted-light}'
+    height: '56px'
 ---
 
 # Design System: Lexa

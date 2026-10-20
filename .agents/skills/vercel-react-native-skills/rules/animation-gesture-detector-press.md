@@ -19,14 +19,14 @@ import { Pressable } from 'react-native'
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withTiming,
+  withTiming
 } from 'react-native-reanimated'
 
 function AnimatedButton({ onPress }: { onPress: () => void }) {
   const scale = useSharedValue(1)
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
+    transform: [{ scale: scale.value }]
   }))
 
   return (
@@ -52,7 +52,7 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
   interpolate,
-  runOnJS,
+  runOnJS
 } from 'react-native-reanimated'
 
 function AnimatedButton({ onPress }: { onPress: () => void }) {
@@ -73,8 +73,8 @@ function AnimatedButton({ onPress }: { onPress: () => void }) {
   // Derive visual values from the state
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
-      { scale: interpolate(withTiming(pressed.get()), [0, 1], [1, 0.95]) },
-    ],
+      { scale: interpolate(withTiming(pressed.get()), [0, 1], [1, 0.95]) }
+    ]
   }))
 
   return (

@@ -25,7 +25,7 @@ function DomainSearch() {
   const domains = tlds.map((tld) => ({
     domain: `${keyword}.${tld.name}`,
     tld: tld.name,
-    price: tld.price,
+    price: tld.price
   }))
 
   return (

@@ -6,6 +6,7 @@
 ## Estado: IMPLEMENTADO (núcleo) — 2026-06-04
 
 **Construido** (migraciones `019`–`021`, `src/features/chat`, `src/features/clubs`, rutas):
+
 - DM 1:1 con **solicitudes de mensaje** (seguidores mutuos → directo; resto → bandeja Solicitudes; aceptar/rechazar), **reply citado**, editar/borrar propio, read receipts + no leídos, realtime (Postgres Changes), reportar mensaje, bloqueo enforced en RLS.
 - Clubes: crear (público/privado), unirse/solicitar/aceptar invitación/salir, roles owner/mod (+ RPCs de moderación: aprobar, banear, rol), **chat grupal** del club, reportar club, descubrir/mis clubes.
 - Compliance: reportar (`message`/`club`), cascada de borrado por FK, export incluye mensajes, prefs `push_dm`/`push_club` + `send-push` actualizado.
@@ -21,13 +22,13 @@
 
 ## Decisiones de producto (fijadas)
 
-| Tema | Decisión |
-|------|----------|
-| **DMs — acceso** | *Solicitudes de mensaje*: seguidores mutuos chatean directo; un no-seguidor cae en bandeja de **Solicitudes** del receptor (aceptar/ignorar/bloquear). |
-| **Responder mensajes** | Sí — **reply citado** a un mensaje concreto (estilo Discord/WhatsApp), en DMs y clubes. |
-| **Clubes — chat** | Chat grupal + **hilos de discusión** (libro del mes, por capítulo, con aviso de spoilers). |
-| **Clubes — entrada** | Público abierto (unirse al instante) **o** privado por invitación/aprobación (no aparece en búsqueda). |
-| **Alcance ahora** | DM **1:1** + clubes con chat. DMs de grupo: esquema preparado, UI después. |
+| Tema                   | Decisión                                                                                                                                               |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **DMs — acceso**       | _Solicitudes de mensaje_: seguidores mutuos chatean directo; un no-seguidor cae en bandeja de **Solicitudes** del receptor (aceptar/ignorar/bloquear). |
+| **Responder mensajes** | Sí — **reply citado** a un mensaje concreto (estilo Discord/WhatsApp), en DMs y clubes.                                                                |
+| **Clubes — chat**      | Chat grupal + **hilos de discusión** (libro del mes, por capítulo, con aviso de spoilers).                                                             |
+| **Clubes — entrada**   | Público abierto (unirse al instante) **o** privado por invitación/aprobación (no aparece en búsqueda).                                                 |
+| **Alcance ahora**      | DM **1:1** + clubes con chat. DMs de grupo: esquema preparado, UI después.                                                                             |
 
 ---
 
@@ -62,7 +63,9 @@ club_topics (id, club_id, title, kind 'general'|'book_discussion',
   (`least/greatest` de los dos `user_id`) en una tabla `dm_pairs(conversation_id, user_low, user_high UNIQUE)` o `unique(conversation_id)` derivado — evita conversaciones duplicadas.
 
 ### Roles de club
+
 `reading_club_members` hoy solo tiene pertenencia. Añadir:
+
 - `role enum 'owner'|'moderator'|'member'` (default member; `owner` = `created_by`).
 - `state enum 'active'|'pending'|'invited'|'banned'` (público abierto → `active`; privado → `invited`/`pending`).
 - `last_read_at timestamptz` (read-state del chat de club).
@@ -83,15 +86,16 @@ is_conversation_member(conv) -- ¿auth.uid() pertenece y está 'active'?
                              -- DM: fila en conversation_members; Club: reading_club_members.state='active'
 ```
 
-| Tabla | SELECT | INSERT | UPDATE/DELETE |
-|-------|--------|--------|---------------|
-| `conversations` | miembro de la conversación | ver §3 (creación de DM) | — |
-| `messages` | `is_conversation_member(conversation_id)` **y NOT `is_blocked_with(sender_id)`** (oculta mensajes de bloqueados en ambos sentidos, incluso dentro de un club) | `sender_id = auth.uid()` ∧ miembro activo ∧ conversación no cerrada ∧ (DM no bloqueado) | solo el autor edita/borra; owner/mod del club soft-borra ajenos |
-| `conversation_members` | el propio usuario | al crear DM (§3) | el propio: `last_read_at`, `muted`, `archived` |
-| `reading_club_members` | miembros del club | público→self `active`; privado→`pending`/solo invitación | owner/mod gestionan; self puede salir |
-| `club_topics` | miembros del club | owner/mod | owner/mod |
+| Tabla                  | SELECT                                                                                                                                                        | INSERT                                                                                  | UPDATE/DELETE                                                   |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| `conversations`        | miembro de la conversación                                                                                                                                    | ver §3 (creación de DM)                                                                 | —                                                               |
+| `messages`             | `is_conversation_member(conversation_id)` **y NOT `is_blocked_with(sender_id)`** (oculta mensajes de bloqueados en ambos sentidos, incluso dentro de un club) | `sender_id = auth.uid()` ∧ miembro activo ∧ conversación no cerrada ∧ (DM no bloqueado) | solo el autor edita/borra; owner/mod del club soft-borra ajenos |
+| `conversation_members` | el propio usuario                                                                                                                                             | al crear DM (§3)                                                                        | el propio: `last_read_at`, `muted`, `archived`                  |
+| `reading_club_members` | miembros del club                                                                                                                                             | público→self `active`; privado→`pending`/solo invitación                                | owner/mod gestionan; self puede salir                           |
+| `club_topics`          | miembros del club                                                                                                                                             | owner/mod                                                                               | owner/mod                                                       |
 
 **Solicitudes de mensaje (anti-spam/seguridad):**
+
 - Si A y B se siguen mutuamente → al crear el DM, `request_state='open'`.
 - Si no → `request_state='pending'`, `requested_by=A`. B ve el hilo en **Solicitudes**.
   A puede enviar (límite: p. ej. ≤3 mensajes) hasta que B acepte; B no recibe push
@@ -120,6 +124,7 @@ de la DB, escala mejor) cuando el volumen lo pida — la persistencia sigue sien
 Features nuevas: `src/features/chat/` (DMs) y `src/features/clubs/`.
 
 **Rutas (`app/`, solo routing):**
+
 ```
 app/messages/index.tsx              # inbox: conversaciones + pestaña 'Solicitudes'
 app/messages/[conversationId].tsx   # hilo de DM
@@ -128,6 +133,7 @@ app/club/[slug].tsx                 # club: chat general + lista de hilos + miem
 app/club/[slug]/topic/[topicId].tsx # hilo de discusión
 app/club/new.tsx                    # crear club
 ```
+
 Entrada al inbox: ícono en el header del feed (o tab dedicada si crece el uso).
 
 **Datos:** historial con `useInfiniteQuery` + cursor `(created_at, id)` (CLAUDE §6);
@@ -167,31 +173,31 @@ El chat dispara requisitos de UGC de App Store/Play:
 
 ## 7. Matriz de features ("que no se sientan limitados")
 
-| Feature | DM | Club | Fase |
-|---------|:--:|:----:|:----:|
-| Enviar / recibir texto en realtime | ✓ | ✓ | 1 / 2 |
-| **Responder a mensaje (reply citado)** | ✓ | ✓ | 1 / 2 |
-| Solicitudes de mensaje (anti-spam) | ✓ | — | 1 |
-| Editar / borrar propio (soft) | ✓ | ✓ | 1 / 2 |
-| Read receipts (`last_read_at`) + no leídos | ✓ | ✓ | 1 / 2 |
-| Typing indicator / presencia | ✓ | ✓ | 1 / 3 |
-| Mute / archivar / salir | ✓ | ✓ | 1 / 2 |
-| Reportar + bloqueo enforced | ✓ | ✓ | 1 / 2 |
-| Roles (owner/mod) + moderación | — | ✓ | 2 |
-| Hilos de discusión (libro/capítulo) + spoiler-gate | — | ✓ | 3 |
-| @menciones | — | ✓ | 3 |
-| Reacciones emoji | ✓ | ✓ | 4 |
-| Adjuntar imágenes (Supabase Storage) | ✓ | ✓ | 4 |
-| Búsqueda en mensajes | ✓ | ✓ | 4 |
-| DMs de grupo | — | — | 4 |
+| Feature                                            | DM  | Club | Fase  |
+| -------------------------------------------------- | :-: | :--: | :---: |
+| Enviar / recibir texto en realtime                 |  ✓  |  ✓   | 1 / 2 |
+| **Responder a mensaje (reply citado)**             |  ✓  |  ✓   | 1 / 2 |
+| Solicitudes de mensaje (anti-spam)                 |  ✓  |  —   |   1   |
+| Editar / borrar propio (soft)                      |  ✓  |  ✓   | 1 / 2 |
+| Read receipts (`last_read_at`) + no leídos         |  ✓  |  ✓   | 1 / 2 |
+| Typing indicator / presencia                       |  ✓  |  ✓   | 1 / 3 |
+| Mute / archivar / salir                            |  ✓  |  ✓   | 1 / 2 |
+| Reportar + bloqueo enforced                        |  ✓  |  ✓   | 1 / 2 |
+| Roles (owner/mod) + moderación                     |  —  |  ✓   |   2   |
+| Hilos de discusión (libro/capítulo) + spoiler-gate |  —  |  ✓   |   3   |
+| @menciones                                         |  —  |  ✓   |   3   |
+| Reacciones emoji                                   |  ✓  |  ✓   |   4   |
+| Adjuntar imágenes (Supabase Storage)               |  ✓  |  ✓   |   4   |
+| Búsqueda en mensajes                               |  ✓  |  ✓   |   4   |
+| DMs de grupo                                       |  —  |  —   |   4   |
 
 ---
 
 ## 8. Plan de entrega por fases
 
 1. **Núcleo de mensajería + DM 1:1.** `conversations`/`messages`/`conversation_members`
-   + RLS + helpers + solicitudes de mensaje + reply citado + inbox + realtime (postgres
-   changes) + reportar mensaje + bloqueo + export/borrado. *Es el cimiento de todo.*
+   - RLS + helpers + solicitudes de mensaje + reply citado + inbox + realtime (postgres
+     changes) + reportar mensaje + bloqueo + export/borrado. _Es el cimiento de todo._
 2. **Clubes base.** Roles y `state` en `reading_club_members`; alta/baja (público abierto
    vs privado por invitación/aprobación); chat grupal (topic general) reusando el núcleo;
    descubrimiento de clubes; moderación de club.

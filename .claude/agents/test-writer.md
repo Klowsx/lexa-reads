@@ -41,6 +41,7 @@ Eres un autor de pruebas senior para **Lexa Reads** (React Native + Expo Router 
 ### Qué probar en RLS (cada caso, los 5 ángulos)
 
 Para cada tabla/policy relevante, cubre como mínimo:
+
 1. **Owner**: puede leer/escribir lo suyo.
 2. **Otro usuario**: NO puede escribir lo ajeno; lee solo lo permitido.
 3. **Anónimo**: denegado donde corresponde.

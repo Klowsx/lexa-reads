@@ -1,24 +1,24 @@
-import { useEffect, useRef } from 'react';
-import { Animated, Pressable } from 'react-native';
-import { useColors } from '~/theme/colors';
+import { useEffect, useRef } from 'react'
+import { Animated, Pressable } from 'react-native'
+import { useColors } from '~/theme/colors'
 
 interface Props {
-  on: boolean;
-  onChange: (v: boolean) => void;
-  disabled?: boolean;
+  on: boolean
+  onChange: (v: boolean) => void
+  disabled?: boolean
 }
 
 export function SettingsToggle({ on, onChange, disabled }: Props) {
-  const c = useColors();
-  const anim = useRef(new Animated.Value(on ? 1 : 0)).current;
+  const c = useColors()
+  const anim = useRef(new Animated.Value(on ? 1 : 0)).current
 
   useEffect(() => {
     Animated.timing(anim, {
       toValue: on ? 1 : 0,
       duration: 200,
-      useNativeDriver: false,
-    }).start();
-  }, [on]);
+      useNativeDriver: false
+    }).start()
+  }, [on])
 
   return (
     <Pressable
@@ -29,7 +29,7 @@ export function SettingsToggle({ on, onChange, disabled }: Props) {
         height: 26,
         backgroundColor: on ? c.accent : c.sh,
         borderColor: on ? c.accent : c.border,
-        opacity: disabled ? 0.45 : 1,
+        opacity: disabled ? 0.45 : 1
       }}
     >
       <Animated.View
@@ -43,9 +43,9 @@ export function SettingsToggle({ on, onChange, disabled }: Props) {
           shadowOpacity: 0.3,
           shadowRadius: 2,
           shadowOffset: { width: 0, height: 1 },
-          elevation: 3,
+          elevation: 3
         }}
       />
     </Pressable>
-  );
+  )
 }

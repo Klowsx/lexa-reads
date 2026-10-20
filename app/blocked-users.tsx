@@ -1,24 +1,24 @@
-import { useRouter } from 'expo-router';
-import { ChevronLeft, ShieldOff } from 'lucide-react-native';
-import { Alert, Pressable, Text, View } from 'react-native';
-import { FlashList } from '@shopify/flash-list';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Avatar } from '~/components/ui/Avatar';
-import { useBlockedUsers } from '~/features/user/hooks/useBlockedUsers';
-import { useBlockUser } from '~/features/user/hooks/useBlockUser';
-import type { BlockedUser } from '~/features/user/user.queries';
-import { useAuthStore } from '~/stores/auth.store';
-import { useColors } from '~/theme/colors';
+import { useRouter } from 'expo-router'
+import { ChevronLeft, ShieldOff } from 'lucide-react-native'
+import { Alert, Pressable, Text, View } from 'react-native'
+import { FlashList } from '@shopify/flash-list'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Avatar } from '~/components/ui/Avatar'
+import { useBlockedUsers } from '~/features/user/hooks/useBlockedUsers'
+import { useBlockUser } from '~/features/user/hooks/useBlockUser'
+import type { BlockedUser } from '~/features/user/user.queries'
+import { useAuthStore } from '~/stores/auth.store'
+import { useColors } from '~/theme/colors'
 
 const alpha = (hex: string, op: number) => {
-  const n = parseInt(hex.replace('#', ''), 16);
-  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})`;
-};
+  const n = parseInt(hex.replace('#', ''), 16)
+  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})`
+}
 
 function BlockedUserRow({ item }: { item: BlockedUser }) {
-  const c = useColors();
-  const currentUserId = useAuthStore((s) => s.user?.id) ?? '';
-  const { unblock } = useBlockUser(item.blocked.id, item.blocked.username);
+  const c = useColors()
+  const currentUserId = useAuthStore((s) => s.user?.id) ?? ''
+  const { unblock } = useBlockUser(item.blocked.id, item.blocked.username)
 
   function handleUnblock() {
     Alert.alert(
@@ -26,15 +26,13 @@ function BlockedUserRow({ item }: { item: BlockedUser }) {
       `¿Desbloquear a @${item.blocked.username}? Podrá volver a ver tu perfil y seguirte.`,
       [
         { text: 'Cancelar', style: 'cancel' },
-        { text: 'Desbloquear', onPress: () => unblock.mutate() },
-      ],
-    );
+        { text: 'Desbloquear', onPress: () => unblock.mutate() }
+      ]
+    )
   }
 
   return (
-    <View
-      className="flex-row items-center px-4 py-3.5 gap-3 border-b border-border"
-    >
+    <View className="flex-row items-center px-4 py-3.5 gap-3 border-b border-border">
       <Avatar
         displayName={item.blocked.display_name ?? item.blocked.username}
         username={item.blocked.username}
@@ -57,22 +55,20 @@ function BlockedUserRow({ item }: { item: BlockedUser }) {
         className="px-3.5 py-2 rounded-full border"
         style={{
           backgroundColor: alpha(c.error, 0.07),
-          borderColor: alpha(c.error, 0.25),
+          borderColor: alpha(c.error, 0.25)
         }}
       >
-        <Text className="text-xs font-body-sb text-error">
-          Desbloquear
-        </Text>
+        <Text className="text-xs font-body-sb text-error">Desbloquear</Text>
       </Pressable>
     </View>
-  );
+  )
 }
 
 export default function BlockedUsersScreen() {
-  const insets = useSafeAreaInsets();
-  const router = useRouter();
-  const c = useColors();
-  const { data: blocked = [], isLoading } = useBlockedUsers();
+  const insets = useSafeAreaInsets()
+  const router = useRouter()
+  const c = useColors()
+  const { data: blocked = [], isLoading } = useBlockedUsers()
 
   return (
     <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
@@ -97,7 +93,8 @@ export default function BlockedUsersScreen() {
             Sin usuarios bloqueados
           </Text>
           <Text className="text-xs font-body text-t3 text-center leading-[20px]">
-            Los usuarios que bloquees aparecerán aquí. Podrán seguir usando la app, pero no podrán interactuar contigo.
+            Los usuarios que bloquees aparecerán aquí. Podrán seguir usando la
+            app, pero no podrán interactuar contigo.
           </Text>
         </View>
       ) : (
@@ -105,7 +102,9 @@ export default function BlockedUsersScreen() {
           {blocked.length > 0 && (
             <Text className="text-xs font-body text-t3 px-4 pt-3 pb-1">
               {blocked.length}{' '}
-              {blocked.length === 1 ? 'usuario bloqueado' : 'usuarios bloqueados'}
+              {blocked.length === 1
+                ? 'usuario bloqueado'
+                : 'usuarios bloqueados'}
             </Text>
           )}
           <FlashList
@@ -118,5 +117,5 @@ export default function BlockedUsersScreen() {
         </>
       )}
     </View>
-  );
+  )
 }

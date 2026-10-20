@@ -1,6 +1,7 @@
 # Archivos de asociación de deep links (A-3)
 
 `app.json` declara universal links / app links a `lexareads.app`:
+
 - iOS: `associatedDomains: ["applinks:lexareads.app"]`
 - Android: intent filters `https://lexareads.app/{book,user,list}`
 
@@ -8,7 +9,7 @@ Para que los links abran la app (en vez de fallar en silencio), estos dos
 archivos **deben estar publicados en el dominio** `lexareads.app`, servidos por
 HTTPS, con `Content-Type: application/json` y **sin redirecciones**:
 
-- `https://lexareads.app/.well-known/apple-app-site-association`  (sin extensión)
+- `https://lexareads.app/.well-known/apple-app-site-association` (sin extensión)
 - `https://lexareads.app/.well-known/assetlinks.json`
 
 ## Pendiente antes del submit

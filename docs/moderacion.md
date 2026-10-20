@@ -32,10 +32,10 @@ Los usuarios crean reportes desde la app (`ReportSheet` → `useCreateReport`) s
 1. Studio → Table Editor → `reports`, filtrar `status = pending`, ordenar por
    `created_at` ascendente (los más viejos primero).
 2. Para cada fila, inspeccionar el contenido objetivo:
-   - `target_type = review`   → tabla `reviews`, `id = target_id`
-   - `target_type = comment`  → tabla `comments`
-   - `target_type = user`     → tabla `users`
-   - `target_type = list`     → tabla `lists`
+   - `target_type = review` → tabla `reviews`, `id = target_id`
+   - `target_type = comment` → tabla `comments`
+   - `target_type = user` → tabla `users`
+   - `target_type = list` → tabla `lists`
    - `target_type = activity` → tabla `activity_feed`
 3. Decidir y actuar (ver abajo).
 4. Cerrar el reporte:
@@ -92,5 +92,5 @@ FROM reports;
 ## Pendiente recomendado
 
 - Alerta automática (cron/Edge Function) que avise si hay un `pending` con
-  `created_at` de hace más de, p. ej., 12h — margen para no incumplir el SLA.
+`created_at` de hace más de, p. ej., 12h — margen para no incumplir el SLA.
 </content>

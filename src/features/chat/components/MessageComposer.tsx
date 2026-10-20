@@ -1,22 +1,28 @@
-import { Send, X } from "lucide-react-native";
-import { useRef } from "react";
-import { ActivityIndicator, Pressable, Text, TextInput, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useColors } from "~/theme/colors";
-import type { ChatMessage } from "../chat.queries";
+import { Send, X } from 'lucide-react-native'
+import { useRef } from 'react'
+import {
+  ActivityIndicator,
+  Pressable,
+  Text,
+  TextInput,
+  View
+} from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useColors } from '~/theme/colors'
+import type { ChatMessage } from '../chat.queries'
 
-const MAX_MESSAGE_LENGTH = 4000;
+const MAX_MESSAGE_LENGTH = 4000
 
 type Props = {
-  value: string;
-  onChangeText: (t: string) => void;
-  onSend: () => void;
-  sending: boolean;
-  replyTo: ChatMessage | null;
-  onCancelReply: () => void;
-  disabled?: boolean;
-  disabledHint?: string;
-};
+  value: string
+  onChangeText: (t: string) => void
+  onSend: () => void
+  sending: boolean
+  replyTo: ChatMessage | null
+  onCancelReply: () => void
+  disabled?: boolean
+  disabledHint?: string
+}
 
 export function MessageComposer({
   value,
@@ -26,12 +32,12 @@ export function MessageComposer({
   replyTo,
   onCancelReply,
   disabled,
-  disabledHint,
+  disabledHint
 }: Props) {
-  const c = useColors();
-  const insets = useSafeAreaInsets();
-  const inputRef = useRef<TextInput>(null);
-  const canSend = !!value.trim() && !sending && !disabled;
+  const c = useColors()
+  const insets = useSafeAreaInsets()
+  const inputRef = useRef<TextInput>(null)
+  const canSend = !!value.trim() && !sending && !disabled
 
   if (disabled && disabledHint) {
     return (
@@ -39,22 +45,37 @@ export function MessageComposer({
         className="border-t border-border bg-surface px-4"
         style={{ paddingBottom: insets.bottom + 12, paddingTop: 12 }}
       >
-        <Text className="text-xs font-body text-t3 text-center">{disabledHint}</Text>
+        <Text className="text-xs font-body text-t3 text-center">
+          {disabledHint}
+        </Text>
       </View>
-    );
+    )
   }
 
   return (
-    <View className="border-t border-border bg-surface" style={{ paddingBottom: insets.bottom + 8 }}>
+    <View
+      className="border-t border-border bg-surface"
+      style={{ paddingBottom: insets.bottom + 8 }}
+    >
       {replyTo && (
         <View className="flex-row items-center gap-2 px-4 pt-2">
-          <View className="flex-1 pl-2" style={{ borderLeftWidth: 2, borderLeftColor: c.accent }}>
-            <Text className="text-[11px] font-body-sb text-accent">Respondiendo</Text>
+          <View
+            className="flex-1 pl-2"
+            style={{ borderLeftWidth: 2, borderLeftColor: c.accent }}
+          >
+            <Text className="text-[11px] font-body-sb text-accent">
+              Respondiendo
+            </Text>
             <Text numberOfLines={1} className="text-[11px] font-body text-t2">
               {replyTo.body}
             </Text>
           </View>
-          <Pressable onPress={onCancelReply} hitSlop={8} accessibilityRole="button" accessibilityLabel="Cancelar respuesta">
+          <Pressable
+            onPress={onCancelReply}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel="Cancelar respuesta"
+          >
             <X size={16} color={c.t3} strokeWidth={1.8} />
           </Pressable>
         </View>
@@ -87,5 +108,5 @@ export function MessageComposer({
         </Pressable>
       </View>
     </View>
-  );
+  )
 }

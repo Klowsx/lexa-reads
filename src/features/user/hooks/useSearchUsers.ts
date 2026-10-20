@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
-import { searchUsersQueryOptions } from "../user.queries";
+import { useQuery } from '@tanstack/react-query'
+import { searchUsersQueryOptions } from '../user.queries'
 
 export function useSearchUsers(q: string) {
-  return useQuery(searchUsersQueryOptions(q));
+  return useQuery(searchUsersQueryOptions(q))
 }

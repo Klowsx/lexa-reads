@@ -1,11 +1,17 @@
-import { Lock, Users } from "lucide-react-native";
-import { Pressable, Text, View } from "react-native";
-import { Image } from "expo-image";
-import { useColors } from "~/theme/colors";
-import type { ClubListItem } from "../clubs.queries";
+import { Lock, Users } from 'lucide-react-native'
+import { Pressable, Text, View } from 'react-native'
+import { Image } from 'expo-image'
+import { useColors } from '~/theme/colors'
+import type { ClubListItem } from '../clubs.queries'
 
-export function ClubCard({ club, onPress }: { club: ClubListItem; onPress: () => void }) {
-  const c = useColors();
+export function ClubCard({
+  club,
+  onPress
+}: {
+  club: ClubListItem
+  onPress: () => void
+}) {
+  const c = useColors()
   return (
     <Pressable
       onPress={onPress}
@@ -29,7 +35,9 @@ export function ClubCard({ club, onPress }: { club: ClubListItem; onPress: () =>
           <Text className="text-sm font-body-sb text-text" numberOfLines={1}>
             {club.name}
           </Text>
-          {club.visibility === "private" && <Lock size={12} color={c.t3} strokeWidth={2} />}
+          {club.visibility === 'private' && (
+            <Lock size={12} color={c.t3} strokeWidth={2} />
+          )}
         </View>
         {club.description && (
           <Text className="text-xs font-body text-t2 mt-0.5" numberOfLines={2}>
@@ -39,10 +47,11 @@ export function ClubCard({ club, onPress }: { club: ClubListItem; onPress: () =>
         <View className="flex-row items-center gap-1 mt-1">
           <Users size={11} color={c.t3} strokeWidth={1.8} />
           <Text className="text-[11px] font-body text-t3">
-            {club.members_count} {club.members_count === 1 ? "miembro" : "miembros"}
+            {club.members_count}{' '}
+            {club.members_count === 1 ? 'miembro' : 'miembros'}
           </Text>
         </View>
       </View>
     </Pressable>
-  );
+  )
 }

@@ -1,5 +1,5 @@
-import { View } from "react-native";
-import { Skeleton } from "~/components/ui/Skeleton";
+import { View } from 'react-native'
+import { Skeleton } from '~/components/ui/Skeleton'
 
 function FeedCardSkeleton() {
   return (
@@ -17,7 +17,7 @@ function FeedCardSkeleton() {
         <Skeleton width="60%" height={12} />
       </View>
     </View>
-  );
+  )
 }
 
 /** Skeleton del feed (UX-2). */
@@ -27,5 +27,5 @@ export function FeedSkeleton() {
       <FeedCardSkeleton />
       <FeedCardSkeleton />
     </View>
-  );
+  )
 }

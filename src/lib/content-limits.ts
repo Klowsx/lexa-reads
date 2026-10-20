@@ -3,6 +3,6 @@
 // sincronizados. El cliente valida para dar feedback inmediato; la DB es la
 // garantía real.
 
-export const MAX_COMMENT_LENGTH = 2000;
-export const MAX_REVIEW_LENGTH = 10000;
-export const MAX_BIO_LENGTH = 300;
+export const MAX_COMMENT_LENGTH = 2000
+export const MAX_REVIEW_LENGTH = 10000
+export const MAX_BIO_LENGTH = 300

@@ -1,6 +1,6 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { messagesInfiniteOptions } from "../chat.queries";
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { messagesInfiniteOptions } from '../chat.queries'
 
 export function useMessages(conversationId: string) {
-  return useInfiniteQuery(messagesInfiniteOptions(conversationId));
+  return useInfiniteQuery(messagesInfiniteOptions(conversationId))
 }

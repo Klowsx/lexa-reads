@@ -29,9 +29,21 @@
           "action": "VIEW",
           "autoVerify": true,
           "data": [
-            { "scheme": "https", "host": "lexareads.app", "pathPrefix": "/book" },
-            { "scheme": "https", "host": "lexareads.app", "pathPrefix": "/user" },
-            { "scheme": "https", "host": "lexareads.app", "pathPrefix": "/list" }
+            {
+              "scheme": "https",
+              "host": "lexareads.app",
+              "pathPrefix": "/book"
+            },
+            {
+              "scheme": "https",
+              "host": "lexareads.app",
+              "pathPrefix": "/user"
+            },
+            {
+              "scheme": "https",
+              "host": "lexareads.app",
+              "pathPrefix": "/list"
+            }
           ],
           "category": ["BROWSABLE", "DEFAULT"]
         }

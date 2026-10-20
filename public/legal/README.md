@@ -5,13 +5,13 @@ que los enlaces de la app (registro + Ajustes → Legal) funcionen.
 
 ## Mapa URL → archivo
 
-| URL (en `app/`)                  | Archivo                       | Estado |
-|----------------------------------|-------------------------------|--------|
-| `https://lexareads.app/terms`    | `terms.md`                    | plantilla |
-| `https://lexareads.app/eula`     | `eula.md`                     | plantilla |
-| `https://lexareads.app/community`| `community-guidelines.md`     | plantilla |
-| `https://lexareads.app/privacy`  | *(documento de privacidad)*   | pendiente — no está en el repo |
-| `https://lexareads.app/licenses` | *(licencias OSS)*             | pendiente |
+| URL (en `app/`)                   | Archivo                     | Estado                         |
+| --------------------------------- | --------------------------- | ------------------------------ |
+| `https://lexareads.app/terms`     | `terms.md`                  | plantilla                      |
+| `https://lexareads.app/eula`      | `eula.md`                   | plantilla                      |
+| `https://lexareads.app/community` | `community-guidelines.md`   | plantilla                      |
+| `https://lexareads.app/privacy`   | _(documento de privacidad)_ | pendiente — no está en el repo |
+| `https://lexareads.app/licenses`  | _(licencias OSS)_           | pendiente                      |
 
 ## Antes del submit (bloqueante de tiendas)
 

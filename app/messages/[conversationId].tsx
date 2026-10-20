@@ -1,46 +1,56 @@
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { ChevronLeft } from "lucide-react-native";
-import { Pressable, Text, View } from "react-native";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Avatar } from "~/components/ui/Avatar";
-import { ChatThread } from "~/features/chat/components/ChatThread";
-import { conversationMetaQueryOptions } from "~/features/chat/chat.queries";
-import { useRespondMessageRequest } from "~/features/chat/hooks/useRespondMessageRequest";
-import { useAuthStore } from "~/stores/auth.store";
-import { useColors } from "~/theme/colors";
+import { useLocalSearchParams, useRouter } from 'expo-router'
+import { ChevronLeft } from 'lucide-react-native'
+import { Pressable, Text, View } from 'react-native'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { Avatar } from '~/components/ui/Avatar'
+import { ChatThread } from '~/features/chat/components/ChatThread'
+import { conversationMetaQueryOptions } from '~/features/chat/chat.queries'
+import { useRespondMessageRequest } from '~/features/chat/hooks/useRespondMessageRequest'
+import { useAuthStore } from '~/stores/auth.store'
+import { useColors } from '~/theme/colors'
 
 export default function DMThreadScreen() {
-  const { conversationId } = useLocalSearchParams<{ conversationId: string }>();
-  const convId = conversationId ?? "";
-  const userId = useAuthStore((s) => s.user?.id) ?? "";
-  const router = useRouter();
-  const c = useColors();
-  const queryClient = useQueryClient();
+  const { conversationId } = useLocalSearchParams<{ conversationId: string }>()
+  const convId = conversationId ?? ''
+  const userId = useAuthStore((s) => s.user?.id) ?? ''
+  const router = useRouter()
+  const c = useColors()
+  const queryClient = useQueryClient()
 
-  const metaQuery = useQuery(conversationMetaQueryOptions(convId, userId));
-  const respond = useRespondMessageRequest();
-  const meta = metaQuery.data;
-  const other = meta?.other;
-  const isPendingRecipient = meta?.isPendingRecipient ?? false;
+  const metaQuery = useQuery(conversationMetaQueryOptions(convId, userId))
+  const respond = useRespondMessageRequest()
+  const meta = metaQuery.data
+  const other = meta?.other
+  const isPendingRecipient = meta?.isPendingRecipient ?? false
 
   function accept() {
     respond.mutate(
       { conversationId: convId, accept: true },
       {
         onSuccess: () =>
-          queryClient.invalidateQueries({ queryKey: ["conversation-meta", convId, userId] }),
-      },
-    );
+          queryClient.invalidateQueries({
+            queryKey: ['conversation-meta', convId, userId]
+          })
+      }
+    )
   }
 
   function reject() {
-    respond.mutate({ conversationId: convId, accept: false }, { onSuccess: () => router.back() });
+    respond.mutate(
+      { conversationId: convId, accept: false },
+      { onSuccess: () => router.back() }
+    )
   }
 
   const header = (
     <View>
       <View className="px-4 py-2.5 border-b border-border flex-row items-center gap-2.5">
-        <Pressable hitSlop={8} onPress={() => router.back()} accessibilityRole="button" accessibilityLabel="Volver">
+        <Pressable
+          hitSlop={8}
+          onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel="Volver"
+        >
           <ChevronLeft size={24} color={c.t3} strokeWidth={1.6} />
         </Pressable>
         {other && (
@@ -56,7 +66,10 @@ export default function DMThreadScreen() {
               avatarUrl={other.avatar_url ?? undefined}
               size={34}
             />
-            <Text className="font-display-sb text-lg text-text tracking-tight" numberOfLines={1}>
+            <Text
+              className="font-display-sb text-lg text-text tracking-tight"
+              numberOfLines={1}
+            >
               {other.display_name ?? other.username}
             </Text>
           </Pressable>
@@ -66,7 +79,8 @@ export default function DMThreadScreen() {
       {isPendingRecipient && (
         <View className="px-4 py-3 border-b border-border bg-surface gap-2">
           <Text className="text-xs font-body text-t2 text-center">
-            {other?.display_name ?? other?.username ?? "Este usuario"} quiere enviarte mensajes.
+            {other?.display_name ?? other?.username ?? 'Este usuario'} quiere
+            enviarte mensajes.
           </Text>
           <View className="flex-row gap-2">
             <Pressable
@@ -91,7 +105,7 @@ export default function DMThreadScreen() {
         </View>
       )}
     </View>
-  );
+  )
 
   return (
     <ChatThread
@@ -100,5 +114,5 @@ export default function DMThreadScreen() {
       canSend={!isPendingRecipient}
       disabledHint="Acepta la solicitud para responder."
     />
-  );
+  )
 }

@@ -1,14 +1,14 @@
-import { Pressable, Text, View } from "react-native";
-import { Avatar } from "~/components/ui/Avatar";
-import { formatRelativeTime } from "~/lib/utils";
-import type { ConversationListItem } from "../chat.queries";
+import { Pressable, Text, View } from 'react-native'
+import { Avatar } from '~/components/ui/Avatar'
+import { formatRelativeTime } from '~/lib/utils'
+import type { ConversationListItem } from '../chat.queries'
 
 export function ConversationRow({
   item,
-  onPress,
+  onPress
 }: {
-  item: ConversationListItem;
-  onPress: () => void;
+  item: ConversationListItem
+  onPress: () => void
 }) {
   return (
     <Pressable
@@ -36,18 +36,20 @@ export function ConversationRow({
         </View>
         <View className="flex-row items-center justify-between gap-2">
           <Text
-            className={`flex-1 text-xs font-body ${item.unread > 0 ? "text-text" : "text-t3"}`}
+            className={`flex-1 text-xs font-body ${item.unread > 0 ? 'text-text' : 'text-t3'}`}
             numberOfLines={1}
           >
-            {item.lastMessage ?? "Sin mensajes aún"}
+            {item.lastMessage ?? 'Sin mensajes aún'}
           </Text>
           {item.unread > 0 && (
             <View className="rounded-full bg-accent min-w-[18px] h-[18px] items-center justify-center px-1.5">
-              <Text className="text-[10px] font-body-sb text-white">{item.unread}</Text>
+              <Text className="text-[10px] font-body-sb text-white">
+                {item.unread}
+              </Text>
             </View>
           )}
         </View>
       </View>
     </Pressable>
-  );
+  )
 }

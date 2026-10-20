@@ -1,5 +1,5 @@
-import { View } from "react-native";
-import { Skeleton } from "~/components/ui/Skeleton";
+import { View } from 'react-native'
+import { Skeleton } from '~/components/ui/Skeleton'
 
 /** Skeleton del detalle de libro (UX-2): hero + barra CTA + bloque de texto. */
 export function BookSkeleton() {
@@ -39,5 +39,5 @@ export function BookSkeleton() {
         <Skeleton width="70%" height={12} />
       </View>
     </View>
-  );
+  )
 }

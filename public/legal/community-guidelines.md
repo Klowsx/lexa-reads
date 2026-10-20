@@ -7,6 +7,7 @@ normas a **todo** el contenido: reseñas, comentarios, listas, perfiles, nombres
 de usuario, mensajes directos (DMs) y chats de club.
 
 ## Tolerancia cero
+
 No se permite y se elimina (y puede costar la cuenta):
 
 - **Acoso e intimidación**: ataques dirigidos, amenazas, doxxing.
@@ -20,11 +21,13 @@ No se permite y se elimina (y puede costar la cuenta):
 - **Contenido ilegal** o que infrinja derechos de terceros.
 
 ## Qué esperamos
+
 - Critica libros, no ataques a personas.
 - Marca los spoilers (usa el flag de spoiler en reseñas).
 - Respeta la privacidad ajena; no compartas datos personales de otros.
 
 ## Reportar y bloquear
+
 - **Reportar**: usa la opción "Reportar" en reseñas, comentarios, usuarios,
   listas, **mensajes y clubes**.
 - **Bloquear**: bloquea a cualquier usuario desde su perfil; deja de ver e
@@ -33,8 +36,10 @@ No se permite y se elimina (y puede costar la cuenta):
   **en un máximo de 24 horas**.
 
 ## Moderación de clubes
+
 Los dueños y moderadores de un club pueden eliminar mensajes y expulsar
 miembros. El equipo de Lexa puede intervenir sobre cualquier club.
 
 ## Apelaciones / contacto
+
 Si crees que actuamos por error, escríbenos a `<correo de contacto>`.

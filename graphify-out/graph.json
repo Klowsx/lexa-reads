@@ -124,12 +124,7 @@
       {
         "id": "theme_aware_components",
         "label": "Theme-Aware Auth Components",
-        "nodes": [
-          "AuthField",
-          "BookFan",
-          "CodeInput",
-          "StepBar"
-        ],
+        "nodes": ["AuthField", "BookFan", "CodeInput", "StepBar"],
         "relation": "participate_in",
         "confidence": "INFERRED",
         "confidence_score": 0.95,
@@ -8275,12 +8270,7 @@
     {
       "id": "theme_aware_components",
       "label": "Theme-Aware Auth Components",
-      "nodes": [
-        "AuthField",
-        "BookFan",
-        "CodeInput",
-        "StepBar"
-      ],
+      "nodes": ["AuthField", "BookFan", "CodeInput", "StepBar"],
       "relation": "participate_in",
       "confidence": "INFERRED",
       "confidence_score": 0.95,

@@ -60,16 +60,25 @@ Comprehensive performance optimization guide for React Native applications, desi
    - 9.8 [Use Native Modals Over JS-Based Bottom Sheets](#98-use-native-modals-over-js-based-bottom-sheets)
    - 9.9 [Use Pressable Instead of Touchable Components](#99-use-pressable-instead-of-touchable-components)
 10. [Design System](#10-design-system) — **MEDIUM**
-   - 10.1 [Use Compound Components Over Polymorphic Children](#101-use-compound-components-over-polymorphic-children)
+
+- 10.1 [Use Compound Components Over Polymorphic Children](#101-use-compound-components-over-polymorphic-children)
+
 11. [Monorepo](#11-monorepo) — **LOW**
-   - 11.1 [Install Native Dependencies in App Directory](#111-install-native-dependencies-in-app-directory)
-   - 11.2 [Use Single Dependency Versions Across Monorepo](#112-use-single-dependency-versions-across-monorepo)
+
+- 11.1 [Install Native Dependencies in App Directory](#111-install-native-dependencies-in-app-directory)
+- 11.2 [Use Single Dependency Versions Across Monorepo](#112-use-single-dependency-versions-across-monorepo)
+
 12. [Third-Party Dependencies](#12-third-party-dependencies) — **LOW**
-   - 12.1 [Import from Design System Folder](#121-import-from-design-system-folder)
+
+- 12.1 [Import from Design System Folder](#121-import-from-design-system-folder)
+
 13. [JavaScript](#13-javascript) — **LOW**
-   - 13.1 [Hoist Intl Formatter Creation](#131-hoist-intl-formatter-creation)
+
+- 13.1 [Hoist Intl Formatter Creation](#131-hoist-intl-formatter-creation)
+
 14. [Fonts](#14-fonts) — **LOW**
-   - 14.1 [Load fonts natively at build time](#141-load-fonts-natively-at-build-time)
+
+- 14.1 [Load fonts natively at build time](#141-load-fonts-natively-at-build-time)
 
 ---
 
@@ -456,7 +465,7 @@ function DomainSearch() {
   const domains = tlds.map((tld) => ({
     domain: `${keyword}.${tld.name}`,
     tld: tld.name,
-    price: tld.price,
+    price: tld.price
   }))
 
   return (
@@ -732,7 +741,7 @@ function ProductItem({ product }: { product: Product }) {
       <Image
         source={{ uri: thumbnailUrl }}
         style={{ width: 100, height: 100 }}
-        contentFit='cover'
+        contentFit="cover"
       />
       <Text>{product.name}</Text>
     </View>
@@ -875,7 +884,7 @@ import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 function CollapsiblePanel({ expanded }: { expanded: boolean }) {
   const animatedStyle = useAnimatedStyle(() => ({
     height: withTiming(expanded ? 200 : 0), // triggers layout on every frame
-    overflow: 'hidden',
+    overflow: 'hidden'
   }))
 
   return <Animated.View style={animatedStyle}>{children}</Animated.View>
@@ -889,14 +898,14 @@ import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 
 function CollapsiblePanel({ expanded }: { expanded: boolean }) {
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scaleY: withTiming(expanded ? 1 : 0) },
-    ],
-    opacity: withTiming(expanded ? 1 : 0),
+    transform: [{ scaleY: withTiming(expanded ? 1 : 0) }],
+    opacity: withTiming(expanded ? 1 : 0)
   }))
 
   return (
-    <Animated.View style={[{ height: 200, transformOrigin: 'top' }, animatedStyle]}>
+    <Animated.View
+      style={[{ height: 200, transformOrigin: 'top' }, animatedStyle]}
+    >
       {children}
     </Animated.View>
   )
@@ -910,10 +919,8 @@ import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 
 function SlideIn({ visible }: { visible: boolean }) {
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateY: withTiming(visible ? 0 : 100) },
-    ],
-    opacity: withTiming(visible ? 1 : 0),
+    transform: [{ translateY: withTiming(visible ? 0 : 100) }],
+    opacity: withTiming(visible ? 1 : 0)
   }))
 
   return <Animated.View style={animatedStyle}>{children}</Animated.View>
@@ -995,14 +1002,14 @@ import { Pressable } from 'react-native'
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withTiming,
+  withTiming
 } from 'react-native-reanimated'
 
 function AnimatedButton({ onPress }: { onPress: () => void }) {
   const scale = useSharedValue(1)
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
+    transform: [{ scale: scale.value }]
   }))
 
   return (
@@ -1028,7 +1035,7 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
   interpolate,
-  runOnJS,
+  runOnJS
 } from 'react-native-reanimated'
 
 function AnimatedButton({ onPress }: { onPress: () => void }) {
@@ -1049,8 +1056,8 @@ function AnimatedButton({ onPress }: { onPress: () => void }) {
   // Derive visual values from the state
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
-      { scale: interpolate(withTiming(pressed.get()), [0, 1], [1, 0.95]) },
-    ],
+      { scale: interpolate(withTiming(pressed.get()), [0, 1], [1, 0.95]) }
+    ]
   }))
 
   return (
@@ -1094,7 +1101,7 @@ import { useState } from 'react'
 import {
   ScrollView,
   NativeSyntheticEvent,
-  NativeScrollEvent,
+  NativeScrollEvent
 } from 'react-native'
 
 function Feed() {
@@ -1113,7 +1120,7 @@ function Feed() {
 ```tsx
 import Animated, {
   useSharedValue,
-  useAnimatedScrollHandler,
+  useAnimatedScrollHandler
 } from 'react-native-reanimated'
 
 function Feed() {
@@ -1122,7 +1129,7 @@ function Feed() {
   const onScroll = useAnimatedScrollHandler({
     onScroll: (e) => {
       scrollY.value = e.contentOffset.y // runs on UI thread, no re-render
-    },
+    }
   })
 
   return (
@@ -1143,7 +1150,7 @@ import { useRef } from 'react'
 import {
   ScrollView,
   NativeSyntheticEvent,
-  NativeScrollEvent,
+  NativeScrollEvent
 } from 'react-native'
 
 function Feed() {
@@ -1202,8 +1209,8 @@ const Stack = createStackNavigator()
 function App() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name='Home' component={HomeScreen} />
-      <Stack.Screen name='Details' component={DetailsScreen} />
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Details" component={DetailsScreen} />
     </Stack.Navigator>
   )
 }
@@ -1219,8 +1226,8 @@ const Stack = createNativeStackNavigator()
 function App() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name='Home' component={HomeScreen} />
-      <Stack.Screen name='Details' component={DetailsScreen} />
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Details" component={DetailsScreen} />
     </Stack.Navigator>
   )
 }
@@ -1247,8 +1254,8 @@ const Tab = createBottomTabNavigator()
 function App() {
   return (
     <Tab.Navigator>
-      <Tab.Screen name='Home' component={HomeScreen} />
-      <Tab.Screen name='Settings' component={SettingsScreen} />
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Settings" component={SettingsScreen} />
     </Tab.Navigator>
   )
 }
@@ -1265,17 +1272,17 @@ function App() {
   return (
     <Tab.Navigator>
       <Tab.Screen
-        name='Home'
+        name="Home"
         component={HomeScreen}
         options={{
-          tabBarIcon: () => ({ sfSymbol: 'house' }),
+          tabBarIcon: () => ({ sfSymbol: 'house' })
         }}
       />
       <Tab.Screen
-        name='Settings'
+        name="Settings"
         component={SettingsScreen}
         options={{
-          tabBarIcon: () => ({ sfSymbol: 'gear' }),
+          tabBarIcon: () => ({ sfSymbol: 'gear' })
         }}
       />
     </Tab.Navigator>
@@ -1292,13 +1299,13 @@ import { NativeTabs } from 'expo-router/unstable-native-tabs'
 export default function TabLayout() {
   return (
     <NativeTabs>
-      <NativeTabs.Trigger name='index'>
+      <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf='house.fill' md='home' />
+        <NativeTabs.Trigger.Icon sf="house.fill" md="home" />
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name='settings'>
+      <NativeTabs.Trigger name="settings">
         <NativeTabs.Trigger.Label>Settings</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf='gear' md='settings' />
+        <NativeTabs.Trigger.Icon sf="gear" md="settings" />
       </NativeTabs.Trigger>
     </NativeTabs>
   )
@@ -1317,10 +1324,10 @@ behind the translucent tab bar. If you need to disable this, use
 
 ```tsx
 <Stack.Screen
-  name='Profile'
+  name="Profile"
   component={ProfileScreen}
   options={{
-    header: () => <CustomHeader title='Profile' />,
+    header: () => <CustomHeader title="Profile" />
   }}
 />
 ```
@@ -1329,14 +1336,14 @@ behind the translucent tab bar. If you need to disable this, use
 
 ```tsx
 <Stack.Screen
-  name='Profile'
+  name="Profile"
   component={ProfileScreen}
   options={{
     title: 'Profile',
     headerLargeTitleEnabled: true,
     headerSearchBarOptions: {
-      placeholder: 'Search',
-    },
+      placeholder: 'Search'
+    }
   }}
 />
 ```
@@ -1606,7 +1613,7 @@ const tap = Gesture.Tap()
   })
 
 const animatedStyle = useAnimatedStyle(() => ({
-  transform: [{ scale: scale.get() }],
+  transform: [{ scale: scale.get() }]
 }))
 ```
 
@@ -1624,7 +1631,7 @@ const tap = Gesture.Tap()
   })
 
 const animatedStyle = useAnimatedStyle(() => ({
-  transform: [{ scale: interpolate(pressed.get(), [0, 1], [1, 0.95]) }],
+  transform: [{ scale: interpolate(pressed.get(), [0, 1], [1, 0.95]) }]
 }))
 ```
 
@@ -2028,7 +2035,7 @@ import { ScrollView, View, Text } from 'react-native'
 
 function MyScreen() {
   return (
-    <ScrollView contentInsetAdjustmentBehavior='automatic'>
+    <ScrollView contentInsetAdjustmentBehavior="automatic">
       <View>
         <Text>Content</Text>
       </View>
@@ -2262,12 +2269,12 @@ function MyMenu() {
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Content>
-        <DropdownMenu.Item key='edit' onSelect={() => console.log('edit')}>
+        <DropdownMenu.Item key="edit" onSelect={() => console.log('edit')}>
           <DropdownMenu.ItemTitle>Edit</DropdownMenu.ItemTitle>
         </DropdownMenu.Item>
 
         <DropdownMenu.Item
-          key='delete'
+          key="delete"
           destructive
           onSelect={() => console.log('delete')}
         >
@@ -2294,11 +2301,11 @@ function MyContextMenu() {
       </ContextMenu.Trigger>
 
       <ContextMenu.Content>
-        <ContextMenu.Item key='copy' onSelect={() => console.log('copy')}>
+        <ContextMenu.Item key="copy" onSelect={() => console.log('copy')}>
           <ContextMenu.ItemTitle>Copy</ContextMenu.ItemTitle>
         </ContextMenu.Item>
 
-        <ContextMenu.Item key='paste' onSelect={() => console.log('paste')}>
+        <ContextMenu.Item key="paste" onSelect={() => console.log('paste')}>
           <ContextMenu.ItemTitle>Paste</ContextMenu.ItemTitle>
         </ContextMenu.Item>
       </ContextMenu.Content>
@@ -2325,7 +2332,7 @@ function SettingsMenu() {
 
       <DropdownMenu.Content>
         <DropdownMenu.CheckboxItem
-          key='notifications'
+          key="notifications"
           value={notifications}
           onValueChange={() => setNotifications((prev) => !prev)}
         >
@@ -2353,21 +2360,21 @@ function MenuWithSubmenu() {
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Content>
-        <DropdownMenu.Item key='home' onSelect={() => console.log('home')}>
+        <DropdownMenu.Item key="home" onSelect={() => console.log('home')}>
           <DropdownMenu.ItemTitle>Home</DropdownMenu.ItemTitle>
         </DropdownMenu.Item>
 
         <DropdownMenu.Sub>
-          <DropdownMenu.SubTrigger key='more'>
+          <DropdownMenu.SubTrigger key="more">
             <DropdownMenu.ItemTitle>More Options</DropdownMenu.ItemTitle>
           </DropdownMenu.SubTrigger>
 
           <DropdownMenu.SubContent>
-            <DropdownMenu.Item key='settings'>
+            <DropdownMenu.Item key="settings">
               <DropdownMenu.ItemTitle>Settings</DropdownMenu.ItemTitle>
             </DropdownMenu.Item>
 
-            <DropdownMenu.Item key='help'>
+            <DropdownMenu.Item key="help">
               <DropdownMenu.ItemTitle>Help</DropdownMenu.ItemTitle>
             </DropdownMenu.Item>
           </DropdownMenu.SubContent>
@@ -2402,7 +2409,7 @@ function MyScreen() {
 
   return (
     <View style={{ flex: 1 }}>
-      <Button onPress={() => sheetRef.current?.expand()} title='Open' />
+      <Button onPress={() => sheetRef.current?.expand()} title="Open" />
       <BottomSheet ref={sheetRef} snapPoints={['50%', '90%']}>
         <View>
           <Text>Sheet content</Text>
@@ -2423,11 +2430,11 @@ function MyScreen() {
 
   return (
     <View style={{ flex: 1 }}>
-      <Button onPress={() => setVisible(true)} title='Open' />
+      <Button onPress={() => setVisible(true)} title="Open" />
       <Modal
         visible={visible}
-        presentationStyle='formSheet'
-        animationType='slide'
+        presentationStyle="formSheet"
+        animationType="slide"
         onRequestClose={() => setVisible(false)}
       >
         <View>
@@ -2444,11 +2451,11 @@ function MyScreen() {
 ```tsx
 // In your navigator
 <Stack.Screen
-  name='Details'
+  name="Details"
   component={DetailsScreen}
   options={{
     presentation: 'formSheet',
-    sheetAllowedDetents: 'fitToContents',
+    sheetAllowedDetents: 'fitToContents'
   }}
 />
 ```
@@ -2779,7 +2786,7 @@ instantiate. Hoist to module scope when the locale/options are static.
 function Price({ amount }: { amount: number }) {
   const formatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'USD'
   })
   return <Text>{formatter.format(amount)}</Text>
 }
@@ -2790,7 +2797,7 @@ function Price({ amount }: { amount: number }) {
 ```tsx
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
-  currency: 'USD',
+  currency: 'USD'
 })
 
 function Price({ amount }: { amount: number }) {
@@ -2815,7 +2822,7 @@ const dateFormatter = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' })
 const timeFormatter = new Intl.DateTimeFormat('en-US', { timeStyle: 'short' })
 const percentFormatter = new Intl.NumberFormat('en-US', { style: 'percent' })
 const relativeFormatter = new Intl.RelativeTimeFormat('en-US', {
-  numeric: 'auto',
+  numeric: 'auto'
 })
 ```
 
@@ -2849,7 +2856,7 @@ import { Text, View } from 'react-native'
 
 function App() {
   const [fontsLoaded] = useFonts({
-    'Geist-Bold': require('./assets/fonts/Geist-Bold.otf'),
+    'Geist-Bold': require('./assets/fonts/Geist-Bold.otf')
   })
 
   if (!fontsLoaded) {

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useState } from 'react'
+import { useMutation } from '@tanstack/react-query'
 
 /**
  * Like optimista local para superficies cuyo `liked` NO viaja en la fila
@@ -17,33 +17,38 @@ import { useMutation } from "@tanstack/react-query";
 export function useOptimisticLike(
   initialLiked: boolean,
   initialCount: number,
-  mutationFn: (currentlyLiked: boolean) => Promise<void>,
+  mutationFn: (currentlyLiked: boolean) => Promise<void>
 ) {
-  const [liked, setLiked] = useState(initialLiked);
-  const [count, setCount] = useState(initialCount);
+  const [liked, setLiked] = useState(initialLiked)
+  const [count, setCount] = useState(initialCount)
   // Sincroniza el estado local cuando cambian las props (refetch externo).
-  const [seed, setSeed] = useState({ liked: initialLiked, count: initialCount });
+  const [seed, setSeed] = useState({ liked: initialLiked, count: initialCount })
   if (seed.liked !== initialLiked || seed.count !== initialCount) {
-    setSeed({ liked: initialLiked, count: initialCount });
-    setLiked(initialLiked);
-    setCount(initialCount);
+    setSeed({ liked: initialLiked, count: initialCount })
+    setLiked(initialLiked)
+    setCount(initialCount)
   }
 
   const mutation = useMutation({
     mutationFn: () => mutationFn(liked),
     onMutate: () => {
-      const snapshot = { liked, count };
-      setLiked((p) => !p);
-      setCount((p) => (liked ? p - 1 : p + 1));
-      return snapshot;
+      const snapshot = { liked, count }
+      setLiked((p) => !p)
+      setCount((p) => (liked ? p - 1 : p + 1))
+      return snapshot
     },
     onError: (_err, _vars, ctx) => {
       if (ctx) {
-        setLiked(ctx.liked);
-        setCount(ctx.count);
+        setLiked(ctx.liked)
+        setCount(ctx.count)
       }
-    },
-  });
+    }
+  })
 
-  return { liked, count, toggle: mutation.mutate, isPending: mutation.isPending };
+  return {
+    liked,
+    count,
+    toggle: mutation.mutate,
+    isPending: mutation.isPending
+  }
 }

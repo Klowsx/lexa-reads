@@ -17,7 +17,7 @@ instantiate. Hoist to module scope when the locale/options are static.
 function Price({ amount }: { amount: number }) {
   const formatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'USD'
   })
   return <Text>{formatter.format(amount)}</Text>
 }
@@ -28,7 +28,7 @@ function Price({ amount }: { amount: number }) {
 ```tsx
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
-  currency: 'USD',
+  currency: 'USD'
 })
 
 function Price({ amount }: { amount: number }) {
@@ -53,7 +53,7 @@ const dateFormatter = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' })
 const timeFormatter = new Intl.DateTimeFormat('en-US', { timeStyle: 'short' })
 const percentFormatter = new Intl.NumberFormat('en-US', { style: 'percent' })
 const relativeFormatter = new Intl.RelativeTimeFormat('en-US', {
-  numeric: 'auto',
+  numeric: 'auto'
 })
 ```
 

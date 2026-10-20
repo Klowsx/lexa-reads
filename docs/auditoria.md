@@ -17,12 +17,12 @@ Más una mejora de fiabilidad de cliente (sesión > 2 KB en Android) y varios pu
 
 ## Leyenda de severidad
 
-| Nivel | Significado |
-|-------|-------------|
-| 🔴 P0 | Seguridad / abuso explotable. Arreglar ya. |
-| 🟠 P1 | Compliance bloqueante de stores o privacidad. |
-| 🟡 P2 | Bug de datos / fiabilidad. |
-| 🟢 P3 | UX / accesibilidad / pulido. |
+| Nivel | Significado                                                  |
+| ----- | ------------------------------------------------------------ |
+| 🔴 P0 | Seguridad / abuso explotable. Arreglar ya.                   |
+| 🟠 P1 | Compliance bloqueante de stores o privacidad.                |
+| 🟡 P2 | Bug de datos / fiabilidad.                                   |
+| 🟢 P3 | UX / accesibilidad / pulido.                                 |
 | 🔵 P4 | Deuda técnica / consistencia / performance / observabilidad. |
 
 ---
@@ -31,13 +31,14 @@ Más una mejora de fiabilidad de cliente (sesión > 2 KB en Android) y varios pu
 
 **Archivos:** `001_initial_schema.sql:475` (policy) + `012_books_insert_hardening.sql:24` (`is_admin`) → corregido en `017_privilege_and_search_path_hardening.sql`
 
-**Problema:** la policy de UPDATE de `users` es `FOR UPDATE USING (auth.uid() = id)`. **RLS no puede restringir columnas**, así que la policy autoriza actualizar *cualquier* columna de la propia fila — incluida `is_admin`, que la migración 012 introdujo sin ninguna protección. Un usuario autenticado podía ejecutar:
+**Problema:** la policy de UPDATE de `users` es `FOR UPDATE USING (auth.uid() = id)`. **RLS no puede restringir columnas**, así que la policy autoriza actualizar _cualquier_ columna de la propia fila — incluida `is_admin`, que la migración 012 introdujo sin ninguna protección. Un usuario autenticado podía ejecutar:
 
 ```sql
 UPDATE users SET is_admin = true WHERE id = auth.uid();
 ```
 
 y con ello obtener, vía las policies de 012/015:
+
 - **Lectura/resolución de TODOS los reportes** (`reports`) → PII y reportes de otros usuarios.
 - **UPDATE/DELETE del catálogo global `books`** → vandalismo del catálogo compartido.
 
@@ -108,7 +109,7 @@ De paso se blindó `account_deletion_requests`: se revoca el UPDATE de `schedule
 
 **Decisión:** se deja **sin implementar a propósito** (igual que Sentry). El paso a paso completo (env, `PostHogProvider` gated por `ConsentModal`, conexión de `setCrashReporter`, eventos clave) queda documentado en **`docs/despliegue.md §8`**.
 
-- [ ] *(Documentado)* Inicializar PostHog + conectar `setCrashReporter` — `docs/despliegue.md §8`
+- [ ] _(Documentado)_ Inicializar PostHog + conectar `setCrashReporter` — `docs/despliegue.md §8`
 
 ---
 
@@ -119,6 +120,7 @@ De paso se blindó `account_deletion_requests`: se revoca el UPDATE de `schedule
 **Problema:** los triggers insertan con `ON CONFLICT DO NOTHING`, pero `notifications` **no tenía ningún índice/constraint UNIQUE** (`001:252` solo crea un índice no único) → la cláusula nunca encontraba conflicto y **no aportaba idempotencia**. Además `notify_new_follower` corría en `AFTER INSERT OR UPDATE` (cualquier UPDATE de la fila lo re-disparaba).
 
 **Fix aplicado (migración 018):**
+
 1. Índice **único parcial** `uq_notifications_unread_dedup (recipient_id, actor_id, type, reference_id) WHERE read_at IS NULL` → da semántica al `ON CONFLICT DO NOTHING` sin tocar los triggers: no se apilan notificaciones idénticas **sin leer**; si el usuario ya la leyó, una nueva interacción sí notifica.
 2. Trigger de follower precisado a `AFTER INSERT OR UPDATE OF status`.
 
@@ -131,23 +133,23 @@ De paso se blindó `account_deletion_requests`: se revoca el UPDATE de `schedule
 
 Cerrado **en código**; pendiente solo de **despliegue** (ver abajo). Detalle histórico en el control de versiones.
 
-| ID | Hallazgo | Fix |
-|----|----------|-----|
-| S-1 | `send-push` sin validar origen del webhook | secreto `x-webhook-secret` (fail-closed) |
-| S-2 | Inyección en filtro PostgREST por ISBN | guarda de formato en `getBookByIsbn` |
-| S-3 | Catálogo `books` con INSERT abierto | migración 012 (atribución + admin) |
-| C-1 | Hard-delete no borraba contenido ni `auth.users` | migración 013 (cascada real) |
-| C-2 | Reseñas ignoraban `is_private` | migración 014 (modelo unificado) |
-| C-3 | Bloqueo unidireccional | migración 014 (`is_blocked_with`) |
-| C-4 | Sin moderación de reportes | migración 015 + `docs/moderacion.md` |
-| D-1/P-1 | Optimistic likes con `useState` + invalidate global | caché + `useOptimisticLike` |
-| D-2 | Cursor solo por `created_at` | cursor compuesto `(created_at, id)` |
-| D-3 | `ADD VALUE` de enum + uso en misma migración | `011_notification_enum.sql` separado |
-| D-4 | Sin límites de longitud de contenido | migración 016 + zod |
-| O-1 | Sin ErrorBoundary | `ErrorBoundary` raíz + `crash-reporting.ts` |
-| UX-1 | Cero accesibilidad | pase de a11y en superficies núcleo |
-| UX-2 | Sin `QueryBoundary`/skeletons | infra + feed/library/book/profile |
-| A-1/A-2/A-3 | Docs desfasados / auth web / deep links | sincronizados / documentado / plantillas |
+| ID          | Hallazgo                                            | Fix                                         |
+| ----------- | --------------------------------------------------- | ------------------------------------------- |
+| S-1         | `send-push` sin validar origen del webhook          | secreto `x-webhook-secret` (fail-closed)    |
+| S-2         | Inyección en filtro PostgREST por ISBN              | guarda de formato en `getBookByIsbn`        |
+| S-3         | Catálogo `books` con INSERT abierto                 | migración 012 (atribución + admin)          |
+| C-1         | Hard-delete no borraba contenido ni `auth.users`    | migración 013 (cascada real)                |
+| C-2         | Reseñas ignoraban `is_private`                      | migración 014 (modelo unificado)            |
+| C-3         | Bloqueo unidireccional                              | migración 014 (`is_blocked_with`)           |
+| C-4         | Sin moderación de reportes                          | migración 015 + `docs/moderacion.md`        |
+| D-1/P-1     | Optimistic likes con `useState` + invalidate global | caché + `useOptimisticLike`                 |
+| D-2         | Cursor solo por `created_at`                        | cursor compuesto `(created_at, id)`         |
+| D-3         | `ADD VALUE` de enum + uso en misma migración        | `011_notification_enum.sql` separado        |
+| D-4         | Sin límites de longitud de contenido                | migración 016 + zod                         |
+| O-1         | Sin ErrorBoundary                                   | `ErrorBoundary` raíz + `crash-reporting.ts` |
+| UX-1        | Cero accesibilidad                                  | pase de a11y en superficies núcleo          |
+| UX-2        | Sin `QueryBoundary`/skeletons                       | infra + feed/library/book/profile           |
+| A-1/A-2/A-3 | Docs desfasados / auth web / deep links             | sincronizados / documentado / plantillas    |
 
 > i18n (UX-3): sigue **parcial** — extracción mecánica de strings hardcodeados pendiente.
 
@@ -164,7 +166,7 @@ Cerrado **en código**; pendiente solo de **despliegue** (ver abajo). Detalle hi
 5. Promover al menos un admin por SQL (el cliente ya no puede tras 017).
 6. Publicar y verificar `apple-app-site-association` y `assetlinks.json`.
 7. Restringir la key de Google Books en Cloud Console.
-8. *(Excluido a propósito)* PostHog + `setCrashReporter` — documentado en `docs/despliegue.md §8`.
+8. _(Excluido a propósito)_ PostHog + `setCrashReporter` — documentado en `docs/despliegue.md §8`.
 
 ## Features y pre-submit aún abiertos
 
@@ -174,13 +176,13 @@ Ver **`docs/pendientes.md`** (features de MVP que faltan + pre-submit + diferido
 
 ## Orden de ataque sugerido
 
-| Orden | Item | Estado |
-|------:|------|--------|
-| 1 | **NEW-1** escalado a admin | ✅ Código (falta aplicar `017`) |
-| 2 | **NEW-2** search_path | ✅ Código (falta aplicar `017`) |
-| 3 | **NEW-3** SecureStore > 2 KB | ✅ Código |
-| 4 | **NEW-4** keys de terceros (proxy NYT) | ✅ Código (falta desplegar función + secret) |
-| 5 | **NEW-6** dedupe notificaciones | ✅ Código (falta aplicar `018`) |
-| 6 | **NEW-5** PostHog init | ⏸️ Excluido a propósito — documentado en `docs/despliegue.md §8` |
+| Orden | Item                                   | Estado                                                           |
+| ----: | -------------------------------------- | ---------------------------------------------------------------- |
+|     1 | **NEW-1** escalado a admin             | ✅ Código (falta aplicar `017`)                                  |
+|     2 | **NEW-2** search_path                  | ✅ Código (falta aplicar `017`)                                  |
+|     3 | **NEW-3** SecureStore > 2 KB           | ✅ Código                                                        |
+|     4 | **NEW-4** keys de terceros (proxy NYT) | ✅ Código (falta desplegar función + secret)                     |
+|     5 | **NEW-6** dedupe notificaciones        | ✅ Código (falta aplicar `018`)                                  |
+|     6 | **NEW-5** PostHog init                 | ⏸️ Excluido a propósito — documentado en `docs/despliegue.md §8` |
 
 > Regla (CLAUDE.md): cada fix de RLS debe probarse contra una instancia real de Supabase. Los tests de `src/__tests__/features/auth/rls.test.ts` (con `SUPABASE_SERVICE_ROLE_KEY`) ya cubren NEW-1.

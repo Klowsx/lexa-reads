@@ -1,15 +1,18 @@
-# Graph Report - .  (2026-05-20)
+# Graph Report - . (2026-05-20)
 
 ## Corpus Check
+
 - 0 files · ~99,999 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
+
 - 325 nodes · 430 edges · 51 communities (28 shown, 23 thin omitted)
 - Extraction: 89% EXTRACTED · 11% INFERRED · 0% AMBIGUOUS · INFERRED: 49 edges (avg confidence: 0.88)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
+
 - [[_COMMUNITY_Product Architecture & Schema|Product Architecture & Schema]]
 - [[_COMMUNITY_Security & Production Readiness|Security & Production Readiness]]
 - [[_COMMUNITY_Onboarding Flow UI|Onboarding Flow UI]]
@@ -51,6 +54,7 @@
 - [[_COMMUNITY_Community 50|Community 50]]
 
 ## God Nodes (most connected - your core abstractions)
+
 1. `STACK.md â€” Canonical Product and DB Spec` - 33 edges
 2. `useColors()` - 23 edges
 3. `useAuthStore` - 14 edges
@@ -63,18 +67,20 @@
 10. `User Blocks Database Table` - 7 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `Schema Sync Migration` --references--> `Canonical Product and Architecture Spec`  [INFERRED]
+
+- `Schema Sync Migration` --references--> `Canonical Product and Architecture Spec` [INFERRED]
   supabase/migrations/006_schema_sync.sql → STACK.md
-- `RLS Policy Integration Tests` --implements--> `RLS Testing Against Real Database`  [INFERRED]
-  src/__tests__/features/auth/rls.test.ts → CLAUDE.md
-- `Auth Store Unit Tests` --references--> `RLS Exclusion via User Blocks Pattern`  [INFERRED]
-  src/__tests__/stores/auth.store.test.ts → STACK.md
-- `Comments Migration` --references--> `Dev Blockers and Inconsistencies Log`  [INFERRED]
+- `RLS Policy Integration Tests` --implements--> `RLS Testing Against Real Database` [INFERRED]
+  src/**tests**/features/auth/rls.test.ts → CLAUDE.md
+- `Auth Store Unit Tests` --references--> `RLS Exclusion via User Blocks Pattern` [INFERRED]
+  src/**tests**/stores/auth.store.test.ts → STACK.md
+- `Comments Migration` --references--> `Dev Blockers and Inconsistencies Log` [INFERRED]
   supabase/migrations/003_comments.sql → test.md
-- `Notification Preferences Migration` --implements--> `RLS Policies as SQL in Migrations Rule`  [EXTRACTED]
+- `Notification Preferences Migration` --implements--> `RLS Policies as SQL in Migrations Rule` [EXTRACTED]
   supabase/migrations/004_notification_preferences.sql → STACK.md
 
 ## Hyperedges (group relationships)
+
 - **User Onboarding Flow** — app_auth_index_tsx, app_auth_register_tsx, app_onboarding_genres_tsx, app_onboarding_goal_tsx, app_onboarding_username_tsx [INFERRED 0.95]
 - **Auth Screen Group** — app_auth_index_tsx, app_auth_login_tsx, app_auth_register_tsx, app_auth_success_tsx, app_auth_verify_email_tsx [INFERRED 0.95]
 - **Canonical Documentation Set** — doc_STACK_md, doc_analisis_md, doc_gaps_produccion_md, doc_inicio_md [INFERRED 0.85]
@@ -89,75 +95,93 @@
 ## Communities (51 total, 23 thin omitted)
 
 ### Community 0 - "Product Architecture & Schema"
+
 Cohesion: 0.09
 Nodes (40): Project Guidance Document, Canonical Product and Architecture Spec, UserProfile Domain Type, Account Deletion Requests Table, Activity Feed Database Table, Schema Gap Analysis (Graph Output), App Routes Only Rule, Auth Store Unit Tests (+32 more)
 
 ### Community 1 - "Security & Production Readiness"
+
 Cohesion: 0.06
 Nodes (36): Row Level Security Policies, delete-account Edge Function (30-day deferred), STACK.md â€” Canonical Product and DB Spec, docs/analisis.md â€” Schema Gap Analysis, docs/gaps-produccion.md â€” Production Readiness Gaps, Auth Store as Supabase onAuthStateChange Projection, Store Compliance Requirements, Cursor-Based Infinite Scroll Pagination (+28 more)
 
 ### Community 2 - "Onboarding Flow UI"
+
 Cohesion: 0.1
 Nodes (22): SuccessScreen(), AuthField(), Props, BookFan(), BOOKS, styles, CodeInput(), Props (+14 more)
 
 ### Community 3 - "Auth Screens (Login/Register)"
+
 Cohesion: 0.12
 Nodes (23): app/(auth)/onboarding/genres.tsx â€” Genre Selection, app/(auth)/onboarding/goal.tsx â€” Reading Goal Selection, app/(auth)/onboarding/username.tsx â€” Username Selection, googleStyles, LoginScreen(), RegisterScreen(), VerifyEmailScreen(), AuthField (auth form input) (+15 more)
 
 ### Community 4 - "App Layout & Routing"
+
 Cohesion: 0.13
 Nodes (17): AuthGate(), RootLayout(), FlowGuard(), LoginParams, useLogout(), RegisterParams, supportedLocales, queryClient (+9 more)
 
 ### Community 5 - "Supabase Types & Test Utils"
+
 Cohesion: 0.15
 Nodes (14): adminClient, createTestUser(), createUserClient(), CompositeTypes, Constants, Database, DatabaseWithoutInternals, DefaultSchema (+6 more)
 
 ### Community 6 - "Auth Flow Architecture Patterns"
+
 Cohesion: 0.15
 Nodes (18): Auth Flow Pattern, State Management Architecture, AuthGate (app/_layout.tsx), FlowGuard (auth layout guard), RootLayout (app/_layout.tsx), Auth Gate, Root Layout, focusManager (TanStack Query) (+10 more)
 
 ### Community 7 - "Cross-Cutting Patterns (Stores/Mutations)"
+
 Cohesion: 0.25
 Nodes (16): ExpoSecureStoreAdapter, PrimaryButton, authStore, FeedScreen, Auth Mutation Hook Pattern, Platform-Aware Storage Pattern, Sequential Auth Flow Pattern, supabaseClient (+8 more)
 
 ### Community 8 - "Utility Functions"
+
 Cohesion: 0.15
 Nodes (3): formatDate(), formatRelativeTime(), StarState
 
 ### Community 9 - "Error Handling & Toast System"
+
 Cohesion: 0.24
 Nodes (7): Toast, UIState, useUIStore, AppError, AppErrorCode, SUPABASE_AUTH_MESSAGES, toAppError()
 
 ### Community 10 - "Typography System"
+
 Cohesion: 0.33
 Nodes (5): fontFamily, fonts, fontSize, letterSpacing, lineHeight
 
 ### Community 11 - "Theme-Aware Components"
+
 Cohesion: 0.6
 Nodes (6): AuthField, BookFan, CodeInput, StepBar, Theme-Aware Component Pattern, useColors
 
 ### Community 12 - "Theme Design System"
+
 Cohesion: 0.6
 Nodes (5): Theme Design System, Metro Config, Tailwind Config, Theme Colors, Theme Typography
 
 ### Community 13 - "Metro Configuration"
+
 Cohesion: 0.5
 Nodes (3): config, { getDefaultConfig }, { withNativeWind }
 
 ### Community 14 - "Color Tokens"
+
 Cohesion: 0.5
 Nodes (3): fixed, rawDark, rawLight
 
 ### Community 15 - "App Assets & Icons"
+
 Cohesion: 0.67
 Nodes (4): Android Adaptive Icon Format, Android Adaptive App Icon (PNG), Expo Standard Asset, Lexa Reads App
 
 ## Knowledge Gaps
+
 - **130 isolated node(s):** `{ getDefaultConfig }`, `{ withNativeWind }`, `config`, `ExpoSecureStoreAdapter`, `StarState` (+125 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **23 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
+
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `useColors()` connect `Onboarding Flow UI` to `Auth Screens (Login/Register)`?**

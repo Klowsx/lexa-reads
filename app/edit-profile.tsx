@@ -1,7 +1,7 @@
-import { useRouter } from 'expo-router';
-import { ChevronLeft } from 'lucide-react-native';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useRouter } from 'expo-router'
+import { ChevronLeft } from 'lucide-react-native'
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -11,69 +11,78 @@ import {
   Switch,
   Text,
   TextInput,
-  View,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Avatar } from '~/components/ui/Avatar';
-import { getAvatarColor } from '~/lib/avatar';
-import { cn } from '~/lib/utils';
-import { useColors } from '~/theme/colors';
-import { useMe } from '~/features/user/hooks/useMe';
-import { useUpdateProfile } from '~/features/user/hooks/useUpdateProfile';
+  View
+} from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Avatar } from '~/components/ui/Avatar'
+import { getAvatarColor } from '~/lib/avatar'
+import { cn } from '~/lib/utils'
+import { useColors } from '~/theme/colors'
+import { useMe } from '~/features/user/hooks/useMe'
+import { useUpdateProfile } from '~/features/user/hooks/useUpdateProfile'
 
 const alpha = (hex: string, op: number) => {
-  const n = parseInt(hex.replace('#', ''), 16);
-  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})`;
-};
+  const n = parseInt(hex.replace('#', ''), 16)
+  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})`
+}
 
 const GENRES = [
-  'Fantasía', 'Realismo mágico', 'Ciencia ficción', 'Misterio',
-  'Romance', 'Dark Academia', 'Clásicos', 'Memorias',
-  'Historia', 'Thriller', 'Poesía', 'Horror',
-];
+  'Fantasía',
+  'Realismo mágico',
+  'Ciencia ficción',
+  'Misterio',
+  'Romance',
+  'Dark Academia',
+  'Clásicos',
+  'Memorias',
+  'Historia',
+  'Thriller',
+  'Poesía',
+  'Horror'
+]
 
 export default function EditProfileScreen() {
-  const router = useRouter();
-  const insets = useSafeAreaInsets();
-  const c = useColors();
-  const { t } = useTranslation();
-  const { data: me } = useMe();
-  const { mutate: updateProfile, isPending } = useUpdateProfile();
+  const router = useRouter()
+  const insets = useSafeAreaInsets()
+  const c = useColors()
+  const { t } = useTranslation()
+  const { data: me } = useMe()
+  const { mutate: updateProfile, isPending } = useUpdateProfile()
 
-  const color = me ? getAvatarColor(me.username) : c.accent;
+  const color = me ? getAvatarColor(me.username) : c.accent
 
-  const [name, setName] = useState('');
-  const [bio, setBio] = useState('');
-  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
-  const [isPrivate, setIsPrivate] = useState(false);
+  const [name, setName] = useState('')
+  const [bio, setBio] = useState('')
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([])
+  const [isPrivate, setIsPrivate] = useState(false)
 
   useEffect(() => {
-    if (!me) return;
-    setName(me.display_name);
-    setBio(me.bio ?? '');
-    setSelectedGenres(me.favorite_genres ?? []);
-    setIsPrivate(me.is_private ?? false);
-  }, [me]);
+    if (!me) return
+    setName(me.display_name)
+    setBio(me.bio ?? '')
+    setSelectedGenres(me.favorite_genres ?? [])
+    setIsPrivate(me.is_private ?? false)
+  }, [me])
 
-  const canSave = name.trim().length >= 2 && !isPending;
+  const canSave = name.trim().length >= 2 && !isPending
 
   function toggleGenre(g: string) {
     setSelectedGenres((prev) =>
-      prev.includes(g) ? prev.filter((x) => x !== g) : [...prev, g],
-    );
+      prev.includes(g) ? prev.filter((x) => x !== g) : [...prev, g]
+    )
   }
 
   function handleSave() {
-    if (!canSave) return;
+    if (!canSave) return
     updateProfile(
       {
         display_name: name.trim(),
         bio: bio.trim() || null,
         favorite_genres: selectedGenres.length > 0 ? selectedGenres : null,
-        is_private: isPrivate,
+        is_private: isPrivate
       },
-      { onSuccess: () => router.back() },
-    );
+      { onSuccess: () => router.back() }
+    )
   }
 
   return (
@@ -95,7 +104,10 @@ export default function EditProfileScreen() {
             <ActivityIndicator size="small" color={c.accent} />
           ) : (
             <Text
-              className={cn("text-sm font-body-sb", canSave ? "text-accent" : "text-t3")}
+              className={cn(
+                'text-sm font-body-sb',
+                canSave ? 'text-accent' : 'text-t3'
+              )}
             >
               {t('common.save')}
             </Text>
@@ -121,9 +133,13 @@ export default function EditProfileScreen() {
               size={80}
             />
             <Pressable className="mt-3 px-4 py-2 rounded-md bg-sh border border-border">
-              <Text className="text-xs font-body-md text-text">{t('editProfile.changePhoto')}</Text>
+              <Text className="text-xs font-body-md text-text">
+                {t('editProfile.changePhoto')}
+              </Text>
             </Pressable>
-            <Text className="text-xs font-body text-t3 mt-1.5">{t('editProfile.photoHint')}</Text>
+            <Text className="text-xs font-body text-t3 mt-1.5">
+              {t('editProfile.photoHint')}
+            </Text>
           </View>
         )}
 
@@ -156,7 +172,7 @@ export default function EditProfileScreen() {
               placeholder={t('editProfile.bioPlaceholder')}
               className="rounded-md border border-border font-body text-sm text-text bg-surface px-[14px] py-[11px] leading-[22px]"
               style={{
-                textAlignVertical: 'top',
+                textAlignVertical: 'top'
               }}
               placeholderTextColor={c.t3}
             />
@@ -172,7 +188,7 @@ export default function EditProfileScreen() {
             </Text>
             <View className="flex-row flex-wrap gap-2">
               {GENRES.map((g) => {
-                const active = selectedGenres.includes(g);
+                const active = selectedGenres.includes(g)
                 return (
                   <Pressable
                     key={g}
@@ -180,7 +196,10 @@ export default function EditProfileScreen() {
                     className="px-3 py-1.5 rounded-full border bg-sh border-border"
                     style={
                       active
-                        ? { backgroundColor: alpha(color, 0.14), borderColor: color }
+                        ? {
+                            backgroundColor: alpha(color, 0.14),
+                            borderColor: color
+                          }
                         : undefined
                     }
                   >
@@ -191,7 +210,7 @@ export default function EditProfileScreen() {
                       {g}
                     </Text>
                   </Pressable>
-                );
+                )
               })}
             </View>
           </View>
@@ -199,7 +218,9 @@ export default function EditProfileScreen() {
           {/* Cuenta privada */}
           <View className="flex-row items-center justify-between py-3.5 border-t border-border mb-8">
             <View className="flex-1 mr-4">
-              <Text className="text-sm font-body-md text-text">{t('editProfile.privateAccount')}</Text>
+              <Text className="text-sm font-body-md text-text">
+                {t('editProfile.privateAccount')}
+              </Text>
               <Text className="text-xs font-body text-t3 mt-0.5">
                 {t('editProfile.privateAccountSub')}
               </Text>
@@ -215,16 +236,21 @@ export default function EditProfileScreen() {
           <Pressable
             onPress={handleSave}
             disabled={!canSave}
-            className={cn("py-3.5 rounded-md items-center mb-2 bg-accent", canSave ? "opacity-100" : "opacity-50")}
+            className={cn(
+              'py-3.5 rounded-md items-center mb-2 bg-accent',
+              canSave ? 'opacity-100' : 'opacity-50'
+            )}
           >
             {isPending ? (
               <ActivityIndicator size="small" color="#fff" />
             ) : (
-              <Text className="text-sm font-body-sb text-white">{t('common.saveChanges')}</Text>
+              <Text className="text-sm font-body-sb text-white">
+                {t('common.saveChanges')}
+              </Text>
             )}
           </Pressable>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
-  );
+  )
 }

@@ -18,7 +18,7 @@ import { Text, View } from 'react-native'
 
 function App() {
   const [fontsLoaded] = useFonts({
-    'Geist-Bold': require('./assets/fonts/Geist-Bold.otf'),
+    'Geist-Bold': require('./assets/fonts/Geist-Bold.otf')
   })
 
   if (!fontsLoaded) {

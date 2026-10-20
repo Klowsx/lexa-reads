@@ -200,7 +200,7 @@ sequenceDiagram
 ```
 
 > La puerta de solicitud: si A y B **no** son seguidores mutuos, `request_state='pending'`
-> y B ve el hilo en *Solicitudes*; B solo puede responder tras `accept_message_request`.
+> y B ve el hilo en _Solicitudes_; B solo puede responder tras `accept_message_request`.
 
 ---
 

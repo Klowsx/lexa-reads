@@ -17,7 +17,7 @@ import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 function CollapsiblePanel({ expanded }: { expanded: boolean }) {
   const animatedStyle = useAnimatedStyle(() => ({
     height: withTiming(expanded ? 200 : 0), // triggers layout on every frame
-    overflow: 'hidden',
+    overflow: 'hidden'
   }))
 
   return <Animated.View style={animatedStyle}>{children}</Animated.View>
@@ -31,14 +31,14 @@ import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 
 function CollapsiblePanel({ expanded }: { expanded: boolean }) {
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scaleY: withTiming(expanded ? 1 : 0) },
-    ],
-    opacity: withTiming(expanded ? 1 : 0),
+    transform: [{ scaleY: withTiming(expanded ? 1 : 0) }],
+    opacity: withTiming(expanded ? 1 : 0)
   }))
 
   return (
-    <Animated.View style={[{ height: 200, transformOrigin: 'top' }, animatedStyle]}>
+    <Animated.View
+      style={[{ height: 200, transformOrigin: 'top' }, animatedStyle]}
+    >
       {children}
     </Animated.View>
   )
@@ -52,10 +52,8 @@ import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 
 function SlideIn({ visible }: { visible: boolean }) {
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateY: withTiming(visible ? 0 : 100) },
-    ],
-    opacity: withTiming(visible ? 1 : 0),
+    transform: [{ translateY: withTiming(visible ? 0 : 100) }],
+    opacity: withTiming(visible ? 1 : 0)
   }))
 
   return <Animated.View style={animatedStyle}>{children}</Animated.View>

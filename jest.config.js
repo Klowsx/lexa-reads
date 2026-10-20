@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '.env.test' });
+require('dotenv').config({ path: '.env.test' })
 
 module.exports = {
   preset: 'jest-expo',
@@ -9,6 +9,6 @@ module.exports = {
 
   moduleNameMapper: {
     '^~/(.*)\$': '<rootDir>/src/\$1',
-    '^@/(.*)\$': '<rootDir>/\$1',
-  },
-};
+    '^@/(.*)\$': '<rootDir>/\$1'
+  }
+}

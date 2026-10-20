@@ -1,4 +1,4 @@
-@import "./src/theme/generated-colors.css";
+@import './src/theme/generated-colors.css';
 
 @tailwind base;
 @tailwind components;

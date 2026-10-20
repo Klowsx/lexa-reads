@@ -26,7 +26,7 @@ const tap = Gesture.Tap()
   })
 
 const animatedStyle = useAnimatedStyle(() => ({
-  transform: [{ scale: scale.get() }],
+  transform: [{ scale: scale.get() }]
 }))
 ```
 
@@ -44,7 +44,7 @@ const tap = Gesture.Tap()
   })
 
 const animatedStyle = useAnimatedStyle(() => ({
-  transform: [{ scale: interpolate(pressed.get(), [0, 1], [1, 0.95]) }],
+  transform: [{ scale: interpolate(pressed.get(), [0, 1], [1, 0.95]) }]
 }))
 ```
 

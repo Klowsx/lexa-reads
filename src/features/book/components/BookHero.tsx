@@ -1,32 +1,32 @@
-import { LinearGradient } from "expo-linear-gradient";
-import { ChevronLeft, MoreHorizontal, Share2 } from "lucide-react-native";
-import { useTranslation } from "react-i18next";
-import { Pressable, Text, View } from "react-native";
-import { BookCover } from "~/components/ui/BookCover";
-import { fixed, rawDark, rawLight } from "~/theme/colors";
-import { useColorScheme } from "react-native";
-import type { Tables } from "~/types/database";
+import { LinearGradient } from 'expo-linear-gradient'
+import { ChevronLeft, MoreHorizontal, Share2 } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
+import { Pressable, Text, View } from 'react-native'
+import { BookCover } from '~/components/ui/BookCover'
+import { fixed, rawDark, rawLight } from '~/theme/colors'
+import { useColorScheme } from 'react-native'
+import type { Tables } from '~/types/database'
 
-const ACCENT = fixed.accent;
+const ACCENT = fixed.accent
 
 const alpha = (hex: string, op: number) => {
-  const n = parseInt(hex.replace("#", ""), 16);
-  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})` as const;
-};
+  const n = parseInt(hex.replace('#', ''), 16)
+  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})` as const
+}
 
 interface BookHeroProps {
-  book: Tables<"books">;
-  onBack: () => void;
-  onShare?: () => void;
+  book: Tables<'books'>
+  onBack: () => void
+  onShare?: () => void
 }
 
 export function BookHero({ book, onBack, onShare }: BookHeroProps) {
-  const scheme = useColorScheme();
-  const raw = scheme === "dark" ? rawDark : rawLight;
-  const { t } = useTranslation();
+  const scheme = useColorScheme()
+  const raw = scheme === 'dark' ? rawDark : rawLight
+  const { t } = useTranslation()
 
-  const coverH = 170;
-  const coverW = Math.round(coverH * 0.667);
+  const coverH = 170
+  const coverW = Math.round(coverH * 0.667)
 
   return (
     <View className="relative pb-container">
@@ -47,10 +47,10 @@ export function BookHero({ book, onBack, onShare }: BookHeroProps) {
           style={{
             color: alpha(ACCENT, 0.06),
             lineHeight: 108 * 0.88,
-            transform: [{ rotate: "-7deg" }],
+            transform: [{ rotate: '-7deg' }],
             letterSpacing: -2,
-            width: "150%",
-            textAlign: "center",
+            width: '150%',
+            textAlign: 'center'
           }}
           numberOfLines={1}
           allowFontScaling={false}
@@ -90,11 +90,11 @@ export function BookHero({ book, onBack, onShare }: BookHeroProps) {
       <View
         className="items-center mt-5 z-[4]"
         style={{
-          shadowColor: "#000",
+          shadowColor: '#000',
           shadowOffset: { width: 0, height: 24 },
           shadowOpacity: 0.93,
           shadowRadius: 34,
-          elevation: 20,
+          elevation: 20
         }}
       >
         <BookCover book={book} width={coverW} height={coverH} />
@@ -110,7 +110,7 @@ export function BookHero({ book, onBack, onShare }: BookHeroProps) {
         </Text>
         {book.authors && book.authors.length > 0 && (
           <Text className="font-body text-sm text-t2 mb-[3px]">
-            {book.authors.join(", ")}
+            {book.authors.join(', ')}
           </Text>
         )}
       </View>
@@ -118,34 +118,34 @@ export function BookHero({ book, onBack, onShare }: BookHeroProps) {
       {/* Stats row */}
       {(book.page_count || book.published_year) && (
         <View className="flex-row justify-center mt-4 z-[4]">
-          {(
-            [
-              book.page_count ? [`${book.page_count}p`, t("book.pagesLabel")] : null,
-              book.published_year
-                ? [String(book.published_year), t("book.publishedLabel")]
-                : null,
-            ].filter((x): x is [string, string] => x != null)
-          ).map(([value, label], i, arr) => (
-            <View
-              key={label}
-              className="items-center px-container"
-              style={{
-                borderRightWidth: i < arr.length - 1 ? 1 : 0,
-                borderRightColor: alpha(raw.border, 0.28),
-              }}
-            >
-              <Text
-                className="font-body-bold text-sm text-text leading-[15px]"
+          {[
+            book.page_count
+              ? [`${book.page_count}p`, t('book.pagesLabel')]
+              : null,
+            book.published_year
+              ? [String(book.published_year), t('book.publishedLabel')]
+              : null
+          ]
+            .filter((x): x is [string, string] => x != null)
+            .map(([value, label], i, arr) => (
+              <View
+                key={label}
+                className="items-center px-container"
+                style={{
+                  borderRightWidth: i < arr.length - 1 ? 1 : 0,
+                  borderRightColor: alpha(raw.border, 0.28)
+                }}
               >
-                {value}
-              </Text>
-              <Text className="font-body text-xs text-t3 mt-1 tracking-wide uppercase">
-                {label}
-              </Text>
-            </View>
-          ))}
+                <Text className="font-body-bold text-sm text-text leading-[15px]">
+                  {value}
+                </Text>
+                <Text className="font-body text-xs text-t3 mt-1 tracking-wide uppercase">
+                  {label}
+                </Text>
+              </View>
+            ))}
         </View>
       )}
     </View>
-  );
+  )
 }

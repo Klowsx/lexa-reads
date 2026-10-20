@@ -1,33 +1,27 @@
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import {
-  ActivityIndicator,
-  Modal,
-  Pressable,
-  Text,
-  View,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Bell, Mail } from 'lucide-react-native';
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { ActivityIndicator, Modal, Pressable, Text, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Bell, Mail } from 'lucide-react-native'
 import {
   useNotificationPreferences,
-  useUpsertNotificationPreferences,
-} from '~/features/user/hooks/useNotificationPreferences';
-import { useColors } from '~/theme/colors';
+  useUpsertNotificationPreferences
+} from '~/features/user/hooks/useNotificationPreferences'
+import { useColors } from '~/theme/colors'
 
 const alpha = (hex: string, op: number) => {
-  const n = parseInt(hex.replace('#', ''), 16);
-  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})`;
-};
+  const n = parseInt(hex.replace('#', ''), 16)
+  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})`
+}
 
 function Toggle({
   on,
-  onChange,
+  onChange
 }: {
-  on: boolean;
-  onChange: (v: boolean) => void;
+  on: boolean
+  onChange: (v: boolean) => void
 }) {
-  const c = useColors();
+  const c = useColors()
   return (
     <Pressable
       onPress={() => onChange(!on)}
@@ -37,7 +31,7 @@ function Toggle({
         borderRadius: 13,
         backgroundColor: on ? c.accent : c.sh,
         justifyContent: 'center',
-        padding: 3,
+        padding: 3
       }}
     >
       <View
@@ -46,25 +40,25 @@ function Toggle({
           height: 20,
           borderRadius: 10,
           backgroundColor: '#fff',
-          transform: [{ translateX: on ? 18 : 0 }],
+          transform: [{ translateX: on ? 18 : 0 }]
         }}
       />
     </Pressable>
-  );
+  )
 }
 
 export function ConsentModal() {
-  const insets = useSafeAreaInsets();
-  const c = useColors();
-  const { t } = useTranslation();
-  const { data: prefs } = useNotificationPreferences();
-  const upsert = useUpsertNotificationPreferences();
+  const insets = useSafeAreaInsets()
+  const c = useColors()
+  const { t } = useTranslation()
+  const { data: prefs } = useNotificationPreferences()
+  const upsert = useUpsertNotificationPreferences()
 
-  const [pushOn, setPushOn] = useState(true);
-  const [emailOn, setEmailOn] = useState(false);
+  const [pushOn, setPushOn] = useState(true)
+  const [emailOn, setEmailOn] = useState(false)
 
   // Solo mostrar si el registro de preferencias existe y no se ha dado consentimiento
-  if (!prefs || prefs.consent_given_at !== null) return null;
+  if (!prefs || prefs.consent_given_at !== null) return null
 
   function handleSave() {
     upsert.mutate({
@@ -74,15 +68,13 @@ export function ConsentModal() {
       push_comment: pushOn,
       push_recommendation: pushOn,
       email_weekly_digest: emailOn,
-      markConsent: true,
-    });
+      markConsent: true
+    })
   }
 
   return (
     <Modal transparent animationType="fade" statusBarTranslucent>
-      <View
-        className="flex-1 justify-end bg-black/60"
-      >
+      <View className="flex-1 justify-end bg-black/60">
         <View
           className="bg-surface rounded-t-xl border-t border-border"
           style={{ paddingBottom: insets.bottom + 16 }}
@@ -101,9 +93,7 @@ export function ConsentModal() {
             </Text>
 
             {/* Push */}
-            <View
-              className="flex-row items-center gap-3 py-3.5 border-b border-border"
-            >
+            <View className="flex-row items-center gap-3 py-3.5 border-b border-border">
               <View
                 className="w-9 h-9 rounded-md items-center justify-center"
                 style={{ backgroundColor: alpha(c.accent, 0.12) }}
@@ -145,16 +135,17 @@ export function ConsentModal() {
               disabled={upsert.isPending}
               className="mt-5 py-3.5 rounded-md items-center bg-accent"
             >
-              {upsert.isPending
-                ? <ActivityIndicator size="small" color="#fff" />
-                : <Text className="text-xs font-body-sb text-white">
-                    {t('consent.continue')}
-                  </Text>
-              }
+              {upsert.isPending ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text className="text-xs font-body-sb text-white">
+                  {t('consent.continue')}
+                </Text>
+              )}
             </Pressable>
           </View>
         </View>
       </View>
     </Modal>
-  );
+  )
 }

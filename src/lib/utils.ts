@@ -1,4 +1,4 @@
-import { fixed } from "~/theme/colors";
+import { fixed } from '~/theme/colors'
 
 /*
  * Utilidades generales
@@ -26,10 +26,8 @@ import { fixed } from "~/theme/colors";
  * Si el proyecto escala y necesitas resolución de conflictos de Tailwind,
  * reemplaza el cuerpo con clsx + tailwind-merge.
  */
-export function cn(
-  ...classes: (string | undefined | null | false)[]
-): string {
-  return classes.filter(Boolean).join(" ");
+export function cn(...classes: (string | undefined | null | false)[]): string {
+  return classes.filter(Boolean).join(' ')
 }
 
 /* ------------------------------------------------------------------ */
@@ -46,18 +44,17 @@ export function cn(
  * Si no hay fecha, retorna string vacío.
  */
 export function formatDate(
-  date: Date | string | number | null | undefined,
+  date: Date | string | number | null | undefined
 ): string {
-  if (!date) return "";
-  const d = typeof date === "string" || typeof date === "number"
-    ? new Date(date)
-    : date;
+  if (!date) return ''
+  const d =
+    typeof date === 'string' || typeof date === 'number' ? new Date(date) : date
 
-  return d.toLocaleDateString("es-ES", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+  return d.toLocaleDateString('es-ES', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  })
 }
 
 /*
@@ -67,27 +64,26 @@ export function formatDate(
  * Retorna string human-readable en español.
  */
 export function formatRelativeTime(
-  date: Date | string | number | null | undefined,
+  date: Date | string | number | null | undefined
 ): string {
-  if (!date) return "";
-  const d = typeof date === "string" || typeof date === "number"
-    ? new Date(date)
-    : date;
+  if (!date) return ''
+  const d =
+    typeof date === 'string' || typeof date === 'number' ? new Date(date) : date
 
-  const now = Date.now();
-  const diffMs = now - d.getTime();
-  const diffSec = Math.floor(diffMs / 1000);
-  const diffMin = Math.floor(diffSec / 60);
-  const diffHour = Math.floor(diffMin / 60);
-  const diffDay = Math.floor(diffHour / 24);
-  const diffMonth = Math.floor(diffDay / 30);
+  const now = Date.now()
+  const diffMs = now - d.getTime()
+  const diffSec = Math.floor(diffMs / 1000)
+  const diffMin = Math.floor(diffSec / 60)
+  const diffHour = Math.floor(diffMin / 60)
+  const diffDay = Math.floor(diffHour / 24)
+  const diffMonth = Math.floor(diffDay / 30)
 
-  if (diffSec < 60) return "ahora";
-  if (diffMin < 60) return `hace ${diffMin} min`;
-  if (diffHour < 24) return `hace ${diffHour}h`;
-  if (diffDay < 30) return `hace ${diffDay} día${diffDay > 1 ? "s" : ""}`;
-  if (diffMonth < 12) return `hace ${diffMonth} mes${diffMonth > 1 ? "es" : ""}`;
-  return formatDate(d);
+  if (diffSec < 60) return 'ahora'
+  if (diffMin < 60) return `hace ${diffMin} min`
+  if (diffHour < 24) return `hace ${diffHour}h`
+  if (diffDay < 30) return `hace ${diffDay} día${diffDay > 1 ? 's' : ''}`
+  if (diffMonth < 12) return `hace ${diffMonth} mes${diffMonth > 1 ? 'es' : ''}`
+  return formatDate(d)
 }
 
 /*
@@ -96,13 +92,12 @@ export function formatRelativeTime(
  * Útil para mostrar "Publicado en 2024" en la página del libro.
  */
 export function formatYear(
-  date: Date | string | number | null | undefined,
+  date: Date | string | number | null | undefined
 ): number | null {
-  if (!date) return null;
-  const d = typeof date === "string" || typeof date === "number"
-    ? new Date(date)
-    : date;
-  return d.getFullYear();
+  if (!date) return null
+  const d =
+    typeof date === 'string' || typeof date === 'number' ? new Date(date) : date
+  return d.getFullYear()
 }
 
 /* ------------------------------------------------------------------ */
@@ -124,10 +119,10 @@ export function formatYear(
 export function pluralize(
   count: number,
   singular: string,
-  plural?: string,
+  plural?: string
 ): string {
-  const p = plural ?? `${singular}s`;
-  return `${count} ${count === 1 ? singular : p}`;
+  const p = plural ?? `${singular}s`
+  return `${count} ${count === 1 ? singular : p}`
 }
 
 /*
@@ -140,9 +135,9 @@ export function pluralize(
  * Útil para contadores en perfiles y feeds.
  */
 export function truncateNumber(n: number): string {
-  if (n < 1000) return String(n);
-  if (n < 1_000_000) return `${(n / 1000).toFixed(1)}K`;
-  return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n < 1000) return String(n)
+  if (n < 1_000_000) return `${(n / 1000).toFixed(1)}K`
+  return `${(n / 1_000_000).toFixed(1)}M`
 }
 
 /* ------------------------------------------------------------------ */
@@ -160,8 +155,8 @@ export function truncateNumber(n: number): string {
  * Siempre mostramos 1 decimal por claridad.
  */
 export function formatRating(rating: number | null | undefined): string {
-  if (rating == null) return "--";
-  return rating.toFixed(1);
+  if (rating == null) return '--'
+  return rating.toFixed(1)
 }
 
 /*
@@ -173,20 +168,20 @@ export function formatRating(rating: number | null | undefined): string {
  *   ratingToStars(4.5) → ["full","full","full","full","half"]
  *   ratingToStars(3.0) → ["full","full","full","empty","empty"]
  */
-export type StarState = "full" | "half" | "empty";
+export type StarState = 'full' | 'half' | 'empty'
 
 export function ratingToStars(rating: number): StarState[] {
-  const result: StarState[] = [];
+  const result: StarState[] = []
   for (let i = 1; i <= 5; i++) {
     if (rating >= i) {
-      result.push("full");
+      result.push('full')
     } else if (rating >= i - 0.5) {
-      result.push("half");
+      result.push('half')
     } else {
-      result.push("empty");
+      result.push('empty')
     }
   }
-  return result;
+  return result
 }
 
 /* ------------------------------------------------------------------ */
@@ -203,10 +198,10 @@ export function ratingToStars(rating: number): StarState[] {
 export function generateSlug(text: string): string {
   return text
     .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // elimina diacríticos
-    .replace(/[^a-z0-9]+/g, "-") // espacios y no-alfanuméricos → guión
-    .replace(/^-+|-+$/g, ""); // recortar guiones extremos
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // elimina diacríticos
+    .replace(/[^a-z0-9]+/g, '-') // espacios y no-alfanuméricos → guión
+    .replace(/^-+|-+$/g, '') // recortar guiones extremos
 }
 
 /*
@@ -217,12 +212,12 @@ export function generateSlug(text: string): string {
  */
 export function extractInitials(name: string): string {
   return name
-    .split(" ")
+    .split(' ')
     .map((w) => w[0])
     .filter(Boolean)
     .slice(0, 2)
-    .join("")
-    .toUpperCase();
+    .join('')
+    .toUpperCase()
 }
 
 /*
@@ -233,14 +228,14 @@ export function extractInitials(name: string): string {
  *
  *   deriveAvatarColor("javierh3r") → "#C4783A" (siempre el mismo)
  */
-const AVATAR_PALETTE = fixed.avatar.derived;
+const AVATAR_PALETTE = fixed.avatar.derived
 
 export function deriveAvatarColor(seed: string): string {
-  let hash = 5381;
+  let hash = 5381
   for (let i = 0; i < seed.length; i++) {
-    hash = (hash * 33) ^ seed.charCodeAt(i);
+    hash = (hash * 33) ^ seed.charCodeAt(i)
   }
-  return AVATAR_PALETTE[Math.abs(hash) % AVATAR_PALETTE.length];
+  return AVATAR_PALETTE[Math.abs(hash) % AVATAR_PALETTE.length]
 }
 
 /* ------------------------------------------------------------------ */
@@ -255,14 +250,14 @@ export function deriveAvatarColor(seed: string): string {
  */
 export function groupBy<T>(
   items: T[],
-  keyFn: (item: T) => string,
+  keyFn: (item: T) => string
 ): Record<string, T[]> {
-  const result: Record<string, T[]> = {};
+  const result: Record<string, T[]> = {}
   for (const item of items) {
-    const key = keyFn(item);
-    (result[key] ??= []).push(item);
+    const key = keyFn(item)
+    ;(result[key] ??= []).push(item)
   }
-  return result;
+  return result
 }
 
 /*
@@ -275,11 +270,11 @@ export function groupBy<T>(
 export function sortByDate<T>(
   items: T[],
   dateField: keyof T,
-  direction: "asc" | "desc" = "desc",
+  direction: 'asc' | 'desc' = 'desc'
 ): T[] {
   return [...items].sort((a, b) => {
-    const aDate = new Date(String(a[dateField])).getTime();
-    const bDate = new Date(String(b[dateField])).getTime();
-    return direction === "desc" ? bDate - aDate : aDate - bDate;
-  });
+    const aDate = new Date(String(a[dateField])).getTime()
+    const bDate = new Date(String(b[dateField])).getTime()
+    return direction === 'desc' ? bDate - aDate : aDate - bDate
+  })
 }

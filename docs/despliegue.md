@@ -14,20 +14,21 @@ Leyenda: 🔴 bloqueante de seguridad · 🟠 bloqueante de tiendas · 🔵 reco
 Aplicar **en orden** en Supabase → SQL Editor (corre como `postgres`, necesario
 para los `REVOKE` de `017` y el `DELETE FROM auth.users` de `013`).
 
-| Migración | Qué hace | Notas |
-|-----------|----------|-------|
-| `012_books_insert_hardening.sql` | Atribución `added_by` + `is_admin` + moderación de `books` | — |
-| `013_account_hard_delete.sql` | Hard-delete real (cascada + audit trail) | Requiere `postgres` |
-| `014_privacy_and_blocks.sql` | Privacidad unificada + bloqueo bidireccional | — |
-| `015_reports_moderation.sql` | Policies admin sobre `reports` | — |
-| `016_content_length_limits.sql` | CHECK de longitud en comments/reviews/bio | — |
-| `017_privilege_and_search_path_hardening.sql` | **REVOKE de `is_admin`/contadores** + `search_path` en funciones DEFINER | Requiere `postgres` |
-| `018_notifications_dedupe.sql` | Índice único parcial + trigger de follower preciso | — |
-| `019_messaging_enums.sql` | `ADD VALUE` a notification_type y report_target_type | **Antes** de 020 |
-| `020_messaging.sql` | Mensajería: conversations/messages/club_topics, RLS, RPCs, triggers, realtime | Requiere `postgres` (REVOKE) |
-| `021_notification_prefs_messaging.sql` | `push_dm` / `push_club` en notification_preferences | — |
+| Migración                                     | Qué hace                                                                      | Notas                        |
+| --------------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------- |
+| `012_books_insert_hardening.sql`              | Atribución `added_by` + `is_admin` + moderación de `books`                    | —                            |
+| `013_account_hard_delete.sql`                 | Hard-delete real (cascada + audit trail)                                      | Requiere `postgres`          |
+| `014_privacy_and_blocks.sql`                  | Privacidad unificada + bloqueo bidireccional                                  | —                            |
+| `015_reports_moderation.sql`                  | Policies admin sobre `reports`                                                | —                            |
+| `016_content_length_limits.sql`               | CHECK de longitud en comments/reviews/bio                                     | —                            |
+| `017_privilege_and_search_path_hardening.sql` | **REVOKE de `is_admin`/contadores** + `search_path` en funciones DEFINER      | Requiere `postgres`          |
+| `018_notifications_dedupe.sql`                | Índice único parcial + trigger de follower preciso                            | —                            |
+| `019_messaging_enums.sql`                     | `ADD VALUE` a notification_type y report_target_type                          | **Antes** de 020             |
+| `020_messaging.sql`                           | Mensajería: conversations/messages/club_topics, RLS, RPCs, triggers, realtime | Requiere `postgres` (REVOKE) |
+| `021_notification_prefs_messaging.sql`        | `push_dm` / `push_club` en notification_preferences                           | —                            |
 
 **Verificación post-aplicación:**
+
 - `Database → Advisors`: no debe quedar el warning **"Function Search Path Mutable"**.
 - Probar como usuario normal (no admin): `UPDATE users SET is_admin = true WHERE id = auth.uid();` debe **no** cambiar el valor (sigue `false`).
 - Correr los tests de RLS con `SUPABASE_SERVICE_ROLE_KEY` seteada: `pnpm jest src/__tests__/features/auth/rls.test.ts`.
@@ -124,13 +125,14 @@ Plantillas en `public/.well-known/` (ver su `README.md`). Antes del submit:
 
 `EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY` viaja en el bundle (NEW-4). En Google Cloud
 Console → Credenciales → la API key:
+
 - Restringir a la **Books API** únicamente.
 - Poner una **cuota** diaria razonable para limitar el abuso si se extrae.
 - (Opcional, más seguro) proxificarla también vía Edge Function, igual que NYT.
 
 ---
 
-## 8. 🔵 PostHog + crash reporting  ⚠️ NO IMPLEMENTADO — pendiente a propósito
+## 8. 🔵 PostHog + crash reporting ⚠️ NO IMPLEMENTADO — pendiente a propósito
 
 > Decisión: **sin Sentry**. PostHog ya está en dependencias
 > (`posthog-react-native`) pero **nunca se inicializa**, así que hoy el
@@ -153,16 +155,16 @@ Envolver el árbol con `PostHogProvider` **por dentro** del `ErrorBoundary` y
 el usuario acepte. Esquema:
 
 ```tsx
-import { PostHogProvider } from "posthog-react-native";
+import { PostHogProvider } from 'posthog-react-native'
 
 // dentro de RootLayout, envolviendo QueryClientProvider:
-<PostHogProvider
+;<PostHogProvider
   apiKey={process.env.EXPO_PUBLIC_POSTHOG_KEY!}
   options={{
     host: process.env.EXPO_PUBLIC_POSTHOG_HOST,
     // No arrancar la captura hasta tener consentimiento:
-    defaultOptIn: false,            // lusar posthog.optIn() tras aceptar el ConsentModal
-    enableSessionReplay: false,     // privacidad por defecto
+    defaultOptIn: false, // lusar posthog.optIn() tras aceptar el ConsentModal
+    enableSessionReplay: false // privacidad por defecto
   }}
   autocapture={{ captureLifecycleEvents: true, captureScreens: true }}
 >
@@ -179,13 +181,13 @@ de rechazo, `posthog.optOut()`.
 En el arranque (una vez que hay cliente PostHog y consentimiento):
 
 ```tsx
-import { usePostHog } from "posthog-react-native";
-import { setCrashReporter } from "~/lib/crash-reporting";
+import { usePostHog } from 'posthog-react-native'
+import { setCrashReporter } from '~/lib/crash-reporting'
 
 // en un efecto de arranque, con el cliente ya disponible:
 setCrashReporter((error, context) => {
-  posthog.captureException(error, context);
-});
+  posthog.captureException(error, context)
+})
 ```
 
 El `ErrorBoundary` raíz ya llama `logError`, que reenvía al reporter en cuanto

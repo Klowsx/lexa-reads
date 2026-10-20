@@ -119,30 +119,30 @@
 
 ## 5. Stack técnico
 
-| Capa            | Tecnología                                        | Razón                                            |
-| --------------- | ------------------------------------------------- | ------------------------------------------------ |
-| Móvil           | React Native + Expo (SDK 54)                      | Universal, OTA via EAS Update                    |
-| Routing         | Expo Router (`experiments.typedRoutes: true`)     | File-based, navegación tipada                    |
-| Lenguaje        | TypeScript strict                                 |                                                  |
-| Estilos         | NativeWind (Tailwind para RN)                     |                                                  |
-| Backend         | **Supabase-first**                                | Auth + Postgres + Realtime + Storage + Edge Fns  |
-| Edge Functions  | Solo cuando RLS/triggers no alcanzan              | Import Goodreads, hard-delete diferido, webhooks |
-| Base de datos   | PostgreSQL via Supabase (`pg_trgm`, `citext`)     |                                                  |
-| Auth tokens     | `expo-secure-store`                               | No usar AsyncStorage para tokens                 |
-| Server state    | TanStack Query v5 con `queryOptions` factory      | Cache, infinite query, optimistic updates        |
-| Client state    | Zustand mínimo (auth + toasts)                    | El resto es server state                         |
-| Listas grandes  | `@shopify/flash-list`                             | FlatList no escala en feeds                      |
-| Imágenes        | `expo-image` (blurhash + cache)                   | FastImage deprecated en RN 0.81                  |
-| Forms           | `react-hook-form` + `zod`                         | Esquemas zod compartidos con Edge Functions      |
-| Animaciones     | `react-native-reanimated` v4 + Gesture Handler    | Microinteracciones del feed                      |
-| Storage rápido  | `react-native-mmkv` (si hace falta persist)       | 10× más rápido que AsyncStorage                  |
-| i18n            | `expo-localization` + `i18next` (ES + EN en MVP)  |                                                  |
-| API libros      | Google Books (primary) + Open Library (fallback)  |                                                  |
-| Crash reporting | `@sentry/react-native`                            | Mandatorio en producción                         |
-| Analytics       | PostHog RN (con consentimiento) + feature flags   |                                                  |
-| Build / Submit  | EAS Build + EAS Update + EAS Submit               |                                                  |
-| E2E testing     | Maestro                                           | Más simple y mantenido que Detox                 |
-| Unit testing    | Jest + RNTL + tests de RLS contra BD real         | No mockear Supabase                              |
+| Capa            | Tecnología                                       | Razón                                            |
+| --------------- | ------------------------------------------------ | ------------------------------------------------ |
+| Móvil           | React Native + Expo (SDK 54)                     | Universal, OTA via EAS Update                    |
+| Routing         | Expo Router (`experiments.typedRoutes: true`)    | File-based, navegación tipada                    |
+| Lenguaje        | TypeScript strict                                |                                                  |
+| Estilos         | NativeWind (Tailwind para RN)                    |                                                  |
+| Backend         | **Supabase-first**                               | Auth + Postgres + Realtime + Storage + Edge Fns  |
+| Edge Functions  | Solo cuando RLS/triggers no alcanzan             | Import Goodreads, hard-delete diferido, webhooks |
+| Base de datos   | PostgreSQL via Supabase (`pg_trgm`, `citext`)    |                                                  |
+| Auth tokens     | `expo-secure-store`                              | No usar AsyncStorage para tokens                 |
+| Server state    | TanStack Query v5 con `queryOptions` factory     | Cache, infinite query, optimistic updates        |
+| Client state    | Zustand mínimo (auth + toasts)                   | El resto es server state                         |
+| Listas grandes  | `@shopify/flash-list`                            | FlatList no escala en feeds                      |
+| Imágenes        | `expo-image` (blurhash + cache)                  | FastImage deprecated en RN 0.81                  |
+| Forms           | `react-hook-form` + `zod`                        | Esquemas zod compartidos con Edge Functions      |
+| Animaciones     | `react-native-reanimated` v4 + Gesture Handler   | Microinteracciones del feed                      |
+| Storage rápido  | `react-native-mmkv` (si hace falta persist)      | 10× más rápido que AsyncStorage                  |
+| i18n            | `expo-localization` + `i18next` (ES + EN en MVP) |                                                  |
+| API libros      | Google Books (primary) + Open Library (fallback) |                                                  |
+| Crash reporting | `@sentry/react-native`                           | Mandatorio en producción                         |
+| Analytics       | PostHog RN (con consentimiento) + feature flags  |                                                  |
+| Build / Submit  | EAS Build + EAS Update + EAS Submit              |                                                  |
+| E2E testing     | Maestro                                          | Más simple y mantenido que Detox                 |
+| Unit testing    | Jest + RNTL + tests de RLS contra BD real        | No mockear Supabase                              |
 
 ### Comandos
 
@@ -212,7 +212,7 @@ app/                              # Raíz Expo
 
 1. **`app/` solo contiene rutas.** Toda la lógica vive en `src/`. Pantallas importan de `src/`, nunca al revés.
 2. **Datos del servidor:** Screen → hook de `src/features/*/hooks/` (TanStack Query) → `src/lib/supabase.ts` → DB.
-3. **Estado de UI:** Screen → Zustand store. Zustand para *ephemeral*, no para server state.
+3. **Estado de UI:** Screen → Zustand store. Zustand para _ephemeral_, no para server state.
 4. **`google-books.ts` siempre busca primero en la tabla `books`** por `google_books_id`. Si no existe: API → guardar en `books` → retornar. Pantallas nunca llaman la API directo.
 5. **`queryOptions` factory** (no keys-as-functions sueltas):
 
@@ -222,7 +222,7 @@ app/                              # Raíz Expo
    export const feedQueryOptions = (cursor?: string) =>
      queryOptions({
        queryKey: ['feed', cursor],
-       queryFn: () => fetchFeed(cursor),
+       queryFn: () => fetchFeed(cursor)
      })
    ```
 
@@ -231,7 +231,7 @@ app/                              # Raíz Expo
 
    ```tsx
    useEffect(() => {
-     const sub = AppState.addEventListener('change', s => {
+     const sub = AppState.addEventListener('change', (s) => {
        if (Platform.OS !== 'web') focusManager.setFocused(s === 'active')
      })
      return () => sub.remove()

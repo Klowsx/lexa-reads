@@ -18,7 +18,7 @@ import { useState } from 'react'
 import {
   ScrollView,
   NativeSyntheticEvent,
-  NativeScrollEvent,
+  NativeScrollEvent
 } from 'react-native'
 
 function Feed() {
@@ -37,7 +37,7 @@ function Feed() {
 ```tsx
 import Animated, {
   useSharedValue,
-  useAnimatedScrollHandler,
+  useAnimatedScrollHandler
 } from 'react-native-reanimated'
 
 function Feed() {
@@ -46,7 +46,7 @@ function Feed() {
   const onScroll = useAnimatedScrollHandler({
     onScroll: (e) => {
       scrollY.value = e.contentOffset.y // runs on UI thread, no re-render
-    },
+    }
   })
 
   return (
@@ -67,7 +67,7 @@ import { useRef } from 'react'
 import {
   ScrollView,
   NativeSyntheticEvent,
-  NativeScrollEvent,
+  NativeScrollEvent
 } from 'react-native'
 
 function Feed() {

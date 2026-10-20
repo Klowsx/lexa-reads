@@ -4,25 +4,105 @@
   "title": "Design System: Lexa",
   "extensions": {
     "colorMeta": {
-      "accent": { "role": "primary", "displayName": "Terracota de lectura", "canonical": "#C4783A", "tonalRamp": ["#301A09", "#593113", "#82491E", "#A9602A", "#C4783A", "#D79A64", "#E8BC94", "#F5DEC6"] },
-      "light-bg": { "role": "neutral", "displayName": "Papel claro", "canonical": "#F5F0EA", "tonalRamp": ["#221D19", "#443C35", "#665B51", "#877A6F", "#A99B8E", "#CAC0B6", "#E1DAD2", "#F5F0EA"] },
-      "dark-bg": { "role": "neutral", "displayName": "Papel nocturno", "canonical": "#100D0A", "tonalRamp": ["#100D0A", "#2D2823", "#4C443C", "#6D6359", "#8E8378", "#AEA49A", "#CEC6BF", "#F0EAE2"] },
-      "star": { "role": "secondary", "displayName": "Oro de valoración", "canonical": "#E8C05A", "tonalRamp": ["#342707", "#644B0D", "#947015", "#BD931E", "#E8C05A", "#F0D884", "#F7E9B4", "#FFF7E1"] }
+      "accent": {
+        "role": "primary",
+        "displayName": "Terracota de lectura",
+        "canonical": "#C4783A",
+        "tonalRamp": [
+          "#301A09",
+          "#593113",
+          "#82491E",
+          "#A9602A",
+          "#C4783A",
+          "#D79A64",
+          "#E8BC94",
+          "#F5DEC6"
+        ]
+      },
+      "light-bg": {
+        "role": "neutral",
+        "displayName": "Papel claro",
+        "canonical": "#F5F0EA",
+        "tonalRamp": [
+          "#221D19",
+          "#443C35",
+          "#665B51",
+          "#877A6F",
+          "#A99B8E",
+          "#CAC0B6",
+          "#E1DAD2",
+          "#F5F0EA"
+        ]
+      },
+      "dark-bg": {
+        "role": "neutral",
+        "displayName": "Papel nocturno",
+        "canonical": "#100D0A",
+        "tonalRamp": [
+          "#100D0A",
+          "#2D2823",
+          "#4C443C",
+          "#6D6359",
+          "#8E8378",
+          "#AEA49A",
+          "#CEC6BF",
+          "#F0EAE2"
+        ]
+      },
+      "star": {
+        "role": "secondary",
+        "displayName": "Oro de valoración",
+        "canonical": "#E8C05A",
+        "tonalRamp": [
+          "#342707",
+          "#644B0D",
+          "#947015",
+          "#BD931E",
+          "#E8C05A",
+          "#F0D884",
+          "#F7E9B4",
+          "#FFF7E1"
+        ]
+      }
     },
     "typographyMeta": {
-      "display": { "displayName": "Editorial", "purpose": "Títulos de pantalla, secciones y libros destacados." },
-      "headline": { "displayName": "Titular", "purpose": "Encabezados de bloque y tarjetas con protagonismo." },
-      "body": { "displayName": "Lectura funcional", "purpose": "Reseñas, descripciones, campos y datos." },
-      "label": { "displayName": "Acción", "purpose": "Botones, chips, pestañas y navegación." }
+      "display": {
+        "displayName": "Editorial",
+        "purpose": "Títulos de pantalla, secciones y libros destacados."
+      },
+      "headline": {
+        "displayName": "Titular",
+        "purpose": "Encabezados de bloque y tarjetas con protagonismo."
+      },
+      "body": {
+        "displayName": "Lectura funcional",
+        "purpose": "Reseñas, descripciones, campos y datos."
+      },
+      "label": {
+        "displayName": "Acción",
+        "purpose": "Botones, chips, pestañas y navegación."
+      }
     },
     "shadows": [
-      { "name": "cover-lift", "value": "2px 8px 14px rgba(0,0,0,0.35)", "purpose": "Solo para una portada aislada." }
+      {
+        "name": "cover-lift",
+        "value": "2px 8px 14px rgba(0,0,0,0.35)",
+        "purpose": "Solo para una portada aislada."
+      }
     ],
     "motion": [
-      { "name": "state-change", "value": "150-200ms ease-out", "purpose": "Cambios de selección, guardado y hojas; sin coreografías de entrada." }
+      {
+        "name": "state-change",
+        "value": "150-200ms ease-out",
+        "purpose": "Cambios de selección, guardado y hojas; sin coreografías de entrada."
+      }
     ],
     "breakpoints": [
-      { "name": "touch-target", "value": "44px", "purpose": "Mínimo para iconos y controles táctiles." }
+      {
+        "name": "touch-target",
+        "value": "44px",
+        "purpose": "Mínimo para iconos y controles táctiles."
+      }
     ]
   },
   "components": [
@@ -62,13 +142,36 @@
   "narrative": {
     "northStar": "La biblioteca habitada",
     "overview": "Lexa combina la pausa de una biblioteca personal con la conversación de una comunidad lectora. La calidez viene de los neutros tierra, de la tipografía editorial y de las portadas, no de adornos.",
-    "keyCharacteristics": ["Editorial en títulos y nombres de libros; sobrio y eficiente en controles y datos.", "Color de acento escaso y significativo.", "Jerarquía por tipografía, espacio y superficie.", "Accesibilidad WCAG AA en ambos temas."],
-    "rules": [
-      { "name": "Quiet Accent Rule", "body": "El terracota solo identifica la acción principal, la selección o una relación activa.", "section": "colors" },
-      { "name": "Editorial Boundary Rule", "body": "La tipografía editorial narra y presenta libros. La tipografía sans permite actuar.", "section": "typography" },
-      { "name": "Cover Exception Rule", "body": "Solo una portada o un elemento que represente físicamente un libro puede proyectar una sombra perceptible.", "section": "elevation" }
+    "keyCharacteristics": [
+      "Editorial en títulos y nombres de libros; sobrio y eficiente en controles y datos.",
+      "Color de acento escaso y significativo.",
+      "Jerarquía por tipografía, espacio y superficie.",
+      "Accesibilidad WCAG AA en ambos temas."
     ],
-    "dos": ["Do usar Playfair Display para títulos editoriales y DM Sans para interacción.", "Do respetar contraste WCAG AA y tamaños táctiles de 44 × 44 px."],
-    "donts": ["Don't copiar la paleta roja, navegación web, carruseles decorativos o radios de Pinterest.", "Don't usar gradientes, glassmorphism, neón, sombras extensas ni tarjetas flotantes como decoración."]
+    "rules": [
+      {
+        "name": "Quiet Accent Rule",
+        "body": "El terracota solo identifica la acción principal, la selección o una relación activa.",
+        "section": "colors"
+      },
+      {
+        "name": "Editorial Boundary Rule",
+        "body": "La tipografía editorial narra y presenta libros. La tipografía sans permite actuar.",
+        "section": "typography"
+      },
+      {
+        "name": "Cover Exception Rule",
+        "body": "Solo una portada o un elemento que represente físicamente un libro puede proyectar una sombra perceptible.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do usar Playfair Display para títulos editoriales y DM Sans para interacción.",
+      "Do respetar contraste WCAG AA y tamaños táctiles de 44 × 44 px."
+    ],
+    "donts": [
+      "Don't copiar la paleta roja, navegación web, carruseles decorativos o radios de Pinterest.",
+      "Don't usar gradientes, glassmorphism, neón, sombras extensas ni tarjetas flotantes como decoración."
+    ]
   }
 }

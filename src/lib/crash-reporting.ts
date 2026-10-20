@@ -5,24 +5,27 @@
 // `logError` lo reenviará. Mientras tanto, los errores se loguean en consola
 // (visibles en dev y en logs de crash de la plataforma).
 
-export type CrashReporter = (error: unknown, context?: Record<string, unknown>) => void;
+export type CrashReporter = (
+  error: unknown,
+  context?: Record<string, unknown>
+) => void
 
-let reporter: CrashReporter | null = null;
+let reporter: CrashReporter | null = null
 
 /**
  * Conecta un reporter real (p. ej. `posthog.captureException`) en el arranque:
  *   setCrashReporter((e, ctx) => posthog.captureException(e, ctx));
  */
 export function setCrashReporter(fn: CrashReporter | null) {
-  reporter = fn;
+  reporter = fn
 }
 
 export function logError(error: unknown, context?: Record<string, unknown>) {
   // Siempre dejamos rastro en consola.
   // eslint-disable-next-line no-console
-  console.error("[lexa] error capturado:", error, context ?? "");
+  console.error('[lexa] error capturado:', error, context ?? '')
   try {
-    reporter?.(error, context);
+    reporter?.(error, context)
   } catch {
     // Nunca dejar que el propio reporting tire la app.
   }

@@ -1,7 +1,7 @@
-import { useRouter } from 'expo-router';
-import { Check, ChevronLeft, Eye, EyeOff, Lock } from 'lucide-react-native';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useRouter } from 'expo-router'
+import { Check, ChevronLeft, Eye, EyeOff, Lock } from 'lucide-react-native'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   KeyboardAvoidingView,
   Platform,
@@ -9,25 +9,28 @@ import {
   ScrollView,
   Text,
   TextInput,
-  View,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { cn } from '~/lib/utils';
-import { useColors } from '~/theme/colors';
+  View
+} from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { cn } from '~/lib/utils'
+import { useColors } from '~/theme/colors'
 
 const alpha = (hex: string, op: number) => {
-  const n = parseInt(hex.replace('#', ''), 16);
-  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})`;
-};
+  const n = parseInt(hex.replace('#', ''), 16)
+  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})`
+}
 
 const NEW_PW_REQUIREMENTS = [
-  { labelKey: 'changePassword.reqMinChars', test: (pw: string) => pw.length >= 8 },
-  { labelKey: 'changePassword.reqNumber',   test: (pw: string) => /\d/.test(pw) },
+  {
+    labelKey: 'changePassword.reqMinChars',
+    test: (pw: string) => pw.length >= 8
+  },
+  { labelKey: 'changePassword.reqNumber', test: (pw: string) => /\d/.test(pw) },
   {
     labelKey: 'changePassword.reqMatch',
-    test: (_: string, confirm: string) => _ !== '' && _ === confirm,
-  },
-];
+    test: (_: string, confirm: string) => _ !== '' && _ === confirm
+  }
+]
 
 function Field({
   label,
@@ -35,24 +38,22 @@ function Field({
   onChange,
   show,
   onToggleShow,
-  trailing,
+  trailing
 }: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  show: boolean;
-  onToggleShow: () => void;
-  trailing?: React.ReactNode;
+  label: string
+  value: string
+  onChange: (v: string) => void
+  show: boolean
+  onToggleShow: () => void
+  trailing?: React.ReactNode
 }) {
-  const c = useColors();
+  const c = useColors()
   return (
     <View className="mb-3.5">
       <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase mb-1.5">
         {label}
       </Text>
-      <View
-        className="flex-row items-center rounded-md border border-border bg-surface"
-      >
+      <View className="flex-row items-center rounded-md border border-border bg-surface">
         <Lock size={15} color={c.t3} strokeWidth={1.8} className="ml-[13px]" />
         <TextInput
           value={value}
@@ -64,32 +65,33 @@ function Field({
         />
         {trailing ?? (
           <Pressable onPress={onToggleShow} hitSlop={8} className="pr-[13px]">
-            {show
-              ? <EyeOff size={16} color={c.t3} strokeWidth={1.8} />
-              : <Eye size={16} color={c.t3} strokeWidth={1.8} />
-            }
+            {show ? (
+              <EyeOff size={16} color={c.t3} strokeWidth={1.8} />
+            ) : (
+              <Eye size={16} color={c.t3} strokeWidth={1.8} />
+            )}
           </Pressable>
         )}
       </View>
     </View>
-  );
+  )
 }
 
 export default function ChangePasswordScreen() {
-  const router = useRouter();
-  const insets = useSafeAreaInsets();
-  const c = useColors();
-  const { t } = useTranslation();
+  const router = useRouter()
+  const insets = useSafeAreaInsets()
+  const c = useColors()
+  const { t } = useTranslation()
 
-  const [current, setCurrent] = useState('');
-  const [newPw, setNewPw] = useState('');
-  const [confirm, setConfirm] = useState('');
-  const [showCurrent, setShowCurrent] = useState(false);
-  const [showNew, setShowNew] = useState(false);
+  const [current, setCurrent] = useState('')
+  const [newPw, setNewPw] = useState('')
+  const [confirm, setConfirm] = useState('')
+  const [showCurrent, setShowCurrent] = useState(false)
+  const [showNew, setShowNew] = useState(false)
 
   const allMet =
     current.length >= 1 &&
-    NEW_PW_REQUIREMENTS.every(({ test }) => test(newPw, confirm));
+    NEW_PW_REQUIREMENTS.every(({ test }) => test(newPw, confirm))
 
   return (
     <KeyboardAvoidingView
@@ -155,11 +157,9 @@ export default function ChangePasswordScreen() {
         />
 
         {/* Requirements */}
-        <View
-          className="rounded-xl border border-border mt-1 mb-6 p-3 gap-1 bg-sr"
-        >
+        <View className="rounded-xl border border-border mt-1 mb-6 p-3 gap-1 bg-sr">
           {NEW_PW_REQUIREMENTS.map(({ labelKey, test }) => {
-            const ok = test(newPw, confirm);
+            const ok = test(newPw, confirm)
             return (
               <View key={labelKey} className="flex-row items-center gap-2 py-1">
                 {ok ? (
@@ -175,24 +175,32 @@ export default function ChangePasswordScreen() {
                   </View>
                 )}
                 <Text
-                  className={cn("font-body text-xs", ok ? "text-text" : "text-t2")}
+                  className={cn(
+                    'font-body text-xs',
+                    ok ? 'text-text' : 'text-t2'
+                  )}
                 >
                   {t(labelKey)}
                 </Text>
               </View>
-            );
+            )
           })}
         </View>
 
         <Pressable
           onPress={() => router.back()}
           disabled={!allMet}
-          className={cn("py-3.5 rounded-md items-center", allMet ? "bg-accent" : "")}
+          className={cn(
+            'py-3.5 rounded-md items-center',
+            allMet ? 'bg-accent' : ''
+          )}
           style={allMet ? undefined : { backgroundColor: alpha(c.accent, 0.4) }}
         >
-          <Text className="text-sm font-body-sb text-white">{t('changePassword.save')}</Text>
+          <Text className="text-sm font-body-sb text-white">
+            {t('changePassword.save')}
+          </Text>
         </Pressable>
       </ScrollView>
     </KeyboardAvoidingView>
-  );
+  )
 }

@@ -1,6 +1,6 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { followingInfiniteOptions } from "../user.queries";
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { followingInfiniteOptions } from '../user.queries'
 
 export function useFollowing(userId: string) {
-  return useInfiniteQuery(followingInfiniteOptions(userId));
+  return useInfiniteQuery(followingInfiniteOptions(userId))
 }
