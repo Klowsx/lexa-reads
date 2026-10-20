@@ -734,10 +734,12 @@ export type Database = {
       }
       lists: {
         Row: {
+          accent_color: string | null
           books_count: number | null
           created_at: string | null
           description: string | null
           id: string
+          is_featured: boolean | null
           likes_count: number | null
           name: string
           slug: string
@@ -746,10 +748,12 @@ export type Database = {
           visibility: Database['public']['Enums']['list_visibility'] | null
         }
         Insert: {
+          accent_color?: string | null
           books_count?: number | null
           created_at?: string | null
           description?: string | null
           id?: string
+          is_featured?: boolean | null
           likes_count?: number | null
           name: string
           slug: string
@@ -758,10 +762,12 @@ export type Database = {
           visibility?: Database['public']['Enums']['list_visibility'] | null
         }
         Update: {
+          accent_color?: string | null
           books_count?: number | null
           created_at?: string | null
           description?: string | null
           id?: string
+          is_featured?: boolean | null
           likes_count?: number | null
           name?: string
           slug?: string
@@ -1435,6 +1441,10 @@ export type Database = {
     Functions: {
       accept_club_invite: { Args: { p_club: string }; Returns: undefined }
       accept_message_request: { Args: { p_conv: string }; Returns: undefined }
+      add_list_book: {
+        Args: { target_book: string; target_list: string }
+        Returns: undefined
+      }
       approve_club_member: {
         Args: { p_club: string; p_user: string }
         Returns: undefined

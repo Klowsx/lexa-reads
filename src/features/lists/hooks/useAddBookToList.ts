@@ -1,21 +1,15 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { addBookToListFn } from "../list.queries";
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { addBookToListFn, userListsQueryOptions } from '../list.queries'
 
+// Refresca detalle, portadas, contadores y pertenencia tras una incorporación.
 export function useAddBookToList() {
-  const queryClient = useQueryClient();
-
+  const client = useQueryClient()
   return useMutation({
-    mutationFn: ({
-      listId,
-      bookId,
-      position,
-    }: {
-      listId: string;
-      bookId: string;
-      position: number;
-    }) => addBookToListFn(listId, bookId, position),
-    onSuccess: (_data, vars) => {
-      queryClient.invalidateQueries({ queryKey: ["lists", "user"] });
-    },
-  });
+    mutationFn: ({ listId, bookId }: { listId: string; bookId: string }) =>
+      addBookToListFn(listId, bookId),
+    onSuccess: () =>
+      client.invalidateQueries({
+        queryKey: userListsQueryOptions('').queryKey.slice(0, 1)
+      })
+  })
 }

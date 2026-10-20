@@ -345,6 +345,13 @@ async function entries(browser) {
         await page
           .getByRole('button', { name: 'Vistazo al libro', exact: true })
           .click()
+      else if (entry === 'list')
+        await page
+          .getByRole('button', {
+            name: 'Registrar lectura: ' + book.title,
+            exact: true
+          })
+          .click()
       else await page.getByText(book.title, { exact: true }).first().click()
       await page.getByText('Tu lectura', { exact: true }).waitFor()
       await page.getByRole('button', { name: 'Leído', exact: true }).click()

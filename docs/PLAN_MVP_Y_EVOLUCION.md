@@ -106,7 +106,7 @@ Esta es una propuesta de alcance, no un cambio ya aprobado del producto descrito
 - [x] Reseñas, protección de spoilers y comentarios si se mantienen en el lanzamiento.
 - [x] Perfil, seguir/dejar de seguir y privacidad consistente. Si se ofrece cuenta privada, debe estar protegida en el servidor.
 - [ ] Feed pequeño pero útil, con una alternativa cuando todavía no existan contactos.
-- [ ] Listas básicas: crear, editar y añadir/quitar libros. Funciones más elaboradas pueden esperar.
+- [x] Listas básicas: crear, editar y añadir/quitar libros. Funciones más elaboradas pueden esperar.
 - [ ] Notificaciones internas de los eventos incluidos y push solamente si está probado de extremo a extremo.
 - [ ] Bloquear, reportar, exportar datos y solicitar eliminación de cuenta.
 - [ ] Accesibilidad básica, errores visibles, controles operativos, documentación pública y una versión instalable verificada.
@@ -119,6 +119,7 @@ Los puntos marcados corresponden a implementación y comprobaciones automatizada
 - **Biblioteca:** [contrato y comprobaciones](biblioteca.md): filtros combinables por estado, título/autor, puntuación y etiquetas; páginas por cursor de 24 libros; totales independientes; vacíos específicos y errores recuperables sin perder lo cargado. Verificado con SQL real y navegador. Pendiente: recorrido instalado y gestos nativos en Android/iOS.
 - **Perfiles, seguimiento y privacidad:** [contrato y pruebas](perfiles-seguimiento-privacidad.md): perfil propio/ajeno coherente, edición y privacidad, solicitudes recibidas operativas, relaciones decididas por servidor, contadores de aceptados, listas y comunidad protegidas, y revalidación de caché al perder acceso. Verificado con SQL real, navegador y regresiones de lectura/reseñas. Pendiente: recorrido instalado y accesibilidad con lectores de pantalla nativos.
 - La búsqueda recibió mejoras de UI/UX, pero el punto completo continúa abierto hasta verificar expresamente título, autor e ISBN.
+- **Listas básicas:** [contrato y comprobaciones](listas-basicas.md): formulario compartido de creación/edición, búsqueda dentro de la lista, selector persistente desde el libro, incorporación sin duplicados, retiradas y eliminación con errores recuperables. UI alineada con el design system, permisos y contadores verificados en Supabase; flujo y presentación comprobados en navegador. Pendiente: recorrido instalado, navegación y accesibilidad nativas.
 
 ### Opcional para la primera beta, con decisión explícita
 

@@ -1,21 +1,14 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateListFn } from "../list.queries";
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { updateListFn, userListsQueryOptions } from '../list.queries'
 
-export function useUpdateList(slug: string) {
-  const queryClient = useQueryClient();
-
+// Mantiene sincronizados el formulario, el detalle y las vistas del perfil.
+export function useUpdateList(_slug: string) {
+  const client = useQueryClient()
   return useMutation({
-    mutationFn: (params: {
-      listId: string;
-      name?: string;
-      description?: string | null;
-      visibility?: "public" | "private";
-      accentColor?: string;
-      isFeatured?: boolean;
-    }) => updateListFn(params),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["lists", "slug", slug] });
-      queryClient.invalidateQueries({ queryKey: ["lists", "user"] });
-    },
-  });
+    mutationFn: updateListFn,
+    onSuccess: () =>
+      client.invalidateQueries({
+        queryKey: userListsQueryOptions('').queryKey.slice(0, 1)
+      })
+  })
 }

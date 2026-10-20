@@ -1,15 +1,14 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteListFn } from "../list.queries";
-import { useAuthStore } from "~/stores/auth.store";
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { deleteListFn, userListsQueryOptions } from '../list.queries'
 
+// Descarta los detalles eliminados y actualiza las listas visibles del perfil.
 export function useDeleteList() {
-  const userId = useAuthStore((s) => s.user?.id ?? "");
-  const queryClient = useQueryClient();
-
+  const client = useQueryClient()
   return useMutation({
-    mutationFn: (listId: string) => deleteListFn(listId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["lists", "user", userId] });
-    },
-  });
+    mutationFn: deleteListFn,
+    onSuccess: () =>
+      client.resetQueries({
+        queryKey: userListsQueryOptions('').queryKey.slice(0, 1)
+      })
+  })
 }
