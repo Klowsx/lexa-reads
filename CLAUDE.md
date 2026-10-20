@@ -26,6 +26,7 @@ pnpm tsc --noEmit
 ```
 
 **Environment variables** go in `.env.local` (gitignored):
+
 ```
 EXPO_PUBLIC_SUPABASE_URL=
 EXPO_PUBLIC_SUPABASE_ANON_KEY=
@@ -83,9 +84,13 @@ The project is scaffolded and implemented. The layout is:
 4. **`google-books.ts` is the only place to call the Google Books API.** Always query the local `books` table first by `google_books_id`; if missing, fetch → insert → return. Screens never hit the external API directly.
 
 5. **`queryOptions` factory pattern** — no loose query keys:
+
    ```ts
    export const feedQueryOptions = (cursor?: string) =>
-     queryOptions({ queryKey: ['feed', cursor], queryFn: () => fetchFeed(cursor) })
+     queryOptions({
+       queryKey: ['feed', cursor],
+       queryFn: () => fetchFeed(cursor)
+     })
    ```
 
 6. **Infinite scroll with cursor, not offset** — cursor = `(created_at, id)`.
@@ -102,9 +107,12 @@ The project is scaffolded and implemented. The layout is:
 
 12. **RLS policies are written as SQL in migrations**, not described in prose. All tables have RLS enabled.
 
+13. **Simplicidad antes que capas adicionales.** Seguir las reglas de `AGENTS.md`: no crear reexports internos ni wrappers triviales de un solo uso, ni mover código únicamente para acortar un archivo. Una extracción debe aportar reutilización real, una responsabilidad clara o cumplir una obligación arquitectónica, como las rutas de Expo Router.
+
 ## Key UI patterns
 
 **`QueryBoundary`** — standard wrapper for data-dependent screens:
+
 ```tsx
 <QueryBoundary query={feedQuery} skeleton={<FeedSkeleton />}>
   {(data) => <FeedList items={data} />}
@@ -118,6 +126,7 @@ The project is scaffolded and implemented. The layout is:
 ## Database (Supabase / PostgreSQL)
 
 Full schema is in `STACK.md §7` and `supabase/migrations/001_initial_schema.sql`. Key conventions:
+
 - All PKs: `uuid DEFAULT gen_random_uuid()`
 - All tables have RLS enabled
 - `citext` for usernames and slugs (case-insensitive)
@@ -135,6 +144,7 @@ Apply migrations via Supabase SQL Editor. After schema changes, regenerate types
 ## Compliance requirements (store-blocking)
 
 These must ship in MVP or the app will be rejected:
+
 - In-app content reporting with ≤24h internal response
 - User blocking with RLS enforcement
 - In-app account deletion with 30-day deferred hard-delete (Edge Function `delete-account`)
