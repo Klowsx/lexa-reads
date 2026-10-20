@@ -37,7 +37,7 @@
     "status": {
       "reading": "Leyendo",
       "read": "Leído",
-      "want_to_read": "Quiero leer",
+      "want_to_read": "Pendiente",
       "abandoned": "Abandonado"
     },
     "tabs": {
@@ -57,7 +57,7 @@
     "review": "Reseña",
     "spoilers": "Contiene spoilers",
     "myRating": "Mi calificación",
-    "myRatingShort": "Mi rating",
+    "myRatingShort": "Mi puntuación",
     "ratingValue": "Tu calificación: {{rating}} ★",
     "tapToRate": "Toca para calificar",
     "doubleTapRemove": "Toca dos veces para quitar el rating",
@@ -487,5 +487,39 @@
     "pushBody": "¿Quieres recibir avisos cuando alguien te siga, comente o le dé me gusta a tus publicaciones?",
     "pushNotNow": "Ahora no",
     "pushEnable": "Activar"
+  },
+  "reading": {
+    "title": "Tu lectura",
+    "status": "Estado de lectura",
+    "rating": "Tu puntuación",
+    "ratingHint": "Toca una estrella para puntuar. Vuelve a tocarla para elegir media estrella.",
+    "removeRating": "Quitar puntuación",
+    "rateValue": "Puntuar con {{value}} de 5 estrellas",
+    "dates": "Fechas de lectura",
+    "editDates": "Editar fechas de lectura",
+    "dateUnknown": "Sin fecha registrada",
+    "goalYear": "Cuenta para tu meta de {{year}}.",
+    "goalMissingDate": "Añade la fecha de finalización para contar este libro en tu meta anual.",
+    "dateHint": "Usa el formato año-mes-día. La fecha de inicio es opcional.",
+    "started": "Fecha de inicio (opcional)",
+    "finished": "Fecha de finalización",
+    "today": "Hoy",
+    "todayFor": "Usar hoy en {{field}}",
+    "removeStart": "Quitar fecha de inicio",
+    "saveDates": "Guardar fechas",
+    "saving": "Guardando…",
+    "saved": "Lectura guardada",
+    "saveError": "No se guardaron los cambios. Tus datos anteriores se mantienen; vuelve a intentarlo.",
+    "loadError": "No pudimos cargar tu lectura. Reintenta antes de hacer cambios.",
+    "errors": {
+      "invalidDate": "Escribe una fecha válida en formato AAAA-MM-DD.",
+      "futureDate": "La fecha no puede ser posterior a hoy.",
+      "dateOrder": "La finalización debe ser el mismo día o después del inicio.",
+      "finishRequired": "Un libro leído necesita una fecha de finalización."
+    },
+    "manageStatus": "Cambiar estado de lectura",
+    "add": "Guardar libro",
+    "editRating": "Editar puntuación",
+    "addToList": "Añadir a una lista"
   }
 }

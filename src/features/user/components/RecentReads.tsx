@@ -12,6 +12,7 @@ interface Props {
   onViewAll?: () => void
 }
 
+// Enlaza las lecturas terminadas con su ficha del catálogo para poder editarlas.
 export function RecentReads({ books, onViewAll }: Props) {
   const router = useRouter()
   const { t } = useTranslation()
@@ -61,7 +62,7 @@ export function RecentReads({ books, onViewAll }: Props) {
                 onPress={() =>
                   router.push({
                     pathname: '/book/[id]',
-                    params: { id: book.id }
+                    params: { id: book.google_books_id }
                   })
                 }
                 className="gap-2 rounded-sm active:opacity-70"

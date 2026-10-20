@@ -487,5 +487,39 @@
     "pushBody": "Want to get notified when someone follows you, comments, or likes your posts?",
     "pushNotNow": "Not now",
     "pushEnable": "Enable"
+  },
+  "reading": {
+    "title": "Your reading",
+    "status": "Reading status",
+    "rating": "Your rating",
+    "ratingHint": "Tap a star to rate. Tap it again to choose a half star.",
+    "removeRating": "Remove rating",
+    "rateValue": "Rate {{value}} out of 5 stars",
+    "dates": "Reading dates",
+    "editDates": "Edit reading dates",
+    "dateUnknown": "No date recorded",
+    "goalYear": "Counts towards your {{year}} goal.",
+    "goalMissingDate": "Add the finish date to count this book towards your yearly goal.",
+    "dateHint": "Use year-month-day format. The start date is optional.",
+    "started": "Start date (optional)",
+    "finished": "Finish date",
+    "today": "Today",
+    "todayFor": "Use today for {{field}}",
+    "removeStart": "Remove start date",
+    "saveDates": "Save dates",
+    "saving": "Saving…",
+    "saved": "Reading saved",
+    "saveError": "Changes could not be saved. Your previous data is kept; try again.",
+    "loadError": "We could not load your reading record. Retry before making changes.",
+    "errors": {
+      "invalidDate": "Enter a valid date in YYYY-MM-DD format.",
+      "futureDate": "The date cannot be later than today.",
+      "dateOrder": "Finish date must be on or after the start date.",
+      "finishRequired": "A read book needs a finish date."
+    },
+    "manageStatus": "Change reading status",
+    "add": "Save book",
+    "editRating": "Edit rating",
+    "addToList": "Add to a list"
   }
 }

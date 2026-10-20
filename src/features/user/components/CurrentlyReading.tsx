@@ -12,6 +12,7 @@ interface Props {
   onDiscover?: () => void
 }
 
+// Abre la ficha con el identificador del catálogo que espera la ruta de libros.
 export function CurrentlyReading({ books, onDiscover }: Props) {
   const c = useColors()
   const router = useRouter()
@@ -49,7 +50,7 @@ export function CurrentlyReading({ books, onDiscover }: Props) {
                 onPress={() =>
                   router.push({
                     pathname: '/book/[id]',
-                    params: { id: book.id }
+                    params: { id: book.google_books_id }
                   })
                 }
                 accessibilityRole="button"

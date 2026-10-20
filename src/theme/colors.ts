@@ -1,5 +1,5 @@
 // Este archivo se genera desde src/theme/tokens.json. No editar manualmente.
-import { useColorScheme } from 'react-native';
+import { useThemeStore } from '~/stores/theme.store';
 
 // Valores para StyleSheet.create() o cuando no hay acceso a clases NativeWind.
 export const rawDark = {
@@ -80,7 +80,7 @@ export type AppColors = typeof rawDark & typeof fixed;
 
 // Devuelve la paleta del tema activo junto con los colores semánticos fijos.
 export function useColors(): AppColors {
-  const scheme = useColorScheme() ?? 'light';
+  const scheme = useThemeStore((state) => state.scheme);
   const raw = scheme === 'dark' ? rawDark : rawLight;
   return { ...raw, ...fixed } as AppColors;
 }
