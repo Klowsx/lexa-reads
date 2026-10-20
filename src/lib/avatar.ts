@@ -1,12 +1,8 @@
-const PALETTE = [
-  '#C4783A', // accent/terracotta
-  '#4A96B8', // blue
-  '#5B9A6A', // green
-  '#B8445A', // rose
-  '#8A6CD8', // purple
-  '#C49A20', // amber
-] as const;
+import { fixed } from '~/theme/colors';
 
+const PALETTE = fixed.avatar.profile;
+
+// Genera las iniciales que se muestran cuando el usuario no tiene avatar.
 export function getInitials(displayName: string): string {
   return displayName
     .trim()
@@ -16,6 +12,7 @@ export function getInitials(displayName: string): string {
     .join('');
 }
 
+// Asigna un color estable de la paleta central según el nombre de usuario.
 export function getAvatarColor(username: string): string {
   let hash = 0;
   for (let i = 0; i < username.length; i++) {

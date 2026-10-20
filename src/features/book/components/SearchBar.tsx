@@ -1,42 +1,57 @@
-﻿import { Search, X } from 'lucide-react-native';
-import { useTranslation } from 'react-i18next';
-import { Pressable, TextInput, View } from 'react-native';
-import { useColors } from '~/theme/colors';
+import { Search, X } from 'lucide-react-native'
+import { useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { Keyboard, TextInput, View } from 'react-native'
+import { SearchIconButton } from '~/features/search/components/SearchControls'
+import { useColors } from '~/theme/colors'
 
 interface Props {
-  value: string;
-  onChangeText: (text: string) => void;
-  focused: boolean;
-  onFocus: () => void;
-  onBlur: () => void;
+  value: string
+  onChangeText: (text: string) => void
+  placeholder?: string
 }
 
-export function SearchBar({ value, onChangeText, focused, onFocus, onBlur }: Props) {
-  const c = useColors();
-  const { t } = useTranslation();
+// Mantiene el foco al limpiar y adapta la ayuda al tipo de búsqueda.
+export function SearchBar({ value, onChangeText, placeholder }: Props) {
+  const c = useColors()
+  const { t } = useTranslation()
+  const input = useRef<TextInput>(null)
+  const [focused, setFocused] = useState(false)
+
+  // Limpia el texto sin obligar al lector a volver a abrir el teclado.
+  function clearSearch() {
+    onChangeText('')
+    input.current?.focus()
+  }
 
   return (
     <View
-      className="flex-row items-center gap-2 bg-surface rounded-md px-3.5 py-2.5"
-      style={{ borderWidth: 1, borderColor: focused ? c.accent + '66' : 'transparent' }}
+      className="min-h-14 flex-row items-center gap-3 rounded-md border-2 bg-surface pl-4 pr-1"
+      style={{ borderColor: focused ? c.accent : c.surface }}
     >
-      <Search size={15} color={c.t3} strokeWidth={1.6} />
+      <Search size={20} color={c.t2} strokeWidth={1.75} />
       <TextInput
+        ref={input}
         value={value}
         onChangeText={onChangeText}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        placeholder={t('book.searchPlaceholder')}
-        placeholderTextColor={c.t3}
-        className="flex-1 text-text font-body text-base"
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        placeholder={placeholder ?? t('book.searchPlaceholder')}
+        accessibilityLabel={placeholder ?? t('book.searchPlaceholder')}
+        accessibilityRole="search"
+        placeholderTextColor={c.t2}
+        selectionColor={c.accent}
+        className="min-w-0 flex-1 py-3 font-body text-xs text-text web:outline-none"
         autoCapitalize="none"
+        autoCorrect={false}
         returnKeyType="search"
+        onSubmitEditing={Keyboard.dismiss}
       />
       {value.length > 0 && (
-        <Pressable onPress={() => onChangeText('')} hitSlop={8}>
-          <X size={18} color={c.t3} strokeWidth={1.6} />
-        </Pressable>
+        <SearchIconButton label={t('search.clear')} onPress={clearSearch}>
+          <X size={20} color={c.t2} />
+        </SearchIconButton>
       )}
     </View>
-  );
+  )
 }

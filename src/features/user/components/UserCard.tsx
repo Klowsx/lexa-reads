@@ -1,83 +1,106 @@
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Pressable, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
-import { Avatar } from '~/components/ui/Avatar';
-import { useFollow } from '~/features/user/hooks/useFollow';
-import type { SearchUser } from '~/features/user/user.queries';
-import { useColors } from '~/theme/colors';
-
-const alpha = (hex: string, op: number) => {
-  const n = parseInt(hex.replace('#', ''), 16);
-  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})`;
-};
+import { useTranslation } from 'react-i18next'
+import { Pressable, Text, View } from 'react-native'
+import { useRouter } from 'expo-router'
+import { Avatar } from '~/components/ui/Avatar'
+import { SearchAction } from '~/features/search/components/SearchControls'
+import { useFollow } from '~/features/user/hooks/useFollow'
+import { useProfile } from '~/features/user/hooks/useProfile'
+import type { SearchUser } from '~/features/user/user.queries'
+import { useAuthStore } from '~/stores/auth.store'
 
 interface Props {
-  user: SearchUser;
+  user: SearchUser
 }
 
+// Muestra al lector y refleja el seguimiento persistido, incluidas solicitudes privadas.
 export function UserCard({ user }: Props) {
-  const router = useRouter();
-  const c = useColors();
-  const { t } = useTranslation();
-  const [followed, setFollowed] = useState(false);
+  const router = useRouter()
+  const { t } = useTranslation()
+  const currentUserId = useAuthStore((state) => state.user?.id)
+  const isOwnProfile = currentUserId === user.id
+  const profile = useProfile(isOwnProfile ? '' : user.username)
   const { follow, unfollow } = useFollow(
     user.id,
     user.username,
-    user.is_private ?? false,
-  );
+    user.is_private ?? false
+  )
+  const followStatus = profile.data?.follow_status
+  const busy = follow.isPending || unfollow.isPending
+  const label = busy
+    ? t('search.saving')
+    : followStatus === 'pending'
+      ? t('search.requested')
+      : followStatus === 'accepted'
+        ? t('common.following')
+        : t('common.follow')
 
-  function handleFollow(e: any) {
-    e.stopPropagation();
-    if (followed) {
-      unfollow.mutate(undefined, { onSuccess: () => setFollowed(false) });
-    } else {
-      follow.mutate(undefined, { onSuccess: () => setFollowed(true) });
-    }
+  // Cambia el seguimiento solamente después de conocer el estado actual del perfil.
+  function handleFollow() {
+    if (busy || !profile.data) return
+    follow.reset()
+    unfollow.reset()
+    if (followStatus) unfollow.mutate()
+    else follow.mutate()
   }
 
   return (
-    <Pressable
-      onPress={() => router.push(`/user/${user.username}` as any)}
-      className="flex-row items-center gap-3 py-3 border-b border-border"
-    >
-      <Avatar
-        displayName={user.display_name}
-        username={user.username}
-        avatarUrl={user.avatar_url}
-        size={44}
-      />
-
-      <View className="flex-1 min-w-0">
-        <Text className="text-xs font-body-sb text-text" numberOfLines={1}>
-          {user.display_name}
-        </Text>
-        <Text className="text-xs font-body text-t3 mt-0.5" numberOfLines={1}>
-          @{user.username}
-        </Text>
-        {user.bio ? (
-          <Text className="text-xs font-body text-t2 mt-0.5" numberOfLines={1}>
-            {user.bio}
-          </Text>
-        ) : null}
-      </View>
-
-      <Pressable
-        onPress={handleFollow}
-        disabled={follow.isPending || unfollow.isPending}
-        className="px-3.5 py-2 rounded-full border shrink-0"
-        style={{
-          backgroundColor: followed ? 'transparent' : alpha(c.accent, 0.1),
-          borderColor: followed ? c.border : alpha(c.accent, 0.35),
-        }}
-      >
-        <Text
-          className="text-xs font-body-sb"
-          style={{ color: followed ? c.t2 : c.accent }}
+    <View className="mb-4 gap-2">
+      <View className="flex-row flex-wrap items-center gap-3">
+        <Pressable
+          onPress={() => router.push('/user/' + user.username)}
+          accessibilityRole="button"
+          accessibilityLabel={t('search.openReader', {
+            name: user.display_name || user.username
+          })}
+          className="min-w-0 flex-1 flex-row items-center gap-3 rounded-md py-2 hover:bg-surface active:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
         >
-          {followed ? t('common.following') : t('common.follow')}
+          <Avatar
+            neutral
+            displayName={user.display_name || user.username}
+            username={user.username}
+            avatarUrl={user.avatar_url}
+            size={48}
+          />
+          <View className="min-w-0 flex-1 gap-1">
+            <Text className="font-body-sb text-xs text-text" numberOfLines={1}>
+              {user.display_name || user.username}
+            </Text>
+            <Text className="font-body text-xs text-t2" numberOfLines={1}>
+              @{user.username}
+            </Text>
+          </View>
+        </Pressable>
+        {!isOwnProfile && (
+          <SearchAction
+            label={
+              profile.isError
+                ? t('common.retry')
+                : profile.isPending
+                  ? t('common.loading')
+                  : label
+            }
+            onPress={
+              profile.isError
+                ? () => {
+                    void profile.refetch()
+                  }
+                : handleFollow
+            }
+            selected={!!followStatus}
+            disabled={busy || (profile.isPending && !profile.isError)}
+          />
+        )}
+      </View>
+      {user.bio ? (
+        <Text className="font-body text-xs text-t2" numberOfLines={2}>
+          {user.bio}
         </Text>
-      </Pressable>
-    </Pressable>
-  );
+      ) : null}
+      {(follow.isError || unfollow.isError) && (
+        <Text accessibilityRole="alert" className="font-body text-xs text-text">
+          {t('search.followError')}
+        </Text>
+      )}
+    </View>
+  )
 }

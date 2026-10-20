@@ -1,3 +1,5 @@
+import { fixed } from "~/theme/colors";
+
 /*
  * Utilidades generales
  * =====================
@@ -231,16 +233,7 @@ export function extractInitials(name: string): string {
  *
  *   deriveAvatarColor("javierh3r") → "#C4783A" (siempre el mismo)
  */
-const AVATAR_PALETTE = [
-  "#C4783A", // accent cálido
-  "#4A96B8", // azul
-  "#5CAF7E", // verde
-  "#8A6CD8", // púrpura
-  "#B8445A", // rosa oscuro
-  "#C49A20", // dorado
-  "#3A8AB8", // azul vivo
-  "#7E5CAF", // lavanda
-];
+const AVATAR_PALETTE = fixed.avatar.derived;
 
 export function deriveAvatarColor(seed: string): string {
   let hash = 5381;

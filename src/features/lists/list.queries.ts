@@ -1,5 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "~/lib/supabase";
+import { fixed } from "~/theme/colors";
 import type { Tables } from "~/types/database";
 
 // ── Types ──────────────────────────────────────────────────────
@@ -62,6 +63,7 @@ const LIST_DETAIL_COLS = `
 
 // ── Fetch functions ────────────────────────────────────────────
 
+// Consulta las listas del usuario y aplica el color semántico cuando falta en la base de datos.
 async function fetchUserLists(userId: string): Promise<ListRow[]> {
   const { data, error } = await supabase
     .from("lists")
@@ -72,7 +74,7 @@ async function fetchUserLists(userId: string): Promise<ListRow[]> {
   return ((data ?? []) as any[]).map((row) => ({
     ...row,
     is_featured: row.is_featured ?? false,
-    accent_color: row.accent_color ?? "#4A96B8",
+    accent_color: row.accent_color ?? fixed.status.reading,
     preview_books: ((row.preview_books ?? []) as any[])
       .sort((a: any, b: any) => a.position - b.position)
       .slice(0, 3)
@@ -80,6 +82,7 @@ async function fetchUserLists(userId: string): Promise<ListRow[]> {
   }));
 }
 
+// Consulta una lista pública o privada y conserva un color de respaldo centralizado.
 async function fetchList(slug: string): Promise<ListDetail | null> {
   const { data, error } = await supabase
     .from("lists")
@@ -93,7 +96,7 @@ async function fetchList(slug: string): Promise<ListDetail | null> {
   const detail: ListDetail = {
     ...raw,
     is_featured: raw.is_featured ?? false,
-    accent_color: raw.accent_color ?? "#4A96B8",
+    accent_color: raw.accent_color ?? fixed.status.reading,
     items: ((raw.items ?? []) as any[]).sort(
       (a, b) => a.position - b.position,
     ),

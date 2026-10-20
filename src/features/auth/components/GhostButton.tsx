@@ -1,24 +1,34 @@
-import { ActivityIndicator, Pressable, View } from 'react-native';
-import { useColors } from '~/theme/colors';
+import { Pressable, View } from 'react-native'
 
 type Props = {
-  children: React.ReactNode;
-  onPress?: () => void;
-  loading?: boolean;
-  disabled?: boolean;
-};
+  children: React.ReactNode
+  onPress?: () => void
+  disabled?: boolean
+  accessibilityLabel?: string
+}
 
-export function GhostButton({ children, onPress, loading, disabled }: Props) {
-  const c = useColors();
+// Renderiza una acción secundaria con tamaño táctil, estado deshabilitado y feedback al presionar.
+export function GhostButton({
+  children,
+  onPress,
+  disabled = false,
+  accessibilityLabel
+}: Props) {
   return (
     <Pressable
       onPress={onPress}
-      disabled={disabled || loading}
-      className="flex-1 rounded-xl py-[14px] bg-transparent border border-border disabled:opacity-60"
+      disabled={disabled}
+      className="flex-1 min-h-12 rounded-md bg-transparent border border-border"
+      style={({ pressed }) => ({
+        opacity: disabled ? 0.45 : pressed ? 0.7 : 1
+      })}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      accessibilityState={{ disabled }}
     >
-      <View className="flex-row items-center justify-center gap-2">
-        {loading ? <ActivityIndicator size="small" color={c.text} /> : children}
+      <View className="flex-1 flex-row items-center justify-center gap-2">
+        {children}
       </View>
     </Pressable>
-  );
+  )
 }

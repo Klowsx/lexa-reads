@@ -1,23 +1,18 @@
-﻿import { Check, Eye, EyeOff, Lock } from "lucide-react-native";
-import { useRouter } from "expo-router";
+import { Check, Eye, EyeOff, Lock } from "lucide-react-native";
 import { useState } from "react";
 import { useUpdatePassword } from "@/src/features/auth/hooks/useResetPassword";
 import {
-  KeyboardAvoidingView,
-  Platform,
   Pressable,
-  ScrollView,
   Text,
   View,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   AuthField,
-  BackBar,
   PrimaryButton,
   alpha,
 } from "../../src/features/auth/components";
 import { useColors } from "~/theme/colors";
+import { AuthPage } from "~/features/auth/components/auth-page";
 
 const REQUIREMENTS = [
   { label: "Al menos 8 caracteres", test: (pw: string) => pw.length >= 8 },
@@ -28,9 +23,8 @@ const REQUIREMENTS = [
   },
 ];
 
+// Permite definir una contraseña nueva con controles visibles y requisitos verificables.
 export default function NewPasswordScreen() {
-  const router = useRouter();
-  const insets = useSafeAreaInsets();
   const c = useColors();
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -41,30 +35,7 @@ export default function NewPasswordScreen() {
   const allMet = REQUIREMENTS.every(({ test }) => test(password, confirm));
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-bg"
-      style={{ paddingTop: insets.top }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <BackBar onBack={() => router.back()} />
-      <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-          paddingHorizontal: 24,
-          paddingTop: 12,
-          paddingBottom: insets.bottom + 24,
-        }}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-      >
-        <View className="mb-7">
-          <Text className="font-display-sb text-text text-2xl tracking-[-0.3px]">
-            Nueva contraseña
-          </Text>
-          <Text className="font-body text-t2 text-sm mt-2.5">
-            Elige una contraseña fuerte y única.
-          </Text>
-        </View>
+    <AuthPage title="Una contraseña nueva" description="Usa una contraseña que no utilices en otras cuentas. Al guardarla, volverás a iniciar sesión.">
 
         <AuthField
           label="Nueva contraseña"
@@ -72,9 +43,16 @@ export default function NewPasswordScreen() {
           onChangeText={setPassword}
           secureTextEntry={!show}
           autoCapitalize="none"
+          textContentType="newPassword"
+          autoComplete="new-password"
           icon={Lock}
           trailing={
-            <Pressable onPress={() => setShow(!show)} hitSlop={8}>
+            <Pressable
+              onPress={() => setShow(!show)}
+              className="w-11 h-11 -mr-3 items-center justify-center"
+              accessibilityRole="button"
+              accessibilityLabel={show ? "Ocultar contraseña" : "Mostrar contraseña"}
+            >
               {show ? (
                 <EyeOff size={16} color={c.t3} />
               ) : (
@@ -90,6 +68,8 @@ export default function NewPasswordScreen() {
           onChangeText={setConfirm}
           secureTextEntry={!show}
           autoCapitalize="none"
+          textContentType="newPassword"
+          autoComplete="new-password"
           icon={Lock}
           trailing={
             password && password === confirm ? (
@@ -137,8 +117,7 @@ export default function NewPasswordScreen() {
         >
           Guardar contraseña
         </PrimaryButton>
-      </ScrollView>
-    </KeyboardAvoidingView>
+    </AuthPage>
   );
 }
 

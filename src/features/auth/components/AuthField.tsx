@@ -1,74 +1,79 @@
-﻿import { useState } from "react";
-import { Text, TextInput, TextInputProps, View } from "react-native";
-import type { LucideIcon } from "lucide-react-native";
-import { isValidElement } from "react";
-import type { ReactNode } from "react";
-import { useColors } from "~/theme/colors";
+import { useState, isValidElement } from 'react'
+import { Text, TextInput, TextInputProps, View } from 'react-native'
+import type { LucideIcon } from 'lucide-react-native'
+
+import type { ReactNode } from 'react'
+import { alpha, useColors } from '~/theme/colors'
 
 type Props = {
-  label?: string;
-  value: string;
-  onChangeText: (v: string) => void;
-  placeholder?: string;
-  secureTextEntry?: boolean;
-  keyboardType?: "default" | "email-address";
-  autoCapitalize?: "none" | "words" | "sentences";
-  icon?: LucideIcon | ReactNode;
-  trailing?: ReactNode;
-  error?: string;
+  label?: string
+  value: string
+  onChangeText: (v: string) => void
+  placeholder?: string
+  secureTextEntry?: boolean
+  keyboardType?: 'default' | 'email-address'
+  autoCapitalize?: 'none' | 'words' | 'sentences'
+  icon?: LucideIcon | ReactNode
+  trailing?: ReactNode
+  error?: string
   // Estos dos props activan el autofill nativo y la integración con gestores de contraseñas.
   // textContentType es solo para iOS; autoComplete cubre Android y web.
-  textContentType?: TextInputProps["textContentType"];
-  autoComplete?: TextInputProps["autoComplete"];
-};
+  textContentType?: TextInputProps['textContentType']
+  autoComplete?: TextInputProps['autoComplete']
+  accessibilityLabel?: string
+}
 
+// Muestra un campo de autenticación consistente, accesible y adaptable a ambos temas.
 export function AuthField({
   label,
   value,
   onChangeText,
   placeholder,
   secureTextEntry,
-  keyboardType = "default",
-  autoCapitalize = "sentences",
+  keyboardType = 'default',
+  autoCapitalize = 'sentences',
   icon,
   trailing,
   error,
   textContentType,
   autoComplete,
+  accessibilityLabel
 }: Props) {
-  const [focused, setFocused] = useState(false);
-  const c = useColors();
+  const [focused, setFocused] = useState(false)
+  const c = useColors()
 
-  const focusedBorder = `rgba(${parseInt(c.accent.slice(1, 3), 16)},${parseInt(c.accent.slice(3, 5), 16)},${parseInt(c.accent.slice(5, 7), 16)},0.55)`;
-  const borderColor = error ? c.error : focused ? focusedBorder : undefined;
+  const focusedBorder = alpha(c.accent, 0.55)
+  const borderColor = error ? c.error : focused ? focusedBorder : undefined
 
   // forwardRef components (como LucideIcon) son objetos, no funciones
   const isComponentType =
-    typeof icon === "function" ||
-    (icon != null && typeof icon === "object" && !isValidElement(icon));
-  const IconComponent = isComponentType ? (icon as LucideIcon) : null;
-  const iconNode = isComponentType ? null : (icon as ReactNode);
+    typeof icon === 'function' ||
+    (icon != null && typeof icon === 'object' && !isValidElement(icon))
+  const IconComponent = isComponentType ? (icon as LucideIcon) : null
+  const iconNode = isComponentType ? null : (icon as ReactNode)
 
   return (
     <View className="mb-[14px]">
       {label && (
-        <Text className="text-xs text-t2 font-body-sb tracking-wide uppercase mb-1.5">
-          {label}
-        </Text>
+        <Text className="text-xs text-text font-body-md mb-2">{label}</Text>
       )}
       <View
-        className="flex-row items-center gap-2.5 bg-surface rounded-md px-3.5 py-[13px] border border-border"
+        className="flex-row items-center gap-2.5 bg-surface rounded-md px-3.5 min-h-[56px] border border-border"
         style={borderColor ? { borderColor } : undefined}
       >
         {(IconComponent || iconNode) && (
           <View
-            className={`shrink-0 ${focused ? "opacity-100" : "opacity-60"}`}
+            className={`shrink-0 ${focused ? 'opacity-100' : 'opacity-60'}`}
           >
-            {IconComponent ? <IconComponent size={16} color={c.t3} /> : iconNode}
+            {IconComponent ? (
+              <IconComponent size={16} color={c.t3} />
+            ) : (
+              iconNode
+            )}
           </View>
         )}
         <TextInput
-          className="flex-1 text-text text-[14px] font-body min-w-0"
+          className="flex-1 text-text text-xs font-body min-w-0"
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
@@ -78,6 +83,10 @@ export function AuthField({
           autoCapitalize={autoCapitalize}
           textContentType={textContentType}
           autoComplete={autoComplete}
+          autoCorrect={autoCapitalize !== 'none'}
+          spellCheck={autoCapitalize !== 'none'}
+          accessibilityLabel={accessibilityLabel ?? label ?? placeholder}
+          accessibilityHint={error}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
         />
@@ -89,5 +98,5 @@ export function AuthField({
         </Text>
       )}
     </View>
-  );
+  )
 }

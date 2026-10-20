@@ -16,6 +16,7 @@ export type UserProfile = Pick<
   | "reading_goal"
   | "reading_goal_year"
   | "onboarding_completed"
+  | "onboarding_step"
   | "created_at"
 >;
 
@@ -31,4 +32,10 @@ export type UpdateProfileData = {
   bio?: string | null;
   favorite_genres?: string[] | null;
   is_private?: boolean;
+};
+
+export type OnboardingPreferences = {
+  favoriteGenres: string[];
+  readingGoal: number;
+  nextStep: 2 | 3;
 };

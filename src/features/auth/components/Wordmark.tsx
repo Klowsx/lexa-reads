@@ -1,6 +1,6 @@
-﻿import { Text } from 'react-native';
+import { Text } from 'react-native'
 
-type Props = { size?: number };
+type Props = { size?: number }
 
 export function Wordmark({ size = 22 }: Props) {
   return (
@@ -10,5 +10,5 @@ export function Wordmark({ size = 22 }: Props) {
     >
       lexa
     </Text>
-  );
+  )
 }

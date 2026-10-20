@@ -1,0 +1,33 @@
+/* Este archivo se genera desde src/theme/tokens.json. No editar manualmente. */
+@layer base {
+  :root {
+    --color-bg: 245 240 234;
+    --color-surface: 235 229 222;
+    --color-sr: 224 217 209;
+    --color-sh: 213 206 197;
+    --color-border: 194 186 176;
+    --color-text: 26 21 18;
+    --color-t2: 104 94 85;
+    --color-t3: 116 106 97;
+    --color-accent: 196 120 58;
+    --color-star: 232 192 90;
+    --color-error: 196 58 58;
+    --color-warning: 196 154 32;
+    --color-success: 92 175 126;
+    --color-status-reading: 74 150 184;
+    --color-status-read: 92 175 126;
+    --color-status-want: 138 108 216;
+    --color-status-abandoned: 120 112 104;
+  }
+
+  .dark {
+    --color-bg: 16 13 10;
+    --color-surface: 28 24 21;
+    --color-sr: 37 33 24;
+    --color-sh: 45 41 34;
+    --color-border: 53 48 43;
+    --color-text: 240 234 226;
+    --color-t2: 158 148 136;
+    --color-t3: 134 125 116;
+  }
+}

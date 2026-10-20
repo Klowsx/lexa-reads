@@ -1,0 +1,13 @@
+node_modules
+.expo
+dist
+coverage
+pnpm-lock.yaml
+*.lock
+*.svg
+*.png
+*.jpg
+*.jpeg
+*.ttf
+*.woff
+*.woff2

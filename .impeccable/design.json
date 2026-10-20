@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-19T00:00:00-05:00",
+  "title": "Design System: Lexa",
+  "extensions": {
+    "colorMeta": {
+      "accent": { "role": "primary", "displayName": "Terracota de lectura", "canonical": "#C4783A", "tonalRamp": ["#301A09", "#593113", "#82491E", "#A9602A", "#C4783A", "#D79A64", "#E8BC94", "#F5DEC6"] },
+      "light-bg": { "role": "neutral", "displayName": "Papel claro", "canonical": "#F5F0EA", "tonalRamp": ["#221D19", "#443C35", "#665B51", "#877A6F", "#A99B8E", "#CAC0B6", "#E1DAD2", "#F5F0EA"] },
+      "dark-bg": { "role": "neutral", "displayName": "Papel nocturno", "canonical": "#100D0A", "tonalRamp": ["#100D0A", "#2D2823", "#4C443C", "#6D6359", "#8E8378", "#AEA49A", "#CEC6BF", "#F0EAE2"] },
+      "star": { "role": "secondary", "displayName": "Oro de valoración", "canonical": "#E8C05A", "tonalRamp": ["#342707", "#644B0D", "#947015", "#BD931E", "#E8C05A", "#F0D884", "#F7E9B4", "#FFF7E1"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Editorial", "purpose": "Títulos de pantalla, secciones y libros destacados." },
+      "headline": { "displayName": "Titular", "purpose": "Encabezados de bloque y tarjetas con protagonismo." },
+      "body": { "displayName": "Lectura funcional", "purpose": "Reseñas, descripciones, campos y datos." },
+      "label": { "displayName": "Acción", "purpose": "Botones, chips, pestañas y navegación." }
+    },
+    "shadows": [
+      { "name": "cover-lift", "value": "2px 8px 14px rgba(0,0,0,0.35)", "purpose": "Solo para una portada aislada." }
+    ],
+    "motion": [
+      { "name": "state-change", "value": "150-200ms ease-out", "purpose": "Cambios de selección, guardado y hojas; sin coreografías de entrada." }
+    ],
+    "breakpoints": [
+      { "name": "touch-target", "value": "44px", "purpose": "Mínimo para iconos y controles táctiles." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Acción principal de un formulario o flujo.",
+      "html": "<button class=\"ds-btn-primary\">Guardar reseña</button>",
+      "css": ".ds-btn-primary { min-height: 48px; padding: 15px 24px; border: 0; border-radius: 12px; background: #C4783A; color: #FFFFFF; font: 600 16px/20px 'DM Sans', sans-serif; cursor: pointer; transition: background 180ms ease-out, transform 180ms ease-out; } .ds-btn-primary:hover { background: #A9602A; } .ds-btn-primary:active { transform: scale(0.98); } .ds-btn-primary:focus-visible { outline: 2px solid #1A1512; outline-offset: 3px; }"
+    },
+    {
+      "name": "Reading Status Chip",
+      "kind": "chip",
+      "refersTo": "chip-selected",
+      "description": "Estado explícito de una lectura; siempre conserva texto.",
+      "html": "<button class=\"ds-chip\" aria-pressed=\"true\">Leyendo</button>",
+      "css": ".ds-chip { padding: 6px 14px; border: 1px solid #4A96B8; border-radius: 999px; background: rgba(74,150,184,0.15); color: #2F6B85; font: 600 16px/20px 'DM Sans', sans-serif; cursor: pointer; } .ds-chip:focus-visible { outline: 2px solid #1A1512; outline-offset: 2px; }"
+    },
+    {
+      "name": "Book Cover",
+      "kind": "card",
+      "refersTo": "cover",
+      "description": "Portada editorial o respaldo tipográfico cuando no hay imagen.",
+      "html": "<article class=\"ds-cover\"><span>Una lectura<br>pendiente</span></article>",
+      "css": ".ds-cover { display: flex; align-items: end; width: 120px; height: 180px; padding: 12px; border-radius: 5px; background: #1C1635; box-shadow: 2px 8px 14px rgba(0,0,0,0.35); color: #F0EAE2; font: 400 18px/1.2 Georgia, serif; }"
+    },
+    {
+      "name": "Bottom Navigation",
+      "kind": "nav",
+      "refersTo": "tab-navigation",
+      "description": "Navegación principal con destino activo indicado por icono, etiqueta y color.",
+      "html": "<nav class=\"ds-tabs\"><button class=\"ds-tab ds-tab-active\">Inicio</button><button class=\"ds-tab\">Buscar</button><button class=\"ds-tab\">Biblioteca</button></nav>",
+      "css": ".ds-tabs { display: flex; padding: 8px 0; border-top: 1px solid #C2BAB0; background: #EBE5DE; } .ds-tab { flex: 1; min-height: 44px; border: 0; background: transparent; color: #685E55; font: 600 14px/20px 'DM Sans', sans-serif; } .ds-tab-active { color: #C4783A; } .ds-tab:focus-visible { outline: 2px solid #1A1512; outline-offset: -2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "La biblioteca habitada",
+    "overview": "Lexa combina la pausa de una biblioteca personal con la conversación de una comunidad lectora. La calidez viene de los neutros tierra, de la tipografía editorial y de las portadas, no de adornos.",
+    "keyCharacteristics": ["Editorial en títulos y nombres de libros; sobrio y eficiente en controles y datos.", "Color de acento escaso y significativo.", "Jerarquía por tipografía, espacio y superficie.", "Accesibilidad WCAG AA en ambos temas."],
+    "rules": [
+      { "name": "Quiet Accent Rule", "body": "El terracota solo identifica la acción principal, la selección o una relación activa.", "section": "colors" },
+      { "name": "Editorial Boundary Rule", "body": "La tipografía editorial narra y presenta libros. La tipografía sans permite actuar.", "section": "typography" },
+      { "name": "Cover Exception Rule", "body": "Solo una portada o un elemento que represente físicamente un libro puede proyectar una sombra perceptible.", "section": "elevation" }
+    ],
+    "dos": ["Do usar Playfair Display para títulos editoriales y DM Sans para interacción.", "Do respetar contraste WCAG AA y tamaños táctiles de 44 × 44 px."],
+    "donts": ["Don't copiar la paleta roja, navegación web, carruseles decorativos o radios de Pinterest.", "Don't usar gradientes, glassmorphism, neón, sombras extensas ni tarjetas flotantes como decoración."]
+  }
+}
