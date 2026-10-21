@@ -12,9 +12,8 @@ enlazado o en el PR correspondiente.
 
 ## 1. Bloqueadores para una beta instalada
 
-- [ ] Desplegar el estado remoto requerido: aplicar las migraciones indicadas,
-      generar los tipos de Supabase y publicar/configurar las Edge Functions,
-      secretos, webhooks, administrador y deep links. Seguir
+- [ ] Publicar y configurar las Edge Functions, secretos, webhooks,
+      administrador y deep links restantes. Seguir
       [el runbook de despliegue](despliegue.md).
 - [ ] Reparar el acceso al proyecto EAS con la cuenta propietaria y generar una
       APK de desarrollo para Android. Registrar el identificador de build y el
@@ -49,12 +48,12 @@ enlazado o en el PR correspondiente.
 
 ## 3. Recorrido esencial del producto
 
-- [ ] Completar búsqueda por ISBN y definir el fallback cuando el catálogo no
-      tenga el libro. Incluir la prueba en dispositivo.
-- [ ] Añadir sugerencias de seguimiento en onboarding para evitar un feed vacío
-      y comprobar el recorrido de un usuario sin contactos.
-- [ ] Confirmar las notificaciones incluidas en el lanzamiento y probar sus
-      enlaces y push de extremo a extremo; ocultar los eventos no soportados.
+- [ ] Probar en Android la búsqueda por ISBN, su fallback de alta y el escáner
+      de cámara ya implementados.
+- [ ] Comprobar en Android el onboarding con sugerencias y el recorrido de una
+      cuenta sin contactos.
+- [ ] Probar enlaces y push de extremo a extremo para las notificaciones
+      navegables incluidas en el lanzamiento.
 - [ ] Extraer las cadenas pendientes a los catálogos de traducción y comprobar
       español e inglés.
 
@@ -78,6 +77,23 @@ enlazado o en el PR correspondiente.
 - [ ] Completar las declaraciones de datos de App Store Connect y Play Console.
 - [ ] Generar la build de producción, validar Internal Testing/TestFlight y
       conservar la evidencia de la versión enviada.
+
+## Completado y pendiente de validación física
+
+- [x] Aplicar en Supabase las migraciones remotas de catálogo comunitario,
+      metadatos y voto de portadas, y sugerencias de seguimiento en onboarding.
+      El cron de finalización de portadas quedó corregido con expresión válida
+      de cinco campos y las migraciones aparecen aplicadas en el proyecto.
+- [x] Revisar la compatibilidad declarada del proyecto con Expo mediante
+      `expo install --check`.
+- [x] Implementar búsqueda por ISBN-13, fallback de alta del catálogo y escáner
+      de cámara para EAN-13. Las pruebas automatizadas pasaron; falta Android.
+- [x] Implementar sugerencias de lectores durante el onboarding y en el feed
+      inicial para evitar una primera pantalla vacía.
+- [x] Limitar la bandeja a tipos de notificación que el MVP puede mostrar o
+      abrir, y mantener la paginación por cursor compuesto.
+- [x] Corregir la generación de tokens del design system para que
+      `gen:theme`, `check:theme` y el formato del repositorio coincidan.
 
 ## Diferido a propósito
 
