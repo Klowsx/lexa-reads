@@ -23,9 +23,10 @@ del catálogo `books` (migración 012).
 
 ## Cola de reportes
 
-Los usuarios crean reportes desde la app (`ReportSheet` → `useCreateReport`) sobre
-`review | comment | user | list | activity`. Llegan a la tabla `reports` con
-`status = 'pending'`.
+Los usuarios crean reportes desde la app (`ReportSheet` → `useCreateReport` →
+`submit_report`) sobre `review | comment | user | list | activity | message |
+club`. La RPC valida el objetivo y el motivo, limita abuso y evita duplicados
+activos antes de crear una fila con `status = 'pending'`.
 
 ### Opción A — Supabase Studio (mínimo viable, hoy)
 
@@ -37,6 +38,8 @@ Los usuarios crean reportes desde la app (`ReportSheet` → `useCreateReport`) s
    - `target_type = user` → tabla `users`
    - `target_type = list` → tabla `lists`
    - `target_type = activity` → tabla `activity_feed`
+   - `target_type = message` → tabla `messages`
+   - `target_type = club` → tabla `reading_clubs`
 3. Decidir y actuar (ver abajo).
 4. Cerrar el reporte:
    ```sql

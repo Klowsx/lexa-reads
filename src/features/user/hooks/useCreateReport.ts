@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useAuthStore } from '~/stores/auth.store'
 import { type ReportTargetType, createReportFn } from '../user.queries'
 
+// Expone el envío de reportes solo cuando existe una sesión autenticada.
 export function useCreateReport() {
   const currentUserId = useAuthStore((s) => s.user?.id)
 
@@ -13,7 +14,7 @@ export function useCreateReport() {
       details?: string
     }) => {
       if (!currentUserId) throw new Error('Not authenticated')
-      return createReportFn({ reporterId: currentUserId, ...data })
+      return createReportFn(data)
     }
   })
 }

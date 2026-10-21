@@ -100,6 +100,10 @@ enlazado o en el PR correspondiente.
       Supabase. La exportación pagina las colecciones y declara la versión de
       formato; la solicitud de eliminación es idempotente y revoca sesiones.
       Falta validación con una cuenta real y Android antes de cerrar los flujos.
+- [x] Centralizar el envío de reportes en la RPC `submit_report`, aplicada en
+      Supabase. Valida tipo, objetivo, motivo y longitud, limita diez reportes
+      por día y evita duplicados activos; la interfaz conserva el borrador si
+      falla. Falta el recorrido con moderador y Android para cerrar el flujo.
 
 ## Diferido a propósito
 

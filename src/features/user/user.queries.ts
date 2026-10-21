@@ -526,21 +526,21 @@ export const blockedUsersQueryOptions = (userId: string) =>
 export type ReportTargetType =
   'review' | 'comment' | 'user' | 'list' | 'activity' | 'message' | 'club'
 
+// Envía el reporte al RPC para que el servidor determine quién reporta y valide el objetivo.
 export async function createReportFn(params: {
-  reporterId: string
   targetType: ReportTargetType
   targetId: string
   reason: string
   details?: string
-}): Promise<void> {
-  const { error } = await supabase.from('reports').insert({
-    reporter_id: params.reporterId,
-    target_type: params.targetType,
-    target_id: params.targetId,
-    reason: params.reason,
-    details: params.details ?? null
+}): Promise<string> {
+  const { data, error } = await (supabase as any).rpc('submit_report', {
+    p_target_type: params.targetType,
+    p_target_id: params.targetId,
+    p_reason: params.reason,
+    p_details: params.details?.trim() || null
   })
   if (error) throw error
+  return data as string
 }
 
 // ── Eliminación de cuenta ──────────────────────────────────────
