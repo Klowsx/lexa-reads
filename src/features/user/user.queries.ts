@@ -499,15 +499,19 @@ export async function unblockUserFn(
 }
 
 async function fetchBlockedUsers(userId: string): Promise<BlockedUser[]> {
-  const { data, error } = await supabase
-    .from('user_blocks')
-    .select(
-      'id, created_at, blocked:users!blocked_id(id, username, display_name, avatar_url)'
-    )
-    .eq('blocker_id', userId)
-    .order('created_at', { ascending: false })
+  // La RPC mantiene la fila visible para quien bloqueó aunque RLS oculte el perfil relacionado.
+  const { data, error } = await (supabase as any).rpc('list_my_blocked_users')
   if (error) throw error
-  return (data ?? []) as unknown as BlockedUser[]
+  return (data ?? []).map((row: any) => ({
+    id: row.block_id,
+    created_at: row.created_at,
+    blocked: {
+      id: row.blocked_id,
+      username: row.username,
+      display_name: row.display_name,
+      avatar_url: row.avatar_url
+    }
+  }))
 }
 
 export const blockedUsersQueryOptions = (userId: string) =>
