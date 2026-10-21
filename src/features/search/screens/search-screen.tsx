@@ -28,6 +28,7 @@ import { useSearchUsers } from '~/features/user/hooks/useSearchUsers'
 import type { SearchUser } from '~/features/user/user.queries'
 import { useDebounce } from '~/lib/useDebounce'
 import type { Tables } from '~/types/database'
+import { isIsbn13, normalizeIsbn13 } from '~/features/book/isbn'
 
 type Item =
   { kind: 'book'; value: Tables<'books'> } | { kind: 'user'; value: SearchUser }
@@ -47,6 +48,7 @@ export default function SearchScreen() {
     null
   )
   const trimmed = query.trim()
+  const isbn13 = isIsbn13(trimmed) ? normalizeIsbn13(trimmed) : null
   const debounced = useDebounce(trimmed, 350)
   const waiting = !!trimmed && trimmed !== debounced
   const activeFilters =
@@ -80,6 +82,14 @@ export default function SearchScreen() {
   function openBook(book: Tables<'books'>) {
     Keyboard.dismiss()
     router.push({ pathname: '/book/[id]', params: { id: book.id } })
+  }
+
+  // Lleva el ISBN no encontrado al alta para evitar que el lector vuelva a escribirlo.
+  function openBookCreation() {
+    router.push({
+      pathname: '/book/create',
+      params: isbn13 ? { isbn: isbn13 } : { title: trimmed }
+    })
   }
 
   // Muestra una fila con acciones separadas para libro y lector.
@@ -231,20 +241,25 @@ export default function SearchScreen() {
             ) : (
               <SearchFeedback
                 title={t(
-                  tab === 'books' ? 'search.discoveryEmpty' : 'search.noReaders'
+                  isbn13
+                    ? 'search.isbnNotFound'
+                    : tab === 'books'
+                      ? 'search.discoveryEmpty'
+                      : 'search.noReaders'
                 )}
                 message={t(
-                  tab === 'books'
-                    ? 'search.addBookHint'
-                    : 'search.noReadersHint'
+                  isbn13
+                    ? 'search.isbnNotFoundHint'
+                    : tab === 'books'
+                      ? 'search.addBookHint'
+                      : 'search.noReadersHint'
                 )}
-                action={tab === 'books' ? t('search.addBook') : undefined}
-                onAction={() =>
-                  router.push({
-                    pathname: '/book/create',
-                    params: { title: trimmed }
-                  })
+                action={
+                  tab === 'books'
+                    ? t(isbn13 ? 'search.addBookWithIsbn' : 'search.addBook')
+                    : undefined
                 }
+                onAction={tab === 'books' ? openBookCreation : undefined}
               />
             )
           }
@@ -272,12 +287,7 @@ export default function SearchScreen() {
                   )}
                 <SearchAction
                   label={t('search.addBook')}
-                  onPress={() =>
-                    router.push({
-                      pathname: '/book/create',
-                      params: { title: trimmed }
-                    })
-                  }
+                  onPress={openBookCreation}
                 />
               </View>
             ) : null
