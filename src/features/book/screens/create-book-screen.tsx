@@ -15,21 +15,27 @@ import { useDebounce } from '~/lib/useDebounce'
 import { useAuthStore } from '~/stores/auth.store'
 import { useColors } from '~/theme/colors'
 import { pickBookCover } from '../pick-cover'
+import { isIsbn13, normalizeIsbn13 } from '../isbn'
 
 // Reúne datos bilingües, términos y propuestas antes de crear una ficha compartida.
 export default function CreateBookScreen() {
   const router = useRouter()
-  const { title: initialTitle } = useLocalSearchParams<{ title?: string }>()
+  const { title: initialTitle, isbn: initialIsbn } = useLocalSearchParams<{
+    title?: string
+    isbn?: string
+  }>()
   const { t, i18n } = useTranslation()
   const c = useColors()
   const insets = useSafeAreaInsets()
   const createBook = useCreateBook()
   const facets = useQuery(catalogFacetsQueryOptions())
   const userId = useAuthStore((s) => s.user?.id)
-  const searchedIsbn = /^\d{13}$/.test(initialTitle ?? '')
+  const searchedIsbn = isIsbn13(initialIsbn ?? initialTitle ?? '')
   const [title, setTitle] = useState(searchedIsbn ? '' : (initialTitle ?? ''))
   const [author, setAuthor] = useState('')
-  const [isbn, setIsbn] = useState(searchedIsbn ? initialTitle! : '')
+  const [isbn, setIsbn] = useState(
+    searchedIsbn ? normalizeIsbn13(initialIsbn ?? initialTitle ?? '') : ''
+  )
   const [genres, setGenres] = useState<string[]>([])
   const [tags, setTags] = useState<string[]>([])
   const [descriptionEs, setDescriptionEs] = useState('')
@@ -63,7 +69,7 @@ export default function CreateBookScreen() {
   async function saveBook() {
     const cleanTitle = title.trim()
     const cleanAuthor = author.trim()
-    const cleanIsbn = isbn.replace(/[^0-9]/g, '')
+    const cleanIsbn = normalizeIsbn13(isbn)
     if (!cleanTitle || !cleanAuthor) {
       setError(t('createBook.required'))
       return
