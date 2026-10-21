@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { format, resolveConfig } from 'prettier'
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url))
 const projectRoot = resolve(scriptDirectory, '..')
@@ -42,8 +43,11 @@ function renderCss(tokens) {
 }
 
 // Genera el acceso a tokens desde el mismo tema activo que usa la raíz de la aplicación.
-function renderThemeModule(tokens) {
-  return `// Este archivo se genera desde src/theme/tokens.json. No editar manualmente.\nimport { useThemeStore } from '~/stores/theme.store';\n\n// Valores para StyleSheet.create() o cuando no hay acceso a clases NativeWind.\nexport const rawDark = ${JSON.stringify(tokens.themes.dark, null, 2)} as const;\n\nexport const rawLight = ${JSON.stringify(tokens.themes.light, null, 2)} as const;\n\n// Colores semánticos que no cambian entre tema claro y oscuro.\nexport const fixed = ${JSON.stringify(tokens.fixed, null, 2)} as const;\n\nexport type AppColors = typeof rawDark & typeof fixed;\n\n// Devuelve la paleta del tema activo junto con los colores semánticos fijos.\nexport function useColors(): AppColors {\n  const scheme = useThemeStore((state) => state.scheme);\n  const raw = scheme === 'dark' ? rawDark : rawLight;\n  return { ...raw, ...fixed } as AppColors;\n}\n\n// Convierte un hexadecimal en rgba para usar transparencias sin duplicar colores.\nexport function alpha(hex: string, opacity: number): string {\n  const numericColor = Number.parseInt(hex.replace('#', ''), 16);\n  return 'rgba(' + (numericColor >> 16) + ',' + ((numericColor >> 8) & 255) + ',' + (numericColor & 255) + ',' + opacity + ')';\n}\n`
+async function renderThemeModule(tokens) {
+  const source = `// Este archivo se genera desde src/theme/tokens.json. No editar manualmente.\nimport { useThemeStore } from '~/stores/theme.store'\n\n// Valores para StyleSheet.create() o cuando no hay acceso a clases NativeWind.\nexport const rawDark = ${JSON.stringify(tokens.themes.dark, null, 2)} as const\n\nexport const rawLight = ${JSON.stringify(tokens.themes.light, null, 2)} as const\n\n// Colores semánticos que no cambian entre tema claro y oscuro.\nexport const fixed = ${JSON.stringify(tokens.fixed, null, 2)} as const\n\nexport type AppColors = typeof rawDark & typeof fixed\n\n// Devuelve la paleta del tema activo junto con los colores semánticos fijos.\nexport function useColors(): AppColors {\n  const scheme = useThemeStore((state) => state.scheme)\n  const raw = scheme === 'dark' ? rawDark : rawLight\n  return { ...raw, ...fixed } as AppColors\n}\n\n// Convierte un hexadecimal en rgba para usar transparencias sin duplicar colores.\nexport function alpha(hex: string, opacity: number): string {\n  const numericColor = Number.parseInt(hex.replace('#', ''), 16)\n  return (\n    'rgba(' +\n    (numericColor >> 16) +\n    ',' +\n    ((numericColor >> 8) & 255) +\n    ',' +\n    (numericColor & 255) +\n    ',' +\n    opacity +\n    ')'\n  )\n}\n`
+
+  const prettierConfig = await resolveConfig(themeModulePath)
+  return format(source, { ...prettierConfig, filepath: themeModulePath })
 }
 
 // Escribe una salida solo cuando cambió y permite verificarla en integración continua.
@@ -63,10 +67,8 @@ function syncGeneratedFile(path, content) {
 }
 
 const tokens = JSON.parse(readFileSync(tokensPath, 'utf8'))
-const isThemeModuleCurrent = syncGeneratedFile(
-  themeModulePath,
-  renderThemeModule(tokens)
-)
+const themeModule = await renderThemeModule(tokens)
+const isThemeModuleCurrent = syncGeneratedFile(themeModulePath, themeModule)
 const isCssCurrent = syncGeneratedFile(generatedCssPath, renderCss(tokens))
 
 if (!isThemeModuleCurrent || !isCssCurrent) {
