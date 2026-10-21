@@ -499,7 +499,8 @@
     "reason": "Motivo",
     "details": "Detalles adicionales (opcional)",
     "detailsPlaceholder": "Describe el problema...",
-    "submit": "Enviar reporte"
+    "submit": "Enviar reporte",
+    "submitError": "No se pudo enviar el reporte. Tu información sigue aquí para que lo intentes de nuevo."
   },
   "consent": {
     "title": "Personaliza tu experiencia",

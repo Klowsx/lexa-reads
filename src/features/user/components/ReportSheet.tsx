@@ -53,11 +53,19 @@ export function ReportSheet({
   const report = useCreateReport()
 
   async function handleSubmit() {
+    // Conserva el formulario cuando falla y solo confirma después de persistir el reporte.
     if (!selected) return
-    await report.mutateAsync(
-      { targetType, targetId, reason: selected, details },
-      { onSuccess: () => setSubmitted(true) }
-    )
+    try {
+      await report.mutateAsync({
+        targetType,
+        targetId,
+        reason: selected,
+        details
+      })
+      setSubmitted(true)
+    } catch {
+      // El estado de la mutación muestra un error recuperable sin borrar el borrador.
+    }
   }
 
   return (
@@ -121,6 +129,9 @@ export function ReportSheet({
                 <Pressable
                   key={r.id}
                   onPress={() => setSelected(r.id)}
+                  accessibilityRole="radio"
+                  accessibilityLabel={t(r.labelKey)}
+                  accessibilityState={{ selected: selected === r.id }}
                   className="flex-row items-center gap-3 py-3 border-b border-border"
                 >
                   <View
@@ -165,6 +176,7 @@ export function ReportSheet({
                 placeholderTextColor={c.t3}
                 multiline
                 numberOfLines={3}
+                maxLength={1000}
                 className="text-xs font-body text-text bg-sr border border-border rounded-md p-[10px] min-h-[72px]"
                 style={{ textAlignVertical: 'top' }}
               />
@@ -195,6 +207,14 @@ export function ReportSheet({
                   )}
                 </Pressable>
               </View>
+              {report.isError && (
+                <Text
+                  accessibilityRole="alert"
+                  className="mt-3 text-xs font-body text-error"
+                >
+                  {t('report.submitError')}
+                </Text>
+              )}
             </ScrollView>
           )}
         </View>

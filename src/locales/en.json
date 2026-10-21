@@ -499,7 +499,8 @@
     "reason": "Reason",
     "details": "Additional details (optional)",
     "detailsPlaceholder": "Describe the problem...",
-    "submit": "Send report"
+    "submit": "Send report",
+    "submitError": "We couldn't send the report. Your information is still here so you can try again."
   },
   "consent": {
     "title": "Personalize your experience",
