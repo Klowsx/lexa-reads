@@ -468,6 +468,7 @@
     "unblockConfirm": "¿Desbloquear a @{{username}}? Podrá volver a ver tu perfil y seguirte.",
     "empty": "Sin usuarios bloqueados",
     "emptyBody": "Los usuarios que bloquees aparecerán aquí. Podrán seguir usando la app, pero no podrán interactuar contigo.",
+    "loadError": "No se pudieron cargar los usuarios bloqueados. Inténtalo de nuevo.",
     "count_one": "{{count}} usuario bloqueado",
     "count_other": "{{count}} usuarios bloqueados"
   },
