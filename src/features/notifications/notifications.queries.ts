@@ -28,14 +28,17 @@ export type NotificationItem = {
 
 type NotificationPage = {
   items: NotificationItem[]
-  nextCursor: string | null
+  nextCursor: NotificationCursor | null
 }
+
+type NotificationCursor = { createdAt: string; id: string }
 
 const ACTOR_COLS = 'id, username, display_name, avatar_url'
 
+// Pagina con fecha e identificador para no perder notificaciones con la misma marca de tiempo.
 async function fetchNotifications(
   userId: string,
-  cursor?: string
+  cursor?: NotificationCursor
 ): Promise<NotificationPage> {
   let query = supabase
     .from('notifications')
@@ -45,9 +48,13 @@ async function fetchNotifications(
     )
     .eq('recipient_id', userId)
     .order('created_at', { ascending: false })
+    .order('id', { ascending: false })
     .limit(PAGE_SIZE)
 
-  if (cursor) query = query.lt('created_at', cursor)
+  if (cursor)
+    query = query.or(
+      `created_at.lt.${cursor.createdAt},and(created_at.eq.${cursor.createdAt},id.lt.${cursor.id})`
+    )
 
   const { data, error } = await query
   if (error) throw error
@@ -66,7 +73,10 @@ async function fetchNotifications(
     items,
     nextCursor:
       items.length === PAGE_SIZE
-        ? (items[items.length - 1].created_at ?? null)
+        ? {
+            createdAt: items[items.length - 1].created_at,
+            id: items[items.length - 1].id
+          }
         : null
   }
 }
@@ -75,8 +85,8 @@ export function notificationsQueryOptions(userId: string) {
   return infiniteQueryOptions({
     queryKey: ['notifications', userId],
     queryFn: ({ pageParam }) =>
-      fetchNotifications(userId, pageParam as string | undefined),
-    initialPageParam: undefined as string | undefined,
+      fetchNotifications(userId, pageParam as NotificationCursor | undefined),
+    initialPageParam: undefined as NotificationCursor | undefined,
     getNextPageParam: (last) => last.nextCursor ?? undefined,
     enabled: !!userId
   })
