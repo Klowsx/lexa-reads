@@ -1,9 +1,13 @@
-import { adminClient, createTestUser } from '~/test-utils/supabase'
+import {
+  adminClient,
+  createTestUser,
+  hasSupabaseTestEnv
+} from '~/test-utils/supabase'
 
 // RLS de clubes (migración 020). Requiere SUPABASE_SERVICE_ROLE_KEY +
 // migraciones 019/020 aplicadas. Sin key → SKIP por env; sin migraciones
 // desplegadas → se saltan en runtime (ready=false).
-const SKIP = !process.env.SUPABASE_SERVICE_ROLE_KEY
+const SKIP = !hasSupabaseTestEnv
 const admin = adminClient as any
 
 async function messagingDeployed(): Promise<boolean> {
@@ -53,7 +57,6 @@ describe('RLS: clubes de lectura', () => {
     if (SKIP) return
     ready = await messagingDeployed()
     if (!ready) {
-      // eslint-disable-next-line no-console
       console.warn('[clubs.rls] migración 020 no desplegada → tests omitidos')
       return
     }
@@ -111,13 +114,11 @@ describe('RLS: clubes de lectura', () => {
     if (SKIP || !ready) return
     const clubId = await createClub(owner, 'private')
     const convId = await clubConversationId(clubId)
-    await (owner.client as any)
-      .from('messages')
-      .insert({
-        conversation_id: convId,
-        sender_id: owner.user.id,
-        body: 'solo socios'
-      })
+    await (owner.client as any).from('messages').insert({
+      conversation_id: convId,
+      sender_id: owner.user.id,
+      body: 'solo socios'
+    })
 
     // Solicitud pendiente
     await (outsider.client as any)

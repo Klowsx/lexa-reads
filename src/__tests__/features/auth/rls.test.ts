@@ -1,6 +1,10 @@
-import { adminClient, createTestUser } from '~/test-utils/supabase'
+import {
+  adminClient,
+  createTestUser,
+  hasSupabaseTestEnv
+} from '~/test-utils/supabase'
 
-const SKIP = !process.env.SUPABASE_SERVICE_ROLE_KEY
+const SKIP = !hasSupabaseTestEnv
 
 describe('RLS: users table', () => {
   let userA: Awaited<ReturnType<typeof createTestUser>>
