@@ -13,6 +13,8 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const NYT_BASE = 'https://api.nytimes.com/svc/books/v3/lists/current'
+// Desactiva también el endpoint si la función anterior sigue desplegada.
+const ENABLE_NYT_BOOKS_API = false
 
 // Lista blanca de listas permitidas (evita usar la función como proxy abierto
 // a cualquier endpoint de NYT).
@@ -41,6 +43,12 @@ interface NYTListResponse {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
+  }
+  if (!ENABLE_NYT_BOOKS_API) {
+    return new Response(JSON.stringify({ isbns: [] }), {
+      status: 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    })
   }
 
   // Requerir un usuario autenticado VÁLIDO: la función no es un proxy público.

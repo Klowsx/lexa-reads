@@ -423,9 +423,9 @@ async function fetchSearchUsers(q: string): Promise<SearchUser[]> {
     .select(USER_SEARCH_COLUMNS)
     .is('deleted_at', null)
     .order('followers_count', { ascending: false })
-    .limit(q.length >= 2 ? 20 : 5)
+    .limit(q.length >= 1 ? 20 : 5)
 
-  if (q.length >= 2) {
+  if (q.length >= 1) {
     query = query.or(`username.ilike.%${q}%,display_name.ilike.%${q}%`)
   }
 
@@ -438,7 +438,7 @@ export const searchUsersQueryOptions = (q: string) =>
   queryOptions({
     queryKey: ['search_users', q],
     queryFn: () => fetchSearchUsers(q),
-    staleTime: q.length >= 2 ? 30_000 : 5 * 60_000
+    staleTime: q.length >= 1 ? 30_000 : 5 * 60_000
   })
 
 // ── Bloqueos ──────────────────────────────────────────────────

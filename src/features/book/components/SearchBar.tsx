@@ -9,10 +9,16 @@ interface Props {
   value: string
   onChangeText: (text: string) => void
   placeholder?: string
+  onFocusChange?: (focused: boolean) => void
 }
 
 // Mantiene el foco al limpiar y adapta la ayuda al tipo de búsqueda.
-export function SearchBar({ value, onChangeText, placeholder }: Props) {
+export function SearchBar({
+  value,
+  onChangeText,
+  placeholder,
+  onFocusChange
+}: Props) {
   const c = useColors()
   const { t } = useTranslation()
   const input = useRef<TextInput>(null)
@@ -34,8 +40,14 @@ export function SearchBar({ value, onChangeText, placeholder }: Props) {
         ref={input}
         value={value}
         onChangeText={onChangeText}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
+        onFocus={() => {
+          setFocused(true)
+          onFocusChange?.(true)
+        }}
+        onBlur={() => {
+          setFocused(false)
+          onFocusChange?.(false)
+        }}
         placeholder={placeholder ?? t('book.searchPlaceholder')}
         accessibilityLabel={placeholder ?? t('book.searchPlaceholder')}
         accessibilityRole="search"

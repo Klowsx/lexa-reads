@@ -475,7 +475,7 @@ export function BookReviewsTab({
               review={sharingReview}
               bookTitle={book?.title}
               bookCoverUrl={book?.cover_url}
-              bookGoogleId={book?.google_books_id}
+              bookId={book?.id}
             />
           </ViewShot>
         </View>

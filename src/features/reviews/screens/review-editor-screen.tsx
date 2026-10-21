@@ -143,7 +143,7 @@ export default function NewReviewScreen() {
     else if (bookQuery.data)
       router.replace({
         pathname: '/book/[id]',
-        params: { id: bookQuery.data.google_books_id }
+        params: { id: bookQuery.data.id }
       })
     else router.replace('/(tabs)/feed')
   }

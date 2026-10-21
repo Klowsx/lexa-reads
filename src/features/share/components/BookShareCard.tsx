@@ -78,9 +78,7 @@ export function BookShareCard({ book, rating, username }: BookShareCardProps) {
       {/* Branding */}
       <View style={s.footer}>
         <Text style={s.brand}>lexa</Text>
-        <Text style={s.url}>
-          lexareads.app/book/{book.google_books_id ?? book.id}
-        </Text>
+        <Text style={s.url}>lexareads.app/book/{book.id}</Text>
       </View>
     </View>
   )

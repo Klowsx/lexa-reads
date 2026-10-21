@@ -20,8 +20,7 @@ flowchart TD
   subgraph SRC["src/ — lógica"]
     HOOKS["features/*/hooks<br/>(useFeed, useMessages, useClub...)"]
     QUERIES["features/*/*.queries.ts<br/>(queryOptions / infiniteQueryOptions)"]
-    GBOOKS["lib/google-books.ts<br/>(única puerta a Google Books)"]
-    NYT["lib/nyt-books.ts"]
+    CATALOG["features/book/catalog.queries.ts<br/>(catálogo comunitario)"]
     SUPA["lib/supabase.ts<br/>(cliente + SecureStore chunked)"]
     subgraph STORES["Zustand (solo estado de cliente)"]
       AUTH["auth.store"]
@@ -35,29 +34,26 @@ flowchart TD
     PG[("Postgres + RLS")]
     TRG["Triggers<br/>(contadores, notify_*, last_message_at)"]
     RT["Realtime<br/>(messages)"]
-    EF["Edge Functions<br/>(send-push, delete-account,<br/>export-user-data, nyt-bestsellers)"]
+    EF["Edge Functions<br/>(send-push, delete-account,<br/>export-user-data)"]
+    COVERS["Storage<br/>(book-covers)"]
     AU["Auth (JWT)"]
   end
 
-  GAPI["Google Books API"]
   EXPO["Expo Push"]
 
   SCR --> HOOKS --> QUERIES --> SUPA
-  QUERIES --> GBOOKS --> SUPA
-  GBOOKS -.->|cache-miss| GAPI
-  NYT --> SUPA
+  QUERIES --> CATALOG --> SUPA
   HOOKS -. usa .-> QC
   QC --> UI
   SCR -. sesión .-> AUTH
   AUTH <-->|onAuthStateChange| AU
   SUPA --> PG
+  SUPA --> COVERS
   PG --> TRG
   RT -->|invalida queries| HOOKS
   PG -->|cambios en messages| RT
   TRG -->|INSERT notifications| EF
   EF --> EXPO
-  NYT -->|invoke| EF
-  EF -->|key server-side| GAPI
 ```
 
 ---
@@ -96,7 +92,7 @@ erDiagram
   }
   books {
     uuid id PK
-    text google_books_id
+    text google_books_id "nullable: enlaces antiguos"
     uuid added_by FK
   }
   user_books {

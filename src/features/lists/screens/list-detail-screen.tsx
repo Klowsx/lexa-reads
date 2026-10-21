@@ -77,7 +77,7 @@ export default function ListDetailScreen() {
   }
   const hidden = !owner && query.isFetching
   const rows = searching
-    ? term.length >= 3 && text.trim() === term
+    ? term.length >= 1 && text.trim() === term
       ? (search.data ?? [])
       : []
     : (list?.items.map((i) => i.book) ?? [])
@@ -258,7 +258,7 @@ export default function ListDetailScreen() {
                       onPress={() =>
                         router.push({
                           pathname: '/book/[id]',
-                          params: { id: book.google_books_id }
+                          params: { id: book.id }
                         })
                       }
                       className="flex-1 min-w-0 flex-row items-center gap-3 rounded-md active:bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
@@ -338,7 +338,7 @@ export default function ListDetailScreen() {
             }}
             ListEmptyComponent={
               searching ? (
-                term.length < 3 || text.trim() !== term ? (
+                term.length < 1 || text.trim() !== term ? (
                   <Text className="font-body text-xs text-t2 py-5">
                     {t('lists.searchHint')}
                   </Text>

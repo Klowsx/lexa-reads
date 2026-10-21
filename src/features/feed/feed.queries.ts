@@ -23,7 +23,6 @@ export type FeedItemBook = {
   title: string
   authors: string[]
   cover_url: string | null
-  google_books_id: string
 }
 
 export type FeedItem = {
@@ -51,7 +50,7 @@ export type FeedCursor = { created_at: string; id: string }
 const FEED_COLS = `
   id, user_id, activity_type, book_id, review_id, list_id, likes_count, created_at,
   user:users!activity_feed_user_id_fkey(id, username, display_name, avatar_url),
-  book:books!activity_feed_book_id_fkey(id, title, authors, cover_url, google_books_id),
+  book:books!activity_feed_book_id_fkey(id, title, authors, cover_url),
   review:reviews(body, contains_spoilers, deleted_at, is_published),
   list:lists(name)
 `.trim()

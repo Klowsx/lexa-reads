@@ -3,7 +3,7 @@ import { Pressable, Text, View } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { cn } from '~/lib/utils'
 
-export type SearchTab = 'all' | 'books' | 'users'
+export type SearchTab = 'books' | 'users'
 interface ActionProps {
   label: string
   onPress: () => void
@@ -64,7 +64,6 @@ export function SearchTabs({
 }) {
   const { t } = useTranslation()
   const tabs = [
-    { id: 'all', label: t('search.tabAll') },
     { id: 'books', label: t('search.tabBooks') },
     { id: 'users', label: t('search.tabUsers') }
   ] as const

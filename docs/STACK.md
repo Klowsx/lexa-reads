@@ -29,9 +29,9 @@
 
 ### Búsqueda de libros
 
-- Texto: título / autor / ISBN con fuzzy matching (`pg_trgm`)
+- Texto: título / autor / ISBN en el catálogo compartido de Lexa
 - **Escaneo ISBN por cámara** (`expo-camera` + `expo-barcode-scanner`)
-- Resultados con portada + metadatos (Google Books → fallback Open Library)
+- Resultados con portada compartida y metadatos añadidos por lectores
 - Página de detalle del libro con reseñas, ratings y comentarios de otros
 
 ### Tracking
@@ -137,7 +137,7 @@
 | Animaciones     | `react-native-reanimated` v4 + Gesture Handler   | Microinteracciones del feed                      |
 | Storage rápido  | `react-native-mmkv` (si hace falta persist)      | 10× más rápido que AsyncStorage                  |
 | i18n            | `expo-localization` + `i18next` (ES + EN en MVP) |                                                  |
-| API libros      | Google Books (primary) + Open Library (fallback) |                                                  |
+| Catálogo libros | Tabla `books` de Lexa + portadas en Storage      | Creación por lectores; corrección por moderación |
 | Crash reporting | `@sentry/react-native`                           | Mandatorio en producción                         |
 | Analytics       | PostHog RN (con consentimiento) + feature flags  |                                                  |
 | Build / Submit  | EAS Build + EAS Update + EAS Submit              |                                                  |
@@ -192,7 +192,6 @@ app/                              # Raíz Expo
 │   ├── lib/
 │   │   ├── supabase.ts           # createClient con expo-secure-store
 │   │   ├── query-client.ts       # QueryClient con onError → toasts
-│   │   ├── google-books.ts       # Wrapper: cache DB primero, luego API
 │   │   ├── query-options.ts      # queryOptions factory (TanStack v5)
 │   │   └── utils.ts
 │   ├── types/
@@ -213,7 +212,7 @@ app/                              # Raíz Expo
 1. **`app/` solo contiene rutas.** Toda la lógica vive en `src/`. Pantallas importan de `src/`, nunca al revés.
 2. **Datos del servidor:** Screen → hook de `src/features/*/hooks/` (TanStack Query) → `src/lib/supabase.ts` → DB.
 3. **Estado de UI:** Screen → Zustand store. Zustand para _ephemeral_, no para server state.
-4. **`google-books.ts` siempre busca primero en la tabla `books`** por `google_books_id`. Si no existe: API → guardar en `books` → retornar. Pantallas nunca llaman la API directo.
+4. **El catálogo compartido vive en `books`.** `src/features/book/catalog.queries.ts` busca y crea fichas sin API externa. Los enlaces nuevos usan `books.id`; `google_books_id` solo conserva enlaces antiguos.
 5. **`queryOptions` factory** (no keys-as-functions sueltas):
 
    ```ts
@@ -327,12 +326,12 @@ create index idx_follows_following on follows(following_id);
 
 #### `books`
 
-Cache local de Google Books / Open Library. Búsqueda con `pg_trgm`.
+Catálogo compartido. Lectores autenticados añaden fichas con título y autor originales, categorías y etiquetas públicas, año y descripción en español y/o inglés. Las sugerencias reutilizan términos canónicos; si falta una traducción se muestra el texto disponible. La búsqueda filtra por categorías, etiquetas y año. `books.tags` describe el libro para descubrirlo; `user_books.tags` sigue siendo una organización personal de la biblioteca. Las páginas varían entre ediciones y no se usan como filtro. Cada ficha nueva abre durante siete días propuestas y votos de portada; una tarea horaria fija la candidata más votada (empate: la más antigua), y moderación puede corregirla. Google Books y NYT no participan en búsquedas ni altas: sus módulos y la función NYT conservan interruptores apagados. `google_books_id` solo conserva enlaces anteriores.
 
 ```sql
 create table books (
   id uuid default gen_random_uuid() primary key,
-  google_books_id varchar(20) unique not null,
+  google_books_id varchar(20) unique,
   open_library_id varchar(30),
   title varchar(500) not null,
   authors text[] default '{}',
@@ -340,11 +339,16 @@ create table books (
   isbn_10 varchar(10),
   isbn_13 varchar(13),
   description text,
+  description_es text,
+  description_en text,
   page_count int,
   genres text[] default '{}',
+  tags text[] default '{}',
   language char(2),                                  -- ISO-639-1
   published_date date,
   published_year int,                                -- libros con solo año
+  cover_vote_ends_at timestamptz,
+  cover_finalized_at timestamptz,
   publisher varchar(200),
   created_at timestamptz default now(),
   updated_at timestamptz default now()

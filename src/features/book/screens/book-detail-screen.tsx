@@ -125,7 +125,7 @@ export default function BookDetailScreen() {
                       pageCount={book.page_count}
                     />
                   )}
-                  {activeTab === 3 && <BookSimilarTab />}
+                  {activeTab === 3 && <BookSimilarTab book={book} />}
                 </View>
               </ScrollView>
 

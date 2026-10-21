@@ -5,12 +5,7 @@ import type { Tables } from '~/types/database'
 export type ReviewWithBook = Tables<'reviews'> & {
   books: Pick<
     Tables<'books'>,
-    | 'id'
-    | 'title'
-    | 'authors'
-    | 'cover_url'
-    | 'google_books_id'
-    | 'published_year'
+    'id' | 'title' | 'authors' | 'cover_url' | 'published_year'
   > | null
   user_books: Pick<Tables<'user_books'>, 'rating'> | null
 }
@@ -26,7 +21,7 @@ async function fetchUserReviews(
   let query = supabase
     .from('reviews')
     .select(
-      '*, books(id, title, authors, cover_url, google_books_id, published_year), user_books(rating)'
+      '*, books(id, title, authors, cover_url, published_year), user_books(rating)'
     )
     .eq('user_id', userId)
     .eq('is_published', true)

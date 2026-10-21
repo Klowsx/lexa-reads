@@ -49,7 +49,7 @@ mensaje y el bloqueo te permiten controlar quién te contacta.
 
 ## 6. Propiedad intelectual
 
-Los metadatos de libros provienen de terceros (p. ej. Google Books, NYT). La
+Los metadatos y portadas de libros pueden ser aportados por lectores. La
 marca, el diseño y el software de Lexa son nuestros o de nuestros licenciantes.
 
 ## 7. Descargo de responsabilidad y límite de responsabilidad

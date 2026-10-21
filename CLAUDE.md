@@ -59,7 +59,6 @@ The project is scaffolded and implemented. The layout is:
 │   │   ├── supabase.ts      # createClient with expo-secure-store adapter
 │   │   ├── query-client.ts  # QueryClient — onError dispatches toasts
 │   │   ├── crash-reporting.ts # logError → console + pluggable reporter (no Sentry)
-│   │   ├── google-books.ts  # DB cache-first wrapper for Google Books API
 │   │   └── utils.ts
 │   │   # NOTE: query options use the per-feature `<feature>/<feature>.queries.ts`
 │   │   # pattern (queryOptions/infiniteQueryOptions factories) — there is no
@@ -81,7 +80,7 @@ The project is scaffolded and implemented. The layout is:
 
 3. **Server state = TanStack Query. Client state = Zustand** (only auth session + toast queue). Never use Zustand for server data.
 
-4. **`google-books.ts` is the only place to call the Google Books API.** Always query the local `books` table first by `google_books_id`; if missing, fetch → insert → return. Screens never hit the external API directly.
+4. **Books belong to the shared Lexa catalog.** Search only `books` through `src/features/book/catalog.queries.ts`; authenticated readers add books with canonical categories/tags and descriptions in es/en. Readers propose and vote for the shared cover during seven days; a scheduled job finalizes it, and moderators may correct it. Use the internal book UUID for new links; legacy Google IDs resolve existing links only.
 
 5. **`queryOptions` factory pattern** — no loose query keys:
 

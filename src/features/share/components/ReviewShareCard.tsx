@@ -12,7 +12,7 @@ interface ReviewShareCardProps {
   review: ReviewWithUser
   bookTitle?: string | null
   bookCoverUrl?: string | null
-  bookGoogleId?: string | null
+  bookId?: string | null
 }
 
 // Las tarjetas exportadas nunca incluyen texto marcado como spoiler, aunque ya se haya revelado en pantalla.
@@ -20,7 +20,7 @@ export function ReviewShareCard({
   review,
   bookTitle,
   bookCoverUrl,
-  bookGoogleId
+  bookId
 }: ReviewShareCardProps) {
   const user = review.users ?? {
     username: 'usuario',
@@ -99,9 +99,7 @@ export function ReviewShareCard({
       <View style={s.footer}>
         <Text style={s.brand}>lexa</Text>
         <Text style={s.url}>
-          {bookGoogleId
-            ? `lexareads.app/book/${bookGoogleId}`
-            : 'lexareads.app'}
+          {bookId ? `lexareads.app/book/${bookId}` : 'lexareads.app'}
         </Text>
       </View>
     </View>

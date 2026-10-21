@@ -62,7 +62,7 @@ export function RecentReads({ books, onViewAll, emptyMessage }: Props) {
                 onPress={() =>
                   router.push({
                     pathname: '/book/[id]',
-                    params: { id: book.google_books_id }
+                    params: { id: book.id }
                   })
                 }
                 className="gap-2 rounded-sm active:opacity-70"

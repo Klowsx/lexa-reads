@@ -24,10 +24,10 @@ interface GBVolume {
       thumbnail?: string
       smallThumbnail?: string
     }
-    industryIdentifiers?: Array<{
+    industryIdentifiers?: {
       type: 'ISBN_10' | 'ISBN_13' | string
       identifier: string
-    }>
+    }[]
     pageCount?: number
     categories?: string[] // va a la columna "genres"
     language?: string
@@ -45,6 +45,8 @@ interface GBSearchResponse {
 
 const BASE_URL = 'https://www.googleapis.com/books/v1'
 const API_KEY = process.env.EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY
+// Mantiene la integración disponible, pero desactiva sus consultas y altas externas.
+const ENABLE_GOOGLE_BOOKS_API = false
 
 // Construye la query string agregando la key solo si existe
 function buildParams(extra: Record<string, string | number>): string {
@@ -231,6 +233,7 @@ export async function searchBooks(
   // Si ya hay resultados locales, los deduplicamos y retornamos sin gastar
   // quota de la API. minLocalResults=1: cualquier hit en caché es suficiente.
   const localDeduped = deduplicateBooks(localResults ?? [])
+  if (!ENABLE_GOOGLE_BOOKS_API) return localDeduped.slice(0, maxResults)
   if (localDeduped.length >= minLocalResults) {
     return localDeduped.slice(0, maxResults)
   }
@@ -267,6 +270,7 @@ export async function getBook(googleBooksId: string): Promise<BookRow | null> {
     .single()
 
   if (cached) return cached
+  if (!ENABLE_GOOGLE_BOOKS_API) return null
 
   // Paso 2: no estaba en caché → llamar a la API de Google Books
   const volume = await fetchVolumeFromApi(googleBooksId)
@@ -299,6 +303,7 @@ export async function getBookByIsbn(isbn: string): Promise<BookRow | null> {
     .maybeSingle()
 
   if (cached) return cached
+  if (!ENABLE_GOOGLE_BOOKS_API) return null
 
   // Paso 2: la API de Google Books acepta búsquedas por ISBN
   // usando el prefijo "isbn:" en el parámetro q.

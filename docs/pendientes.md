@@ -28,19 +28,15 @@ Hoy solo hay email/contraseña; `STACK §2` lo marca como MVP. Es el método de 
 
 ### 🟠 Escaneo de ISBN por cámara
 
-`expo-camera` ya está en deps y `getBookByIsbn()` (en `google-books.ts`) está listo y validado — **solo falta la UI**. Diferenciador real vs. teclear títulos; `STACK §2` lo lista como MVP.
+`expo-camera` ya está en deps. El escaneo debe consultar el catálogo de Lexa por ISBN; si falta, ofrecer el formulario de alta con el ISBN precargado.
 
-**Implementación:** botón en `SearchBar` → pantalla con `CameraView` (barcode `ean13`/`upc`) → al detectar, `getBookByIsbn(code)` → navegar a `book/[id]`.
+**Implementación:** botón en `SearchBar` → pantalla con `CameraView` (barcode `ean13`/`upc`) → al detectar, buscar por ISBN en `search_catalog` → abrir `book/[id]` o proponer añadirlo.
 
 ### 🟠 Sugerencias de follow en onboarding
 
 Evita el "cold start": hoy un usuario nuevo entra a un feed vacío. `STACK §2` pide "sigue ≥5 para continuar" como último step del onboarding.
 
 **Implementación:** step en `app/(auth)/onboarding/` con query a usuarios más seguidos / con más en común; gate de ≥5 follows antes de entrar al feed.
-
-### 🔵 Fallback a Open Library
-
-Cuando Google Books no encuentra el libro. `STACK §2` lo menciona; hoy solo Google Books. Iría dentro de `google-books.ts` (manteniéndolo como única puerta de catálogo).
 
 ### 🔵 i18n completo
 

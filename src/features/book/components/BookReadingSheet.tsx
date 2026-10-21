@@ -29,7 +29,7 @@ export function BookReadingSheet({
     onClose()
     router.push({
       pathname: '/book/[id]',
-      params: { id: book.google_books_id ?? book.id }
+      params: { id: book.id }
     })
   }
 

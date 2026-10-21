@@ -2,6 +2,9 @@ import { getBookByIsbn } from '~/lib/google-books'
 import { supabase } from '~/lib/supabase'
 import type { Tables } from '~/types/database'
 
+// Conserva la integración de bestsellers sin hacer peticiones mientras esté apagada.
+const ENABLE_NYT_BOOKS_API = false
+
 // NEW-4 (auditoría): la API key de NYT ya NO vive en el cliente. Esta función
 // invoca la Edge Function `nyt-bestsellers` (que guarda la key como secret del
 // servidor y devuelve solo los ISBNs), y luego resuelve cada ISBN con el flujo
@@ -10,6 +13,7 @@ import type { Tables } from '~/types/database'
 export async function getNYTBestsellers(
   list = 'combined-print-and-e-book-fiction'
 ): Promise<Tables<'books'>[]> {
+  if (!ENABLE_NYT_BOOKS_API) return []
   const { data, error } = await supabase.functions.invoke<{ isbns: string[] }>(
     'nyt-bestsellers',
     { body: { list } }

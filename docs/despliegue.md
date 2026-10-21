@@ -1,7 +1,7 @@
 # Runbook de despliegue — Lexa Reads
 
 > Pasos que **no se pueden hacer desde el repo** (requieren acceso al dashboard de
-> Supabase, Google/NYT Cloud, Apple/Google y el hosting del dominio) más los que
+> Supabase, Apple/Google y el hosting del dominio) más los que
 > se dejaron **solo documentados a propósito** (PostHog / crash reporting).
 > Hacer en este orden. Última actualización: 2026-06-04.
 
@@ -59,7 +59,6 @@ que existen porque las tablas de mensajería aún no están en `database.ts`).
 
 ```bash
 supabase functions deploy send-push
-supabase functions deploy nyt-bestsellers
 supabase functions deploy delete-account
 supabase functions deploy export-user-data
 ```
@@ -68,13 +67,10 @@ Secrets (Supabase → Edge Functions → Secrets, o CLI):
 
 ```bash
 supabase secrets set WEBHOOK_SECRET=<valor-aleatorio-largo>
-supabase secrets set NYT_API_KEY=<key-de-developer.nytimes.com>
 ```
 
 - `WEBHOOK_SECRET`: sin él, `send-push` rechaza TODO (fail-closed) → las push
   no llegan hasta configurarlo. Generar con `openssl rand -hex 32`.
-- `NYT_API_KEY`: la usa la nueva función `nyt-bestsellers` (NEW-4). El cliente
-  ya no lleva ninguna key de NYT.
 - `SUPABASE_URL` / `SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` ya las
   inyecta Supabase automáticamente en las functions.
 
@@ -121,14 +117,15 @@ Plantillas en `public/.well-known/` (ver su `README.md`). Antes del submit:
 
 ---
 
-## 7. 🔵 Restringir la key de Google Books
+## 7. 🔴 Activar el catálogo comunitario
 
-`EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY` viaja en el bundle (NEW-4). En Google Cloud
-Console → Credenciales → la API key:
-
-- Restringir a la **Books API** únicamente.
-- Poner una **cuota** diaria razonable para limitar el abuso si se extrae.
-- (Opcional, más seguro) proxificarla también vía Edge Function, igual que NYT.
+Aplicar en orden `20261021011109_community_books.sql` y
+`20261021020000_book_metadata_cover_votes.sql` antes de publicar esta versión.
+Crean la búsqueda paginada, el vocabulario compartido, las descripciones es/en,
+el bucket `book-covers`, la votación y un job de `pg_cron` que fija la ganadora
+cada hora al cumplirse siete días. Después, regenerar tipos con `pnpm gen:types`
+y comprobar el alta, las sugerencias de términos, las propuestas, un cambio de
+voto y la corrección de moderación.
 
 ---
 
@@ -209,11 +206,11 @@ Mínimo recomendado para producción: `signup_completed`, `book_added`,
 
 - [ ] Migraciones `012`–`018` aplicadas; Advisors sin "Search Path Mutable"
 - [ ] `pnpm gen:types` + `pnpm tsc --noEmit` limpio; `as any` retirados
-- [ ] 4 Edge Functions desplegadas
-- [ ] `WEBHOOK_SECRET` y `NYT_API_KEY` seteados
+- [ ] 3 Edge Functions desplegadas
+- [ ] `WEBHOOK_SECRET` seteado
 - [ ] Webhook de `send-push` con header `x-webhook-secret`
 - [ ] Al menos un admin promovido
 - [ ] `apple-app-site-association` y `assetlinks.json` publicados y verificados
-- [ ] Key de Google Books restringida en Cloud Console
+- [ ] Migraciones del catálogo aplicadas; propuestas, votos y cierre verificados
 - [ ] (Si se hace) PostHog inicializado, gated por consentimiento, crash reporter conectado
 - [ ] `pnpm jest` (incluye RLS con service-role) en verde

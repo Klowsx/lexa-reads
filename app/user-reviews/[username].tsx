@@ -150,10 +150,10 @@ export default function UserReviewsScreen() {
 
   const isLoading = profileLoading || (!!profile && reviewsLoading)
 
-  // Abre la ficha usando el identificador externo esperado por la ruta del catálogo.
+  // Abre la ficha con el identificador estable de Lexa.
   function handleBookPress(review: ReviewWithBook) {
-    const googleId = review.books?.google_books_id
-    if (googleId) router.push(`/book/${googleId}` as any)
+    const bookId = review.books?.id
+    if (bookId) router.push(`/book/${bookId}` as any)
   }
 
   return (

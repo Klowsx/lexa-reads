@@ -50,7 +50,7 @@ export function CurrentlyReading({ books, onDiscover }: Props) {
                 onPress={() =>
                   router.push({
                     pathname: '/book/[id]',
-                    params: { id: book.google_books_id }
+                    params: { id: book.id }
                   })
                 }
                 accessibilityRole="button"

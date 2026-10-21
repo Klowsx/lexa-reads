@@ -169,9 +169,7 @@ export function FeedCard({ item }: FeedCardProps) {
 
         {/* ── Book Cover Band ─────────────────────────── */}
         <Pressable
-          onPress={() =>
-            router.push(`/book/${item.book.google_books_id}` as any)
-          }
+          onPress={() => router.push(`/book/${item.book.id}` as any)}
           accessibilityRole="button"
           accessibilityLabel={t('feed.viewBook', { title: item.book.title })}
           className="items-center justify-center py-7"
@@ -315,7 +313,7 @@ export function FeedCard({ item }: FeedCardProps) {
               Share.share({
                 message: t('feed.shareMessage', {
                   title: item.book.title,
-                  url: `https://lexareads.app/book/${item.book.google_books_id}`
+                  url: `https://lexareads.app/book/${item.book.id}`
                 })
               }).catch(() => {})
             }
