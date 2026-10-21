@@ -28,6 +28,7 @@ const TYPE_CONFIG: Record<
   recommendation_received: { IconComp: Bell, color: fixed.accentAlt.rose }
 }
 
+// Traduce cada evento del MVP a su pantalla relacionada cuando esa navegación está disponible.
 function notificationTarget(
   type: NotificationType,
   referenceId: string | null,
@@ -71,21 +72,9 @@ export function NotificationRow({ item }: NotificationRowProps) {
     actorUsername
   )
 
-  function handlePress() {
-    if (target) router.push(target as any)
-  }
-
-  return (
-    <Pressable
-      onPress={handlePress}
-      className="flex-row items-center px-4 py-3 gap-3"
-      style={{
-        backgroundColor: isUnread ? alpha(c.accent, 0.06) : 'transparent',
-        borderBottomWidth: 1,
-        borderBottomColor: c.border
-      }}
-    >
-      {/* Actor avatar or system icon */}
+  // Comparte el contenido entre una fila navegable y un aviso informativo sin acción.
+  const content = (
+    <>
       {item.actor ? (
         <View className="relative">
           <Avatar
@@ -94,7 +83,6 @@ export function NotificationRow({ item }: NotificationRowProps) {
             avatarUrl={item.actor.avatar_url ?? undefined}
             size={42}
           />
-          {/* Type badge */}
           <View
             className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full items-center justify-center border border-bg"
             style={{ backgroundColor: config.color }}
@@ -111,7 +99,6 @@ export function NotificationRow({ item }: NotificationRowProps) {
         </View>
       )}
 
-      {/* Text */}
       <View className="flex-1 min-w-0 gap-0.5">
         <Text
           className="text-sm font-body text-text leading-[20px]"
@@ -124,8 +111,28 @@ export function NotificationRow({ item }: NotificationRowProps) {
         </Text>
       </View>
 
-      {/* Unread dot */}
       {isUnread && <View className="w-2 h-2 rounded-full shrink-0 bg-accent" />}
+    </>
+  )
+
+  const rowStyle = {
+    backgroundColor: isUnread ? alpha(c.accent, 0.06) : 'transparent',
+    borderBottomWidth: 1,
+    borderBottomColor: c.border
+  }
+
+  return target ? (
+    <Pressable
+      onPress={() => router.push(target as any)}
+      accessibilityRole="button"
+      className="flex-row items-center px-4 py-3 gap-3"
+      style={rowStyle}
+    >
+      {content}
     </Pressable>
+  ) : (
+    <View className="flex-row items-center px-4 py-3 gap-3" style={rowStyle}>
+      {content}
+    </View>
   )
 }
