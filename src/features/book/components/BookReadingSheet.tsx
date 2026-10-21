@@ -9,15 +9,17 @@ import { ReadingRecordControls } from '~/features/library/components/ReadingReco
 import { useColors } from '~/theme/colors'
 import type { Tables } from '~/types'
 
-// Mantiene una única ficha de lectura para búsqueda, biblioteca, feed, listas y detalle.
+// Mantiene una ficha de lectura compartida y evita enlazar a la misma pantalla desde el detalle.
 export function BookReadingSheet({
   book,
   onClose,
-  showSynopsis = true
+  showSynopsis = true,
+  showBookLink = true
 }: {
   book: Tables<'books'>
   onClose: () => void
   showSynopsis?: boolean
+  showBookLink?: boolean
 }) {
   const router = useRouter()
   const { t } = useTranslation()
@@ -95,15 +97,17 @@ export function BookReadingSheet({
         </View>
       ) : null}
       <View className="gap-2 border-t border-border pt-4">
-        <Pressable
-          onPress={openBook}
-          accessibilityRole="button"
-          className="min-h-12 items-center justify-center rounded-md bg-sr px-4 py-3 active:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
-        >
-          <Text className="font-body-sb text-xs text-text">
-            {t('book.viewFullBook')}
-          </Text>
-        </Pressable>
+        {showBookLink && (
+          <Pressable
+            onPress={openBook}
+            accessibilityRole="button"
+            className="min-h-12 items-center justify-center rounded-md bg-sr px-4 py-3 active:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+          >
+            <Text className="font-body-sb text-xs text-text">
+              {t('book.viewFullBook')}
+            </Text>
+          </Pressable>
+        )}
         <Pressable
           onPress={writeReview}
           accessibilityRole="button"

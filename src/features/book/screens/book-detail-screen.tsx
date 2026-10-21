@@ -67,105 +67,114 @@ export default function BookDetailScreen() {
 
   return (
     <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
-      <QueryBoundary query={bookQuery} skeleton={<BookSkeleton />}>
-        {(book) =>
-          book ? (
-            <>
-              <ScrollView
-                className="flex-1"
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
-                stickyHeaderIndices={[2]}
-              >
-                {/* 0 — scrolls away */}
-                <BookHero
-                  book={book}
-                  onBack={() => router.back()}
-                  onShare={captureBook}
-                />
-
-                {/* 1 — scrolls away */}
-                <BookCtaBar
-                  book={book}
-                  status={status}
-                  rating={rating}
-                  userBook={userBook ?? null}
-                  isPending={isPending}
-                  onStatusPress={openReadingSheet}
-                  onRatingPress={openReadingSheet}
-                  onAddToList={handleAddToList}
-                />
-
-                {/* 2 — sticks to top */}
-                <BookTabBar activeTab={activeTab} onChange={setActiveTab} />
-
-                {/* 3 — tab content */}
-                <View>
-                  {activeTab === 0 && (
-                    <BookSummaryTab
-                      book={book}
-                      // Desde Resumen: cambia al tab de Reseñas antes de abrir el modal
-                      // para que el usuario vea su reseña en contexto al volver.
-                      onWriteReview={() => {
-                        setActiveTab(1)
-                        handleWriteReview()
-                      }}
-                    />
-                  )}
-                  {activeTab === 1 && (
-                    <BookReviewsTab
-                      bookId={book.id}
-                      book={book}
-                      onWriteReview={handleWriteReview}
-                    />
-                  )}
-                  {activeTab === 2 && (
-                    <BookCommunityTab
-                      bookId={book.id}
-                      pageCount={book.page_count}
-                    />
-                  )}
-                  {activeTab === 3 && <BookSimilarTab book={book} />}
-                </View>
-              </ScrollView>
-
-              {showReadingSheet && (
-                <BookReadingSheet
-                  book={book}
-                  onClose={() => setShowReadingSheet(false)}
-                />
-              )}
-
-              {/* ViewShot off-screen para capturar BookShareCard */}
-              <View className="absolute left-[-9999px] top-0">
-                <ViewShot ref={shareRef}>
-                  <BookShareCard
+      <View className="w-full max-w-3xl flex-1 self-center">
+        <QueryBoundary query={bookQuery} skeleton={<BookSkeleton />}>
+          {(book) =>
+            book ? (
+              <>
+                <ScrollView
+                  className="flex-1"
+                  showsVerticalScrollIndicator={false}
+                  contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
+                  stickyHeaderIndices={[2]}
+                >
+                  {/* 0 — scrolls away */}
+                  <BookHero
                     book={book}
-                    rating={rating}
-                    username={username}
+                    onBack={() => router.back()}
+                    onShare={captureBook}
                   />
-                </ViewShot>
-              </View>
-            </>
-          ) : (
-            <View className="flex-1 items-center justify-center px-8">
-              <Text className="font-body text-sm text-t2 text-center">
-                {t('book.notFound')}
-              </Text>
-              <Pressable
-                onPress={() => router.back()}
-                accessibilityRole="button"
-                accessibilityLabel={t('common.back')}
-                className="mt-4"
-              >
-                <Text className="font-body-sb text-sm text-accent">
-                  {t('common.back')}
+
+                  {/* 1 — scrolls away */}
+                  <BookCtaBar
+                    book={book}
+                    status={status}
+                    rating={rating}
+                    userBook={userBook ?? null}
+                    isPending={isPending}
+                    onStatusPress={openReadingSheet}
+                    onRatingPress={openReadingSheet}
+                    onAddToList={handleAddToList}
+                  />
+
+                  {/* 2 — sticks to top */}
+                  <BookTabBar activeTab={activeTab} onChange={setActiveTab} />
+
+                  {/* 3 — tab content */}
+                  <View>
+                    {activeTab === 0 && (
+                      <BookSummaryTab
+                        book={book}
+                        // Desde Resumen: cambia al tab de Reseñas antes de abrir el modal
+                        // para que el usuario vea su reseña en contexto al volver.
+                        onWriteReview={() => {
+                          setActiveTab(1)
+                          handleWriteReview()
+                        }}
+                      />
+                    )}
+                    {activeTab === 1 && (
+                      <BookReviewsTab
+                        bookId={book.id}
+                        book={book}
+                        onWriteReview={handleWriteReview}
+                      />
+                    )}
+                    {activeTab === 2 && (
+                      <BookCommunityTab
+                        bookId={book.id}
+                        pageCount={book.page_count}
+                      />
+                    )}
+                    {activeTab === 3 && <BookSimilarTab book={book} />}
+                  </View>
+                </ScrollView>
+
+                {showReadingSheet && (
+                  <BookReadingSheet
+                    book={book}
+                    showSynopsis={false}
+                    showBookLink={false}
+                    onClose={() => setShowReadingSheet(false)}
+                  />
+                )}
+
+                {/* ViewShot off-screen para capturar BookShareCard */}
+                <View
+                  accessibilityElementsHidden
+                  importantForAccessibility="no-hide-descendants"
+                  aria-hidden
+                  className="absolute left-[-9999px] top-0"
+                >
+                  <ViewShot ref={shareRef}>
+                    <BookShareCard
+                      book={book}
+                      rating={rating}
+                      username={username}
+                    />
+                  </ViewShot>
+                </View>
+              </>
+            ) : (
+              <View className="flex-1 items-center justify-center px-8">
+                <Text className="font-body text-sm text-t2 text-center">
+                  {t('book.notFound')}
                 </Text>
-              </Pressable>
-            </View>
-          )
-        }
-      </QueryBoundary>
+                <Pressable
+                  onPress={() => router.back()}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('common.back')}
+                  className="mt-4"
+                >
+                  <Text className="font-body-sb text-sm text-accent">
+                    {t('common.back')}
+                  </Text>
+                </Pressable>
+              </View>
+            )
+          }
+        </QueryBoundary>
+      </View>
     </View>
   )
 }

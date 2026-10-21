@@ -1,33 +1,25 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { ChevronDown, ChevronRight, PenLine } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'
-import { Pressable, Text, TouchableOpacity, View } from 'react-native'
-import { alpha, useColors } from '~/theme/colors'
-import { ReadingRecordControls } from '~/features/library/components/ReadingRecordControls'
+import { Pressable, Text, View } from 'react-native'
+import { useColors } from '~/theme/colors'
 import { BookCoverModeration } from './BookCoverModeration'
 import { BookCoverVote } from './BookCoverVote'
 import { catalogFacetsQueryOptions } from '../catalog.queries'
 import type { Tables } from '~/types/database'
-
-// Distingue los apartados de la ficha sin cambiar la tipografía del sistema.
-function SectionLabel({ children }: { children: string }) {
-  return (
-    <Text className="font-body-sb text-xs text-t3 uppercase tracking-wider mb-2.5">
-      {children}
-    </Text>
-  )
-}
 
 interface BookSummaryTabProps {
   book: Tables<'books'>
   onWriteReview: () => void
 }
 
-// Reúne el registro personal compartido, la sinopsis y los datos de esta edición.
+// Prioriza la sinopsis y permite consultar los datos y la portada sin duplicar el editor de lectura.
 export function BookSummaryTab({ book, onWriteReview }: BookSummaryTabProps) {
   const c = useColors()
   const { t, i18n } = useTranslation()
   const [expanded, setExpanded] = useState(false)
+  const [showCoverVote, setShowCoverVote] = useState(false)
   const facets = useQuery(catalogFacetsQueryOptions())
   const extended = book as Tables<'books'> & {
     tags?: string[]
@@ -60,98 +52,86 @@ export function BookSummaryTab({ book, onWriteReview }: BookSummaryTabProps) {
     },
     { label: t('book.detail.pages'), value: book.page_count?.toString() },
     { label: t('book.detail.isbn13'), value: book.isbn_13 }
-  ].filter((r) => r.value)
+  ].filter((row) => row.value)
 
   return (
-    <View className="pb-6">
-      <View className="px-container py-4 border-b border-border">
-        <ReadingRecordControls bookId={book.id} />
-      </View>
-      <BookCoverModeration bookId={book.id} />
-      {extended.cover_vote_ends_at && (
-        <BookCoverVote
-          bookId={book.id}
-          endsAt={extended.cover_vote_ends_at}
-          finalizedAt={extended.cover_finalized_at ?? null}
-        />
-      )}
-
-      {/* Genres */}
-      {book.genres && book.genres.length > 0 && (
-        <View
-          className="px-container py-4 border-b"
-          style={{ borderBottomColor: alpha(c.border, 0.55) }}
-        >
-          <View className="flex-row flex-wrap gap-1.5">
-            {book.genres.map((g) => (
-              <Text
-                key={g}
-                className="font-body text-xs text-t3 bg-surface border border-border rounded-md px-3 py-[5px]"
-              >
-                {termLabel('genre', g)}
-              </Text>
-            ))}
-          </View>
+    <View className="gap-6 py-6">
+      {!!book.genres?.length && (
+        <View className="flex-row flex-wrap gap-2 px-container">
+          {book.genres.map((genre) => (
+            <Text
+              key={genre}
+              className="rounded-full bg-surface px-3 py-2 font-body text-xs text-t2"
+            >
+              {termLabel('genre', genre)}
+            </Text>
+          ))}
         </View>
       )}
 
-      {bookTags.length > 0 && (
-        <View className="px-container py-4 border-b border-border">
-          <SectionLabel>{t('search.tags')}</SectionLabel>
-          <View className="flex-row flex-wrap gap-2">
-            {bookTags.map((tag) => (
-              <Text
-                key={tag}
-                className="font-body text-xs text-t2 bg-surface rounded-md px-3 py-2"
-              >
-                {termLabel('tag', tag)}
-              </Text>
-            ))}
-          </View>
-        </View>
-      )}
-
-      {/* Synopsis */}
-      {description && (
-        <View
-          className="px-container py-4 border-b"
-          style={{ borderBottomColor: alpha(c.border, 0.55) }}
-        >
-          <SectionLabel>{t('book.synopsis')}</SectionLabel>
+      {!!description && (
+        <View className="px-container">
           <Text
-            className="font-body text-xs text-t2 mb-2"
-            style={{ lineHeight: 13.5 * 1.76 }}
+            accessibilityRole="header"
+            className="mb-3 font-display-sb text-md text-text"
+          >
+            {t('book.synopsis')}
+          </Text>
+          <Text
+            selectable
+            className="font-body text-sm leading-7 text-text"
             numberOfLines={expanded ? undefined : 5}
           >
             {description}
           </Text>
-          <Pressable onPress={() => setExpanded((e) => !e)}>
-            <Text className="font-body-md text-xs text-accent">
+          <Pressable
+            onPress={() => setExpanded((value) => !value)}
+            accessibilityRole="button"
+            accessibilityState={{ expanded }}
+            aria-expanded={expanded}
+            className="mt-2 min-h-12 justify-center self-start rounded-md px-2 active:bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+          >
+            <Text className="font-body-sb text-xs text-text">
               {expanded ? t('book.readLess') : t('book.readMore')}
             </Text>
           </Pressable>
         </View>
       )}
 
-      {/* Details */}
-      {detailRows.length > 0 && (
-        <View
-          className="px-container py-4 border-b"
-          style={{ borderBottomColor: alpha(c.border, 0.55) }}
+      <View className="px-container">
+        <Pressable
+          onPress={onWriteReview}
+          accessibilityRole="button"
+          className="min-h-14 flex-row items-center gap-3 rounded-md bg-surface px-4 py-3 active:bg-sr focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
         >
-          <SectionLabel>{t('book.details')}</SectionLabel>
-          <View className="rounded-card overflow-hidden border border-border bg-surface">
-            {detailRows.map((row, i) => (
+          <PenLine size={21} color={c.text} />
+          <Text className="flex-1 font-body-sb text-xs text-text">
+            {t('book.writeMyReview')}
+          </Text>
+          <ChevronRight size={20} color={c.t2} />
+        </Pressable>
+      </View>
+
+      {detailRows.length > 0 && (
+        <View className="px-container">
+          <Text
+            accessibilityRole="header"
+            className="mb-3 font-display-sb text-md text-text"
+          >
+            {t('book.details')}
+          </Text>
+          <View className="rounded-card bg-surface px-4">
+            {detailRows.map((row, index) => (
               <View
                 key={row.label}
-                className="flex-row justify-between items-center px-4 border-b border-border"
-                style={{
-                  paddingVertical: 11,
-                  borderBottomWidth: i < detailRows.length - 1 ? 1 : 0
-                }}
+                className="flex-row flex-wrap items-start justify-between gap-x-4 gap-y-1 border-border py-4"
+                style={{ borderTopWidth: index > 0 ? 1 : 0 }}
               >
-                <Text className="font-body text-xs text-t3">{row.label}</Text>
-                <Text className="font-body-md text-xs text-text">
+                <Text className="font-body text-xs text-t2">{row.label}</Text>
+                <Text
+                  selectable
+                  className="min-w-0 flex-shrink font-body-md text-xs text-text"
+                >
                   {row.value}
                 </Text>
               </View>
@@ -160,18 +140,49 @@ export function BookSummaryTab({ book, onWriteReview }: BookSummaryTabProps) {
         </View>
       )}
 
-      {/* Write review CTA */}
-      <View className="px-container pt-4">
-        <TouchableOpacity
-          onPress={onWriteReview}
-          activeOpacity={0.85}
-          className="py-3.5 rounded-card bg-accent items-center"
-        >
-          <Text className="font-body-sb text-sm text-white tracking-tight">
-            {t('book.writeMyReview')}
+      {bookTags.length > 0 && (
+        <View className="gap-3 px-container">
+          <Text
+            accessibilityRole="header"
+            className="font-body-sb text-xs text-text"
+          >
+            {t('search.tags')}
           </Text>
-        </TouchableOpacity>
-      </View>
+          <Text className="font-body text-xs leading-6 text-t2">
+            {bookTags.map((tag) => termLabel('tag', tag)).join(' · ')}
+          </Text>
+        </View>
+      )}
+
+      {/* La participación en portadas sigue visible, pero sus controles se despliegan a petición. */}
+      {extended.cover_vote_ends_at && (
+        <View className="border-t border-border">
+          <Pressable
+            onPress={() => setShowCoverVote((value) => !value)}
+            accessibilityRole="button"
+            accessibilityState={{ expanded: showCoverVote }}
+            aria-expanded={showCoverVote}
+            className="min-h-14 flex-row items-center gap-3 px-container py-4 active:bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+          >
+            <Text className="flex-1 font-body-sb text-xs text-text">
+              {t('book.coverVoteTitle')}
+            </Text>
+            {showCoverVote ? (
+              <ChevronDown size={20} color={c.t2} />
+            ) : (
+              <ChevronRight size={20} color={c.t2} />
+            )}
+          </Pressable>
+          {showCoverVote && (
+            <BookCoverVote
+              bookId={book.id}
+              endsAt={extended.cover_vote_ends_at}
+              finalizedAt={extended.cover_finalized_at ?? null}
+            />
+          )}
+        </View>
+      )}
+      <BookCoverModeration bookId={book.id} />
     </View>
   )
 }

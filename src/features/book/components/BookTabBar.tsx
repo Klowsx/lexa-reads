@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
-import { Pressable, Text, View } from 'react-native'
-import { fixed, useColors } from '~/theme/colors'
+import { Pressable, ScrollView, Text, View } from 'react-native'
+import { fixed } from '~/theme/colors'
 
 const TAB_KEYS = [
   'book.tabs.summary',
@@ -15,37 +15,52 @@ interface BookTabBarProps {
   onChange: (tab: BookTab) => void
 }
 
+// Conserva etiquetas legibles y permite desplazar las pestañas cuando no caben.
 export function BookTabBar({ activeTab, onChange }: BookTabBarProps) {
-  const c = useColors()
   const { t } = useTranslation()
 
   return (
-    <View className="flex-row bg-bg border-b border-border">
-      {TAB_KEYS.map((key, i) => {
-        const active = activeTab === i
-        const label = t(key)
-        return (
-          <Pressable
-            key={key}
-            onPress={() => onChange(i as BookTab)}
-            className="flex-1 items-center py-[11px]"
-            style={{
-              borderBottomWidth: 2.5,
-              borderBottomColor: active ? fixed.accent : 'transparent'
-            }}
-          >
-            <Text
-              className={
-                active
-                  ? 'font-body-sb text-xs text-text'
-                  : 'font-body text-xs text-t3'
-              }
-            >
-              {label}
-            </Text>
-          </Pressable>
-        )
-      })}
+    <View className="bg-bg border-b border-border">
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ flexGrow: 1 }}
+      >
+        <View
+          accessibilityRole="tablist"
+          className="flex-row px-container"
+          style={{ minWidth: '100%' }}
+        >
+          {TAB_KEYS.map((key, i) => {
+            const active = activeTab === i
+            const label = t(key)
+            return (
+              <Pressable
+                key={key}
+                onPress={() => onChange(i as BookTab)}
+                accessibilityRole="tab"
+                accessibilityState={{ selected: active }}
+                aria-selected={active}
+                className="min-h-14 grow shrink-0 items-center justify-center px-3 py-3 active:bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+                style={{
+                  borderBottomWidth: 2.5,
+                  borderBottomColor: active ? fixed.accent : 'transparent'
+                }}
+              >
+                <Text
+                  className={
+                    active
+                      ? 'font-body-sb text-xs text-text'
+                      : 'font-body text-xs text-t2'
+                  }
+                >
+                  {label}
+                </Text>
+              </Pressable>
+            )
+          })}
+        </View>
+      </ScrollView>
     </View>
   )
 }

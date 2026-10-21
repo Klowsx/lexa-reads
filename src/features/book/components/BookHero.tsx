@@ -1,18 +1,9 @@
-import { LinearGradient } from 'expo-linear-gradient'
-import { ChevronLeft, MoreHorizontal, Share2 } from 'lucide-react-native'
+import { ChevronLeft, Share2 } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'
 import { Pressable, Text, View } from 'react-native'
 import { BookCover } from '~/components/ui/BookCover'
-import { fixed, rawDark, rawLight } from '~/theme/colors'
-import { useColorScheme } from 'react-native'
+import { useColors } from '~/theme/colors'
 import type { Tables } from '~/types/database'
-
-const ACCENT = fixed.accent
-
-const alpha = (hex: string, op: number) => {
-  const n = parseInt(hex.replace('#', ''), 16)
-  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})` as const
-}
 
 interface BookHeroProps {
   book: Tables<'books'>
@@ -20,132 +11,63 @@ interface BookHeroProps {
   onShare?: () => void
 }
 
+// Presenta la portada y la edición con una jerarquía tranquila y acciones accesibles.
 export function BookHero({ book, onBack, onShare }: BookHeroProps) {
-  const scheme = useColorScheme()
-  const raw = scheme === 'dark' ? rawDark : rawLight
+  const c = useColors()
   const { t } = useTranslation()
 
-  const coverH = 170
-  const coverW = Math.round(coverH * 0.667)
-
   return (
-    <View className="relative pb-container">
-      {/* Full-bleed gradient */}
-      <LinearGradient
-        colors={[ACCENT, alpha(ACCENT, 0.65), alpha(ACCENT, 0.14), raw.bg]}
-        locations={[0, 0.5, 0.82, 1]}
-        className="absolute inset-0"
-      />
-
-      {/* Watermark title */}
-      <View
-        className="absolute inset-0 items-center justify-center overflow-hidden"
-        pointerEvents="none"
-      >
-        <Text
-          className="font-display-bold text-3xl"
-          style={{
-            color: alpha(ACCENT, 0.06),
-            lineHeight: 108 * 0.88,
-            transform: [{ rotate: '-7deg' }],
-            letterSpacing: -2,
-            width: '150%',
-            textAlign: 'center'
-          }}
-          numberOfLines={1}
-          allowFontScaling={false}
-        >
-          {book.title}
-        </Text>
-      </View>
-
-      {/* Nav row */}
-      <View className="flex-row justify-between items-center px-container pt-[14px] z-[4]">
+    <View className="pb-6">
+      <View className="flex-row items-center justify-between px-container py-2">
         <Pressable
           onPress={onBack}
-          hitSlop={10}
-          className="w-9 h-9 rounded-full items-center justify-center bg-black/[0.42]"
+          accessibilityRole="button"
+          accessibilityLabel={t('common.back')}
+          className="h-12 w-12 items-center justify-center rounded-full bg-surface active:bg-sr focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
         >
-          <ChevronLeft size={18} color="#fff" strokeWidth={1.9} />
+          <ChevronLeft size={24} color={c.text} strokeWidth={1.8} />
         </Pressable>
-
-        <View className="flex-row gap-2">
+        {onShare && (
           <Pressable
-            hitSlop={10}
             onPress={onShare}
-            className="w-9 h-9 rounded-full items-center justify-center bg-black/[0.42]"
+            accessibilityRole="button"
+            accessibilityLabel={t('common.share')}
+            className="h-12 w-12 items-center justify-center rounded-full bg-surface active:bg-sr focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
           >
-            <Share2 size={15} color="#fff" strokeWidth={1.5} />
+            <Share2 size={21} color={c.text} strokeWidth={1.8} />
           </Pressable>
-          <Pressable
-            hitSlop={10}
-            className="w-9 h-9 rounded-full items-center justify-center bg-black/[0.42]"
-          >
-            <MoreHorizontal size={15} color="#fff" strokeWidth={1.5} />
-          </Pressable>
-        </View>
+        )}
       </View>
-
-      {/* Cover centered */}
-      <View
-        className="items-center mt-5 z-[4]"
-        style={{
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 24 },
-          shadowOpacity: 0.93,
-          shadowRadius: 34,
-          elevation: 20
-        }}
-      >
-        <BookCover book={book} width={coverW} height={coverH} />
-      </View>
-
-      {/* Title + author */}
-      <View className="items-center px-9 pt-container z-[4]">
+      <View className="items-center px-container pt-2">
+        <BookCover book={book} width={132} height={198} />
         <Text
-          className="font-display-sb text-md text-text text-center mb-1.5 leading-[26px] tracking-[-0.33px]"
-          numberOfLines={3}
+          accessibilityRole="header"
+          selectable
+          className="mt-6 text-center font-display-sb text-xl text-text"
         >
           {book.title}
         </Text>
-        {book.authors && book.authors.length > 0 && (
-          <Text className="font-body text-sm text-t2 mb-[3px]">
+        {!!book.authors?.length && (
+          <Text
+            selectable
+            className="mt-2 text-center font-body text-sm text-t2"
+          >
             {book.authors.join(', ')}
           </Text>
         )}
+        {(!!book.page_count || !!book.published_year) && (
+          <Text className="mt-3 text-center font-body text-xs text-t2">
+            {[
+              book.page_count
+                ? t('book.pagesLong', { count: book.page_count })
+                : null,
+              book.published_year?.toString()
+            ]
+              .filter(Boolean)
+              .join(' · ')}
+          </Text>
+        )}
       </View>
-
-      {/* Stats row */}
-      {(book.page_count || book.published_year) && (
-        <View className="flex-row justify-center mt-4 z-[4]">
-          {[
-            book.page_count
-              ? [`${book.page_count}p`, t('book.pagesLabel')]
-              : null,
-            book.published_year
-              ? [String(book.published_year), t('book.publishedLabel')]
-              : null
-          ]
-            .filter((x): x is [string, string] => x != null)
-            .map(([value, label], i, arr) => (
-              <View
-                key={label}
-                className="items-center px-container"
-                style={{
-                  borderRightWidth: i < arr.length - 1 ? 1 : 0,
-                  borderRightColor: alpha(raw.border, 0.28)
-                }}
-              >
-                <Text className="font-body-bold text-sm text-text leading-[15px]">
-                  {value}
-                </Text>
-                <Text className="font-body text-xs text-t3 mt-1 tracking-wide uppercase">
-                  {label}
-                </Text>
-              </View>
-            ))}
-        </View>
-      )}
     </View>
   )
 }

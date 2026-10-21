@@ -1,7 +1,14 @@
-import { ChevronDown, ListPlus } from 'lucide-react-native'
+import {
+  BookOpen,
+  ChevronDown,
+  ListPlus,
+  Plus,
+  Star
+} from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'
 import { Pressable, Text, View } from 'react-native'
-import { alpha, fixed, useColors } from '~/theme/colors'
+import { Skeleton } from '~/components/ui/Skeleton'
+import { fixed, useColors } from '~/theme/colors'
 import { type BookStatus, STATUS_META } from '~/lib/book-status'
 import type { Tables } from '~/types/database'
 
@@ -16,7 +23,7 @@ interface BookCtaBarProps {
   onAddToList?: () => void
 }
 
-// Abre el editor compartido desde cualquier posición de la ficha y resume el estado guardado.
+// Resume la lectura y ofrece un único acceso al editor, con valoración y listas a mano.
 export function BookCtaBar({
   book,
   status,
@@ -29,112 +36,117 @@ export function BookCtaBar({
 }: BookCtaBarProps) {
   const c = useColors()
   const { t } = useTranslation()
-
-  const isReading = status === 'reading'
-  const statusMeta = status ? STATUS_META[status] : null
-  const statusColor = statusMeta?.color ?? fixed.accent
-
   const currentPage = userBook?.current_page ?? null
   const pageCount = book.page_count ?? null
-  const progressPct =
-    isReading && currentPage && pageCount
-      ? Math.min(1, currentPage / pageCount)
+  // Incluye la página cero y limita el indicador a un porcentaje válido.
+  const progress =
+    status === 'reading' &&
+    currentPage != null &&
+    pageCount != null &&
+    pageCount > 0
+      ? Math.max(0, Math.min(100, Math.round((currentPage / pageCount) * 100)))
       : null
+  const statusLabel = status
+    ? t(STATUS_META[status].labelKey)
+    : t('reading.add')
 
   return (
-    <View
-      className="px-container py-3 border-b bg-bg"
-      style={{ borderBottomColor: alpha(c.border, 0.55) }}
-    >
-      {/* Buttons row */}
-      <View className="flex-row gap-2">
-        {/* Main status button */}
+    <View className="gap-2 px-container pb-4">
+      {isPending ? (
+        <View
+          accessibilityLabel={t('common.loading')}
+          accessibilityState={{ busy: true }}
+          aria-busy
+        >
+          <Skeleton height={56} radius={12} animate={false} />
+        </View>
+      ) : (
         <Pressable
           onPress={onStatusPress}
-          disabled={isPending}
           accessibilityRole="button"
-          accessibilityLabel={t('reading.manageStatus')}
-          accessibilityState={{ disabled: isPending }}
-          className="min-h-12 flex-1 flex-row items-center justify-center gap-2 rounded-card focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
-          style={{
-            paddingVertical: 12,
-            paddingHorizontal: 16,
-            backgroundColor: status ? alpha(statusColor, 0.13) : c.sr,
-            borderWidth: 1.5,
-            borderColor: status ? statusColor : c.border
-          }}
+          accessibilityLabel={`${statusLabel}. ${t('reading.manageStatus')}`}
+          className="min-h-14 flex-row items-center gap-3 rounded-md bg-sr px-4 py-3 active:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
         >
-          <Text className="font-body-sb text-sm" style={{ color: c.text }}>
-            {status ? t(STATUS_META[status].labelKey) : t('reading.add')}
-          </Text>
-          {status && (
-            <ChevronDown size={12} color={statusColor} strokeWidth={2} />
-          )}
-        </Pressable>
-
-        {/* Add to list button */}
-        {onAddToList && (
-          <Pressable
-            onPress={onAddToList}
-            accessibilityRole="button"
-            accessibilityLabel={t('reading.addToList')}
-            className="flex-row items-center gap-1.5 py-3 px-3 rounded-card bg-surface border border-border"
-          >
-            <ListPlus size={16} color={c.t2} strokeWidth={1.8} />
-          </Pressable>
-        )}
-
-        {/* Rating button */}
-        <Pressable
-          onPress={onRatingPress}
-          accessibilityRole="button"
-          accessibilityLabel={t('reading.editRating')}
-          className="flex-row items-center gap-1.5 py-3 px-4 rounded-card bg-surface border border-border"
-        >
-          {rating != null ? (
-            <>
-              <Text className="text-sm text-star leading-[15px]">★</Text>
-              <Text className="font-body-sb text-sm text-text">{rating}</Text>
-            </>
+          {status ? (
+            <BookOpen size={21} color={c.text} />
           ) : (
-            <>
-              <Text className="text-sm text-t3 leading-[15px]">☆</Text>
-              <Text className="font-body text-xs text-t2">
-                {t('book.rate')}
-              </Text>
-            </>
+            <Plus size={21} color={c.text} />
           )}
+          <Text className="flex-1 font-body-sb text-sm text-text">
+            {statusLabel}
+          </Text>
+          <ChevronDown size={20} color={c.text} />
         </Pressable>
-      </View>
-
-      {/* Reading progress bar */}
-      {progressPct != null && (
-        <View className="mt-2.5">
-          <View className="flex-row justify-between mb-[5px]">
-            <Text className="font-body text-xs text-t3">
+      )}
+      {progress != null && (
+        <View
+          accessible
+          accessibilityRole="progressbar"
+          accessibilityLabel={t('book.pageProgress', {
+            current: currentPage,
+            total: pageCount
+          })}
+          accessibilityValue={{ min: 0, max: 100, now: progress }}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={progress}
+          className="gap-2 py-2"
+        >
+          <View className="flex-row flex-wrap justify-between gap-2">
+            <Text className="font-body text-xs text-t2">
               {t('book.pageProgress', {
                 current: currentPage,
                 total: pageCount
               })}
             </Text>
-            <Text
-              className="font-body-sb text-xs"
-              style={{ color: fixed.status.reading }}
-            >
-              {Math.round(progressPct * 100)}%
-            </Text>
+            <Text className="font-body-sb text-xs text-text">{progress}%</Text>
           </View>
-          <View className="h-[3px] bg-sh rounded-full overflow-hidden">
+          <View className="h-1 rounded-full bg-sr overflow-hidden">
             <View
               className="h-full rounded-full"
               style={{
-                width: `${progressPct * 100}%`,
+                width: `${progress}%`,
                 backgroundColor: fixed.status.reading
               }}
             />
           </View>
         </View>
       )}
+      <View className="flex-row flex-wrap items-center justify-center gap-x-4">
+        <Pressable
+          onPress={onRatingPress}
+          disabled={isPending}
+          accessibilityRole="button"
+          accessibilityLabel={
+            rating != null
+              ? `${t('book.ratingValue', { rating })}. ${t('reading.editRating')}`
+              : t('reading.editRating')
+          }
+          accessibilityState={{ disabled: isPending }}
+          className="min-h-12 flex-row items-center justify-center gap-2 rounded-md px-3 py-2 active:bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+        >
+          <Star
+            size={19}
+            color={c.text}
+            fill={rating != null ? fixed.star : 'none'}
+          />
+          <Text className="font-body-md text-xs text-text">
+            {rating != null ? `${rating} / 5` : t('book.rate')}
+          </Text>
+        </Pressable>
+        {onAddToList && (
+          <Pressable
+            onPress={onAddToList}
+            accessibilityRole="button"
+            className="min-h-12 flex-row items-center justify-center gap-2 rounded-md px-3 py-2 active:bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+          >
+            <ListPlus size={20} color={c.text} />
+            <Text className="font-body-md text-xs text-text">
+              {t('reading.addToList')}
+            </Text>
+          </Pressable>
+        )}
+      </View>
     </View>
   )
 }
