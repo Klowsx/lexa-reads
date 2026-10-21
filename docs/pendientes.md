@@ -30,9 +30,9 @@ enlazado o en el PR correspondiente.
 
 ## 2. Seguridad, moderación y datos de cuenta
 
-- [ ] Validar bloqueo de usuarios de extremo a extremo: autorización por RLS,
-      efecto recíproco en perfiles, seguimiento y contenido, caché sin datos
-      revocados y estados de carga, error y vacío.
+- [ ] Validar en Supabase y Android el bloqueo de usuarios de extremo a extremo:
+      autorización por RLS, efecto recíproco en perfiles, seguimiento y contenido,
+      caché sin datos revocados y estados de carga, error y vacío.
 - [ ] Validar reportes de usuarios y contenido: autorización y tipos en
       servidor, control de duplicados y abuso, confirmación tras persistir y ciclo
       de moderación con responsable y SLA definidos.
@@ -94,6 +94,8 @@ enlazado o en el PR correspondiente.
       abrir, y mantener la paginación por cursor compuesto.
 - [x] Corregir la generación de tokens del design system para que
       `gen:theme`, `check:theme` y el formato del repositorio coincidan.
+- [x] Corregir la lista de bloqueados para que use una RPC limitada al propio
+      bloqueador y siga siendo desbloqueable aunque RLS oculte el perfil.
 
 ## Diferido a propósito
 
