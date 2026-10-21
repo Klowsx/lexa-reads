@@ -6,9 +6,40 @@ const corsHeaders = {
     'authorization, x-client-info, apikey, content-type'
 }
 
+const EXPORT_VERSION = '1.0'
+const PAGE_SIZE = 1000
+
+type QueryResult<Row> = {
+  data: Row[] | null
+  error: { message: string } | null
+}
+
+// Reúne todas las páginas para no truncar una exportación al límite predeterminado de Supabase.
+async function fetchAllRows<Row>(
+  fetchPage: (from: number, to: number) => PromiseLike<QueryResult<Row>>
+): Promise<Row[]> {
+  const rows: Row[] = []
+
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data, error } = await fetchPage(from, from + PAGE_SIZE - 1)
+    if (error) throw new Error(error.message)
+
+    const page = data ?? []
+    rows.push(...page)
+    if (page.length < PAGE_SIZE) return rows
+  }
+}
+
+// Genera una exportación versionada de la información accesible para el usuario autenticado.
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
+  }
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    })
   }
 
   const authHeader = req.headers.get('Authorization')
@@ -54,57 +85,69 @@ Deno.serve(async (req) => {
     )
   }
 
-  const [profile, userBooks, reviews, lists, comments, messages] =
+  const [profileResult, userBooks, reviews, lists, comments, messages] =
     await Promise.all([
       supabase
         .from('users')
         .select('username, display_name, bio, favorite_genres, created_at')
         .eq('id', uid)
-        .single()
-        .then((r) => r.data),
+        .single(),
 
-      supabase
-        .from('user_books')
-        .select(
-          'status, rating, started_at, finished_at, tags, books(title, authors, isbn_13)'
-        )
-        .eq('user_id', uid)
-        .then((r) => r.data ?? []),
+      fetchAllRows((from, to) =>
+        supabase
+          .from('user_books')
+          .select(
+            'status, rating, started_at, finished_at, tags, books(title, authors, isbn_13)'
+          )
+          .eq('user_id', uid)
+          .range(from, to)
+      ),
 
-      supabase
-        .from('reviews')
-        .select('body, contains_spoilers, created_at, books(title, authors)')
-        .eq('user_id', uid)
-        .is('deleted_at', null)
-        .then((r) => r.data ?? []),
+      fetchAllRows((from, to) =>
+        supabase
+          .from('reviews')
+          .select('body, contains_spoilers, created_at, books(title, authors)')
+          .eq('user_id', uid)
+          .is('deleted_at', null)
+          .range(from, to)
+      ),
 
-      supabase
-        .from('lists')
-        .select(
-          'name, description, visibility, created_at, list_books(books(title, authors))'
-        )
-        .eq('user_id', uid)
-        .then((r) => r.data ?? []),
+      fetchAllRows((from, to) =>
+        supabase
+          .from('lists')
+          .select(
+            'name, description, visibility, created_at, list_books(books(title, authors))'
+          )
+          .eq('user_id', uid)
+          .range(from, to)
+      ),
 
-      supabase
-        .from('comments')
-        .select('body, target_type, created_at')
-        .eq('user_id', uid)
-        .is('deleted_at', null)
-        .then((r) => r.data ?? []),
+      fetchAllRows((from, to) =>
+        supabase
+          .from('comments')
+          .select('body, target_type, created_at')
+          .eq('user_id', uid)
+          .is('deleted_at', null)
+          .range(from, to)
+      ),
 
       // Mensajes enviados (DMs + chat de club). Derecho de portabilidad (GDPR).
-      supabase
-        .from('messages')
-        .select('body, conversation_id, created_at')
-        .eq('sender_id', uid)
-        .is('deleted_at', null)
-        .then((r) => r.data ?? [])
+      fetchAllRows((from, to) =>
+        supabase
+          .from('messages')
+          .select('body, conversation_id, created_at')
+          .eq('sender_id', uid)
+          .is('deleted_at', null)
+          .range(from, to)
+      )
     ])
 
+  if (profileResult.error) throw new Error(profileResult.error.message)
+
   const exportData = {
+    version: EXPORT_VERSION,
     exported_at: new Date().toISOString(),
-    profile,
+    profile: profileResult.data,
     library: userBooks,
     reviews,
     lists,
