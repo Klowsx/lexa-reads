@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { useRouter } from 'expo-router'
+import { useLocalSearchParams, useRouter } from 'expo-router'
 import { FlashList } from '@shopify/flash-list'
+import { ScanLine } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'
 import { Keyboard, Pressable, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -27,6 +28,7 @@ import { UserCard } from '~/features/user/components/UserCard'
 import { useSearchUsers } from '~/features/user/hooks/useSearchUsers'
 import type { SearchUser } from '~/features/user/user.queries'
 import { useDebounce } from '~/lib/useDebounce'
+import { useColors } from '~/theme/colors'
 import type { Tables } from '~/types/database'
 import { isIsbn13, normalizeIsbn13 } from '~/features/book/isbn'
 
@@ -36,10 +38,12 @@ type Item =
 // Da prioridad a los libros y combina el texto con los filtros del catálogo.
 export default function SearchScreen() {
   const router = useRouter()
+  const { query: initialQuery } = useLocalSearchParams<{ query?: string }>()
   const insets = useSafeAreaInsets()
   const { t } = useTranslation()
+  const c = useColors()
   const [tab, setTab] = useState<SearchTab>('books')
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState(initialQuery ?? '')
   const [searchFocused, setSearchFocused] = useState(false)
   const [filters, setFilters] =
     useState<Omit<CatalogFilters, 'search'>>(emptyCatalogFilters)
@@ -90,6 +94,12 @@ export default function SearchScreen() {
       pathname: '/book/create',
       params: isbn13 ? { isbn: isbn13 } : { title: trimmed }
     })
+  }
+
+  // Abre la cámara para completar la búsqueda a partir del código ISBN del libro.
+  function openIsbnScanner() {
+    Keyboard.dismiss()
+    router.push('/book/scan-isbn')
   }
 
   // Muestra una fila con acciones separadas para libro y lector.
@@ -163,6 +173,14 @@ export default function SearchScreen() {
           <SearchTabs active={tab} onChange={setTab} />
           {tab === 'books' && (
             <View className="flex-row items-center gap-3">
+              <Pressable
+                onPress={openIsbnScanner}
+                accessibilityRole="button"
+                accessibilityLabel={t('search.scanIsbn')}
+                className="size-11 items-center justify-center rounded-md bg-surface active:bg-sr"
+              >
+                <ScanLine size={20} color={c.accent} />
+              </Pressable>
               <Pressable
                 onPress={() => {
                   Keyboard.dismiss()
