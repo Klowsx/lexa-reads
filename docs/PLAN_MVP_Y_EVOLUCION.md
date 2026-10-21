@@ -97,19 +97,18 @@ Esta es una propuesta de alcance, no un cambio ya aprobado del producto descrito
 
 ### Dentro del MVP
 
-- [x] Acceso por correo completo: registro, confirmación según configuración, recuperación, cierre de sesión y reanudación segura.
-- [x] Onboarding corto, con nombre de usuario validado realmente; géneros y meta opcionales o posponibles.
-- [ ] Búsqueda de libros por título/autor y soporte claro de ISBN; portada o alternativa cuando falte.
-- [x] Guardar un libro como pendiente, leyendo, leído o abandonado desde cualquier entrada disponible.
-- [x] Editar o quitar puntuación; registrar al menos fechas básicas para que la meta anual sea consistente.
-- [x] Biblioteca con filtros útiles, estados vacíos y carga incremental.
-- [x] Reseñas, protección de spoilers y comentarios si se mantienen en el lanzamiento.
-- [x] Perfil, seguir/dejar de seguir y privacidad consistente. Si se ofrece cuenta privada, debe estar protegida en el servidor.
-- [ ] Feed pequeño pero útil, con una alternativa cuando todavía no existan contactos.
-- [x] Listas básicas: crear, editar y añadir/quitar libros. Funciones más elaboradas pueden esperar.
-- [ ] Notificaciones internas de los eventos incluidos y push solamente si está probado de extremo a extremo.
-- [ ] Bloquear, reportar, exportar datos y solicitar eliminación de cuenta.
-- [ ] Accesibilidad básica, errores visibles, controles operativos, documentación pública y una versión instalable verificada.
+El MVP incluye acceso por correo, onboarding corto, biblioteca, estados de
+lectura, puntuaciones, reseñas con spoilers, perfiles, seguimiento, privacidad y
+listas básicas. La búsqueda debe admitir título, autor e ISBN con una alternativa
+cuando falte portada o catálogo. El feed necesita un estado útil para personas
+sin contactos y las notificaciones solo se activan para eventos probados de punta
+a punta.
+
+Bloqueo, reportes, exportación y eliminación de cuenta son requisitos de salida,
+con sus criterios en [el plan de seguridad y datos](plan-seguridad-y-datos-de-cuenta.md).
+La accesibilidad, los errores visibles, los controles operativos, la publicación
+legal y una versión instalable también forman parte de ese requisito de salida.
+El estado de cada entrega se mantiene en [Pendientes](pendientes.md).
 
 Para este último punto, consultar [implementación, comprobaciones y bloqueos de
 publicación](verificacion-accesibilidad-y-publicacion.md). Sigue abierto hasta
@@ -117,13 +116,13 @@ verificar los documentos públicos y la APK instalada en Android.
 
 Los puntos marcados corresponden a implementación y comprobaciones automatizadas realizadas. Evidencia y límites:
 
-- **Acceso y onboarding:** [documentación del flujo](acceso-correo-y-onboarding.md), pruebas unitarias, navegador con HTTP simulado y prueba SQL transaccional. Pendientes de lanzamiento: entrega real del correo, enlaces y reanudación en una compilación instalada.
-- **Estados, puntuación y fechas:** [registro de lectura](registro-de-lectura.md), RPC y RLS verificadas en Supabase, pruebas unitarias y recorrido de las entradas con navegador. Pendiente: teclado y áreas seguras en Android/iOS instalado.
-- **Reseñas, spoilers y comentarios:** se mantienen en el MVP. [Contrato y pruebas](resenas-spoilers-comentarios.md): crear, editar y retirar reseñas; spoilers ocultos también en previews y tarjetas compartidas; comentarios con su propia marca de spoiler, permisos heredados del padre, errores recuperables y confirmación al eliminar. Verificado con SQL real, pruebas de componentes y navegador. Pendiente: recorrido y exportación nativa de tarjetas en una compilación instalada.
-- **Biblioteca:** [contrato y comprobaciones](biblioteca.md): filtros combinables por estado, título/autor, puntuación y etiquetas; páginas por cursor de 24 libros; totales independientes; vacíos específicos y errores recuperables sin perder lo cargado. Verificado con SQL real y navegador. Pendiente: recorrido instalado y gestos nativos en Android/iOS.
-- **Perfiles, seguimiento y privacidad:** [contrato y pruebas](perfiles-seguimiento-privacidad.md): perfil propio/ajeno coherente, edición y privacidad, solicitudes recibidas operativas, relaciones decididas por servidor, contadores de aceptados, listas y comunidad protegidas, y revalidación de caché al perder acceso. Verificado con SQL real, navegador y regresiones de lectura/reseñas. Pendiente: recorrido instalado y accesibilidad con lectores de pantalla nativos.
+- **Acceso y onboarding:** [documentación del flujo](#acceso-por-correo-y-onboarding), pruebas unitarias, navegador con HTTP simulado y prueba SQL transaccional. Pendientes de lanzamiento: entrega real del correo, enlaces y reanudación en una compilación instalada.
+- **Estados, puntuación y fechas:** [registro de lectura](#registro-de-lectura), RPC y RLS verificadas en Supabase, pruebas unitarias y recorrido de las entradas con navegador. Pendiente: teclado y áreas seguras en Android/iOS instalado.
+- **Reseñas, spoilers y comentarios:** se mantienen en el MVP. [Contrato y pruebas](#reseñas-spoilers-y-comentarios): crear, editar y retirar reseñas; spoilers ocultos también en previews y tarjetas compartidas; comentarios con su propia marca de spoiler, permisos heredados del padre, errores recuperables y confirmación al eliminar. Verificado con SQL real, pruebas de componentes y navegador. Pendiente: recorrido y exportación nativa de tarjetas en una compilación instalada.
+- **Biblioteca:** [contrato y comprobaciones](#biblioteca-personal): filtros combinables por estado, título/autor, puntuación y etiquetas; páginas por cursor de 24 libros; totales independientes; vacíos específicos y errores recuperables sin perder lo cargado. Verificado con SQL real y navegador. Pendiente: recorrido instalado y gestos nativos en Android/iOS.
+- **Perfiles, seguimiento y privacidad:** [contrato y pruebas](#perfiles-seguimiento-y-privacidad): perfil propio/ajeno coherente, edición y privacidad, solicitudes recibidas operativas, relaciones decididas por servidor, contadores de aceptados, listas y comunidad protegidas, y revalidación de caché al perder acceso. Verificado con SQL real, navegador y regresiones de lectura/reseñas. Pendiente: recorrido instalado y accesibilidad con lectores de pantalla nativos.
 - La búsqueda recibió mejoras de UI/UX, pero el punto completo continúa abierto hasta verificar expresamente título, autor e ISBN.
-- **Listas básicas:** [contrato y comprobaciones](listas-basicas.md): formulario compartido de creación/edición, búsqueda dentro de la lista, selector persistente desde el libro, incorporación sin duplicados, retiradas y eliminación con errores recuperables. UI alineada con el design system, permisos y contadores verificados en Supabase; flujo y presentación comprobados en navegador. Pendiente: recorrido instalado, navegación y accesibilidad nativas.
+- **Listas básicas:** [contrato y comprobaciones](#listas-básicas): formulario compartido de creación/edición, búsqueda dentro de la lista, selector persistente desde el libro, incorporación sin duplicados, retiradas y eliminación con errores recuperables. UI alineada con el design system, permisos y contadores verificados en Supabase; flujo y presentación comprobados en navegador. Pendiente: recorrido instalado, navegación y accesibilidad nativas.
 
 ### Opcional para la primera beta, con decisión explícita
 
@@ -208,7 +207,7 @@ Esfuerzo orientativo por tarea: S = menos de 1 día; M = 1–3 días; L = 3–5 
 
 #### A05 · P0 · Aprobación de seguidores de cuentas privadas · L
 
-**Estado al 20 de octubre: resuelto en servidor y cliente.** El servidor normaliza solicitudes privadas a `pending`, solo el destinatario puede aprobar, la identidad es inmutable y las listas/comunidad respetan la privacidad. Los contadores incluyen únicamente aceptados. SQL real comprueba los permisos y navegador recorre solicitudes, errores, cancelación y pérdida de acceso. Ver [evidencia y límites](perfiles-seguimiento-privacidad.md). La evidencia siguiente describe el estado anterior.
+**Estado al 20 de octubre: resuelto en servidor y cliente.** El servidor normaliza solicitudes privadas a `pending`, solo el destinatario puede aprobar, la identidad es inmutable y las listas/comunidad respetan la privacidad. Los contadores incluyen únicamente aceptados. SQL real comprueba los permisos y navegador recorre solicitudes, errores, cancelación y pérdida de acceso. Ver [evidencia y límites](#perfiles-seguimiento-y-privacidad). La evidencia siguiente describe el estado anterior.
 
 **Evidencia:** en `001_initial_schema.sql` la inserción de seguimientos comprueba la identidad del seguidor y el estado tiene valor predeterminado `accepted`. En `src/features/user/user.queries.ts` es el cliente quien elige `pending` o `accepted`. Las políticas de `014_privacy_and_blocks.sql` confían en ese estado. No se encontró una normalización de servidor que obligue a solicitar aprobación para una cuenta privada, ni una política UPDATE que explique el flujo legítimo de aceptación.
 
@@ -264,19 +263,19 @@ Implementar un canal visible y accesible de feedback, diferenciar errores recupe
 
 #### B02 · P1 · Spoilers en el feed · M
 
-**Estado al 20 de octubre: resuelto en el recorrido de reseñas del MVP.** Se conserva y consume `contains_spoilers` en el feed, con revelado explícito en todas las vistas de reseñas y comentarios. Las tarjetas compartidas sustituyen el cuerpo sensible; las notificaciones actuales de comentarios guardan referencias, sin copiar ese cuerpo. Ver [evidencia](resenas-spoilers-comentarios.md).
+**Estado al 20 de octubre: resuelto en el recorrido de reseñas del MVP.** Se conserva y consume `contains_spoilers` en el feed, con revelado explícito en todas las vistas de reseñas y comentarios. Las tarjetas compartidas sustituyen el cuerpo sensible; las notificaciones actuales de comentarios guardan referencias, sin copiar ese cuerpo. Ver [evidencia](#reseñas-spoilers-y-comentarios).
 
 `src/features/feed/feed.queries.ts` trae el cuerpo de la reseña, pero no el indicador necesario para proteger spoilers; `FeedCard.tsx` lo muestra directamente. Extender el contrato y aplicar el mismo tratamiento que en la ficha. Aceptación: un spoiler está oculto por defecto en todas las vistas, incluidas previews y notificaciones que contengan texto.
 
 #### B03 · P1 · Cambiar estado no debería borrar por sorpresa · M
 
-**Estado al 20 de octubre: resuelto.** Elegir el estado activo no elimina el registro; los controles compartidos permiten medias estrellas y una retirada explícita de puntuación. Ver [registro de lectura](registro-de-lectura.md).
+**Estado al 20 de octubre: resuelto.** Elegir el estado activo no elimina el registro; los controles compartidos permiten medias estrellas y una retirada explícita de puntuación. Ver [registro de lectura](#registro-de-lectura).
 
 En `app/book/[id].tsx`, pulsar el estado ya seleccionado elimina el registro de biblioteca. Separar «cambiar estado» de «quitar de mi biblioteca» y explicar qué ocurre con puntuación, etiquetas y fechas. Usar confirmación o deshacer verificable para la acción destructiva. Unificar además medios puntos, retirada de puntuación y selección de estrellas entre componentes.
 
 #### B04 · P1 · Fechas y meta anual coherentes · M/L
 
-**Estado al 20 de octubre: resuelto.** Se proponen fechas al comenzar/finalizar, se pueden corregir y el contador anual se sincroniza por `finished_at`. Las lecturas antiguas sin fecha conservan esa ausencia. Ver [registro de lectura](registro-de-lectura.md).
+**Estado al 20 de octubre: resuelto.** Se proponen fechas al comenzar/finalizar, se pueden corregir y el contador anual se sincroniza por `finished_at`. Las lecturas antiguas sin fecha conservan esa ausencia. Ver [registro de lectura](#registro-de-lectura).
 
 La meta cuenta libros mediante `finished_at`, pero las acciones habituales de estado no proporcionan esa fecha y no se encontró un flujo completo que la mantenga. Establecer reglas explícitas: sugerir hoy al terminar, permitir corregir fechas históricas y definir qué pasa al reabrir una lectura. Invalidar biblioteca, meta, perfil y actividad relevante después de guardar. Aceptación: marcar un libro como leído actualiza la meta según el año y la fecha elegida, sin duplicar lecturas.
 
@@ -300,7 +299,7 @@ Las políticas de `014_privacy_and_blocks.sql` ocultan perfiles bloqueados, mien
 
 #### B09 · P1 · Comentarios y visibilidad del contenido padre · M/L
 
-**Estado al 20 de octubre: resuelto para reseñas y actividades.** Las políticas comprueban acceso al padre, privacidad, bloqueos y eliminación; la prueba SQL incluye un seguidor pendiente, uno aceptado, contenido retirado y acciones ajenas. Conocer un ID no concede acceso. Ver [evidencia](resenas-spoilers-comentarios.md).
+**Estado al 20 de octubre: resuelto para reseñas y actividades.** Las políticas comprueban acceso al padre, privacidad, bloqueos y eliminación; la prueba SQL incluye un seguidor pendiente, uno aceptado, contenido retirado y acciones ajenas. Conocer un ID no concede acceso. Ver [evidencia](#reseñas-spoilers-y-comentarios).
 
 La selección de comentarios en `014_privacy_and_blocks.sql` comprueba eliminación y bloqueo del autor, pero no muestra una condición equivalente de acceso al contenido comentado. Auditar lectura e inserción contra reseñas o actividades privadas, eliminadas y bloqueadas. Aceptación: conocer el ID de un contenido no permite acceder a sus comentarios si no se puede acceder al contenido.
 
@@ -428,7 +427,7 @@ Validación visual pendiente: teléfonos de 320/360/390/430 unidades de ancho, u
 
 | Área                    | Patrón actual                                                                                                                  | Mejora propuesta                                                                          | Prioridad                                       |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| Biblioteca              | Resuelto el 20/10: páginas por cursor y totales/etiquetas separados; [evidencia](biblioteca.md)                                | Conservar comprobación de rendimiento y gestos en una compilación instalada               | Verificado en SQL y navegador; pendiente nativo |
+| Biblioteca              | Resuelto el 20/10: páginas por cursor y totales/etiquetas separados; [evidencia](#biblioteca-personal)                         | Conservar comprobación de rendimiento y gestos en una compilación instalada               | Verificado en SQL y navegador; pendiente nativo |
 | Bandeja de mensajes     | Aproximadamente `2 + 2 × N` consultas para N conversaciones: datos base, perfiles, último mensaje y no leídos por conversación | Consulta/RPC agregada autorizada con último mensaje y contador                            | P1 antes de activar chat                        |
 | Mensajes en tiempo real | Invalidación amplia al recibir eventos y tras mutaciones                                                                       | Actualizar caché por ID, deduplicar y resincronizar de forma acotada                      | P1/P2 según medición                            |
 | Búsqueda sin caché      | Consulta local → Google → inserción → nueva consulta                                                                           | Cancelación, timeout, deduplicación, mejor búsqueda local y revisión de la cascada        | P1                                              |
@@ -726,3 +725,325 @@ Las referencias de tiendas y privacidad son una lista de comprobación técnica 
 ---
 
 **Recomendación final:** terminar y validar el núcleo existente antes de ampliar funcionalidades. La primera señal de un buen MVP será que una persona pueda guardar, recordar y compartir sus lecturas con confianza, no la cantidad de módulos visibles.
+
+## Anexo: contratos y comprobaciones de funcionalidades
+
+### Acceso por correo y onboarding
+
+Actualizado: 20 de octubre de 2026.
+
+#### Recorrido de acceso
+
+- El registro envía nombre, correo normalizado y contraseña a Supabase.
+- Si Supabase devuelve una sesión, el guard consulta el perfil y abre el onboarding pendiente.
+- Si la confirmación está activada, se muestra el correo y se permite reenviar con una espera de 60 segundos. No se presupone que la cuenta existe ni se fuerza un ajuste del servidor.
+- El retorno de confirmación crea la sesión y continúa con el perfil. Un error del enlace ofrece volver al acceso o solicitar recuperación.
+- El cierre normal usa `scope: local`: cierra este dispositivo. La recuperación finaliza con cierre global para revocar las sesiones anteriores.
+
+La configuración pública del proyecto consultada durante este cambio tiene el proveedor de correo activado, registro permitido y confirmación requerida. El código cubre también el caso que devuelve una sesión inmediata.
+
+#### Enlaces y configuración de Supabase
+
+El único destino nuevo es `auth-callback`, construido con `Linking.createURL`. Su consulta indica `flow=signup`, `flow=recovery` o `flow=oauth`. Se admite el retorno anterior `auth/callback` para proveedores externos.
+
+Configurar en **Authentication → URL Configuration → Redirect URLs**:
+
+- Compilaciones nativas: `lexa://auth-callback**`.
+- Desarrollo con Expo Go: la URL de desarrollo generada por Expo, incluida la ruta `/--/auth-callback`.
+- Vista previa web: el origen usado por el servidor local más `/auth-callback**`; el script de comprobación usa `http://localhost:8082`.
+
+La plantilla estándar puede conservar `{{ .ConfirmationURL }}`. Para plantillas que usen `token_hash`, conservar también el tipo de verificación: `signup`/`email` para confirmación y `recovery` para recuperación. Los retornos PKCE se intercambian cuando Supabase entrega un `code` y existe su verificador en el mismo dispositivo.
+
+`detectSessionInUrl` está desactivado para que el SDK y el callback no consuman el mismo enlace. El callback valida el propósito, exige credenciales completas y verifica la sesión con Supabase. En web retira códigos y tokens del historial después de consumir el enlace, también si falla. Ningún mensaje de interfaz incluye los tokens ni el error remoto sin filtrar.
+
+Los ajustes de SMTP, entrega real y allowlist deben comprobarse en el entorno que se publique. No se enviaron correos reales durante las pruebas.
+
+#### Reanudación y datos privados
+
+`use-auth-session.ts` es la única suscripción global al SDK:
+
+1. Recupera la sesión guardada y comprueba la identidad con `getUser`.
+2. Una sesión rechazada se cierra localmente. Un fallo temporal muestra reintento y conserva las credenciales.
+3. Un evento de acceso más reciente tiene prioridad sobre una lectura inicial que termine tarde.
+4. Al cerrar sesión o cambiar de cuenta se vacía TanStack Query para retirar los datos privados de la cuenta anterior.
+5. En nativo, la renovación automática se activa en primer plano y se detiene en segundo plano. La web conserva la gestión de visibilidad del SDK.
+
+Los tokens nativos permanecen en SecureStore y no migran a otro dispositivo. El adaptador divide por bytes UTF-8, publica el manifiesto solo después de escribir todos los fragmentos y conserva la versión anterior si falla una escritura. Puede leer los fragmentos del formato anterior. El bloqueo de procesos del SDK serializa operaciones de sesión nativas.
+
+La web sigue siendo un destino de desarrollo/vista previa. Si se publica como producto web, deberá revisarse la estrategia de sesión y protección frente a XSS; este cambio conserva el almacenamiento web existente.
+
+#### Recuperación interrumpida
+
+El contexto de recuperación guarda únicamente la cuenta y si la contraseña ya se actualizó. Usa el mismo almacén seguro. Al reiniciar, la misma cuenta vuelve al formulario de recuperación, incluso si su onboarding ya terminó. Las rutas privadas permanecen cubiertas y redirigen a recuperación.
+
+El cambio de contraseña y el cierre global son dos operaciones distintas. Si falla el cierre después de actualizar, la interfaz ofrece **Finalizar recuperación**. El reintento, también después de reiniciar, no vuelve a cambiar una contraseña que el servidor ya aceptó. Al terminar se retiran sesión, contexto y caché.
+
+La pantalla exige sesión y modo de recuperación antes de mostrar campos. Abrir `new-password` directamente sin ellos ofrece solicitar un enlace válido. Estos controles organizan la interfaz: la autorización real corresponde a Supabase Auth y las políticas RLS.
+
+#### Onboarding corto
+
+Se pueden elegir géneros y meta, saltar cada paso o pulsar **Dejar gustos y meta para después** para ir directamente al usuario. Las preferencias se guardan antes de avanzar; los pasos 1, 2 y 3 permiten reanudar el recorrido. Al posponer la meta se conserva el punto de partida existente, actualmente 12 libros, que puede cambiarse después en Ajustes.
+
+El nombre se normaliza a minúsculas, permite de 3 a 30 letras ASCII, números y guion bajo, y se consulta tras una pausa de 350 ms. Si la consulta falla, **Volver a comprobar** reintenta sin borrar el campo. Un resultado de disponibilidad no reserva el nombre: la restricción única y `complete_onboarding` resuelven las carreras al guardar. Un conflicto invalida la disponibilidad anterior y permite elegir otro.
+
+La migración `20261020135220_auth_username_availability.sql` mantiene la función pública como `SECURITY INVOKER`. La comprobación global de nombres se ejecuta en un ayudante de privilegios elevados dentro de `lexa_auth`, un esquema que debe permanecer fuera de los esquemas expuestos por PostgREST. Solo `authenticated` puede ejecutarlo y siempre exige `auth.uid()`. Solo devuelve un booleano; los bloqueos no liberan nombres ya reservados. La migración ya fue aplicada al proyecto Lexa y su versión coincide con la del archivo.
+
+#### Comprobaciones
+
+- `pnpm typecheck`.
+- `pnpm lint:auth`, ESLint sobre los archivos compartidos modificados y Prettier según la configuración del repositorio.
+- Pruebas unitarias de enlaces, rutas de acceso, estado de recuperación, normalización y almacenamiento interrumpido.
+- `supabase/tests/onboarding-flow.sql`: prueba real de disponibilidad, nombres duplicados/nulos, bloqueo entre cuentas, permisos anónimos y finalización sin géneros. La transacción termina con rollback.
+- `scripts/check-auth-preview.cjs`: navegador aislado con respuestas HTTP simuladas, sin correos ni cambios en cuentas reales. Incluye registro con y sin confirmación, recuperación, reanudación, fallo de cierre, reintento de sesión y rutas inválidas; guarda capturas en `.expo/auth-preview`.
+
+Para la prueba de navegador, iniciar Expo en el puerto 8082 e indicar un Playwright ya disponible:
+
+```powershell
+pnpm exec expo start --web --port 8082
+$env:LEXA_BROWSER_MODULES = 'ruta/absoluta/a/node_modules'
+node scripts/check-auth-preview.cjs
+```
+
+Se puede cambiar el origen con `LEXA_AUTH_PREVIEW_URL` y el canal del navegador con `LEXA_BROWSER_CHANNEL`.
+
+La prueba en navegador no sustituye la validación de SecureStore, enlaces desde correo, bloqueo/desbloqueo del dispositivo y segundo plano en Android/iOS. La prueba unitaria del adaptador usa un almacén en memoria para reproducir interrupciones. Queda comprobar entrega SMTP y el recorrido nativo en una compilación instalada.
+
+---
+
+### Biblioteca personal
+
+La biblioteca consulta el estado seleccionado y combina búsqueda por título o autor, puntuación (todos, con o sin puntuación) y etiquetas existentes. La búsqueda espera 350 ms y trata el texto como literal: `%` no se convierte en un comodín. Las etiquetas se obtienen de toda la estantería, incluyendo libros aún no descargados.
+
+#### Datos y paginación
+
+- `search_library` aplica los filtros en PostgreSQL y devuelve hasta 25 registros. El cliente muestra 24 y usa el adicional para detectar si hay otra página.
+- El orden visible es «Añadidos más recientes primero». El cursor `(created_at, id)` resuelve empates y permanece estable al editar puntuación o estado. Las fechas nulas anteriores al cambio se ordenan como época Unix.
+- `library_summary` agrupa totales y etiquetas en el servidor. Los totales no dependen del límite de filas de REST ni de la cantidad de páginas cargadas.
+- Ambas funciones son `SECURITY INVOKER`, fijan `search_path` vacío, aplican `auth.uid()` y conservan RLS. Solo `authenticated` puede ejecutarlas; no aceptan un identificador de cuenta del cliente.
+- Las páginas tienen claves distintas de las consultas simples del perfil. Todas conservan el prefijo de biblioteca para que guardar, editar o quitar una lectura invalide también páginas, totales y etiquetas.
+
+La pantalla vive en `src/features/library/screens/` porque `CLAUDE.md` exige que `app/` contenga solamente rutas. No se añaden intermediarios de componentes: las portadas abren directamente `BookReadingSheet`.
+
+#### Experiencia y estados
+
+La cuadrícula adapta las columnas al ancho disponible. Las pestañas y filtros se desplazan horizontalmente para conservar las etiquetas y los objetivos táctiles. Tipografía, colores, superficies, radios, portadas y puntuación usan el design system existente, con temas claro y oscuro.
+
+Cada estado sin libros explica cómo alimentarlo. Una combinación sin coincidencias permite limpiar los filtros sin cambiar de estantería. Los errores iniciales ofrecen reintento; un fallo de página adicional conserva los libros cargados y muestra un reintento explícito. Hay carga incremental al acercarse al final, una acción manual para cargar más y actualización por arrastre.
+
+Las etiquetas permiten filtrar datos existentes; su creación y edición no forman parte de este punto del MVP.
+
+#### Verificación
+
+- `supabase/tests/library-pagination.sql`: ejecutado contra Supabase con cuentas sintéticas y `ROLLBACK`. Comprueba 55 libros con la misma fecha distribuidos en tres páginas sin duplicados ni omisiones, búsqueda por autor, texto literal, puntuación, etiquetas fuera de la primera página, estados, vacíos, totales y permisos entre cuentas y anónimos.
+- `scripts/check-library-preview.cjs`: cliente real en navegador con HTTP simulado. Comprueba filtros combinados, búsqueda fuera de la primera página, paginación, error y reintento sin perder los libros cargados, errores iniciales, vacíos y anchos de 320, 390 y 1280 px en claro/oscuro.
+- `scripts/check-reading-preview.cjs`: conserva la comprobación de edición desde biblioteca y las demás entradas.
+- TypeScript, ESLint, Prettier y tokens de tema correctos; 48 pruebas unitarias y de componentes aprobadas. Cuatro suites de integración preexistentes no arrancan sin las credenciales de `.env.test` (auth/RLS, clubs, chat y Google Books). La seguridad específica de este cambio sí se comprueba con el SQL real anterior.
+
+Pendiente de lanzamiento: recorrido en Android/iOS instalado, teclado, escalado de fuente y arrastre nativo. Las pruebas de navegador no sustituyen esa verificación.
+
+---
+
+### Registro de lectura
+
+#### Entradas y componentes
+
+Búsqueda, biblioteca, listas y feed usan directamente `BookReadingSheet`; búsqueda indica `showSynopsis={false}` para conservar su presentación breve. Las ayudas de búsqueda usan directamente `BottomSheet`. La ficha completa usa el mismo `ReadingRecordControls` en Resumen y abre la hoja desde sus acciones superiores. Los enlaces a libros del perfil, reseñas y similares desembocan en esa ficha. Los componentes comparten tipografía, colores semánticos, geometría, foco y áreas táctiles del design system, con textos en español e inglés.
+
+`app/book/[id].tsx` solo exporta la pantalla de `src/features/book/screens`. La lógica de consultas y escrituras vive en `src/features/library`, separada de los componentes visuales.
+
+El hook generado `useColors` consulta el tema activo de `useThemeStore`, igual que la raíz de la aplicación. Esto mantiene los iconos y los colores inline sincronizados con las clases del design system al cambiar de tema.
+
+#### Estados y puntuación
+
+- **Pendiente:** no tiene fechas de inicio ni finalización.
+- **Leyendo:** propone el día local de inicio. Si se vuelve desde Leído, empieza con la fecha de hoy y retira la finalización anterior.
+- **Leído:** propone el día local de finalización al entrar al estado. Se puede corregir a una fecha anterior.
+- **Abandonado:** conserva el inicio conocido y no cuenta como finalizado.
+
+Tocar el estado activo no cambia ni elimina nada. Cambiar el estado conserva la puntuación y las etiquetas. Una puntuación va de 0,5 a 5 en pasos de 0,5: tocar una estrella selecciona la nota completa y repetir la pulsación selecciona media estrella. **Quitar puntuación** envía `null`; nunca elimina el libro ni sus fechas. Puntuar un libro todavía no guardado lo crea como Pendiente, sin dar por terminada una lectura.
+
+#### Fechas y meta anual
+
+La fecha de inicio es opcional; al finalizar se registra una fecha de fin. **Fechas de lectura** permite corregirlas juntas, usar Hoy o retirar el inicio. Se rechazan días inexistentes, fechas futuras e intervalos invertidos. El cliente utiliza fechas `AAAA-MM-DD` del dispositivo, sin convertirlas a UTC. El servidor acepta como día local únicamente hoy o un día adyacente al calendario UTC para cubrir husos horarios.
+
+La meta cuenta filas con estado `read` y `finished_at` dentro del año consultado. Editar una puntuación no mueve el libro a otro año. La clave de caché incluye el año y, al cambiar de calendario, el objetivo de un año anterior no se presenta como objetivo ya configurado para el nuevo: se usa el valor inicial de 12 hasta editarlo.
+
+Las lecturas antiguas sin finalización mantienen la fecha desconocida. No se hace un backfill con la fecha de edición: la interfaz solicita añadir una fecha antes de incluirlas en una meta. El MVP conserva un registro por usuario y libro; no añade un historial de relecturas.
+
+#### Escritura y seguridad
+
+`save_reading_record(book_id, changes, today)` es una RPC `SECURITY INVOKER`, con `search_path` vacío y ejecución solo para `authenticated`. Obtiene el propietario desde `auth.uid()` y conserva las políticas RLS existentes. No acepta un propietario ni columnas arbitrarias en el JSON.
+
+El bloqueo transaccional por usuario y libro cubre también la primera inserción. Cada propiedad omitida conserva su valor; `null` elimina explícitamente el dato. La RPC vuelve a validar las fechas y las restricciones SQL protegen el orden, la correspondencia entre estado y fechas y la escala de puntuación. Los contadores siguen dependiendo de los triggers existentes, sin incrementos manuales desde el cliente.
+
+La migración `20261020154206_reading_tracking_mvp.sql` está aplicada al proyecto Lexa. `src/types/database.ts` se regeneró desde ese proyecto.
+
+#### Caché y errores
+
+La escritura optimista distingue entre ausencia y `null`. Se cancelan consultas previas, se conserva una instantánea y se restaura si falla la escritura. Al responder, la fila del servidor sustituye la proyección. Los controles del mismo libro comparten una identidad de mutación y las escrituras se serializan.
+
+Después se invalidan biblioteca, contadores, meta anual, perfil, lecturas recientes, comunidad del libro, feed y puntuaciones asociadas a reseñas. Si no se pudo cargar la lectura, se ofrece Reintentar antes de permitir cambios. Los errores de guardado mantienen los datos anteriores y se comunican junto al formulario.
+
+#### Verificación
+
+- `pnpm typecheck`, ESLint sobre los archivos modificados, Prettier y `pnpm check:theme`.
+- `src/__tests__/features/library/reading-record.test.ts`: transiciones, fechas reales, años, retirada explícita y lecturas antiguas.
+- `supabase/tests/reading-record.sql`: pruebas reales de RPC, RLS entre cuentas, restricciones, contadores y cambios de año. Se ejecuta en una transacción con rollback y cuentas sintéticas.
+- `scripts/check-reading-preview.cjs`: navegador aislado con el cliente real y respuestas HTTP simuladas. Recorre ficha, búsqueda, biblioteca, feed y listas, incluidos errores de escritura. Las capturas se guardan en `.expo/reading-preview`.
+
+```powershell
+pnpm exec expo start --web --port 8082
+$env:LEXA_BROWSER_MODULES = 'ruta/absoluta/a/node_modules/con/playwright'
+node scripts/check-reading-preview.cjs
+```
+
+`LEXA_READING_PREVIEW_URL` permite cambiar el origen. La revisión web no sustituye la comprobación de teclado y áreas seguras en una compilación instalada de Android/iOS.
+
+---
+
+### Reseñas, spoilers y comentarios
+
+#### Alcance y entradas
+
+Reseñas y comentarios se mantienen en el lanzamiento del MVP. Un lector puede publicar una reseña por libro, editarla y retirarla. El editor se abre desde la ficha y desde Mis reseñas; carga el libro y la reseña existente antes de permitir guardar. Un error de carga no se presenta como formulario nuevo.
+
+`app/review/new.tsx` y `app/comments/[id].tsx` solo exportan sus pantallas, conforme a la arquitectura de rutas. `SpoilerText` se comparte entre ficha, feed, listas de reseñas y comentarios para que la protección sea la misma. `ConfirmDialog` aporta confirmación, cancelación y reintento al retirar reseñas/comentarios o descartar una edición. No se añaden aliases ni wrappers sin comportamiento.
+
+#### Reseñas y borradores
+
+- El cuerpo se recorta en los extremos y requiere de 10 a 10 000 caracteres. El cliente y PostgreSQL validan los límites.
+- Un índice único parcial impide dos reseñas activas del mismo usuario y libro. Una carrera entre editores produce un error visible en lugar de duplicar la reseña.
+- Editar conserva el identificador; registra `edited_at`. Una publicación crea su actividad en la misma transacción y editar no produce otro evento.
+- El borrador permanece ante un error de guardado o un refetch en segundo plano. El envío bloquea pulsaciones repetidas.
+- El botón Cerrar pide confirmar si hay cambios sin guardar. El recorrido de gestos y botones del sistema debe verificarse en la compilación nativa antes del lanzamiento.
+- Retirar una reseña requiere confirmación, no elimina la puntuación del libro y deja de exponer la reseña, su actividad y sus comentarios. Se puede escribir una nueva reseña después.
+- Las mutaciones refrescan ficha, Mis reseñas, listas públicas de reseñas, perfil, contadores, feed y contexto de las conversaciones.
+
+#### Protección de spoilers
+
+`SpoilerText` no monta el cuerpo del texto cuando está protegido. Esto lo retira también del árbol accesible, en lugar de ocultarlo solo con desenfoque o color. El lector debe pulsar **Mostrar spoiler** y puede volver a ocultarlo. Cambiar de contenido o editar la reseña vuelve a protegerlo, también cuando una lista recicla la tarjeta.
+
+La protección se usa en el feed, la ficha del libro, Mis reseñas, las reseñas de un perfil y los comentarios. El contrato del feed conserva `contains_spoilers`; una reseña no publicada o eliminada no aporta texto de preview. La tarjeta que se exporta al compartir sustituye siempre un cuerpo marcado por un aviso, aunque el lector ya lo haya revelado en pantalla.
+
+Una conversación que pertenece a una reseña con spoilers pide consentimiento antes de consultar o mostrar sus comentarios. Cada comentario puede marcarse además individualmente. Esta protección depende de las marcas elegidas por el autor: no intenta detectar spoilers automáticamente. Es un control de presentación; los cuerpos se reciben por API una vez autorizado el acceso al contenido.
+
+Las notificaciones actuales de comentarios contienen referencias al contenido, no una copia del cuerpo. No se añade texto sensible a sus títulos ni previews.
+
+#### Comentarios y permisos
+
+El hilo muestra carga, vacío, error con Reintentar y paginación con cursor compuesto `(created_at, id)`. Usa FlashList y los tokens del design system. Un fallo de envío conserva texto y marca de spoiler; no se limpia el campo hasta que el servidor confirma el éxito. Los comentarios propios se retiran con confirmación y admiten reintento.
+
+El acceso al hilo se comprueba antes de habilitar el formulario. Un padre inexistente, eliminado o inaccesible muestra **Contenido no disponible**. Esta comprobación de UI acompaña la autorización del servidor; conocer el ID no da permiso.
+
+Las políticas RLS exigen acceso al contenido padre tanto al leer como al crear comentarios. Se comprueban privacidad, seguidores aceptados, bloqueos y usuarios eliminados. El feed de una reseña también exige que siga publicada y visible. Las respuestas no pueden apuntar a comentarios de otro contenido ni los comentarios cambiar de propietario o hilo. La interfaz del MVP ofrece comentarios principales; no añade un editor de respuestas anidadas.
+
+#### Migraciones y borrado lógico
+
+Se aplicaron y se regeneraron los tipos de Supabase:
+
+- `20261020162508_reviews_comments_mvp.sql`: unicidad, validación, publicación, marca de spoilers y permisos heredados.
+- `20261020163158_owned_content_soft_delete.sql`: operación de retirada restringida al propietario.
+
+PostgreSQL no permite una actualización ordinaria que deje la fila fuera de su política de selección en este recorrido. `public.remove_own_content` es una entrada `SECURITY INVOKER`; delega la actualización en `lexa_social.remove_own_content`, una función `SECURITY DEFINER` de un esquema que debe mantenerse fuera de los esquemas expuestos por PostgREST. Exige `auth.uid()`, comprueba el propietario dentro de la actualización, acepta solo reseñas/comentarios y devuelve un booleano sin revelar cuerpos ni datos ajenos. El acceso anónimo está revocado y `search_path` permanece vacío.
+
+Los contadores siguen calculándose mediante los triggers existentes, sin incrementos manuales desde el cliente. Las lecturas normales no muestran filas retiradas ni al propio autor.
+
+Se comprobó que `lexa_social` no está expuesto por la Data API (`PGRST106`, esquema no válido). El análisis de seguridad no añadió avisos respecto de los que ya tenía el proyecto.
+
+#### Evidencia y límites
+
+- `supabase/tests/reviews-comments.sql`: ejecución real con usuarios sintéticos, perfiles privados, seguidores pendientes/aceptados, bloqueos, duplicados, intervalos de visibilidad y borrado propio/ajeno. Termina con rollback.
+- `src/__tests__/features/reviews/spoiler-text.test.tsx`: cuerpo ausente hasta revelar, ocultación tras cambios o reciclaje y tarjetas compartidas sin texto sensible.
+- `scripts/check-reviews-preview.cjs`: navegador con el cliente real y HTTP simulado para verificar las cuatro vistas de reseñas, creación/edición/borrado, spoilers de hilo e individuales, borradores y errores recuperables. Incluye 320, 390 y 1280 px y modo oscuro. Guarda capturas en `.expo/reviews-preview`.
+- TypeScript, ESLint, Prettier y comprobación de tokens del repositorio.
+
+```powershell
+pnpm exec expo start --web --port 8082
+$env:LEXA_BROWSER_MODULES = 'ruta/absoluta/a/node_modules/con/playwright'
+node scripts/check-reviews-preview.cjs
+```
+
+El origen se cambia con `LEXA_REVIEWS_PREVIEW_URL`. Las pruebas de navegador no envían comentarios ni reseñas reales. Pendientes antes de lanzar: teclado, áreas seguras, gestos de salida, accesibilidad nativa y exportación de la tarjeta en una compilación instalada de Android/iOS. Las notificaciones push no se marcan como verificadas por estas pruebas.
+
+---
+
+### Perfiles, seguimiento y privacidad
+
+#### Experiencia del lector
+
+El perfil propio y el ajeno comparten identidad, avatar, tipografía editorial y contadores. Se elimina el degradado del perfil ajeno y la tarjeta que encerraba toda la identidad propia. Las lecturas y listas mantienen los componentes del design system; los controles tienen estados de carga, error, foco y áreas táctiles adecuadas. La comunidad se adapta al ancho disponible y conserva el estado real de seguimiento, incluida la ausencia de una acción para seguirse a uno mismo.
+
+La edición del perfil permite cambiar nombre, biografía, géneros y cuenta privada. Si falla el guardado, mantiene el formulario y permite reintentar. Las solicitudes recibidas aparecen en el perfil propio: aceptar concede acceso y rechazar retira la solicitud sin incrementar los contadores ni notificar al solicitante.
+
+El perfil de otra persona distingue entre seguir, solicitar seguimiento, cancelar solicitud y dejar de seguir. Esta última acción requiere confirmación e informa sobre la pérdida de acceso si la cuenta es privada. Las listas del lector se consultan realmente y abren su `slug`; ya no se renderiza una colección vacía fija. Los errores y perfiles no disponibles tienen un estado explícito.
+
+#### Contrato de privacidad
+
+- La identidad pública incluye nombre, usuario, avatar, biografía, géneros y contadores. Una cuenta privada reserva sus registros de lectura, reseñas publicadas, listas públicas y relaciones de comunidad al propietario y a seguidores aceptados. Las listas individuales privadas siguen siendo exclusivas de su propietario.
+- El servidor obtiene la privacidad actual del destinatario. Insertar `accepted` desde un cliente modificado contra una cuenta privada produce `pending`. El cliente no puede aprobar su propia solicitud, cambiar los participantes ni alterar la fecha de creación.
+- Solo el destinatario puede cambiar una solicitud pendiente a aceptada. El servidor establece `accepted_at`. Ambos participantes pueden retirar la relación: el solicitante cancela o deja de seguir, y el destinatario rechaza o retira un seguidor.
+- Los contadores incluyen únicamente relaciones aceptadas. La migración corrige los totales anteriores; los triggers mantienen inserciones, aprobaciones y retiradas sin escrituras manuales desde frontend.
+- Hacer privada una cuenta conserva a sus seguidores ya aceptados. Hacerla pública abre su contenido público; no aprueba silenciosamente las solicitudes pendientes. Volver a privada vuelve a exigir una relación aceptada.
+- Bloquear elimina seguimientos en ambos sentidos. Desbloquear no los restaura. Las solicitudes pendientes no son visibles a terceros; las relaciones aceptadas respetan los permisos de ambos perfiles.
+- Perfiles inexistentes o eliminados no conceden acceso por ausencia de una fila. Los bloqueos se comprueban en ambos sentidos. Las políticas de listas protegen también sus libros mediante las políticas existentes del padre. Reseñas, comentarios y actividad conservan sus comprobaciones de privacidad.
+
+La migración `20261020204044_profile_follow_privacy_mvp.sql` se aplicó en Supabase. Los métodos privilegiados permanecen en el esquema no expuesto `lexa_social`, con `search_path` vacío y ejecución directa revocada para los triggers. `public.can_view_user_content` es un invocador de la comprobación privada, evitando recursión entre políticas.
+
+#### Caché y carga
+
+La UI espera una relación aceptada confirmada por servidor antes de consultar contenido protegido. Revalida el perfil al montarlo y al volver a la pantalla. Mientras comprueba acceso a una cuenta privada, oculta su contenido anterior. Seguir, cancelar, responder, bloquear o cambiar privacidad refresca perfiles, contadores y comunidad y descarta el contenido dependiente de permisos en caché. El optimismo de una nueva solicitud nunca concede por sí solo acceso privado.
+
+Seguidores y seguidos usan FlashList y cursor `(created_at, id)`, con 30 filas visibles y una adicional para detectar continuación. Se consulta solamente la pestaña activa. Un fallo de página adicional conserva las filas cargadas y permite reintentar.
+
+Las tres pantallas modificadas viven en `src/features/user/screens/`; `app/` conserva sus rutas de Expo Router. `FollowButton` se comparte entre perfil y `UserCard`, usado en búsqueda y comunidad. `profile-cache.ts` concentra la invalidación que necesitan seguimiento, solicitudes, bloqueos y edición de privacidad. No se añaden intermediarios de presentación de un solo uso.
+
+#### Verificación y límites
+
+- `supabase/tests/profile-privacy.sql`, ejecutado contra Supabase con `ROLLBACK`: aceptación forzada, identidad inmutable, aprobación legítima, rechazo, retirada, contadores, cuentas públicas/privadas, bloqueo y desbloqueo, anonimato, listas y libros protegidos, y 37 seguidores con fechas empatadas repartidos en dos páginas sin omisiones ni duplicados.
+- `supabase/tests/reviews-comments.sql`, vuelto a ejecutar con relaciones creadas mediante el flujo autorizado: privacidad, bloqueos, comentarios y eliminación conservan sus garantías.
+- `scripts/check-profile-preview.cjs`: cliente real en navegador con HTTP simulado. Comprueba ausencia de consultas protegidas antes de aprobar, errores con reintento, persistencia de solicitudes al recargar, cancelación, confirmación al dejar de seguir, revocación de acceso al volver desde otra pantalla, aceptación/rechazo, edición con error, perfiles no disponibles y anchos de 320/390/1280 px en claro/oscuro.
+- Los recorridos anteriores de registro de lectura y reseñas/comentarios continúan aprobados. TypeScript, lint, formato y 48 pruebas unitarias/de componentes verificados. Las cuatro suites de integración antiguas que necesitan credenciales en `.env.test` permanecen fuera de esta ejecución; la seguridad específica se verificó con los dos scripts SQL reales anteriores.
+- Los avisos de seguridad de Supabase no identifican nuevos hallazgos para las funciones añadidas. Persisten los avisos previos del proyecto, fuera de este punto del MVP.
+
+Pendiente de lanzamiento: compilación instalada en Android/iOS, VoiceOver/TalkBack, escalado de fuente, teclado y navegación nativa. Este punto no marca como completos el feed, notificaciones push ni todo el módulo de bloqueo/reporte y gestión de cuenta, que siguen teniendo sus propios puntos del MVP.
+
+---
+
+### Listas básicas
+
+#### Experiencia
+
+El perfil abre las listas por su enlace estable. El detalle muestra portadas, nombre, descripción, visibilidad y libros en filas legibles. Usa BookCover, ConfirmDialog, los colores semánticos, las fuentes y los radios del design system en claro y oscuro. Se retiran el degradado, los controles de cristal, los colores locales y las franjas decorativas. Las acciones principales tienen objetivos táctiles de 48 px y foco visible.
+
+Crear y editar comparten formulario: nombre de 2 a 60 caracteres, descripción opcional de hasta 200 y visibilidad. Las listas nuevas empiezan privadas. Una lista pública respeta además la privacidad de la cuenta; el formulario lo explica. Renombrar no cambia el slug. Un fallo mantiene el borrador y la acción de volver/cancelar pide confirmación si hay cambios. La confirmación cubre los controles de la pantalla; el historial del navegador y los gestos de navegación nativos requieren validación adicional.
+
+El propietario puede buscar y añadir libros desde el propio detalle, sin abandonar la lista. Se reutiliza la búsqueda existente y su caché de libros. Los libros añadidos se indican con una marca y no se duplican. Quitar un libro requiere confirmación y solo elimina su relación con la lista, no el libro ni su registro de lectura. El título abre su ficha y «Registrar lectura» mantiene disponible el editor compartido.
+
+Desde la ficha de un libro, el selector consulta su pertenencia real. Marcar añade; desmarcar quita. La selección persiste al recargar y los errores permiten reintentar. Crear una lista desde este selector conserva el contexto del libro y vuelve al selector para elegirla.
+
+Eliminar una lista utiliza la confirmación compartida con estado de espera y error. Los estados vacíos enseñan la siguiente acción, los errores de consulta ofrecen reintento y una lista inexistente o inaccesible muestra un mensaje explícito. El editor rechaza URLs de listas ajenas.
+
+#### Datos y permisos
+
+- Se mantienen las políticas RLS existentes: solo el propietario crea y modifica sus listas y sus libros; la lectura pública respeta cuenta privada, seguidores aceptados y bloqueos.
+- `20261020215902_basic_lists_mvp.sql` añade límites de nombre/descripción y `add_list_book`. El RPC es SECURITY INVOKER, usa search_path vacío y solo se concede a authenticated. Verifica propiedad, bloquea la fila de lista durante la incorporación, calcula la siguiente posición desde el máximo y usa la restricción única para evitar duplicados. No confía en el contador como posición.
+- Los triggers existentes mantienen books_count. El cliente no escribe contadores.
+- `20261020220617_restore_list_metadata.sql` recupera is_featured y accent_color: existían en la migración histórica 009 y en el cliente, pero faltaban en la base desplegada. Se regeneraron los tipos y se retiraron casts de las consultas modificadas que ocultaban esa discrepancia.
+- Las escrituras refrescan detalle, selector, portadas y contadores del perfil mediante claves derivadas de las factorías. El detalle separa la caché por lector y revalida permisos al regresar. El estado de «me gusta» se obtiene del servidor.
+- Las consultas de colecciones mantienen el alcance básico existente; esta entrega no incorpora reordenación manual, listas colaborativas ni navegación incremental para grandes colecciones. La API conserva su límite de filas configurado. FlashList virtualiza la presentación.
+
+#### Organización
+
+Las rutas de app/ solo reexportan las pantallas de src/features/lists/screens, como exige CLAUDE.md. Crear y editar usan la misma pantalla y formulario para compartir comportamiento y validación. ListControls comparte cabecera, acciones con estado/foco y skeleton entre las tres pantallas. No hay wrappers de un solo consumidor para acortar archivos.
+
+#### Verificación
+
+- `supabase/tests/basic-lists.sql`, ejecutado contra Supabase y revertido: crear, editar, límites, destacar, alta idempotente, orden después de una retirada, contadores, protección de escrituras ajenas, visibilidad privada y borrado en cascada que conserva el catálogo.
+- `supabase/tests/profile-privacy.sql`: regresión real de acceso por privacidad, seguimiento y bloqueo.
+- Consultas HTTP a la API real: selección de campos y relaciones de lists, list_books y list_likes responde correctamente, incluidos los campos recuperados.
+- `scripts/check-lists-preview.cjs`: cliente real con transporte HTTP simulado. Creación y edición, errores de guardado/alta/retirada/eliminación, selección tras recargar, creación desde el libro, descarte de borrador, editor ajeno, consulta fallida con reintento, lista no disponible, vacíos y anchos 320/390/1280 px en claro/oscuro.
+- `scripts/check-reading-preview.cjs`: regresión del registro de lectura desde búsqueda, biblioteca, feed y listas, además de ficha y meta anual.
+- TypeScript, lint, formato del código modificado, tokens y 48 pruebas unitarias/de componentes. Las cuatro suites antiguas que requieren credenciales en .env.test siguen excluidas; las pruebas de permisos anteriores se ejecutan en la base real.
+- Los advisors no señalan la nueva función; permanecen los avisos anteriores del proyecto.
+
+Pendiente antes de lanzamiento: compilación instalada en Android/iOS, teclado y navegación nativa, VoiceOver/TalkBack y tamaños de fuente ampliados en dispositivos.

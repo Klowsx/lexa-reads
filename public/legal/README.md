@@ -13,7 +13,11 @@ que los enlaces de la app (registro + Ajustes → Legal) funcionen.
 | `https://lexareads.app/privacy`   | `privacy.md`              | borrador, requiere revisión |
 | `https://lexareads.app/licenses`  | _(licencias OSS)_         | pendiente                   |
 
-## Antes del submit (bloqueante de tiendas)
+## Proceso de publicación
+
+El estado de estas actividades se controla en
+[Pendientes](../../docs/pendientes.md). Esta guía conserva el procedimiento y
+las restricciones para ejecutarlas.
 
 1. **Revisar con asesoría legal** los borradores y completar únicamente
    `release-info.json` con datos reales (responsable, correos, jurisdicción,

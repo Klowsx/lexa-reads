@@ -1,135 +1,88 @@
 # Pendientes — Lexa Reads
 
-> **Qué falta** para lanzar y después. Fuente única de "lo que queda".
-> Producto/DB/arquitectura → `STACK.md` · seguridad → `auditoria.md` · despliegue → `despliegue.md` · moderación → `moderacion.md`.
-> El MVP (Fase 1) está construido y conectado a Supabase salvo lo de abajo.
+Este es el **único documento operativo de pendientes** del proyecto. Marca y
+actualiza las tareas aquí; los demás documentos describen arquitectura,
+decisiones, procedimientos o evidencia y enlazan a esta lista.
 
-Leyenda: 🔴 estructural / bloqueante real · 🟠 debería entrar antes de lanzar · 🔵 nice-to-have · ⏸️ diferido a propósito.
-
----
-
-## Features de MVP que faltan
-
-### 🟠 Google OAuth (login)
-
-Hoy solo hay email/contraseña; `STACK §2` lo marca como MVP. Es el método de registro #1 en móvil → sin él se pierde conversión en onboarding.
-
-**Implementación (cliente):** ✅ Hecho. Flujo con `expo-web-browser` + `supabase.auth.signInWithOAuth` en `src/features/auth/auth.queries.ts`, botón conectado en `login.tsx`/`register.tsx`, deep link handler en `app/_layout.tsx`. Redirect `lexa://auth/callback` (el scheme ya está en `app.json`).
-
-> ⚠️ **No funciona en Expo Go Android** — Google OAuth requiere el SHA-1 del certificado de firma de la app. Expo Go usa el certificado de Expo, no el de `com.lexareads.app`. Para probar en Android se necesita un **development build** (`npx eas build --profile development`). En iOS simulator funciona sin configuración extra.
-
-**Setup de dashboard (one-time) — ⏸️ BLOQUEADO hasta builds reales:**
-
-1. **Supabase** → Authentication → Providers → Google: activar y pegar `Client ID` + `Client Secret`. En Redirect URLs: `lexa://auth/callback` (prod) y `https://<project>.supabase.co/auth/v1/callback` (web).
-2. **Google Cloud Console** → APIs & Services → Credentials:
-   - **Web client**: Authorized redirect URIs → callback de Supabase (`https://<project>.supabase.co/auth/v1/callback`).
-   - **iOS client** (tipo iOS): Bundle ID = `com.lexareads.app`.
-   - **Android client** (tipo Android): Package name = `com.lexareads.app`. **SHA-1 certificate fingerprint**: generar con `npx eas build --profile development --platform android` (EAS lo muestra al final del build) o con `eas credentials`.
-
-### 🟠 Escaneo de ISBN por cámara
-
-`expo-camera` ya está en deps. El escaneo debe consultar el catálogo de Lexa por ISBN; si falta, ofrecer el formulario de alta con el ISBN precargado.
-
-**Implementación:** botón en `SearchBar` → pantalla con `CameraView` (barcode `ean13`/`upc`) → al detectar, buscar por ISBN en `search_catalog` → abrir `book/[id]` o proponer añadirlo.
-
-### 🟠 Sugerencias de follow en onboarding
-
-Evita el "cold start": hoy un usuario nuevo entra a un feed vacío. `STACK §2` pide "sigue ≥5 para continuar" como último step del onboarding.
-
-**Implementación:** step en `app/(auth)/onboarding/` con query a usuarios más seguidos / con más en común; gate de ≥5 follows antes de entrar al feed.
-
-### 🔵 i18n completo
-
-i18n está cableado pero quedan strings hardcodeados en pantallas. Tarea mecánica: mover a `src/locales/{es,en}.json`.
+Los elementos se ordenan por el orden razonable de salida. Una tarea marcada
+solo debe cerrarse cuando se registre la evidencia indicada en el documento
+enlazado o en el PR correspondiente.
 
 ---
 
-## Infraestructura, calidad y operación (nivel pro)
+## 1. Bloqueadores para una beta instalada
 
-Huecos estructurales detectados (2026-06-04). Ordenados por impacto. Lo de arriba
-es producto; esto es lo que sostiene el producto en producción.
+- [ ] Desplegar el estado remoto requerido: aplicar las migraciones indicadas,
+      generar los tipos de Supabase y publicar/configurar las Edge Functions,
+      secretos, webhooks, administrador y deep links. Seguir
+      [el runbook de despliegue](despliegue.md).
+- [ ] Reparar el acceso al proyecto EAS con la cuenta propietaria y generar una
+      APK de desarrollo para Android. Registrar el identificador de build y el
+      resultado de instalación.
+- [ ] Recorrer en el Android instalado Registro, biblioteca, ficha de libro,
+      Ajustes y consentimiento. Probar TalkBack, texto ampliado, pantalla pequeña,
+      error de red y recuperación. Criterios y antecedentes en
+      [verificación de accesibilidad y publicación](verificacion-accesibilidad-y-publicacion.md).
+- [ ] Completar los datos reales de publicación en `public/legal/release-info.json`,
+      obtener revisión legal y publicar los documentos aprobados, privacidad y
+      licencias. Seguir [la guía legal](../public/legal/README.md).
+- [ ] Verificar desde Registro y Ajustes todos los enlaces legales publicados
+      en una instalación real.
 
-### 🔴 CI + linting (no existe)
+## 2. Seguridad, moderación y datos de cuenta
 
-No hay `.github/workflows`, ni ESLint/Prettier, ni script `lint`. Hoy nada impide
-mergear código que rompe `tsc` y el estilo es manual.
-**Hacer:** GitHub Actions que corra `pnpm tsc --noEmit` + lint + `pnpm jest` en cada PR;
-configurar `eslint` (preset expo) + `prettier` + script `lint`.
+- [ ] Validar bloqueo de usuarios de extremo a extremo: autorización por RLS,
+      efecto recíproco en perfiles, seguimiento y contenido, caché sin datos
+      revocados y estados de carga, error y vacío.
+- [ ] Validar reportes de usuarios y contenido: autorización y tipos en
+      servidor, control de duplicados y abuso, confirmación tras persistir y ciclo
+      de moderación con responsable y SLA definidos.
+- [ ] Completar y probar la exportación de datos: inventario acordado,
+      paginación, errores visibles, formato versionado y comportamiento correcto
+      con cuentas voluminosas.
+- [ ] Completar y probar solicitud, cancelación y ejecución de eliminación de
+      cuenta: idempotencia, revocación de sesiones, limpieza local, trabajo
+      programado, dependencias de Auth/Storage y comunicación al usuario.
+- [ ] Ejecutar las pruebas de integración y el recorrido Android de los cuatro
+      flujos anteriores. El detalle técnico y los criterios de aceptación viven en
+      [el plan de seguridad y datos](plan-seguridad-y-datos-de-cuenta.md).
 
-### 🔴 Cobertura de tests delgada
+## 3. Recorrido esencial del producto
 
-**Avance (2026-06-04):** añadidos `src/__tests__/features/chat/messaging.rls.test.ts`
-y `clubs.rls.test.ts` (DM/solicitudes/bloqueo + privacidad/roles/moderación de club,
-patrón `rls.test.ts`); se auto-saltan si la migración 020 no está desplegada. `jest.config.js`
-ahora ignora `.claude/` (worktrees de agentes que duplicaban tests).
-**Pendiente:** flujos **Maestro E2E** del camino crítico; tests de hooks/optimistic
-(useSendMessage, etc.); **mantener la BD de test migrada en CI** (hoy varios RLS fallan
-en local solo porque las migraciones 012–021 no están aplicadas en esa instancia — no son
-bugs de código, son deploy-gated).
+- [ ] Completar búsqueda por ISBN y definir el fallback cuando el catálogo no
+      tenga el libro. Incluir la prueba en dispositivo.
+- [ ] Añadir sugerencias de seguimiento en onboarding para evitar un feed vacío
+      y comprobar el recorrido de un usuario sin contactos.
+- [ ] Confirmar las notificaciones incluidas en el lanzamiento y probar sus
+      enlaces y push de extremo a extremo; ocultar los eventos no soportados.
+- [ ] Extraer las cadenas pendientes a los catálogos de traducción y comprobar
+      español e inglés.
 
-### 🔴 Antiabuso / rate-limiting
+## 4. Calidad y operación antes de producción
 
-App social **con DMs** sin límites = imán de spam. No hay rate-limit en envío de
-mensajes, Edge Functions ni signup; sin captcha. Apple/Play lo evalúan en apps UGC.
-**Hacer:** límite de frecuencia de mensajes (p. ej. en RLS/trigger o Edge), rate-limit
-en functions, captcha/turnstile en registro.
+- [ ] Mantener una base de pruebas migrada y automatizar en CI tipos, lint,
+      formato y pruebas relevantes; añadir Maestro al camino crítico de alta,
+      búsqueda, biblioteca, reseña y reacción.
+- [ ] Añadir controles de abuso en registro, mensajes y funciones remotas;
+      revisar los límites con pruebas de servidor.
+- [ ] Configurar observabilidad con consentimiento: analítica, captura de
+      errores, alertas de reportes y supervisión de disponibilidad.
+- [ ] Decidir y documentar copias de seguridad/PITR, actualizaciones OTA y la
+      estrategia de versión mínima.
+- [ ] Ejecutar una prueba de carga proporcionada al feed y revisar las consultas
+      de bandeja de mensajes antes de abrir la beta.
 
-### 🔴 Legal incompleto (bloqueante de tiendas) — ✅ en código
+## 5. Envío a tiendas
 
-**Hecho (2026-06-04):** documentos fuente en `public/legal/` (`terms.md`, `eula.md`,
-`community-guidelines.md`) con cláusula de **tolerancia cero** (Apple §1.2); enlazados
-desde **Registro** (consentimiento) y **Ajustes → Legal** (`eula`/`communityGuidelines`
-en i18n + URLs en `settings.tsx`).
-**Pendiente (deploy/legal):** revisar con abogado y rellenar los `<...>`; **publicar**
-en `lexareads.app/{terms,eula,community}` (ver `public/legal/README.md`); crear el
-documento de **privacidad** (hoy solo es URL, sin contenido en el repo).
+- [ ] Preparar iconos, splash y capturas de tienda para los idiomas soportados.
+- [ ] Completar las declaraciones de datos de App Store Connect y Play Console.
+- [ ] Generar la build de producción, validar Internal Testing/TestFlight y
+      conservar la evidencia de la versión enviada.
 
-### 🟠 Ciclo de vida del push token — ✅ en código (caso síncrono)
+## Diferido a propósito
 
-**Hecho:** `send-push` ahora inspecciona el _ticket_ de Expo y, ante
-`DeviceNotRegistered`/`InvalidCredentials`/`MismatchSenderId`, **limpia el `push_token`**
-en `notification_preferences`.
-**Pendiente (opcional):** job programado que consulte los _receipts_ asíncronos por
-ticket-id (el `DeviceNotRegistered` post-entrega) para una limpieza completa.
-
-### 🟠 Observabilidad (activa)
-
-PostHog instalado pero sin inicializar (ver `auditoria.md` NEW-5), sin crash reporting
-real, sin alertas (SLA de reportes, uptime).
-**Hacer:** init PostHog + `setCrashReporter` (gated por consentimiento, ver `despliegue.md §8`);
-alerta de reportes `pending` > 12h.
-
-### 🔵 Resiliencia offline
-
-Sin persistencia de TanStack Query ni banner de "sin conexión"; el chat se siente roto
-sin red. (STACK lo tiene en Fase 3, pero un mínimo conviene antes.)
-
-### 🔵 Otros
-
-- **Forced-update / OTA:** sin gate de versión mínima ni estrategia documentada de EAS Update.
-- **Moderación automática:** solo reportes manuales; falta filtro básico de groserías en username/mensajes.
-- **Backups/PITR** de Supabase y **monitoreo/uptime** sin configurar (dashboard, no código).
-- **N+1 en bandeja de DMs** (`chat.queries.ts` `fetchDMInbox`): optimizar con RPC o denormalizando el último mensaje.
-
----
-
-## Pre-submit (Fase G)
-
-- [ ] Smoke test en device real iOS + Android con build EAS dev
-- [ ] App Store Connect: privacy nutrition labels · Play Console: data safety form
-- [ ] Iconos + splash en todas las resoluciones · screenshots de tienda (5–8 por idioma)
-- [ ] Build production EAS + TestFlight + Internal Testing
-- [ ] E2E con Maestro: signup → search → add → review → like
-- [ ] Test de carga del feed (1k seguidos × 50 actividades)
-- [ ] Pasos de `despliegue.md` (migraciones, secrets, deep links, admin)
-
----
-
-## Diferido a propósito (no son huecos del MVP)
-
-Hay **tablas creadas vacías** para estas (decisión de `STACK §3/§4`). No construir sin feedback real.
-
-- **Fase 2:** import de Goodreads (CSV — _primera prioridad_, canal de adquisición), wrap-up anual + stats, retos de lectura (`reading_challenge`), recomendaciones entre amigos (`book_recommendations`), progreso/diario/citas (`reading_sessions`, `book_notes`).
-- **Fase 3:** clubes de lectura + mensajería (DMs y chat de club) — **✅ núcleo implementado**, ver `clubs-y-chat.md` (pendiente desplegar migraciones 019–021 + `gen:types`); buddy reads (`buddy_reads`), recomendaciones con IA, quotes con imagen, versión web, modo offline.
-
-> ⚠️ Los tipos de notificación `recommendation_received` y `reading_challenge_completed` ya existen en el enum y en `send-push`, pero **nada los dispara** hasta Fase 2 (código adelantado, no rompe nada).
+No iniciar estos trabajos sin señales de uso de la beta: importación de
+Goodreads, wrap-up y estadísticas, retos, recomendaciones entre amigos,
+progreso/diario/citas, clubes y chat públicos, buddy reads, IA, imágenes de
+citas y modo offline completo. El alcance y las decisiones previas permanecen
+documentados en [STACK](STACK.md) y [el plan de evolución](PLAN_MVP_Y_EVOLUCION.md).

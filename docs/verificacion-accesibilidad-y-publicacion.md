@@ -29,25 +29,30 @@ cambios de valores; se dejó ese archivo ajeno al pedido intacto.
   `null`. `pnpm legal:render` se detiene si falta cualquiera de ellos. La política
   de privacidad y los otros documentos siguen siendo borradores para revisión.
 
-## Comprobación pendiente para cerrar el punto
+## Trabajo de cierre y evidencia esperada
 
-1. Definir la identidad legal, los correos operativos, la jurisdicción, la edad
-   mínima y la fecha de vigencia; revisar legal y técnicamente los borradores.
-   Generar el inventario de licencias de dependencias.
-2. Publicar documentos aprobados en `lexareads.app` y abrir **todos** los enlaces
-   desde Registro y Ajustes en una instalación real. Todavía no hay hosting
-   configurado para esos documentos.
-3. Generar una APK de prueba. La cuenta EAS activa (`javierhr1`) no puede leer el
-   proyecto configurado, propiedad de `javierhr`. La compilación local también
-   se detuvo antes de compilar por `Unable to establish loopback connection` de
-   Gradle 8.14.3 (probado con JDK 17 y 21). Hay que usar una sesión con acceso a
-   ese proyecto o reparar el entorno de Gradle.
-4. Instalar esa APK en el Android y recorrer Registro, biblioteca, detalle de
-   libro, Ajustes y consentimiento con TalkBack, texto ampliado y pantalla
-   pequeña. Forzar un error de red y comprobar anuncio, recuperación y foco.
-   El Android 13 ya aparece en `adb devices`; falta la APK para instalarla. Se
-   intentó abrir el proyecto en Expo Go, pero la versión instalada es para SDK
-   57 y este proyecto usa SDK 54, por lo que tampoco permitió el recorrido.
+El estado de estos trabajos se registra en [Pendientes](pendientes.md).
+
+Definir la identidad legal, los correos operativos, la jurisdicción, la edad
+mínima y la fecha de vigencia; revisar legal y técnicamente los borradores.
+Generar el inventario de licencias de dependencias.
+
+Publicar documentos aprobados en `lexareads.app` y abrir **todos** los enlaces
+desde Registro y Ajustes en una instalación real. Todavía no hay hosting
+configurado para esos documentos.
+
+Generar una APK de prueba. La cuenta EAS activa (`javierhr1`) no puede leer el
+proyecto configurado, propiedad de `javierhr`. La compilación local también
+se detuvo antes de compilar por `Unable to establish loopback connection` de
+Gradle 8.14.3 (probado con JDK 17 y 21). Hay que usar una sesión con acceso a
+ese proyecto o reparar el entorno de Gradle.
+
+Instalar esa APK en el Android y recorrer Registro, biblioteca, detalle de
+libro, Ajustes y consentimiento con TalkBack, texto ampliado y pantalla
+pequeña. Forzar un error de red y comprobar anuncio, recuperación y foco.
+El Android 13 ya aparece en `adb devices`; falta la APK para instalarla. Se
+intentó abrir el proyecto en Expo Go, pero la versión instalada es para SDK
+57 y este proyecto usa SDK 54, por lo que tampoco permitió el recorrido.
 
 El punto del plan debe permanecer sin marcar hasta tener enlaces públicos y la
 instalación y el recorrido nativo documentados.

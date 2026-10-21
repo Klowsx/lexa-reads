@@ -202,15 +202,10 @@ Mínimo recomendado para producción: `signup_completed`, `book_added`,
 
 ---
 
-## Checklist final (Go / No-Go)
+## Criterios de salida
 
-- [ ] Migraciones `012`–`018` aplicadas; Advisors sin "Search Path Mutable"
-- [ ] `pnpm gen:types` + `pnpm tsc --noEmit` limpio; `as any` retirados
-- [ ] 3 Edge Functions desplegadas
-- [ ] `WEBHOOK_SECRET` seteado
-- [ ] Webhook de `send-push` con header `x-webhook-secret`
-- [ ] Al menos un admin promovido
-- [ ] `apple-app-site-association` y `assetlinks.json` publicados y verificados
-- [ ] Migraciones del catálogo aplicadas; propuestas, votos y cierre verificados
-- [ ] (Si se hace) PostHog inicializado, gated por consentimiento, crash reporter conectado
-- [ ] `pnpm jest` (incluye RLS con service-role) en verde
+Antes de una beta, este runbook debe completarse con las migraciones, tipos,
+funciones, secretos, webhook, administrador y enlaces profundos descritos arriba.
+También deben validarse el catálogo, las pruebas configuradas y, si se activa,
+la observabilidad protegida por consentimiento. El estado verificable de cada
+uno se mantiene en [Pendientes](pendientes.md).

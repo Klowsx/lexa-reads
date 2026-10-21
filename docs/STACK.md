@@ -775,19 +775,16 @@ Edge Function `delete-account`:
 
 ---
 
-## 8. Checklist de readiness para App Store / Play Store
+## 8. Requisitos de readiness para App Store / Play Store
 
-- [ ] Reporte de contenido in-app con ack ≤24h
-- [ ] Bloqueo de usuarios + RLS
-- [ ] Borrado de cuenta in-app con anonimización a 30 días
-- [ ] Política de privacidad pública (URL accesible)
-- [ ] Consentimiento granular de analytics
-- [ ] Export de datos del usuario (Edge Function)
-- [ ] Push opt-in contextual (no al primer launch)
-- [ ] Sentry configurado en builds de TestFlight/internal
-- [ ] PostHog tras consentimiento
-- [ ] App Store Connect: privacy nutrition labels
-- [ ] Play Console: data safety form
+La salida requiere reportes con acuse en ≤24 h, bloqueo protegido por RLS,
+eliminación de cuenta con anonimización a 30 días, una política de privacidad
+pública, consentimiento granular de analítica y exportación de datos. También
+requiere consentimiento contextual para push, captura de errores en builds de
+prueba, analítica tras consentimiento y las declaraciones de datos de ambas
+tiendas.
+
+El seguimiento de estos requisitos se mantiene en [Pendientes](pendientes.md).
 
 ---
 

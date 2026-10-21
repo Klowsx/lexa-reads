@@ -56,9 +56,9 @@ Las funciones de contador y `handle_new_user` son `SECURITY DEFINER` (owner = `p
 
 De paso se blindó `account_deletion_requests`: se revoca el UPDATE de `scheduled_delete_at`, `processed_at` y `user_id` (el usuario solo debe poder **cancelar** su solicitud, no posponer/evadir el hard-delete).
 
-- [x] Bloquear `is_admin` y contadores a nivel de columna (migración 017)
-- [x] Test de regresión: `rls.test.ts` ("no puede auto-promoverse a admin", "no puede inflar followers_count")
-- [ ] **Despliegue:** aplicar `017` en el SQL Editor (rol `postgres`).
+- Corregido en código: bloqueo de `is_admin` y contadores a nivel de columna (migración 017).
+- Añadido test de regresión: `rls.test.ts` cubre la auto-promoción y el inflado de contadores.
+- El despliegue de `017` en el SQL Editor (rol `postgres`) se controla en [Pendientes](pendientes.md).
 
 ---
 
@@ -70,8 +70,8 @@ De paso se blindó `account_deletion_requests`: se revoca el UPDATE de `schedule
 
 **Fix aplicado (migración 017):** `ALTER FUNCTION ... SET search_path = public, pg_temp` en las ~15 funciones restantes (`pg_temp` al final para que un esquema temporal no intercepte la resolución). No cambia el cuerpo ni invalida el índice que usa `immutable_array_to_string`.
 
-- [x] Fijar `search_path` en todas las funciones DEFINER (migración 017)
-- [ ] **Despliegue:** aplicar `017`; verificar que el linter de Supabase (Database → Advisors) ya no liste "Function Search Path Mutable".
+- Corregido en código: `search_path` fijado en las funciones DEFINER (migración 017).
+- El despliegue de `017` y la comprobación de Advisors se controlan en [Pendientes](pendientes.md).
 
 ---
 
@@ -83,7 +83,7 @@ De paso se blindó `account_deletion_requests`: se revoca el UPDATE de `schedule
 
 **Fix aplicado:** adaptador con **fragmentación**: si el valor supera ~2000 bytes, se trocea en `${key}.0..N` y la clave base guarda un descriptor `chunks:N`. Lectura, escritura (con limpieza de fragmentos huérfanos si la sesión encoge) y borrado son transparentes para Supabase. Compatible con valores legados no fragmentados.
 
-- [x] Adaptador SecureStore con fragmentación (`src/lib/supabase.ts`)
+- Corregido en código: adaptador SecureStore con fragmentación (`src/lib/supabase.ts`).
 
 ---
 
@@ -95,9 +95,8 @@ De paso se blindó `account_deletion_requests`: se revoca el UPDATE de `schedule
 
 **Fix aplicado (NYT):** nueva Edge Function `nyt-bestsellers` que guarda la key como **secret del servidor** (`Deno.env.get("NYT_API_KEY")`), exige usuario autenticado, valida la lista contra una whitelist y devuelve **solo los ISBNs**. `nyt-books.ts` ahora la invoca con `supabase.functions.invoke` y resuelve cada ISBN con el flujo cache-first de `google-books.ts` (preserva CLAUDE.md §4). El cliente ya **no lleva ninguna key de NYT**; `.env.example` lo refleja.
 
-- [x] Proxy de NYT vía Edge Function (`nyt-bestsellers`) + cliente sin la key
-- [ ] **Despliegue:** `supabase functions deploy nyt-bestsellers` + `supabase secrets set NYT_API_KEY=...` (ver `docs/despliegue.md §3`)
-- [ ] **Despliegue:** restringir la key de Google Books en Cloud Console (API + cuota) — `docs/despliegue.md §7`
+- Corregido en código: proxy de NYT vía Edge Function (`nyt-bestsellers`) y cliente sin la key.
+- El despliegue de la función, su secreto y la restricción de la key de Google Books se controlan en [Pendientes](pendientes.md).
 
 ---
 
@@ -109,7 +108,7 @@ De paso se blindó `account_deletion_requests`: se revoca el UPDATE de `schedule
 
 **Decisión:** se deja **sin implementar a propósito** (igual que Sentry). El paso a paso completo (env, `PostHogProvider` gated por `ConsentModal`, conexión de `setCrashReporter`, eventos clave) queda documentado en **`docs/despliegue.md §8`**.
 
-- [ ] _(Documentado)_ Inicializar PostHog + conectar `setCrashReporter` — `docs/despliegue.md §8`
+- La inicialización de PostHog y la conexión de `setCrashReporter` se controlan en [Pendientes](pendientes.md).
 
 ---
 
@@ -124,8 +123,8 @@ De paso se blindó `account_deletion_requests`: se revoca el UPDATE de `schedule
 1. Índice **único parcial** `uq_notifications_unread_dedup (recipient_id, actor_id, type, reference_id) WHERE read_at IS NULL` → da semántica al `ON CONFLICT DO NOTHING` sin tocar los triggers: no se apilan notificaciones idénticas **sin leer**; si el usuario ya la leyó, una nueva interacción sí notifica.
 2. Trigger de follower precisado a `AFTER INSERT OR UPDATE OF status`.
 
-- [x] Idempotencia real de notificaciones (migración 018)
-- [ ] **Despliegue:** aplicar `018`.
+- Corregido en código: idempotencia real de notificaciones (migración 018).
+- El despliegue de `018` se controla en [Pendientes](pendientes.md).
 
 ---
 
