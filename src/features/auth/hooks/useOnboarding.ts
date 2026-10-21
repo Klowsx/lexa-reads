@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '~/lib/supabase'
 import { usernameAvailabilityQueryOptions } from '../auth.queries'
 import { useAuthStore } from '~/stores/auth.store'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import type { OnboardingPreferences, UserProfile } from '~/types/user'
 import {
   meQueryOptions,
@@ -52,6 +53,28 @@ export function useCompleteOnboarding() {
       void queryClient.invalidateQueries({
         queryKey: usernameAvailabilityQueryOptions(username).queryKey
       })
+    },
+    onSuccess: (profile) => {
+      queryClient.setQueryData<UserProfile>(
+        meQueryOptions(userId).queryKey,
+        profile
+      )
+    }
+  })
+}
+
+// Finaliza el onboarding después de que el lector revise o salte las sugerencias.
+export function useFinishOnboarding() {
+  const userId = useAuthStore((state) => state.user?.id ?? '')
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async () => {
+      const { data, error } = await (supabase as SupabaseClient).rpc(
+        'finish_onboarding'
+      )
+      if (error) throw error
+      return data as UserProfile
     },
     onSuccess: (profile) => {
       queryClient.setQueryData<UserProfile>(
