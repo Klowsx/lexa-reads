@@ -468,6 +468,7 @@
     "unblockConfirm": "Unblock @{{username}}? They'll be able to see your profile and follow you again.",
     "empty": "No blocked users",
     "emptyBody": "Users you block will appear here. They can keep using the app, but won't be able to interact with you.",
+    "loadError": "We couldn't load blocked users. Try again.",
     "count_one": "{{count}} blocked user",
     "count_other": "{{count}} blocked users"
   },
