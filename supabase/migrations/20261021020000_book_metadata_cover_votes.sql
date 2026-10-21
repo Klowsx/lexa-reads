@@ -250,6 +250,6 @@ BEGIN
 END;
 $$;
 REVOKE ALL ON FUNCTION lexa_catalog.finalize_covers() FROM PUBLIC;
-SELECT cron.schedule('lexa-finalize-book-covers', '0 * * *', $$
+SELECT cron.schedule('lexa-finalize-book-covers', '0 * * * *', $$
   SELECT lexa_catalog.finalize_covers();
 $$);
