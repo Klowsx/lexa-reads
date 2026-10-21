@@ -494,6 +494,7 @@
     "pushBody": "Followers, likes and comments",
     "emailTitle": "Weekly digest",
     "emailBody": "News and recommendations by email",
+    "saveError": "We couldn't save your preferences. Check your connection and try again.",
     "continue": "Continue"
   },
   "settings": {
@@ -502,6 +503,7 @@
     "editProfile": "Edit profile",
     "editProfileSub": "Name, bio, favorite genres",
     "readingGoal": "Reading goal",
+    "goalSaveError": "The goal was not saved. Your value is still here; check your connection and try again.",
     "readingGoalSub_one": "{{count}} book in {{year}}",
     "readingGoalSub_other": "{{count}} books in {{year}}",
     "booksToReadIn": "Books to read in {{year}}",
@@ -519,6 +521,7 @@
     "manageNotificationsSub": "Push, email and preferences",
     "privacy": "Privacy",
     "privateAccount": "Private account",
+    "privacySaveError": "Privacy was not saved. Check your connection and try again.",
     "privateOn": "Only approved followers see your profile",
     "privateOff": "Your profile is visible to everyone",
     "blockedUsers": "Blocked users",

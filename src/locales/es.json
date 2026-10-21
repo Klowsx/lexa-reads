@@ -494,6 +494,7 @@
     "pushBody": "Seguidores, likes y comentarios",
     "emailTitle": "Resumen semanal",
     "emailBody": "Novedades y recomendaciones por email",
+    "saveError": "No pudimos guardar tus preferencias. Revisa tu conexión e inténtalo de nuevo.",
     "continue": "Continuar"
   },
   "settings": {
@@ -502,6 +503,7 @@
     "editProfile": "Editar perfil",
     "editProfileSub": "Nombre, bio, géneros favoritos",
     "readingGoal": "Meta de lectura",
+    "goalSaveError": "No se guardó la meta. Tu valor sigue aquí; revisa la conexión e inténtalo de nuevo.",
     "readingGoalSub_one": "{{count}} libro en {{year}}",
     "readingGoalSub_other": "{{count}} libros en {{year}}",
     "booksToReadIn": "Libros a leer en {{year}}",
@@ -519,6 +521,7 @@
     "manageNotificationsSub": "Push, email y preferencias",
     "privacy": "Privacidad",
     "privateAccount": "Cuenta privada",
+    "privacySaveError": "No se guardó la privacidad. Revisa tu conexión e inténtalo de nuevo.",
     "privateOn": "Solo seguidores aprobados ven tu perfil",
     "privateOff": "Tu perfil es visible para todos",
     "blockedUsers": "Usuarios bloqueados",

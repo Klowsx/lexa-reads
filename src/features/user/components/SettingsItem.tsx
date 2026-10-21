@@ -12,6 +12,7 @@ interface Props {
   separator?: boolean
 }
 
+// Presenta una fila de ajustes y anuncia como botón las filas que ejecutan acciones.
 export function SettingsItem({
   label,
   subtitle,
@@ -26,7 +27,10 @@ export function SettingsItem({
     <>
       <Pressable
         onPress={onPress}
-        className="flex-row items-center gap-3 px-4 py-3"
+        accessible={Boolean(onPress)}
+        accessibilityRole={onPress ? 'button' : undefined}
+        accessibilityLabel={onPress ? label : undefined}
+        className="min-h-12 flex-row items-center gap-3 px-4 py-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
         style={({ pressed }) => ({
           backgroundColor: pressed && onPress ? c.sh : 'transparent'
         })}

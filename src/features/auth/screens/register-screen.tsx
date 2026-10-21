@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Linking, Pressable, Text, View } from 'react-native'
 import { AuthField, PrimaryButton } from '~/features/auth/components'
 import { useRegister } from '~/features/auth/hooks/useRegister'
-import { useColors } from '~/theme/colors'
+import { rawLight, useColors } from '~/theme/colors'
 import { AuthPage } from '~/features/auth/components/auth-page'
 
 // Recoge los datos de registro y muestra requisitos claros antes de crear una cuenta.
@@ -85,48 +85,46 @@ export default function RegisterScreen() {
         </Text>
       </View>
 
-      <Pressable
-        className="flex-row items-start gap-2.5 mb-[22px]"
-        onPress={() => setTerms((accepted) => !accepted)}
-        accessibilityRole="checkbox"
-        accessibilityState={{ checked: terms }}
-        aria-checked={terms}
-        accessibilityLabel="Aceptar términos, licencia, privacidad y normas de la comunidad"
-      >
-        <View
-          className={`w-[18px] h-[18px] rounded-sm border-[1.5px] mt-0.5 items-center justify-center ${terms ? 'bg-accent border-accent' : 'border-border'}`}
+      <View className="mb-[22px]">
+        <Pressable
+          className="min-h-12 flex-row items-center gap-2.5 rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+          onPress={() => setTerms((accepted) => !accepted)}
+          accessibilityRole="checkbox"
+          accessibilityState={{ checked: terms }}
+          aria-checked={terms}
+          accessibilityLabel="Acepto los documentos legales de Lexa"
         >
-          {terms && <Check size={11} color={c.onAccent} />}
+          <View
+            className={`h-5 w-5 rounded-sm border-[1.5px] items-center justify-center ${terms ? 'bg-accent border-accent' : 'border-border'}`}
+          >
+            {terms && <Check size={11} color={rawLight.text} />}
+          </View>
+          <Text className="flex-1 text-xs text-t2 font-body">
+            He leído y acepto los documentos legales de Lexa.
+          </Text>
+        </Pressable>
+        <View className="flex-row flex-wrap">
+          {/* Los enlaces son controles separados para que abrirlos no marque la casilla. */}
+          {[
+            ['terms', 'Términos'],
+            ['eula', 'Licencia de uso'],
+            ['privacy', 'Privacidad'],
+            ['community', 'Normas de la comunidad']
+          ].map(([path, label]) => (
+            <Pressable
+              key={path}
+              onPress={() => handleOpenLegal(path)}
+              accessibilityRole="link"
+              accessibilityLabel={label}
+              className="min-h-11 w-1/2 justify-center rounded-md px-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+            >
+              <Text className="font-body-sb text-xs text-text underline">
+                {label}
+              </Text>
+            </Pressable>
+          ))}
         </View>
-        <Text className="flex-1 text-xs text-t2 leading-[18px] font-body">
-          Acepto los{' '}
-          <Text
-            className="text-accent"
-            onPress={() => handleOpenLegal('terms')}
-          >
-            Términos
-          </Text>
-          , la{' '}
-          <Text className="text-accent" onPress={() => handleOpenLegal('eula')}>
-            Licencia de uso
-          </Text>
-          , la{' '}
-          <Text
-            className="text-accent"
-            onPress={() => handleOpenLegal('privacy')}
-          >
-            Política de privacidad
-          </Text>{' '}
-          y las{' '}
-          <Text
-            className="text-accent"
-            onPress={() => handleOpenLegal('community')}
-          >
-            Normas de la comunidad
-          </Text>
-          .
-        </Text>
-      </Pressable>
+      </View>
 
       {error && (
         <Text

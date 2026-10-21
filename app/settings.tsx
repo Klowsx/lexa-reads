@@ -25,7 +25,7 @@ import { useLogout } from '~/features/auth/hooks/useLogout'
 import { type ThemeMode, useThemeStore } from '~/stores/theme.store'
 import { useUIStore } from '~/stores/ui.store'
 import { cn } from '~/lib/utils'
-import { useColors } from '~/theme/colors'
+import { rawLight, useColors } from '~/theme/colors'
 import { supabase } from '~/lib/supabase'
 
 const alpha = (hex: string, op: number) => {
@@ -108,10 +108,10 @@ export default function SettingsScreen() {
     <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
       <View className="px-4 py-2.5 flex-row items-center gap-2 border-b border-border">
         <Pressable
-          hitSlop={8}
           onPress={() => router.back()}
           accessibilityRole="button"
           accessibilityLabel={t('common.back')}
+          className="h-12 w-12 items-center justify-center rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
         >
           <ChevronLeft size={24} color={c.t3} strokeWidth={1.6} />
         </Pressable>
@@ -155,7 +155,7 @@ export default function SettingsScreen() {
                   }
                   accessibilityRole="button"
                   accessibilityLabel={t('settings.reduceGoal')}
-                  className="rounded-full bg-sh border border-border items-center justify-center w-[38px] h-[38px]"
+                  className="h-12 w-12 rounded-full bg-sh border border-border items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
                 >
                   <Text className="text-lg font-body text-text">−</Text>
                 </Pressable>
@@ -168,7 +168,7 @@ export default function SettingsScreen() {
                   }
                   accessibilityRole="button"
                   accessibilityLabel={t('settings.increaseGoal')}
-                  className="rounded-full bg-sh border border-border items-center justify-center w-[38px] h-[38px]"
+                  className="h-12 w-12 rounded-full bg-sh border border-border items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
                 >
                   <Text className="text-lg font-body text-text">+</Text>
                 </Pressable>
@@ -180,16 +180,29 @@ export default function SettingsScreen() {
                   })
                 }}
                 disabled={updateGoal.isPending}
-                className="py-2.5 rounded-md items-center bg-accent"
+                accessibilityRole="button"
+                accessibilityState={{ disabled: updateGoal.isPending }}
+                className="min-h-12 py-2.5 rounded-md items-center justify-center bg-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-text"
               >
                 {updateGoal.isPending ? (
-                  <ActivityIndicator size="small" color="#fff" />
+                  <ActivityIndicator size="small" color={rawLight.text} />
                 ) : (
-                  <Text className="text-xs font-body-sb text-white">
+                  <Text
+                    className="text-xs font-body-sb"
+                    style={{ color: rawLight.text }}
+                  >
                     {t('common.save')}
                   </Text>
                 )}
               </Pressable>
+              {updateGoal.isError && (
+                <Text
+                  accessibilityRole="alert"
+                  className="mt-2 font-body text-xs text-text"
+                >
+                  {t('settings.goalSaveError')}
+                </Text>
+              )}
             </View>
           )}
           <SettingsItem
@@ -218,21 +231,23 @@ export default function SettingsScreen() {
                       name: label
                     })}
                     accessibilityState={{ selected: active }}
+                    aria-selected={active}
                     className={cn(
-                      'flex-1 flex-row items-center justify-center gap-1.5 py-2 rounded-sm',
+                      'min-h-12 flex-1 flex-row items-center justify-center gap-1.5 py-2 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-text',
                       active ? 'bg-accent' : 'bg-transparent'
                     )}
                   >
                     <Icon
                       size={14}
-                      color={active ? '#fff' : c.t3}
+                      color={active ? rawLight.text : c.t3}
                       strokeWidth={1.8}
                     />
                     <Text
                       className={cn(
                         'text-xs font-body-sb',
-                        active ? 'text-white' : 'text-t3'
+                        active ? 'text-text' : 'text-t3'
                       )}
+                      style={active ? { color: rawLight.text } : undefined}
                     >
                       {label}
                     </Text>
@@ -262,12 +277,21 @@ export default function SettingsScreen() {
             }
             trailing={
               <SettingsToggle
+                label={t('settings.privateAccount')}
                 on={privateOn}
                 onChange={(val) => updateProfile.mutate({ is_private: val })}
                 disabled={updateProfile.isPending || !me}
               />
             }
           />
+          {updateProfile.isError && (
+            <Text
+              accessibilityRole="alert"
+              className="px-4 pb-3 font-body text-xs text-text"
+            >
+              {t('settings.privacySaveError')}
+            </Text>
+          )}
           <SettingsItem
             label={t('settings.blockedUsers')}
             subtitle={

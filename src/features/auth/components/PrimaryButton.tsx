@@ -1,5 +1,5 @@
 import { ActivityIndicator, Pressable, Text, View } from 'react-native'
-import { fixed } from '~/theme/colors'
+import { rawLight } from '~/theme/colors'
 
 type Props = {
   children: React.ReactNode
@@ -31,8 +31,13 @@ export function PrimaryButton({
       aria-busy={Boolean(loading)}
     >
       <View className="flex-row items-center gap-2">
-        {loading && <ActivityIndicator size="small" color={fixed.onAccent} />}
-        <Text className="text-white text-base font-body-bold">{children}</Text>
+        {loading && <ActivityIndicator size="small" color={rawLight.text} />}
+        <Text
+          className="text-base font-body-bold"
+          style={{ color: rawLight.text }}
+        >
+          {children}
+        </Text>
       </View>
     </Pressable>
   )

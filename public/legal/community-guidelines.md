@@ -1,6 +1,6 @@
 # Normas de la comunidad — Lexa Reads
 
-> **Plantilla.** Revísala con asesoría legal. Última actualización: `<FECHA>`.
+> **Plantilla.** Revísala con asesoría legal. Última actualización: `{{effectiveDate}}`.
 
 Lexa es un espacio para hablar de libros. Para que sea seguro, aplicamos estas
 normas a **todo** el contenido: reseñas, comentarios, listas, perfiles, nombres
@@ -42,4 +42,4 @@ miembros. El equipo de Lexa puede intervenir sobre cualquier club.
 
 ## Apelaciones / contacto
 
-Si crees que actuamos por error, escríbenos a `<correo de contacto>`.
+Si crees que actuamos por error, escríbenos a `{{supportEmail}}`.

@@ -1,10 +1,10 @@
 # Términos de Servicio — Lexa Reads
 
 > **Plantilla.** Revísala con asesoría legal antes de publicar. Rellena los
-> campos entre `<...>`. Última actualización: `<FECHA>`.
+> campos de `release-info.json`. Última actualización: `{{effectiveDate}}`.
 
-**Entidad:** `<NOMBRE LEGAL / EMPRESA>` ("Lexa", "nosotros").
-**Contacto:** `<correo de contacto>` · **Jurisdicción:** `<país/estado>`.
+**Entidad:** `{{legalName}}` ("Lexa", "nosotros").
+**Contacto:** `{{supportEmail}}` · **Jurisdicción:** `{{jurisdiction}}`.
 
 Al crear una cuenta o usar Lexa Reads (la "App") aceptas estos Términos. Si no
 estás de acuerdo, no uses la App.
@@ -16,7 +16,7 @@ reseñas, listas, un feed social, clubes de lectura y mensajería directa (DMs).
 
 ## 2. Cuenta
 
-- Debes tener al menos `<13/16 según jurisdicción>` años.
+- Debes tener al menos `{{minimumAge}}` años.
 - Eres responsable de la actividad de tu cuenta y de mantener segura tu contraseña.
 - Puedes eliminar tu cuenta en cualquier momento desde Ajustes (borrado diferido a 30 días).
 
@@ -64,4 +64,4 @@ continuado implica aceptación.
 
 ## 9. Contacto
 
-`<correo de contacto>`.
+`{{supportEmail}}`.

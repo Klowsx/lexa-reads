@@ -111,6 +111,10 @@ Esta es una propuesta de alcance, no un cambio ya aprobado del producto descrito
 - [ ] Bloquear, reportar, exportar datos y solicitar eliminación de cuenta.
 - [ ] Accesibilidad básica, errores visibles, controles operativos, documentación pública y una versión instalable verificada.
 
+Para este último punto, consultar [implementación, comprobaciones y bloqueos de
+publicación](verificacion-accesibilidad-y-publicacion.md). Sigue abierto hasta
+verificar los documentos públicos y la APK instalada en Android.
+
 Los puntos marcados corresponden a implementación y comprobaciones automatizadas realizadas. Evidencia y límites:
 
 - **Acceso y onboarding:** [documentación del flujo](acceso-correo-y-onboarding.md), pruebas unitarias, navegador con HTTP simulado y prueba SQL transaccional. Pendientes de lanzamiento: entrega real del correo, enlaces y reanudación en una compilación instalada.

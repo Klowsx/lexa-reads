@@ -25,6 +25,7 @@ import { ConsentModal } from '~/features/user/components/ConsentModal'
 import { ErrorBoundary } from '~/components/ErrorBoundary'
 import { AuthGate } from '~/features/auth/components/auth-gate'
 import { SessionStatus } from '~/features/auth/components/session-status'
+import { ToastViewport } from '~/components/ui/ToastViewport'
 import { useAuthSession } from '~/features/auth/hooks/use-auth-session'
 
 // Inicializa fuentes y proveedores; la funcionalidad de acceso mantiene una única sesión y un único callback.
@@ -66,6 +67,7 @@ function RootLayout() {
                 <Stack screenOptions={{ headerShown: false }} />
               </>
             )}
+            <ToastViewport />
           </QueryClientProvider>
         </I18nextProvider>
       </ErrorBoundary>

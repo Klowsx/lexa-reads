@@ -1,10 +1,10 @@
 # Licencia de Uso para el Usuario Final (EULA) — Lexa Reads
 
-> **Plantilla.** Revísala con asesoría legal. Rellena los campos `<...>`.
-> Última actualización: `<FECHA>`.
+> **Plantilla.** Revísala con asesoría legal. Completa `release-info.json`.
+> Última actualización: `{{effectiveDate}}`.
 
 Esta Licencia (EULA) rige el uso de la aplicación Lexa Reads (la "App") provista
-por `<NOMBRE LEGAL / EMPRESA>`. Apple no es parte de esta licencia; en iOS aplica
+por `{{legalName}}`. Apple no es parte de esta licencia; en iOS aplica
 además la EULA estándar de Apple, y esta la complementa.
 
 ## 1. Concesión de licencia
@@ -30,7 +30,7 @@ plazo máximo de 24 horas tras un reporte. Ver las
 ## 4. Propiedad
 
 La App se licencia, no se vende. Todos los derechos no concedidos expresamente
-quedan reservados a `<NOMBRE LEGAL / EMPRESA>` y sus licenciantes.
+quedan reservados a `{{legalName}}` y sus licenciantes.
 
 ## 5. Terminación
 
@@ -43,4 +43,4 @@ La App se provee "tal cual". Ver el descargo de los Términos de Servicio.
 
 ## 7. Contacto
 
-`<correo de contacto>`.
+`{{supportEmail}}`.
