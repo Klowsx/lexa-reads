@@ -4,7 +4,8 @@ describe('Reanudación del primer ingreso', () => {
   it.each([
     [1, '/(auth)/onboarding/genres'],
     [2, '/(auth)/onboarding/goal'],
-    [3, '/(auth)/onboarding/username']
+    [3, '/(auth)/onboarding/username'],
+    [4, '/(auth)/onboarding/suggestions']
   ])(
     'retoma el paso %s guardado, también cuando se saltaron preferencias',
     (step, route) => {

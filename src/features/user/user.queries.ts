@@ -441,6 +441,31 @@ export const searchUsersQueryOptions = (q: string) =>
     staleTime: q.length >= 1 ? 30_000 : 5 * 60_000
   })
 
+// Propone perfiles públicos activos para que una cuenta nueva no empiece con un feed vacío.
+async function fetchOnboardingSuggestions(
+  userId: string
+): Promise<SearchUser[]> {
+  const { data, error } = await supabase
+    .from('users')
+    .select(USER_SEARCH_COLUMNS)
+    .neq('id', userId)
+    .is('deleted_at', null)
+    .not('username', 'is', null)
+    .order('followers_count', { ascending: false })
+    .limit(6)
+  if (error) throw error
+  return (data ?? []) as SearchUser[]
+}
+
+// Mantiene una caché breve de sugerencias para no repetir la consulta al reanudar el último paso.
+export const onboardingSuggestionsQueryOptions = (userId: string) =>
+  queryOptions({
+    queryKey: ['onboarding_suggestions', userId],
+    queryFn: () => fetchOnboardingSuggestions(userId),
+    enabled: !!userId,
+    staleTime: 5 * 60_000
+  })
+
 // ── Bloqueos ──────────────────────────────────────────────────
 
 export type BlockedUser = {

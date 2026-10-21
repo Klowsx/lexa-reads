@@ -17,7 +17,7 @@ import { useDebounce } from '~/lib/useDebounce'
 import { useColors } from '~/theme/colors'
 import { OnboardingScreen } from '~/features/auth/components/onboarding-screen'
 
-// Pide el nombre público y cierra el onboarding cuando el servidor confirma todos los datos.
+// Pide el nombre público antes de ofrecer sugerencias de lectores para el feed inicial.
 export default function OnboardUsernameScreen() {
   const router = useRouter()
   const c = useColors()
@@ -57,18 +57,21 @@ export default function OnboardUsernameScreen() {
     setUsername(normalizeUsername(value))
   }
 
-  // Cierra el onboarding en el servidor y entra a la aplicación solo después de persistirlo.
+  // Guarda el nombre y avanza a las sugerencias solo después de persistirlo en el servidor.
   function handleComplete() {
     if (!validFormat || !isAvailable || completeOnboarding.isPending) return
 
-    completeOnboarding.mutate(username)
+    completeOnboarding.mutate(username, {
+      onSuccess: () => router.replace('/(auth)/onboarding/suggestions')
+    })
   }
 
   return (
     <OnboardingScreen
       step={3}
+      total={4}
       title="Tu firma de lector"
-      description="Elige un nombre único para tus reseñas y conversaciones. Este es el último paso."
+      description="Elige un nombre único para tus reseñas y conversaciones. Después te mostraremos lectores para tu feed."
       onBack={() => router.replace('/(auth)/onboarding/goal')}
       busy={completeOnboarding.isPending}
       footer={
@@ -86,7 +89,7 @@ export default function OnboardUsernameScreen() {
             loading={completeOnboarding.isPending}
             onPress={handleComplete}
           >
-            Entrar a Lexa
+            Continuar
           </PrimaryButton>
         </>
       }

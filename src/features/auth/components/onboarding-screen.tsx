@@ -14,6 +14,7 @@ import { GhostButton } from './GhostButton'
 
 type Props = {
   step: number
+  total?: number
   title: string
   description: string
   children: ReactNode
@@ -26,6 +27,7 @@ type Props = {
 // Mantiene los pasos legibles con teclado, pantallas pequeñas y una salida para cambiar de cuenta.
 export function OnboardingScreen({
   step,
+  total = 3,
   title,
   description,
   children,
@@ -52,12 +54,12 @@ export function OnboardingScreen({
       >
         <OnboardHeader
           step={step}
-          total={3}
+          total={total}
           onBack={onBack}
           onSkip={onSkip}
           disabled={locked}
         />
-        <StepBar step={step} total={3} />
+        <StepBar step={step} total={total} />
         <View className="px-6 mb-7">
           <Text
             accessibilityRole="header"
