@@ -1,9 +1,13 @@
-import { adminClient, createTestUser } from '~/test-utils/supabase'
+import {
+  adminClient,
+  createTestUser,
+  hasSupabaseTestEnv
+} from '~/test-utils/supabase'
 
 // RLS de mensajería (migración 020). Requiere SUPABASE_SERVICE_ROLE_KEY +
 // migraciones 019/020 aplicadas. Si falta la key → SKIP por env; si las
 // migraciones aún no están desplegadas → se saltan en runtime (ready=false).
-const SKIP = !process.env.SUPABASE_SERVICE_ROLE_KEY
+const SKIP = !hasSupabaseTestEnv
 
 // El cliente generado no conoce aún las tablas de mensajería (faltan en
 // database.ts hasta gen:types) → casts a any en el límite de Supabase.
@@ -58,7 +62,6 @@ describe('RLS: mensajería (DMs)', () => {
     if (SKIP) return
     ready = await messagingDeployed()
     if (!ready) {
-      // eslint-disable-next-line no-console
       console.warn(
         '[messaging.rls] migración 020 no desplegada → tests omitidos'
       )
@@ -119,13 +122,11 @@ describe('RLS: mensajería (DMs)', () => {
 
     // Tras aceptar, B sí puede
     await (B.client as any).rpc('accept_message_request', { p_conv: conv })
-    const { error: bErr2 } = await (B.client as any)
-      .from('messages')
-      .insert({
-        conversation_id: conv,
-        sender_id: B.user.id,
-        body: 'ya acepté'
-      })
+    const { error: bErr2 } = await (B.client as any).from('messages').insert({
+      conversation_id: conv,
+      sender_id: B.user.id,
+      body: 'ya acepté'
+    })
     expect(bErr2).toBeNull()
   })
 
@@ -153,13 +154,11 @@ describe('RLS: mensajería (DMs)', () => {
   it('bloqueo: oculta mensajes y bloquea el envío en ambos sentidos', async () => {
     if (SKIP || !ready) return
     const conv = await createDM(A.client, A.user.id, C.user.id)
-    await (A.client as any)
-      .from('messages')
-      .insert({
-        conversation_id: conv,
-        sender_id: A.user.id,
-        body: 'antes del bloqueo'
-      })
+    await (A.client as any).from('messages').insert({
+      conversation_id: conv,
+      sender_id: A.user.id,
+      body: 'antes del bloqueo'
+    })
 
     // C bloquea a A
     await (C.client as any).from('user_blocks').insert({
@@ -175,13 +174,11 @@ describe('RLS: mensajería (DMs)', () => {
     expect(cSees ?? []).toHaveLength(0)
 
     // A ya no puede enviar a C
-    const { error } = await (A.client as any)
-      .from('messages')
-      .insert({
-        conversation_id: conv,
-        sender_id: A.user.id,
-        body: 'después del bloqueo'
-      })
+    const { error } = await (A.client as any).from('messages').insert({
+      conversation_id: conv,
+      sender_id: A.user.id,
+      body: 'después del bloqueo'
+    })
     expect(error).not.toBeNull()
 
     await (C.client as any)

@@ -1,9 +1,17 @@
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '~/types/database'
 
-const url = process.env.EXPO_PUBLIC_SUPABASE_URL!
-const anonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+const configuredUrl = process.env.EXPO_PUBLIC_SUPABASE_URL
+const configuredAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY
+const configuredServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+// Permite que Jest cargue las suites RLS y que ellas mismas se omitan si falta un entorno real.
+export const hasSupabaseTestEnv = Boolean(
+  configuredUrl && configuredAnonKey && configuredServiceRoleKey
+)
+const url = configuredUrl ?? 'http://127.0.0.1:54321'
+const anonKey = configuredAnonKey ?? 'test-anon-key'
+const serviceRoleKey = configuredServiceRoleKey ?? 'test-service-role-key'
 
 // Cliente con service_role para setup/teardown en tests (bypasa RLS)
 export const adminClient = createClient<Database>(url, serviceRoleKey, {
