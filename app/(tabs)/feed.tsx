@@ -7,11 +7,14 @@ import { FlashList } from '@shopify/flash-list'
 import { FeedCard } from '~/features/feed/components/FeedCard'
 import { FeedSkeleton } from '~/features/feed/components/FeedSkeleton'
 import { useFeed } from '~/features/feed/hooks/useFeed'
+import { UserCard } from '~/features/user/components/UserCard'
+import { useSearchUsers } from '~/features/user/hooks/useSearchUsers'
 import { QueryBoundary } from '~/components/ui/QueryBoundary'
 import { fixed, useColors } from '~/theme/colors'
 
 // ─── Screen ───────────────────────────────────────────────────
 
+// Presenta actividad reciente y propone lectores si todavía no hay contenido que mostrar.
 export default function FeedScreen() {
   const insets = useSafeAreaInsets()
   const router = useRouter()
@@ -20,6 +23,11 @@ export default function FeedScreen() {
 
   const feedQuery = useFeed()
   const { isFetchingNextPage, hasNextPage, fetchNextPage } = feedQuery
+  const feedItems = feedQuery.data?.pages.flatMap((page) => page.items) ?? []
+  const suggestions = useSearchUsers(
+    '',
+    feedQuery.isSuccess && feedItems.length === 0
+  )
 
   return (
     <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
@@ -62,7 +70,7 @@ export default function FeedScreen() {
 
           if (items.length === 0) {
             return (
-              <View className="flex-1 items-center justify-center px-8 gap-4">
+              <View className="flex-1 justify-center gap-4 px-8 py-6">
                 <View
                   className="w-16 h-16 rounded-full items-center justify-center"
                   style={{ backgroundColor: `${fixed.accent}1A` }}
@@ -85,6 +93,18 @@ export default function FeedScreen() {
                     {t('feed.findPeople')}
                   </Text>
                 </Pressable>
+                {suggestions.data?.length ? (
+                  <View className="mt-2 gap-1 rounded-card border border-border bg-surface p-4">
+                    <Text className="font-body-sb text-xs text-text">
+                      {t('feed.suggestedReaders')}
+                    </Text>
+                    <View className="mt-2">
+                      {suggestions.data.slice(0, 3).map((user) => (
+                        <UserCard key={user.id} user={user} />
+                      ))}
+                    </View>
+                  </View>
+                ) : null}
               </View>
             )
           }

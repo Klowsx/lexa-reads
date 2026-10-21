@@ -434,11 +434,13 @@ async function fetchSearchUsers(q: string): Promise<SearchUser[]> {
   return (data ?? []) as SearchUser[]
 }
 
-export const searchUsersQueryOptions = (q: string) =>
+// Busca lectores por nombre o devuelve sugerencias solo cuando la pantalla habilita la consulta.
+export const searchUsersQueryOptions = (q: string, enabled = true) =>
   queryOptions({
     queryKey: ['search_users', q],
     queryFn: () => fetchSearchUsers(q),
-    staleTime: q.length >= 1 ? 30_000 : 5 * 60_000
+    staleTime: q.length >= 1 ? 30_000 : 5 * 60_000,
+    enabled
   })
 
 // Propone perfiles públicos activos para que una cuenta nueva no empiece con un feed vacío.
