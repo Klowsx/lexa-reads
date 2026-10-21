@@ -60,6 +60,12 @@
     "plugins": [
       "expo-secure-store",
       [
+        "expo-camera",
+        {
+          "cameraPermission": "Lexa usa la cámara para escanear el ISBN de un libro."
+        }
+      ],
+      [
         "expo-notifications",
         {
           "icon": "./assets/icon.png",

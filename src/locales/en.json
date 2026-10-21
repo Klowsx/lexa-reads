@@ -225,6 +225,7 @@
     "addBookHint": "You can add this book and propose covers for the community to choose.",
     "addBook": "Add a book",
     "addBookWithIsbn": "Add with ISBN",
+    "scanIsbn": "Scan ISBN",
     "booksLoaded": "{{count}} books loaded",
     "loadMore": "Load more books",
     "clearFilters": "Clear filters",
@@ -253,6 +254,15 @@
     "saveError": "We couldn't save your change. Check your connection and choose an option again.",
     "requested": "Requested",
     "followError": "We couldn't update this follow. Please try again."
+  },
+  "scanIsbn": {
+    "title": "Scan the ISBN",
+    "description": "Center the barcode in the frame. We'll look up the book automatically.",
+    "permissionTitle": "Enable the camera",
+    "permissionDescription": "We need permission to read the book's ISBN.",
+    "permissionAction": "Allow camera",
+    "invalidCode": "That code is not a valid ISBN-13. Try the barcode on the book.",
+    "loading": "Preparing camera…"
   },
   "createBook": {
     "title": "Add a book",
