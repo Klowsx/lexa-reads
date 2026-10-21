@@ -12,8 +12,8 @@ enlazado o en el PR correspondiente.
 
 ## 1. Bloqueadores para una beta instalada
 
-- [ ] Publicar y configurar las Edge Functions, secretos, webhooks,
-      administrador y deep links restantes. Seguir
+- [ ] Configurar `send-push`, su secreto y webhook, promover el administrador
+      inicial y publicar los deep links restantes. Seguir
       [el runbook de despliegue](despliegue.md).
 - [ ] Reparar el acceso al proyecto EAS con la cuenta propietaria y generar una
       APK de desarrollo para Android. Registrar el identificador de build y el
@@ -96,6 +96,10 @@ enlazado o en el PR correspondiente.
       `gen:theme`, `check:theme` y el formato del repositorio coincidan.
 - [x] Corregir la lista de bloqueados para que use una RPC limitada al propio
       bloqueador y siga siendo desbloqueable aunque RLS oculte el perfil.
+- [x] Publicar `delete-account` y `export-user-data` con verificación JWT en
+      Supabase. La exportación pagina las colecciones y declara la versión de
+      formato; la solicitud de eliminación es idempotente y revoca sesiones.
+      Falta validación con una cuenta real y Android antes de cerrar los flujos.
 
 ## Diferido a propósito
 

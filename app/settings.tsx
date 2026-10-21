@@ -51,7 +51,7 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets()
   const router = useRouter()
   const c = useColors()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const mode = useThemeStore((s) => s.mode)
   const setMode = useThemeStore((s) => s.setMode)
   const addToast = useUIStore((s) => s.addToast)
@@ -78,6 +78,7 @@ export default function SettingsScreen() {
   } = useAccountDeletion()
 
   async function handleExport() {
+    // Solicita el archivo de portabilidad y abre el selector nativo para compartirlo.
     setExportLoading(true)
     try {
       const { data, error } =
@@ -97,11 +98,14 @@ export default function SettingsScreen() {
   const blockedCount = blockedUsers.length
 
   const scheduledDate = deletionRequest?.scheduled_delete_at
-    ? new Date(deletionRequest.scheduled_delete_at).toLocaleDateString('es', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-      })
+    ? new Date(deletionRequest.scheduled_delete_at).toLocaleDateString(
+        i18n.language,
+        {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        }
+      )
     : null
 
   return (
