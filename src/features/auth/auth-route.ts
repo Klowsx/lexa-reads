@@ -1,16 +1,11 @@
-import { getOnboardingRoute } from './onboarding-route'
-
 type AuthRouteState = {
   segments: readonly string[]
   hasSession: boolean
   isRecoveryMode: boolean
-  profile?: {
-    onboarding_completed: boolean | null
-    onboarding_step?: number
-  } | null
+  profile?: object | null
 }
 
-// Prioriza los enlaces y la recuperación; el perfil persistido decide el acceso normal al MVP.
+// Envía a lectores autenticados al feed después de cargar su perfil, sin exigir onboarding.
 export function getAuthRedirect({
   segments,
   hasSession,
@@ -30,10 +25,7 @@ export function getAuthRedirect({
   if (isRecoveryMode)
     return screen === 'new-password' ? null : ('/(auth)/new-password' as const)
   if (!profile) return null
-  if (segments.length === 0 || segments[0] === 'index') {
-    return getOnboardingRoute(profile)
-  }
-  if (profile.onboarding_completed)
-    return inAuth ? ('/(tabs)/feed' as const) : null
-  return screen === 'onboarding' ? null : getOnboardingRoute(profile)
+  if (segments.length === 0 || segments[0] === 'index')
+    return '/(tabs)/feed' as const
+  return inAuth ? ('/(tabs)/feed' as const) : null
 }

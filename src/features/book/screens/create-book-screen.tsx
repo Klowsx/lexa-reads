@@ -157,43 +157,48 @@ export default function CreateBookScreen() {
                 placeholderTextColor={c.t2}
                 className="min-h-14 rounded-md border border-border bg-surface px-4 font-body text-xs text-text"
               />
+              {key === 'title' && matches.data && matches.data.length > 0 && (
+                <View className="gap-3 rounded-md border border-border bg-surface p-2">
+                  <Text className="px-2 py-1 font-body-sb text-xs text-t2">
+                    {t('createBook.possibleMatches')}
+                  </Text>
+                  {matches.data.slice(0, 3).map((book) => (
+                    <Pressable
+                      key={book.id}
+                      accessibilityRole="button"
+                      accessibilityLabel={t('search.openBook', {
+                        title: book.title
+                      })}
+                      onPress={() =>
+                        router.replace({
+                          pathname: '/book/[id]',
+                          params: { id: book.id }
+                        })
+                      }
+                      className="min-h-14 flex-row items-center gap-3 rounded-md p-2 active:bg-sr"
+                    >
+                      <BookCover book={book} width={36} height={54} />
+                      <View className="min-w-0 flex-1">
+                        <Text
+                          numberOfLines={1}
+                          className="font-display-sb text-sm text-text"
+                        >
+                          {book.title}
+                        </Text>
+                        <Text
+                          numberOfLines={1}
+                          className="font-body text-xs text-t2"
+                        >
+                          {book.authors?.[0]}
+                        </Text>
+                      </View>
+                    </Pressable>
+                  ))}
+                </View>
+              )}
             </View>
           ))}
         </View>
-        {matches.data && matches.data.length > 0 && (
-          <View className="gap-3">
-            <Text className="font-body-sb text-xs text-text">
-              {t('createBook.possibleMatches')}
-            </Text>
-            {matches.data.slice(0, 3).map((book) => (
-              <Pressable
-                key={book.id}
-                accessibilityRole="button"
-                accessibilityLabel={t('search.openBook', { title: book.title })}
-                onPress={() =>
-                  router.replace({
-                    pathname: '/book/[id]',
-                    params: { id: book.id }
-                  })
-                }
-                className="min-h-14 flex-row items-center gap-3 rounded-md bg-surface p-2"
-              >
-                <BookCover book={book} width={36} height={54} />
-                <View className="min-w-0 flex-1">
-                  <Text
-                    numberOfLines={1}
-                    className="font-display-sb text-sm text-text"
-                  >
-                    {book.title}
-                  </Text>
-                  <Text numberOfLines={1} className="font-body text-xs text-t2">
-                    {book.authors?.[0]}
-                  </Text>
-                </View>
-              </Pressable>
-            ))}
-          </View>
-        )}
         <CatalogTermPicker
           kind="genre"
           title={t('createBook.genres')}

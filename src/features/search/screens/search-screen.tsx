@@ -222,6 +222,12 @@ export default function SearchScreen() {
               )}
             </View>
           )}
+          {tab === 'books' && (
+            <SearchAction
+              label={t('search.addBook')}
+              onPress={openBookCreation}
+            />
+          )}
         </View>
         <FlashList<Item>
           data={items}
@@ -303,10 +309,6 @@ export default function SearchScreen() {
                       }}
                     />
                   )}
-                <SearchAction
-                  label={t('search.addBook')}
-                  onPress={openBookCreation}
-                />
               </View>
             ) : null
           }

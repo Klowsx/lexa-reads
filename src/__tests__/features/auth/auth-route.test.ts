@@ -18,9 +18,7 @@ describe('Acceso al MVP', () => {
     expect(destination([])).toBe('/(tabs)/feed')
     expect(destination(['index'], true, true)).toBe('/(auth)/new-password')
     expect(destination([], false)).toBe('/(auth)')
-    expect(destination([], true, false, pending)).toBe(
-      '/(auth)/onboarding/goal'
-    )
+    expect(destination([], true, false, pending)).toBe('/(tabs)/feed')
   })
   it('permite consumir un callback antes de decidir el destino', () => {
     expect(destination(['(auth)', 'auth-callback'])).toBeNull()
@@ -44,9 +42,9 @@ describe('Acceso al MVP', () => {
   it('deja que la pantalla de contraseña explique una sesión ausente sin interrumpir el cierre', () => {
     expect(destination(['(auth)', 'new-password'], false)).toBeNull()
   })
-  it('reanuda las preferencias guardadas y evita repetir el onboarding completado', () => {
+  it('abre el feed aunque la cuenta tenga pasos de onboarding pendientes', () => {
     expect(destination(['(auth)', 'login'], true, false, pending)).toBe(
-      '/(auth)/onboarding/goal'
+      '/(tabs)/feed'
     )
     expect(destination(['(auth)', 'onboarding'], true, false)).toBe(
       '/(tabs)/feed'
