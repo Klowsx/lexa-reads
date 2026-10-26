@@ -65,10 +65,10 @@
 - Compartir por link (slug único, case-insensitive)
 - **Deep linking** (universal links + custom scheme)
 
-### Auth y onboarding
+### Auth
 
 - Email/contraseña + Google OAuth (Supabase Auth)
-- **Onboarding con sugerencias de follow** (importar contactos opcional, "sigue ≥5 para continuar")
+- Sin onboarding obligatorio: después del registro y la confirmación de correo se abre el feed; el lector puede completar su perfil y seguir personas después.
 - **i18n desde el día 1** (ES + EN con `expo-localization` + `i18next`)
 
 ### Compliance (bloqueante para stores)
@@ -110,6 +110,8 @@
 
 - Medias estrellas y reading goal **en MVP**, no Fase 2
 - Comentarios anidados **en MVP** (sin esto el feed es estéril)
+- No exigir onboarding ni seguir un mínimo de personas para usar la biblioteca
+- Buscar y sugerir libros solo desde el catálogo de Lexa; si falta una ficha, permitir crearla manualmente y revisar coincidencias para evitar duplicados
 - Import de Goodreads = **primera feature de Fase 2**, no última
 - Clubes de lectura **Fase 3** — sin masa crítica son pantallas vacías
 - Sin ads. Monetización futura: freemium (stats avanzadas, temas)

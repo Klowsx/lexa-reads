@@ -50,8 +50,8 @@ enlazado o en el PR correspondiente.
 
 - [ ] Probar en Android la búsqueda por ISBN, su fallback de alta y el escáner
       de cámara ya implementados.
-- [ ] Comprobar en Android el onboarding con sugerencias y el recorrido de una
-      cuenta sin contactos.
+- [ ] Comprobar en Android que el registro llega al feed sin onboarding y que el
+      lector puede completar su perfil y seguir personas después.
 - [ ] Probar enlaces y push de extremo a extremo para las notificaciones
       navegables incluidas en el lanzamiento.
 - [ ] Extraer las cadenas pendientes a los catálogos de traducción y comprobar
