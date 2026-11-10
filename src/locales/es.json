@@ -1,4 +1,11 @@
 {
+  "sharePreview": {
+    "title": "Compartir lectura",
+    "description": "Revisa la tarjeta antes de compartirla como imagen.",
+    "spoilerHint": "El texto con spoilers permanece oculto en la imagen, aunque ya lo hayas revelado en la app.",
+    "sharing": "Preparando imagen…",
+    "error": "No pudimos compartir la imagen. Comprueba que tu dispositivo permite compartir imágenes y vuelve a intentarlo."
+  },
   "auth": {
     "login": "Iniciar sesión",
     "register": "Registrarse",

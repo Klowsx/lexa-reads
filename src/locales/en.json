@@ -1,4 +1,11 @@
 {
+  "sharePreview": {
+    "title": "Share a reading",
+    "description": "Preview the card before sharing it as an image.",
+    "spoilerHint": "Spoiler text stays hidden in the image, even if you have revealed it in the app.",
+    "sharing": "Preparing image…",
+    "error": "We couldn't share the image. Check that your device supports image sharing and try again."
+  },
   "auth": {
     "login": "Sign in",
     "register": "Sign up",

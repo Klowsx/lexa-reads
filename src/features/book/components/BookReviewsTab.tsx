@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import {
   ActivityIndicator,
   Pressable,
@@ -9,7 +9,6 @@ import {
 import { useRouter } from 'expo-router'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
-import ViewShot from 'react-native-view-shot'
 import {
   Heart,
   MessageCircle,
@@ -26,7 +25,7 @@ import { useMyReview } from '../hooks/useMyReview'
 import { useDeleteReview } from '../hooks/useDeleteReview'
 import { useToggleReviewLike } from '~/features/feed/hooks/useToggleReviewLike'
 import { ReviewShareCard } from '~/features/share/components/ReviewShareCard'
-import { useShareCard } from '~/features/share/hooks/useShareCard'
+import { SharePreviewSheet } from '~/features/share/components/SharePreviewSheet'
 import { bookCommunityStatsQueryOptions } from '../book.queries'
 import { useAuthStore } from '~/stores/auth.store'
 import { meQueryOptions } from '~/features/user/user.queries'
@@ -263,7 +262,6 @@ export function BookReviewsTab({
   const c = useColors()
   const { t } = useTranslation()
   const [deletingId, setDeletingId] = useState<string | null>(null)
-  const [shareError, setShareError] = useState(false)
   const userId = useAuthStore((s) => s.user?.id ?? '')
   const { data: ownProfile } = useQuery(meQueryOptions(userId))
   const ownUser = ownProfile
@@ -277,21 +275,10 @@ export function BookReviewsTab({
   const [sharingReview, setSharingReview] = useState<ReviewWithUser | null>(
     null
   )
-  const { ref: shareRef, capture } = useShareCard()
 
   const { data: communityStats } = useQuery(
     bookCommunityStatsQueryOptions(bookId, userId)
   )
-
-  useEffect(() => {
-    if (!sharingReview) return
-    // Esperar a que el ViewShot se monte antes de capturar
-    const t = setTimeout(async () => {
-      await capture().catch(() => setShareError(true))
-      setSharingReview(null)
-    }, 80)
-    return () => clearTimeout(t)
-  }, [sharingReview, capture])
 
   // Reseñas paginadas del libro.
   const {
@@ -374,14 +361,6 @@ export function BookReviewsTab({
         </View>
       )}
 
-      {shareError && (
-        <Text
-          accessibilityRole="alert"
-          className="px-container font-body text-xs text-text"
-        >
-          {t('reviews.shareError')}
-        </Text>
-      )}
       {isError && (
         <View className="gap-2 px-container">
           <Text
@@ -467,18 +446,18 @@ export function BookReviewsTab({
         )}
       </View>
 
-      {/* ViewShot offscreen para capturar ReviewShareCard */}
       {sharingReview && (
-        <View className="absolute top-0 left-[-9999px]">
-          <ViewShot ref={shareRef}>
-            <ReviewShareCard
-              review={sharingReview}
-              bookTitle={book?.title}
-              bookCoverUrl={book?.cover_url}
-              bookId={book?.id}
-            />
-          </ViewShot>
-        </View>
+        <SharePreviewSheet
+          onClose={() => setSharingReview(null)}
+          containsSpoilers={Boolean(sharingReview.contains_spoilers)}
+        >
+          <ReviewShareCard
+            review={sharingReview}
+            bookTitle={book?.title}
+            bookCoverUrl={book?.cover_url}
+            bookId={book?.id}
+          />
+        </SharePreviewSheet>
       )}
     </View>
   )

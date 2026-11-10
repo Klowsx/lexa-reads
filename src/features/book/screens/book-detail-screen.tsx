@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useTranslation } from 'react-i18next'
 import { Pressable, ScrollView, Text, View } from 'react-native'
-import ViewShot from 'react-native-view-shot'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { QueryBoundary } from '~/components/ui/QueryBoundary'
 import { BookSkeleton } from '~/features/book/components/BookSkeleton'
@@ -17,7 +16,7 @@ import { BookTabBar, type BookTab } from '~/features/book/components/BookTabBar'
 import { BookReadingSheet } from '~/features/book/components/BookReadingSheet'
 import { useUserBook } from '~/features/library/hooks/useUserBook'
 import { BookShareCard } from '~/features/share/components/BookShareCard'
-import { useShareCard } from '~/features/share/hooks/useShareCard'
+import { SharePreviewSheet } from '~/features/share/components/SharePreviewSheet'
 import { useAuthStore } from '~/stores/auth.store'
 import { type BookStatus } from '~/lib/book-status'
 
@@ -39,7 +38,7 @@ export default function BookDetailScreen() {
   const userBook = userBookQuery.data
   const [showReadingSheet, setShowReadingSheet] = useState(false)
 
-  const { ref: shareRef, capture: captureBook } = useShareCard()
+  const [showSharePreview, setShowSharePreview] = useState(false)
 
   const status = (userBook?.status as BookStatus) ?? null
   const rating = userBook?.rating ?? null
@@ -82,7 +81,7 @@ export default function BookDetailScreen() {
                   <BookHero
                     book={book}
                     onBack={() => router.back()}
-                    onShare={captureBook}
+                    onShare={() => setShowSharePreview(true)}
                   />
 
                   {/* 1 — scrolls away */}
@@ -139,21 +138,15 @@ export default function BookDetailScreen() {
                   />
                 )}
 
-                {/* ViewShot off-screen para capturar BookShareCard */}
-                <View
-                  accessibilityElementsHidden
-                  importantForAccessibility="no-hide-descendants"
-                  aria-hidden
-                  className="absolute left-[-9999px] top-0"
-                >
-                  <ViewShot ref={shareRef}>
+                {showSharePreview && (
+                  <SharePreviewSheet onClose={() => setShowSharePreview(false)}>
                     <BookShareCard
                       book={book}
                       rating={rating}
                       username={username}
                     />
-                  </ViewShot>
-                </View>
+                  </SharePreviewSheet>
+                )}
               </>
             ) : (
               <View className="flex-1 items-center justify-center px-8">
