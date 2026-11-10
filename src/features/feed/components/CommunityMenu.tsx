@@ -1,7 +1,14 @@
 import { useState } from 'react'
 import { useRouter } from 'expo-router'
 import { useTranslation } from 'react-i18next'
-import { Modal, Pressable, Text, View } from 'react-native'
+import {
+  Modal,
+  Pressable,
+  ScrollView,
+  Text,
+  useWindowDimensions,
+  View
+} from 'react-native'
 import { ChevronDown, MessageCircle, Users, X } from 'lucide-react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useStitchTheme } from '~/theme/stitch'
@@ -13,6 +20,7 @@ export function CommunityMenu() {
   const router = useRouter()
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
+  const { width, height } = useWindowDimensions()
 
   // Cierra el menú antes de abrir el destino para no dejarlo sobre la pantalla siguiente.
   function navigate(path: '/clubs' | '/messages') {
@@ -27,6 +35,7 @@ export function CommunityMenu() {
         accessibilityRole="button"
         accessibilityLabel={t('communityMenu.title')}
         accessibilityState={{ expanded: open }}
+        className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
         style={{
           minHeight: 44,
           paddingHorizontal: 12,
@@ -53,6 +62,7 @@ export function CommunityMenu() {
         <View style={{ flex: 1 }}>
           <Pressable
             accessible={false}
+            importantForAccessibility="no"
             onPress={() => setOpen(false)}
             style={{
               position: 'absolute',
@@ -67,8 +77,8 @@ export function CommunityMenu() {
               marginRight: 16,
               marginLeft: 16,
               alignSelf: 'flex-end',
-              width: 288,
-              maxWidth: '100%',
+              width: Math.min(288, Math.max(0, width - 32)),
+              maxHeight: Math.max(0, height - insets.top - insets.bottom - 80),
               padding: 12,
               borderRadius: 12,
               backgroundColor: c.surface,
@@ -91,6 +101,7 @@ export function CommunityMenu() {
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel={t('common.close')}
+                className="focus-visible:outline focus-visible:outline-2"
                 onPress={() => setOpen(false)}
                 style={{
                   width: 44,
@@ -102,55 +113,65 @@ export function CommunityMenu() {
                 <X size={20} color={c.text} />
               </Pressable>
             </View>
-            {(
-              [
-                {
-                  path: '/clubs',
-                  icon: Users,
-                  label: 'clubs',
-                  hint: 'clubsHint'
-                },
-                {
-                  path: '/messages',
-                  icon: MessageCircle,
-                  label: 'messages',
-                  hint: 'messagesHint'
-                }
-              ] as const
-            ).map(({ path, icon: Icon, label, hint }) => (
-              <Pressable
-                key={path}
-                onPress={() => navigate(path)}
-                accessibilityRole="button"
-                style={({ pressed }) => ({
-                  minHeight: 64,
-                  flexDirection: 'row',
-                  gap: 12,
-                  alignItems: 'center',
-                  padding: 12,
-                  borderRadius: 8,
-                  backgroundColor: pressed ? c.muted : c.surface
-                })}
-              >
-                <Icon size={22} color={c.text} />
-                <View style={{ flex: 1, gap: 4 }}>
-                  <Text
-                    style={{ fontFamily: c.label, color: c.text, fontSize: 16 }}
-                  >
-                    {t(`communityMenu.${label}`)}
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: c.body,
-                      color: c.secondary,
-                      fontSize: 14
-                    }}
-                  >
-                    {t(`communityMenu.${hint}`)}
-                  </Text>
-                </View>
-              </Pressable>
-            ))}
+            <ScrollView
+              keyboardShouldPersistTaps="handled"
+              contentContainerStyle={{ gap: 4 }}
+            >
+              {(
+                [
+                  {
+                    path: '/clubs',
+                    icon: Users,
+                    label: 'clubs',
+                    hint: 'clubsHint'
+                  },
+                  {
+                    path: '/messages',
+                    icon: MessageCircle,
+                    label: 'messages',
+                    hint: 'messagesHint'
+                  }
+                ] as const
+              ).map(({ path, icon: Icon, label, hint }) => (
+                <Pressable
+                  key={path}
+                  onPress={() => navigate(path)}
+                  accessibilityRole="button"
+                  className="focus-visible:outline focus-visible:outline-2"
+                  style={({ pressed }) => ({
+                    minHeight: 64,
+                    flexDirection: 'row',
+                    gap: 12,
+                    alignItems: 'center',
+                    padding: 12,
+                    borderRadius: 8,
+                    backgroundColor: pressed ? c.muted : c.surface
+                  })}
+                >
+                  <Icon size={22} color={c.text} />
+                  <View style={{ flex: 1, gap: 4 }}>
+                    <Text
+                      style={{
+                        fontFamily: c.label,
+                        color: c.text,
+                        fontSize: 16
+                      }}
+                    >
+                      {t(`communityMenu.${label}`)}
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: c.body,
+                        color: c.secondary,
+                        fontSize: 14
+                      }}
+                    >
+                      {t(`communityMenu.${hint}`)}
+                    </Text>
+                  </View>
+                </Pressable>
+              ))}
+            </ScrollView>
           </View>
         </View>
       </Modal>
