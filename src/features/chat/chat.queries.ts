@@ -27,7 +27,12 @@ export type ChatMessage = {
   edited_at: string | null
   deleted_at: string | null
   sender: MessageUser | null
-  reply_to: { id: string; body: string; sender_id: string } | null
+  reply_to: {
+    id: string
+    body: string
+    sender_id: string
+    deleted_at?: string | null
+  } | null
 }
 
 export type DMRequestState = 'open' | 'pending'
@@ -50,7 +55,7 @@ const MSG_PAGE = 30
 const MSG_COLS = `
   id, conversation_id, sender_id, body, reply_to_id, created_at, edited_at, deleted_at,
   sender:users!messages_sender_id_fkey(id, username, display_name, avatar_url),
-  reply_to:messages!messages_reply_to_id_fkey(id, body, sender_id)
+  reply_to:messages!messages_reply_to_id_fkey(id, body, sender_id, deleted_at)
 `.trim()
 
 function one<T>(rel: T | T[] | null): T | null {

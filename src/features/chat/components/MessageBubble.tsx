@@ -65,7 +65,9 @@ export function MessageBubble({
               className="text-[11px] font-body"
               style={{ color: isOwn ? '#ffffffcc' : c.t2 }}
             >
-              {message.reply_to.body}
+              {message.reply_to.deleted_at
+                ? t('chatStates.deleted')
+                : message.reply_to.body}
             </Text>
           </View>
         )}
