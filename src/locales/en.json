@@ -669,6 +669,8 @@
     "logout": "Sign out"
   },
   "notifSettings": {
+    "noPreferencesTitle": "Choose your notifications",
+    "noPreferencesHint": "You haven't saved any preferences yet. Choose the options you want to use; push permission is requested separately.",
     "push": "Push",
     "pushNotifications": "Push notifications",
     "on": "On",

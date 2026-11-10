@@ -8,7 +8,6 @@ import {
   notificationPreferencesQueryOptions,
   upsertNotificationPreferencesFn
 } from '~/features/user/user.queries'
-import { useUpsertNotificationPreferences } from '~/features/user/hooks/useNotificationPreferences'
 
 // Pide el permiso nativo solo tras una acción explícita y registra un token en dispositivos compatibles.
 export async function registerPushToken(): Promise<string> {
@@ -36,16 +35,6 @@ export async function registerPushToken(): Promise<string> {
     throw new Error('Falta configurar el proyecto de notificaciones.')
   const tokenData = await Notifications.getExpoPushTokenAsync({ projectId })
   return tokenData.data
-}
-
-export function useSavePushToken() {
-  const upsert = useUpsertNotificationPreferences()
-
-  async function savePushToken(token: string) {
-    await upsert.mutateAsync({ push_token: token })
-  }
-
-  return { savePushToken }
 }
 
 // Encadena el permiso y su persistencia para que la hoja contextual muestre un único resultado real.

@@ -669,6 +669,8 @@
     "logout": "Cerrar sesión"
   },
   "notifSettings": {
+    "noPreferencesTitle": "Personaliza tus notificaciones",
+    "noPreferencesHint": "Todavía no has guardado preferencias. Elige las opciones que quieras usar; el permiso push se solicita por separado.",
     "push": "Push",
     "pushNotifications": "Notificaciones push",
     "on": "Activas",
