@@ -48,6 +48,10 @@ enlazado o en el PR correspondiente.
 
 ## 3. Recorrido esencial del producto
 
+- [ ] Continuar la migración visual de las pantallas existentes al sistema de Stitch
+      cuando se aborde su rediseño. Las superficies nuevas ya usan su tema; conservar
+      las diferencias funcionales documentadas en [la adopción gradual](stitch-adoption.md).
+
 - [ ] Probar en Android la búsqueda por ISBN, su fallback de alta y el escáner
       de cámara ya implementados.
 - [ ] Comprobar en Android que el registro llega al feed sin onboarding y que el
@@ -79,6 +83,11 @@ enlazado o en el PR correspondiente.
       conservar la evidencia de la versión enviada.
 
 ## Completado y pendiente de validación física
+
+- [x] Incorporar las superficies nuevas de Stitch: menú Comunidad, vista previa
+      de compartir, hojas y estados compartidos, recuperación de errores de chat,
+      clubes y notificaciones, y confirmación real del cambio de contraseña.
+      Evidencia y límites de las comprobaciones en [la adopción gradual](stitch-adoption.md).
 
 - [x] Aplicar en Supabase las migraciones remotas de catálogo comunitario,
       metadatos y voto de portadas, y sugerencias de seguimiento en onboarding.
