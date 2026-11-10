@@ -1,4 +1,12 @@
 {
+  "changePasswordResult": {
+    "success": "Password updated",
+    "return": "Back to Settings",
+    "errorTitle": "We couldn't change your password",
+    "errorHint": "Check your current password and connection. We kept the fields so you can try again. If your session requires additional verification, sign in again or use email recovery.",
+    "show": "Show password",
+    "hide": "Hide password"
+  },
   "clubStates": {
     "options": "Club options",
     "leaveTitle": "Leave this club?",

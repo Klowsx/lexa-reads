@@ -1,4 +1,12 @@
 {
+  "changePasswordResult": {
+    "success": "Contraseña actualizada",
+    "return": "Volver a Ajustes",
+    "errorTitle": "No pudimos cambiar la contraseña",
+    "errorHint": "Comprueba la contraseña actual y tu conexión. Conservamos los campos para que puedas reintentarlo. Si tu sesión requiere verificación adicional, vuelve a iniciar sesión o utiliza la recuperación por correo.",
+    "show": "Mostrar contraseña",
+    "hide": "Ocultar contraseña"
+  },
   "clubStates": {
     "options": "Opciones del club",
     "leaveTitle": "¿Salir del club?",

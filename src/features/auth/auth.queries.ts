@@ -98,6 +98,21 @@ export async function updatePasswordFn({
   if (error) throw toAppError(error)
 }
 
+// Cambia la contraseña desde Ajustes verificando la actual en el servidor, sin iniciar otra sesión.
+export async function changePasswordFn({
+  currentPassword,
+  password
+}: {
+  currentPassword: string
+  password: string
+}): Promise<void> {
+  const { error } = await supabase.auth.updateUser({
+    current_password: currentPassword,
+    password
+  })
+  if (error) throw toAppError(error)
+}
+
 // Revoca las sesiones tras la recuperación; su reintento no vuelve a modificar la contraseña.
 export async function finishPasswordRecoveryFn(): Promise<void> {
   const { error: signOutError } = await supabase.auth.signOut({
