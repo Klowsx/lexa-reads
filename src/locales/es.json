@@ -1,4 +1,12 @@
 {
+  "pushPermission": {
+    "systemHint": "Al activar, tu dispositivo te pedirá permiso. Puedes cambiar esta decisión después en Ajustes.",
+    "error": "No pudimos guardar tu decisión. Puedes volver a intentarlo sin salir de esta pantalla.",
+    "declined": "Las notificaciones no se activaron. Puedes revisar el permiso del sistema y activarlas desde Ajustes en un dispositivo compatible.",
+    "loadError": "No pudimos cargar las notificaciones",
+    "loadErrorHint": "Reintenta para consultar tu actividad reciente.",
+    "pageError": "No pudimos cargar más notificaciones"
+  },
   "communityStates": {
     "loading": "Cargando…",
     "inboxError": "No pudimos cargar tus conversaciones",

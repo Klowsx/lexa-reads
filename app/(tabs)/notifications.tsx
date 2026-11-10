@@ -1,20 +1,18 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, Alert, Pressable, Text, View } from 'react-native'
+import { ActivityIndicator, Pressable, Text, View } from 'react-native'
 import { useFocusEffect, useRouter } from 'expo-router'
-import { ChevronLeft } from 'lucide-react-native'
+import { Bell, ChevronLeft } from 'lucide-react-native'
 import { FlashList } from '@shopify/flash-list'
-import { Bell } from 'lucide-react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { NotificationRow } from '~/features/notifications/components/NotificationRow'
 import { useNotifications } from '~/features/notifications/hooks/useNotifications'
 import { useMarkNotificationsRead } from '~/features/notifications/hooks/useMarkNotificationsRead'
 import { useNotificationPreferences } from '~/features/user/hooks/useNotificationPreferences'
-import {
-  registerPushToken,
-  useSavePushToken
-} from '~/features/notifications/hooks/usePushOptIn'
-import { fixed, useColors } from '~/theme/colors'
+import { PushOptInSheet } from '~/features/notifications/components/PushOptInSheet'
+import { StitchFeedback } from '~/components/ui/StitchFeedback'
+import { StitchLoading } from '~/components/ui/StitchLoading'
+import { useColors } from '~/theme/colors'
 import type { NotificationItem } from '~/features/notifications/notifications.queries'
 
 const alpha = (hex: string, op: number) => {
@@ -22,59 +20,59 @@ const alpha = (hex: string, op: number) => {
   return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})`
 }
 
+// Presenta los avisos y explica el permiso push únicamente al visitar esta sección.
 export default function NotificationsScreen() {
   const insets = useSafeAreaInsets()
   const c = useColors()
   const router = useRouter()
   const { t } = useTranslation()
   const canGoBack = router.canGoBack()
-  const markRead = useMarkNotificationsRead()
-  const savePushToken = useSavePushToken()
+  const { mutate: markRead } = useMarkNotificationsRead()
   const { data: prefs } = useNotificationPreferences()
   const pushOptInShown = useRef(false)
+  const [showPushOptIn, setShowPushOptIn] = useState(false)
 
-  const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
-    useNotifications()
+  const query = useNotifications()
+  const {
+    data,
+    isPending: isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage
+  } = query
 
   const items: NotificationItem[] = data?.pages.flatMap((p) => p.items) ?? []
 
   // Mark all as read when screen comes into focus
   useFocusEffect(
     useCallback(() => {
-      if (items.length > 0) markRead.mutate()
-    }, [items.length])
+      if (items.length > 0) markRead()
+    }, [items.length, markRead])
   )
 
-  // Push opt-in contextual: show after first visit if consent was given and token not set
-  useEffect(() => {
-    if (pushOptInShown.current) return
-    if (!prefs) return
-    const pushToken = (prefs as any).push_token as string | null | undefined
-    const consentGiven = (prefs as any).consent_given_at as string | null
-    if (consentGiven && pushToken === null) {
-      pushOptInShown.current = true
-      // Small delay so the screen finishes rendering first
-      const t = setTimeout(() => showPushOptIn(), 1200)
-      return () => clearTimeout(t)
-    }
-  }, [prefs])
-
-  async function showPushOptIn() {
-    Alert.alert(t('notifications.pushTitle'), t('notifications.pushBody'), [
-      {
-        text: t('notifications.pushNotNow'),
-        style: 'cancel',
-        onPress: () => savePushToken.savePushToken('declined')
-      },
-      {
-        text: t('notifications.pushEnable'),
-        onPress: async () => {
-          const token = await registerPushToken()
-          await savePushToken.savePushToken(token)
-        }
-      }
-    ])
-  }
+  // Cancela el aviso al salir antes de que aparezca; marcarlo al mostrar evita perderlo en StrictMode.
+  useFocusEffect(
+    useCallback(() => {
+      if (
+        pushOptInShown.current ||
+        !prefs?.consent_given_at ||
+        prefs.push_token !== null ||
+        !(
+          prefs.push_new_follower ||
+          prefs.push_activity_like ||
+          prefs.push_review_like ||
+          prefs.push_comment ||
+          prefs.push_recommendation
+        )
+      )
+        return
+      const timer = setTimeout(() => {
+        pushOptInShown.current = true
+        setShowPushOptIn(true)
+      }, 1200)
+      return () => clearTimeout(timer)
+    }, [prefs])
+  )
 
   return (
     <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
@@ -91,9 +89,20 @@ export default function NotificationsScreen() {
       </View>
 
       {isLoading ? (
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator color={c.accent} />
-        </View>
+        <StitchLoading />
+      ) : query.isError && (!data || items.length === 0) ? (
+        <StitchFeedback
+          kind="error"
+          title={t('pushPermission.loadError')}
+          message={t('pushPermission.loadErrorHint')}
+          action={{
+            label: t('common.retry'),
+            onPress: () => {
+              void query.refetch()
+            }
+          }}
+          busy={query.isFetching}
+        />
       ) : items.length === 0 ? (
         <View className="flex-1 items-center justify-center gap-3 px-8">
           <View
@@ -115,19 +124,54 @@ export default function NotificationsScreen() {
           renderItem={({ item }) => <NotificationRow item={item} />}
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
+          ListHeaderComponent={
+            query.isRefetchError && !query.isFetchNextPageError ? (
+              <StitchFeedback
+                kind="error"
+                title={t('communityStates.refreshError')}
+                message={t('communityStates.cachedHint')}
+                action={{
+                  label: t('common.retry'),
+                  onPress: () => {
+                    void query.refetch()
+                  }
+                }}
+                busy={query.isFetching}
+              />
+            ) : null
+          }
           onEndReached={() =>
-            hasNextPage && !isFetchingNextPage && fetchNextPage()
+            hasNextPage &&
+            !isFetchingNextPage &&
+            !query.isFetchNextPageError &&
+            fetchNextPage()
           }
           onEndReachedThreshold={0.4}
           contentContainerStyle={{ paddingBottom: 24 }}
           ListFooterComponent={
-            isFetchingNextPage ? (
+            query.isFetchNextPageError ? (
+              <StitchFeedback
+                kind="error"
+                title={t('pushPermission.pageError')}
+                message={t('communityStates.cachedHint')}
+                action={{
+                  label: t('common.retry'),
+                  onPress: () => {
+                    void fetchNextPage()
+                  }
+                }}
+                busy={isFetchingNextPage}
+              />
+            ) : isFetchingNextPage ? (
               <View className="py-4 items-center">
                 <ActivityIndicator size="small" color={c.t3} />
               </View>
             ) : null
           }
         />
+      )}
+      {showPushOptIn && (
+        <PushOptInSheet onClose={() => setShowPushOptIn(false)} />
       )}
     </View>
   )

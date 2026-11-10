@@ -1,4 +1,12 @@
 {
+  "pushPermission": {
+    "systemHint": "When you enable notifications, your device will ask for permission. You can change this decision later in Settings.",
+    "error": "We couldn't save your decision. You can try again without leaving this screen.",
+    "declined": "Notifications weren't enabled. You can check system permissions and enable them in Settings on a supported device.",
+    "loadError": "We couldn't load notifications",
+    "loadErrorHint": "Try again to see your recent activity.",
+    "pageError": "We couldn't load more notifications"
+  },
   "communityStates": {
     "loading": "Loading…",
     "inboxError": "We couldn't load your conversations",
