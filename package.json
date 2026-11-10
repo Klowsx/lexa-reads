@@ -34,6 +34,8 @@
   },
   "dependencies": {
     "@expo-google-fonts/dm-sans": "^0.4.2",
+    "@expo-google-fonts/inter": "^0.4.2",
+    "@expo-google-fonts/newsreader": "^0.4.1",
     "@expo-google-fonts/playfair-display": "^0.4.2",
     "@expo/metro-runtime": "~6.1.2",
     "@hookform/resolvers": "^5.2.2",
