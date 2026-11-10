@@ -42,3 +42,11 @@ La ausencia de un diseño en Stitch no significa que falte la pantalla en el có
 - Las capturas descargadas de Inicio y Ficha rápida se recibieron casi negras, mientras que su HTML sí contiene contenido. No se ha tomado esa captura como referencia cromática; se revisaron su HTML y el tema del proyecto.
 - Cambiar contraseña desde Ajustes sigue pendiente de conexión; `Lexa.md` lo describe explícitamente. Requiere un trabajo de autenticación separado, no una confirmación de éxito simulada.
 - No se ha ejecutado una migración general de las pantallas existentes ni una revisión visual exhaustiva en emulador. El envío nativo de imágenes requiere comprobarse en iOS/Android; una plataforma sin soporte recibe un error recuperable.
+
+## Verificación de esta entrega
+
+- `pnpm.cmd typecheck`: correcto.
+- ESLint sobre los archivos de código modificados: correcto.
+- Diez pruebas pasan: vista previa, reintento tras error, cierre, navegación del menú y protección de spoilers.
+- `git diff --check`: correcto.
+- Falta validación visual en dispositivo y del mecanismo nativo de compartir. Las pruebas de componentes no sustituyen esas comprobaciones.

@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router'
-import { Bell, MessageCircle, Users } from 'lucide-react-native'
+import { Bell, Users } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, Pressable, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -11,6 +11,7 @@ import { UserCard } from '~/features/user/components/UserCard'
 import { useSearchUsers } from '~/features/user/hooks/useSearchUsers'
 import { QueryBoundary } from '~/components/ui/QueryBoundary'
 import { fixed, useColors } from '~/theme/colors'
+import { CommunityMenu } from '~/features/feed/components/CommunityMenu'
 
 // ─── Screen ───────────────────────────────────────────────────
 
@@ -36,23 +37,8 @@ export default function FeedScreen() {
         <Text className="font-display-sb text-xl text-text tracking-tight">
           {t('feed.title')}
         </Text>
-        <View className="flex-row items-center gap-4">
-          <Pressable
-            hitSlop={8}
-            onPress={() => router.push('/clubs' as any)}
-            accessibilityRole="button"
-            accessibilityLabel="Clubes de lectura"
-          >
-            <Users size={20} color={c.t3} strokeWidth={1.6} />
-          </Pressable>
-          <Pressable
-            hitSlop={8}
-            onPress={() => router.push('/messages' as any)}
-            accessibilityRole="button"
-            accessibilityLabel="Mensajes"
-          >
-            <MessageCircle size={20} color={c.t3} strokeWidth={1.6} />
-          </Pressable>
+        <View className="flex-row items-center gap-2">
+          <CommunityMenu />
           <Pressable
             hitSlop={8}
             onPress={() => router.push('/notifications' as any)}

@@ -1,4 +1,11 @@
 {
+  "communityMenu": {
+    "title": "Community",
+    "clubs": "Book clubs",
+    "clubsHint": "Find your next conversation",
+    "messages": "Messages",
+    "messagesHint": "Conversations and requests"
+  },
   "sharePreview": {
     "title": "Share a reading",
     "description": "Preview the card before sharing it as an image.",
