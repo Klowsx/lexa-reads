@@ -112,6 +112,7 @@ export default function ClubScreen() {
     return (
       <>
         <ChatThread
+          key={club.conversationId}
           conversationId={club.conversationId}
           header={header}
           showSender

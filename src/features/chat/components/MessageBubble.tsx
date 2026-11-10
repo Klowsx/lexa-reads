@@ -1,4 +1,5 @@
-import { Alert, Pressable, Text, View } from 'react-native'
+import { Pressable, Text, View } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import { useColors } from '~/theme/colors'
 import { formatRelativeTime } from '~/lib/utils'
 import type { ChatMessage } from '../chat.queries'
@@ -7,51 +8,37 @@ type Props = {
   message: ChatMessage
   isOwn: boolean
   showSender?: boolean // en clubes: mostrar el nombre del autor
-  onReply: (m: ChatMessage) => void
-  onDelete?: (m: ChatMessage) => void
-  onReport?: (m: ChatMessage) => void
+  onActions: (message: ChatMessage) => void
 }
 
+// Conserva la presentación del mensaje y expone sus acciones a teclado, lector y pulsación larga.
 export function MessageBubble({
   message,
   isOwn,
   showSender,
-  onReply,
-  onDelete,
-  onReport
+  onActions
 }: Props) {
   const c = useColors()
+  const { t } = useTranslation()
   const isDeleted = !!message.deleted_at
+  const isTemporary = message.id.startsWith('temp-')
 
+  // No ofrece borrar o citar un identificador temporal que todavía no existe en el servidor.
   function showActions() {
-    if (isDeleted) return
-    const actions: Parameters<typeof Alert.alert>[2] = [
-      { text: 'Responder', onPress: () => onReply(message) }
-    ]
-    if (isOwn && onDelete) {
-      actions.push({
-        text: 'Eliminar',
-        style: 'destructive',
-        onPress: () => onDelete(message)
-      })
-    } else if (!isOwn && onReport) {
-      actions.push({
-        text: 'Reportar',
-        style: 'destructive',
-        onPress: () => onReport(message)
-      })
-    }
-    actions.push({ text: 'Cancelar', style: 'cancel' })
-    Alert.alert('Mensaje', undefined, actions)
+    if (!isDeleted && !isTemporary) onActions(message)
   }
 
   return (
     <View className={`px-4 py-0.5 ${isOwn ? 'items-end' : 'items-start'}`}>
       <Pressable
         onLongPress={showActions}
+        onPress={showActions}
         delayLongPress={250}
-        accessibilityRole="text"
-        accessibilityLabel={isDeleted ? 'Mensaje eliminado' : message.body}
+        accessibilityRole={isDeleted || isTemporary ? 'text' : 'button'}
+        accessibilityLabel={isDeleted ? t('chatStates.deleted') : message.body}
+        accessibilityHint={
+          isDeleted || isTemporary ? undefined : t('chatStates.messageOptions')
+        }
         className={`max-w-[78%] rounded-2xl px-3 py-2 ${
           isOwn ? 'bg-accent' : 'bg-surface border border-border'
         }`}
@@ -88,7 +75,7 @@ export function MessageBubble({
             className="text-xs font-body italic"
             style={{ color: isOwn ? '#ffffffcc' : c.t3 }}
           >
-            Mensaje eliminado
+            {t('chatStates.deleted')}
           </Text>
         ) : (
           <Text
@@ -103,7 +90,9 @@ export function MessageBubble({
           className="text-[10px] font-body mt-0.5 self-end"
           style={{ color: isOwn ? '#ffffffaa' : c.t3 }}
         >
-          {formatRelativeTime(message.created_at)}
+          {isTemporary
+            ? t('chatStates.sending')
+            : formatRelativeTime(message.created_at)}
           {message.edited_at ? ' · editado' : ''}
         </Text>
       </Pressable>

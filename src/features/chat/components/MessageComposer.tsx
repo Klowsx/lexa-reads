@@ -1,5 +1,6 @@
 import { Send, X } from 'lucide-react-native'
 import { useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   ActivityIndicator,
   Pressable,
@@ -24,6 +25,7 @@ type Props = {
   disabledHint?: string
 }
 
+// Conserva el borrador mientras se envía e indica el límite de texto y la respuesta citada.
 export function MessageComposer({
   value,
   onChangeText,
@@ -35,6 +37,7 @@ export function MessageComposer({
   disabledHint
 }: Props) {
   const c = useColors()
+  const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   const inputRef = useRef<TextInput>(null)
   const canSend = !!value.trim() && !sending && !disabled
@@ -64,7 +67,7 @@ export function MessageComposer({
             style={{ borderLeftWidth: 2, borderLeftColor: c.accent }}
           >
             <Text className="text-[11px] font-body-sb text-accent">
-              Respondiendo
+              {t('chatStates.replying')}
             </Text>
             <Text numberOfLines={1} className="text-[11px] font-body text-t2">
               {replyTo.body}
@@ -74,7 +77,8 @@ export function MessageComposer({
             onPress={onCancelReply}
             hitSlop={8}
             accessibilityRole="button"
-            accessibilityLabel="Cancelar respuesta"
+            accessibilityLabel={t('chatStates.cancelReply')}
+            disabled={sending}
           >
             <X size={16} color={c.t3} strokeWidth={1.8} />
           </Pressable>
@@ -86,7 +90,9 @@ export function MessageComposer({
           ref={inputRef}
           value={value}
           onChangeText={onChangeText}
-          placeholder="Mensaje..."
+          placeholder={t('chatStates.placeholder')}
+          accessibilityLabel={t('chatStates.messageInput')}
+          editable={!sending && !disabled}
           placeholderTextColor={c.t3}
           maxLength={MAX_MESSAGE_LENGTH}
           multiline
@@ -97,7 +103,8 @@ export function MessageComposer({
           hitSlop={8}
           disabled={!canSend}
           accessibilityRole="button"
-          accessibilityLabel="Enviar mensaje"
+          accessibilityLabel={t('chatStates.send')}
+          accessibilityState={{ disabled: !canSend, busy: sending }}
           style={{ opacity: canSend ? 1 : 0.35 }}
         >
           {sending ? (
@@ -107,6 +114,15 @@ export function MessageComposer({
           )}
         </Pressable>
       </View>
+      <Text
+        className="px-4 pt-1 text-xs font-body text-t2"
+        accessibilityLabel={t('chatStates.characterCount', {
+          count: value.length,
+          max: MAX_MESSAGE_LENGTH
+        })}
+      >
+        {value.length} / {MAX_MESSAGE_LENGTH}
+      </Text>
     </View>
   )
 }

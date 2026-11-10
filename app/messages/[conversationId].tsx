@@ -8,13 +8,20 @@ import { conversationMetaQueryOptions } from '~/features/chat/chat.queries'
 import { useRespondMessageRequest } from '~/features/chat/hooks/useRespondMessageRequest'
 import { useAuthStore } from '~/stores/auth.store'
 import { useColors } from '~/theme/colors'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useTranslation } from 'react-i18next'
+import { StitchFeedback } from '~/components/ui/StitchFeedback'
+import { StitchLoading } from '~/components/ui/StitchLoading'
 
+// No habilita el compositor hasta conocer la conversación, su destinatario y los permisos.
 export default function DMThreadScreen() {
   const { conversationId } = useLocalSearchParams<{ conversationId: string }>()
   const convId = conversationId ?? ''
   const userId = useAuthStore((s) => s.user?.id) ?? ''
   const router = useRouter()
   const c = useColors()
+  const insets = useSafeAreaInsets()
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
 
   const metaQuery = useQuery(conversationMetaQueryOptions(convId, userId))
@@ -23,7 +30,9 @@ export default function DMThreadScreen() {
   const other = meta?.other
   const isPendingRecipient = meta?.isPendingRecipient ?? false
 
+  // Actualiza la puerta de acceso tras aceptar; un error mantiene visible la solicitud.
   function accept() {
+    if (respond.isPending) return
     respond.mutate(
       { conversationId: convId, accept: true },
       {
@@ -35,7 +44,9 @@ export default function DMThreadScreen() {
     )
   }
 
+  // Vuelve a la bandeja únicamente cuando el servidor confirma el rechazo.
   function reject() {
+    if (respond.isPending) return
     respond.mutate(
       { conversationId: convId, accept: false },
       { onSuccess: () => router.back() }
@@ -74,6 +85,11 @@ export default function DMThreadScreen() {
             </Text>
           </Pressable>
         )}
+        {!other && (
+          <Text className="font-display-sb text-lg text-text">
+            {t('communityMenu.messages')}
+          </Text>
+        )}
       </View>
 
       {isPendingRecipient && (
@@ -102,13 +118,59 @@ export default function DMThreadScreen() {
               <Text className="text-xs font-body-sb text-white">Aceptar</Text>
             </Pressable>
           </View>
+          {respond.isError && (
+            <StitchFeedback
+              kind="error"
+              title={t('communityStates.requestError')}
+              message={t('communityStates.requestRetryHint')}
+            />
+          )}
         </View>
       )}
     </View>
   )
 
+  if (metaQuery.isPending || (metaQuery.isError && !meta)) {
+    return (
+      <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
+        {header}
+        {metaQuery.isPending ? (
+          <StitchLoading />
+        ) : (
+          <StitchFeedback
+            kind="error"
+            title={t('communityStates.conversationError')}
+            message={t('communityStates.retryHint')}
+            action={{
+              label: t('common.retry'),
+              onPress: () => {
+                void metaQuery.refetch()
+              }
+            }}
+            busy={metaQuery.isFetching}
+          />
+        )}
+      </View>
+    )
+  }
+
+  if (!meta || meta.kind !== 'dm' || !other) {
+    return (
+      <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
+        {header}
+        <StitchFeedback
+          kind="private"
+          title={t('communityStates.unavailableConversation')}
+          message={t('communityStates.unavailableHint')}
+          action={{ label: t('common.back'), onPress: () => router.back() }}
+        />
+      </View>
+    )
+  }
+
   return (
     <ChatThread
+      key={convId}
       conversationId={convId}
       header={header}
       canSend={!isPendingRecipient}

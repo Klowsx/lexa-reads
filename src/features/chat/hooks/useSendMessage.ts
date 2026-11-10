@@ -6,6 +6,7 @@ import {
 import { useAuthStore } from '~/stores/auth.store'
 import {
   sendMessageFn,
+  messagesInfiniteOptions,
   type ChatCursor,
   type ChatMessage
 } from '../chat.queries'
@@ -19,7 +20,7 @@ export type ReplyTarget = { id: string; body: string; sender_id: string } | null
 export function useSendMessage(conversationId: string) {
   const queryClient = useQueryClient()
   const userId = useAuthStore((s) => s.user?.id)
-  const queryKey = ['messages', conversationId]
+  const queryKey = messagesInfiniteOptions(conversationId).queryKey
 
   return useMutation({
     mutationFn: (params: { body: string; replyTo?: ReplyTarget }) => {
@@ -34,7 +35,6 @@ export function useSendMessage(conversationId: string) {
     onMutate: async ({ body, replyTo }) => {
       if (!userId) return
       await queryClient.cancelQueries({ queryKey })
-      const prev = queryClient.getQueryData<InfiniteData<Page>>(queryKey)
 
       const temp: ChatMessage = {
         id: `temp-${Date.now()}`,
@@ -63,10 +63,25 @@ export function useSendMessage(conversationId: string) {
         }
       })
 
-      return { prev }
+      return { temporaryId: temp.id }
     },
     onError: (_err, _vars, ctx) => {
-      if (ctx?.prev) queryClient.setQueryData(queryKey, ctx.prev)
+      // Retira únicamente el mensaje temporal fallido, incluso si el hilo aún no tenía caché.
+      // Así no se pierden mensajes reales que hayan llegado por Realtime durante el envío.
+      if (!ctx) return
+      queryClient.setQueryData<InfiniteData<Page>>(queryKey, (old) =>
+        old
+          ? {
+              ...old,
+              pages: old.pages.map((page) => ({
+                ...page,
+                items: page.items.filter(
+                  (message) => message.id !== ctx.temporaryId
+                )
+              }))
+            }
+          : old
+      )
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey })

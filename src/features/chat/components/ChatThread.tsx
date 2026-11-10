@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   ActivityIndicator,
   FlatList,
@@ -8,17 +9,18 @@ import {
   View
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useQueryClient } from '@tanstack/react-query'
+import { StitchFeedback } from '~/components/ui/StitchFeedback'
 import { ReportSheet } from '~/features/user/components/ReportSheet'
 import { useAuthStore } from '~/stores/auth.store'
 import { useColors } from '~/theme/colors'
-import { deleteMessageFn, type ChatMessage } from '../chat.queries'
+import { type ChatMessage } from '../chat.queries'
 import { useMessages } from '../hooks/useMessages'
 import { useSendMessage } from '../hooks/useSendMessage'
 import { useRealtimeMessages } from '../hooks/useRealtimeMessages'
 import { useMarkConversationRead } from '../hooks/useMarkConversationRead'
 import { MessageBubble } from './MessageBubble'
 import { MessageComposer } from './MessageComposer'
+import { MessageActionsSheet } from './MessageActionsSheet'
 
 type Props = {
   conversationId: string
@@ -29,6 +31,7 @@ type Props = {
   disabledHint?: string
 }
 
+// Gestiona los estados del hilo sin borrar el borrador hasta que el envío se confirme.
 export function ChatThread({
   conversationId,
   header,
@@ -39,41 +42,58 @@ export function ChatThread({
   const c = useColors()
   const insets = useSafeAreaInsets()
   const currentUserId = useAuthStore((s) => s.user?.id)
-  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+  const sending = useRef(false)
 
   const [text, setText] = useState('')
   const [replyTo, setReplyTo] = useState<ChatMessage | null>(null)
   const [reportMsg, setReportMsg] = useState<ChatMessage | null>(null)
+  const [actionMessage, setActionMessage] = useState<ChatMessage | null>(null)
 
-  const { data, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } =
-    useMessages(conversationId)
+  const query = useMessages(conversationId)
+  const {
+    data,
+    isPending: isLoading,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage
+  } = query
   const sendMutation = useSendMessage(conversationId)
   useRealtimeMessages(conversationId)
 
   const messages = data?.pages.flatMap((p) => p.items) ?? []
   useMarkConversationRead(conversationId, messages.length)
 
+  // Bloquea pulsaciones repetidas y conserva texto y cita si el servidor falla.
   function send() {
     const body = text.trim()
-    if (!body) return
-    sendMutation.mutate({
-      body,
-      replyTo: replyTo
-        ? { id: replyTo.id, body: replyTo.body, sender_id: replyTo.sender_id }
-        : null
-    })
-    setText('')
-    setReplyTo(null)
-  }
-
-  function deleteOwn(m: ChatMessage) {
-    deleteMessageFn(m.id)
-      .then(() =>
-        queryClient.invalidateQueries({
-          queryKey: ['messages', conversationId]
-        })
-      )
-      .catch(() => {})
+    if (
+      !body ||
+      body.length > 4000 ||
+      sending.current ||
+      !canSend ||
+      isLoading ||
+      (query.isError && !data)
+    )
+      return
+    sending.current = true
+    sendMutation.mutate(
+      {
+        body,
+        replyTo: replyTo
+          ? { id: replyTo.id, body: replyTo.body, sender_id: replyTo.sender_id }
+          : null
+      },
+      {
+        onSuccess: () => {
+          setText('')
+          setReplyTo(null)
+        },
+        onSettled: () => {
+          sending.current = false
+        }
+      }
+    )
   }
 
   return (
@@ -88,6 +108,21 @@ export function ChatThread({
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator color={c.accent} />
         </View>
+      ) : query.isError && !data ? (
+        <View className="flex-1 justify-center">
+          <StitchFeedback
+            kind="error"
+            title={t('chatStates.loadError')}
+            message={t('chatStates.loadErrorHint')}
+            action={{
+              label: t('common.retry'),
+              onPress: () => {
+                void query.refetch()
+              }
+            }}
+            busy={query.isFetching}
+          />
+        </View>
       ) : (
         // FlatList invertida: el patrón estándar de chat (FlashList v2 ya no
         // soporta `inverted`). Los datos vienen newest-first → invertida los
@@ -99,8 +134,39 @@ export function ChatThread({
           showsVerticalScrollIndicator={false}
           keyboardDismissMode="interactive"
           contentContainerStyle={{ paddingVertical: 8 }}
+          ListEmptyComponent={
+            <View style={{ transform: [{ scaleY: -1 }] }}>
+              <StitchFeedback
+                title={t('chatStates.emptyTitle')}
+                message={t(
+                  canSend ? 'chatStates.emptyHint' : 'chatStates.waitingHint'
+                )}
+              />
+            </View>
+          }
+          ListFooterComponent={
+            query.isFetchNextPageError ? (
+              <StitchFeedback
+                kind="error"
+                title={t('chatStates.olderError')}
+                message={t('chatStates.olderErrorHint')}
+                action={{
+                  label: t('common.retry'),
+                  onPress: () => {
+                    void fetchNextPage()
+                  }
+                }}
+                busy={isFetchingNextPage}
+              />
+            ) : isFetchingNextPage ? (
+              <ActivityIndicator color={c.accent} />
+            ) : null
+          }
           onEndReached={() =>
-            hasNextPage && !isFetchingNextPage && fetchNextPage()
+            hasNextPage &&
+            !isFetchingNextPage &&
+            !query.isFetchNextPageError &&
+            fetchNextPage()
           }
           onEndReachedThreshold={0.4}
           renderItem={({ item }) => (
@@ -108,11 +174,17 @@ export function ChatThread({
               message={item}
               isOwn={item.sender_id === currentUserId}
               showSender={showSender}
-              onReply={setReplyTo}
-              onDelete={deleteOwn}
-              onReport={setReportMsg}
+              onActions={setActionMessage}
             />
           )}
+        />
+      )}
+
+      {sendMutation.isError && (
+        <StitchFeedback
+          kind="error"
+          title={t('chatStates.sendError')}
+          message={t('chatStates.sendErrorHint')}
         />
       )}
 
@@ -123,9 +195,20 @@ export function ChatThread({
         sending={sendMutation.isPending}
         replyTo={replyTo}
         onCancelReply={() => setReplyTo(null)}
-        disabled={!canSend}
+        disabled={!canSend || isLoading || (query.isError && !data)}
         disabledHint={canSend ? undefined : disabledHint}
       />
+
+      {actionMessage && (
+        <MessageActionsSheet
+          message={actionMessage}
+          isOwn={actionMessage.sender_id === currentUserId}
+          conversationId={conversationId}
+          onClose={() => setActionMessage(null)}
+          onReply={setReplyTo}
+          onReport={setReportMsg}
+        />
+      )}
 
       {reportMsg && (
         <ReportSheet
