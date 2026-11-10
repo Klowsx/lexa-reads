@@ -4,6 +4,8 @@ import ChangePasswordScreen from '~/features/auth/screens/change-password-screen
 const mockBack = jest.fn()
 const mockReplace = jest.fn()
 const mockMutation = { mutate: jest.fn(), isPending: false, isError: false }
+jest.mock('@react-navigation/native', () => ({ usePreventRemove: jest.fn() }))
+jest.mock('~/stores/auth.store', () => ({ useAuthStore: () => true }))
 jest.mock('expo-router', () => ({
   useRouter: () => ({
     back: mockBack,

@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router'
+import { usePreventRemove } from '@react-navigation/native'
 import { Check, ChevronLeft, Eye, EyeOff, Lock } from 'lucide-react-native'
 import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -16,6 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { cn } from '~/lib/utils'
 import { useColors } from '~/theme/colors'
 import { useChangePassword } from '../hooks/useChangePassword'
+import { useAuthStore } from '~/stores/auth.store'
 import { StitchSheet } from '~/components/ui/StitchSheet'
 import { StitchFeedback } from '~/components/ui/StitchFeedback'
 import { StitchButton } from '~/components/ui/StitchButton'
@@ -112,8 +114,14 @@ export default function ChangePasswordScreen() {
   const c = useColors()
   const { t } = useTranslation()
   const mutation = useChangePassword()
+  const hasSession = useAuthStore((state) => Boolean(state.session))
   const saving = useRef(false)
   const [saved, setSaved] = useState(false)
+
+  // Bloquea gestos y salidas durante el guardado, sin impedir retirar la pantalla si termina la sesión.
+  usePreventRemove(mutation.isPending && !saved && hasSession, () => {
+    // La acción de salida se descarta: el resultado debe confirmarse en esta misma pantalla.
+  })
 
   const [current, setCurrent] = useState('')
   const [newPw, setNewPw] = useState('')
