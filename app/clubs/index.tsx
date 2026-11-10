@@ -1,13 +1,11 @@
 import { useRouter } from 'expo-router'
 import { ChevronLeft, Plus } from 'lucide-react-native'
 import { useState } from 'react'
-import {
-  ActivityIndicator,
-  FlatList,
-  Pressable,
-  Text,
-  View
-} from 'react-native'
+import { Pressable, Text, View } from 'react-native'
+import { FlashList } from '@shopify/flash-list'
+import { useTranslation } from 'react-i18next'
+import { StitchFeedback } from '~/components/ui/StitchFeedback'
+import { StitchLoading } from '~/components/ui/StitchLoading'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ClubCard } from '~/features/clubs/components/ClubCard'
 import { useDiscoverClubs, useMyClubs } from '~/features/clubs/hooks/useClubs'
@@ -15,10 +13,12 @@ import { useColors } from '~/theme/colors'
 
 type Tab = 'mine' | 'discover'
 
+// Diferencia las listas vacías de los errores y conserva los clubes ya cargados al actualizar.
 export default function ClubsScreen() {
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const c = useColors()
+  const { t } = useTranslation()
   const [tab, setTab] = useState<Tab>('mine')
 
   const mine = useMyClubs()
@@ -75,30 +75,70 @@ export default function ClubsScreen() {
         })}
       </View>
 
-      {active.isLoading ? (
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator color={c.accent} />
-        </View>
+      {active.isPending ? (
+        <StitchLoading />
+      ) : active.isError && !active.data ? (
+        <StitchFeedback
+          kind="error"
+          title={t('communityStates.clubsError')}
+          message={t('communityStates.retryHint')}
+          action={{
+            label: t('common.retry'),
+            onPress: () => {
+              void active.refetch()
+            }
+          }}
+          busy={active.isFetching}
+        />
       ) : (
-        <FlatList
+        <FlashList
           data={list}
           keyExtractor={(c2) => c2.id}
           onRefresh={active.refetch}
           refreshing={active.isRefetching}
           showsVerticalScrollIndicator={false}
+          ListHeaderComponent={
+            active.isError ? (
+              <StitchFeedback
+                kind="error"
+                title={t('communityStates.refreshError')}
+                message={t('communityStates.cachedHint')}
+                action={{
+                  label: t('common.retry'),
+                  onPress: () => {
+                    void active.refetch()
+                  }
+                }}
+                busy={active.isFetching}
+              />
+            ) : null
+          }
           ListEmptyComponent={
-            <View className="items-center py-16 gap-2 px-8">
-              <Text className="text-sm font-body-sb text-text">
-                {tab === 'mine'
-                  ? 'Aún no estás en clubes'
-                  : 'No hay clubes todavía'}
-              </Text>
-              <Text className="text-xs font-body text-t3 text-center">
-                {tab === 'mine'
-                  ? 'Explora en Descubrir o crea el tuyo.'
-                  : 'Sé el primero en crear uno.'}
-              </Text>
-            </View>
+            !active.isError ? (
+              <StitchFeedback
+                title={t(
+                  tab === 'mine'
+                    ? 'communityStates.noClubs'
+                    : 'communityStates.noDiscoverClubs'
+                )}
+                message={t(
+                  tab === 'mine'
+                    ? 'communityStates.discoverHint'
+                    : 'communityStates.createHint'
+                )}
+                action={
+                  tab === 'mine'
+                    ? {
+                        label: t('communityStates.discoverClubs'),
+                        onPress: () => setTab('discover')
+                      }
+                    : {
+                        label: t('communityStates.createClub'),
+                        onPress: () => router.push('/club/new')
+                      }
+                }
+              />
+            ) : null
           }
           renderItem={({ item }) => (
             <ClubCard
