@@ -8,6 +8,8 @@
     "hide": "Ocultar contraseña"
   },
   "clubStates": {
+    "nameLabel": "Nombre del club",
+    "descriptionLabel": "Descripción del club",
     "options": "Opciones del club",
     "leaveTitle": "¿Salir del club?",
     "leaveHint": "Dejarás de participar en el chat. Si el club es privado, necesitarás una nueva invitación o aprobación para volver.",
