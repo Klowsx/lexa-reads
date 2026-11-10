@@ -1,4 +1,26 @@
 {
+  "clubStates": {
+    "options": "Opciones del club",
+    "leaveTitle": "¿Salir del club?",
+    "leaveHint": "Dejarás de participar en el chat. Si el club es privado, necesitarás una nueva invitación o aprobación para volver.",
+    "leave": "Salir del club",
+    "leaveError": "No pudimos completar la salida. Sigues en el club y puedes reintentarlo.",
+    "report": "Reportar club",
+    "loadError": "No pudimos cargar el club",
+    "unavailable": "Club no disponible",
+    "chatUnavailable": "El chat no está disponible",
+    "chatUnavailableHint": "Tu membresía está activa, pero no pudimos abrir el chat. Reintenta para actualizar el acceso.",
+    "membershipError": "No pudimos actualizar tu membresía",
+    "membershipHint": "Conservamos el estado anterior. Vuelve a pulsar la acción para reintentarlo.",
+    "createError": "No pudimos crear el club",
+    "createErrorHint": "Conservamos los datos. Puedes revisarlos y volver a crear el club.",
+    "nameHint": "Entre 3 y 100 caracteres.",
+    "descriptionHint": "Opcional, hasta 500 caracteres.",
+    "discardTitle": "¿Descartar este club?",
+    "discardHint": "Los datos que has escrito no se guardarán.",
+    "discard": "Descartar cambios",
+    "continueEditing": "Seguir editando"
+  },
   "pushPermission": {
     "systemHint": "Al activar, tu dispositivo te pedirá permiso. Puedes cambiar esta decisión después en Ajustes.",
     "error": "No pudimos guardar tu decisión. Puedes volver a intentarlo sin salir de esta pantalla.",

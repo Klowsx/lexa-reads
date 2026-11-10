@@ -17,7 +17,8 @@ export function useClubMembership() {
       return acceptClubInviteFn(clubId)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clubs'] })
+      // Mantiene el procesamiento hasta reconciliar el acceso y evitar acciones sobre la membresía anterior.
+      return queryClient.invalidateQueries({ queryKey: ['clubs'] })
     }
   })
 }

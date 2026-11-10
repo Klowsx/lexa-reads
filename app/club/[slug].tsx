@@ -3,7 +3,6 @@ import { ChevronLeft, MoreVertical, Users } from 'lucide-react-native'
 import { useState } from 'react'
 import {
   ActivityIndicator,
-  Alert,
   Pressable,
   ScrollView,
   Text,
@@ -17,15 +16,23 @@ import { useClub } from '~/features/clubs/hooks/useClub'
 import { useClubMembership } from '~/features/clubs/hooks/useClubMembership'
 import type { ClubDetail } from '~/features/clubs/clubs.queries'
 import { useColors } from '~/theme/colors'
+import { useTranslation } from 'react-i18next'
+import { StitchFeedback } from '~/components/ui/StitchFeedback'
+import { StitchLoading } from '~/components/ui/StitchLoading'
+import { ClubActionsSheet } from '~/features/clubs/components/ClubActionsSheet'
 
+// Distingue el acceso al club, la espera de membresía y los fallos recuperables sin inventar permisos.
 export default function ClubScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>()
   const router = useRouter()
   const c = useColors()
   const insets = useSafeAreaInsets()
   const [reporting, setReporting] = useState(false)
+  const [showActions, setShowActions] = useState(false)
+  const { t } = useTranslation()
 
-  const { data: club, isLoading } = useClub(slug ?? '')
+  const query = useClub(slug ?? '')
+  const { data: club, isPending: isLoading } = query
   const membership = useClubMembership()
 
   if (isLoading) {
@@ -34,7 +41,35 @@ export default function ClubScreen() {
         className="flex-1 bg-bg items-center justify-center"
         style={{ paddingTop: insets.top }}
       >
-        <ActivityIndicator color={c.accent} />
+        <StitchLoading />
+      </View>
+    )
+  }
+
+  if (query.isError && !club) {
+    return (
+      <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
+        <StitchFeedback
+          kind="error"
+          title={t('clubStates.loadError')}
+          message={t('communityStates.retryHint')}
+          action={{
+            label: t('common.retry'),
+            onPress: () => {
+              void query.refetch()
+            }
+          }}
+          busy={query.isFetching}
+        />
+        <Pressable
+          onPress={() => router.back()}
+          accessibilityRole="button"
+          className="min-h-12 items-center justify-center"
+        >
+          <Text className="font-body text-sm text-text">
+            {t('common.back')}
+          </Text>
+        </Pressable>
       </View>
     )
   }
@@ -45,37 +80,48 @@ export default function ClubScreen() {
         className="flex-1 bg-bg items-center justify-center px-8"
         style={{ paddingTop: insets.top }}
       >
-        <Text className="text-sm font-body-sb text-text">
-          Club no encontrado
-        </Text>
-        <Pressable onPress={() => router.back()} className="mt-3">
-          <Text className="text-xs font-body-md text-accent">Volver</Text>
-        </Pressable>
+        <StitchFeedback
+          kind="private"
+          title={t('clubStates.unavailable')}
+          message={t('communityStates.unavailableHint')}
+          action={{ label: t('common.back'), onPress: () => router.back() }}
+        />
       </View>
     )
   }
 
   const isMember = club.myState === 'active'
 
+  if (isMember && !club.conversationId) {
+    return (
+      <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
+        <StitchFeedback
+          kind="error"
+          title={t('clubStates.chatUnavailable')}
+          message={t('clubStates.chatUnavailableHint')}
+          action={{
+            label: t('common.retry'),
+            onPress: () => {
+              void query.refetch()
+            }
+          }}
+          busy={query.isFetching}
+        />
+        <Pressable
+          onPress={() => router.back()}
+          accessibilityRole="button"
+          className="min-h-12 items-center justify-center"
+        >
+          <Text className="font-body text-sm text-text">
+            {t('common.back')}
+          </Text>
+        </Pressable>
+      </View>
+    )
+  }
+
   // ── Vista de miembro: chat del club ──
   if (isMember && club.conversationId) {
-    function menu() {
-      const actions: Parameters<typeof Alert.alert>[2] = [
-        {
-          text: 'Salir del club',
-          style: 'destructive',
-          onPress: () => leave()
-        },
-        {
-          text: 'Reportar club',
-          style: 'destructive',
-          onPress: () => setReporting(true)
-        },
-        { text: 'Cancelar', style: 'cancel' }
-      ]
-      Alert.alert(club!.name, undefined, actions)
-    }
-
     const header = (
       <View className="px-4 py-2.5 border-b border-border flex-row items-center gap-2.5">
         <Pressable
@@ -100,7 +146,7 @@ export default function ClubScreen() {
         </View>
         <Pressable
           hitSlop={8}
-          onPress={menu}
+          onPress={() => setShowActions(true)}
           accessibilityRole="button"
           accessibilityLabel="Opciones del club"
         >
@@ -117,6 +163,14 @@ export default function ClubScreen() {
           header={header}
           showSender
         />
+        {showActions && (
+          <ClubActionsSheet
+            clubId={club.id}
+            clubName={club.name}
+            onClose={() => setShowActions(false)}
+            onReport={() => setReporting(true)}
+          />
+        )}
         {reporting && (
           <ReportSheet
             targetType="club"
@@ -130,10 +184,14 @@ export default function ClubScreen() {
   }
 
   // ── Vista de no-miembro: info + acción ──
+  // Cancela una solicitud pendiente una sola vez y conserva el estado si falla.
   function leave() {
+    if (membership.isPending) return
     membership.mutate({ clubId: club!.id, action: 'leave' })
   }
+  // Elige la acción según la membresía confirmada, respetando invitaciones y acceso privado.
   function primaryAction() {
+    if (membership.isPending) return
     const action =
       club!.myState === 'invited'
         ? 'accept-invite'
@@ -210,6 +268,7 @@ export default function ClubScreen() {
         {club.myState === 'pending' && (
           <Pressable
             onPress={leave}
+            disabled={membership.isPending}
             accessibilityRole="button"
             accessibilityLabel="Cancelar solicitud"
           >
@@ -218,11 +277,19 @@ export default function ClubScreen() {
             </Text>
           </Pressable>
         )}
+        {membership.isError && (
+          <StitchFeedback
+            kind="error"
+            title={t('clubStates.membershipError')}
+            message={t('clubStates.membershipHint')}
+          />
+        )}
       </ScrollView>
     </View>
   )
 }
 
+// Traduce la membresía a una única acción y bloquea los estados que no permiten incorporarse.
 function ctaFor(
   club: ClubDetail,
   pending: boolean
