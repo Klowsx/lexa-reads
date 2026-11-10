@@ -139,12 +139,18 @@ export default function BookDetailScreen() {
                 )}
 
                 {showSharePreview && (
-                  <SharePreviewSheet onClose={() => setShowSharePreview(false)}>
-                    <BookShareCard
-                      book={book}
-                      rating={rating}
-                      username={username}
-                    />
+                  <SharePreviewSheet
+                    key={`${book.id}:${book.cover_url ?? ''}`}
+                    onClose={() => setShowSharePreview(false)}
+                  >
+                    {(onCoverReady) => (
+                      <BookShareCard
+                        book={book}
+                        rating={rating}
+                        username={username}
+                        onCoverReady={onCoverReady}
+                      />
+                    )}
                   </SharePreviewSheet>
                 )}
               </>

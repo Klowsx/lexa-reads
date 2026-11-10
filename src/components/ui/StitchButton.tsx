@@ -40,6 +40,7 @@ export function StitchButton({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: secondary || destructive ? c.muted : c.primary,
+        outlineColor: c.text,
         opacity: blocked ? 0.5 : pressed ? 0.75 : 1
       })}
     >

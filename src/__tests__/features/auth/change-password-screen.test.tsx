@@ -34,6 +34,7 @@ describe('Cambio de contraseña desde Ajustes', () => {
     mockMutation.isPending = false
     mockMutation.isError = false
     mockBack.mockReset()
+    mockReplace.mockReset()
   })
 
   it('envía ambas contraseñas sin volver atrás ni confirmar antes del servidor', () => {
@@ -66,6 +67,9 @@ describe('Cambio de contraseña desde Ajustes', () => {
     })
     expect(view.getByText('changePasswordResult.success')).toBeTruthy()
     expect(view.queryByDisplayValue('nuevaClave123')).toBeNull()
+    fireEvent.press(view.getByText('changePasswordResult.return'))
+    expect(mockReplace).toHaveBeenCalledWith('/settings')
+    expect(mockBack).not.toHaveBeenCalled()
   })
 
   it('conserva los campos si falla y no envía contraseñas que no coinciden', () => {

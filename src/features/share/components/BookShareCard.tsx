@@ -1,4 +1,6 @@
 import { Image } from 'expo-image'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { fixed } from '~/theme/colors'
 import type { Tables } from '~/types/database'
@@ -14,6 +16,7 @@ interface BookShareCardProps {
   book: Tables<'books'>
   rating?: number | null
   username?: string | null
+  onCoverReady?: (imageFailed: boolean) => void
 }
 
 function Stars({ rating }: { rating: number }) {
@@ -36,7 +39,15 @@ function Stars({ rating }: { rating: number }) {
   )
 }
 
-export function BookShareCard({ book, rating, username }: BookShareCardProps) {
+// Notifica cuándo la portada o su alternativa ya se dibujaron para permitir una captura completa.
+export function BookShareCard({
+  book,
+  rating,
+  username,
+  onCoverReady
+}: BookShareCardProps) {
+  const [coverFailed, setCoverFailed] = useState(false)
+  const { t } = useTranslation()
   const author = book.authors?.[0] ?? ''
 
   return (
@@ -46,14 +57,19 @@ export function BookShareCard({ book, rating, username }: BookShareCardProps) {
 
       {/* Cover */}
       <View style={s.shadow}>
-        {book.cover_url ? (
+        {book.cover_url && !coverFailed ? (
           <Image
             source={{ uri: book.cover_url }}
             style={s.cover}
             contentFit="cover"
+            onDisplay={() => onCoverReady?.(false)}
+            onError={() => setCoverFailed(true)}
           />
         ) : (
-          <View style={[s.cover, s.coverFallback]}>
+          <View
+            style={[s.cover, s.coverFallback]}
+            onLayout={() => onCoverReady?.(Boolean(book.cover_url))}
+          >
             <Text style={s.coverText} numberOfLines={6}>
               {book.title}
             </Text>
@@ -73,7 +89,11 @@ export function BookShareCard({ book, rating, username }: BookShareCardProps) {
 
       {rating != null && <Stars rating={rating} />}
 
-      {username ? <Text style={s.username}>leído por @{username}</Text> : null}
+      {username ? (
+        <Text style={s.username}>
+          {t('sharePreview.sharedBy', { username })}
+        </Text>
+      ) : null}
 
       {/* Branding */}
       <View style={s.footer}>

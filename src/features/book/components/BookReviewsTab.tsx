@@ -448,15 +448,19 @@ export function BookReviewsTab({
 
       {sharingReview && (
         <SharePreviewSheet
+          key={`${sharingReview.id}:${book?.cover_url ?? ''}`}
           onClose={() => setSharingReview(null)}
           containsSpoilers={Boolean(sharingReview.contains_spoilers)}
         >
-          <ReviewShareCard
-            review={sharingReview}
-            bookTitle={book?.title}
-            bookCoverUrl={book?.cover_url}
-            bookId={book?.id}
-          />
+          {(onCoverReady) => (
+            <ReviewShareCard
+              review={sharingReview}
+              bookTitle={book?.title}
+              bookCoverUrl={book?.cover_url}
+              bookId={book?.id}
+              onCoverReady={onCoverReady}
+            />
+          )}
         </SharePreviewSheet>
       )}
     </View>

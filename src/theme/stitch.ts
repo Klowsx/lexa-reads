@@ -1,5 +1,6 @@
-import { Inter_400Regular, Inter_600SemiBold } from '@expo-google-fonts/inter'
-import { Newsreader_600SemiBold } from '@expo-google-fonts/newsreader'
+import { Inter_400Regular } from '@expo-google-fonts/inter/400Regular'
+import { Inter_600SemiBold } from '@expo-google-fonts/inter/600SemiBold'
+import { Newsreader_600SemiBold } from '@expo-google-fonts/newsreader/600SemiBold'
 import { useFonts } from 'expo-font'
 import { useThemeStore } from '~/stores/theme.store'
 

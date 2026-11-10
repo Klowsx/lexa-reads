@@ -1,4 +1,5 @@
 import { Image } from 'expo-image'
+import { useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { fixed } from '~/theme/colors'
 import type { ReviewWithUser } from '~/features/book/book.queries'
@@ -13,6 +14,7 @@ interface ReviewShareCardProps {
   bookTitle?: string | null
   bookCoverUrl?: string | null
   bookId?: string | null
+  onCoverReady?: (imageFailed: boolean) => void
 }
 
 // Las tarjetas exportadas nunca incluyen texto marcado como spoiler, aunque ya se haya revelado en pantalla.
@@ -20,7 +22,8 @@ export function ReviewShareCard({
   review,
   bookTitle,
   bookCoverUrl,
-  bookId
+  bookId,
+  onCoverReady
 }: ReviewShareCardProps) {
   const user = review.users ?? {
     username: 'usuario',
@@ -30,6 +33,7 @@ export function ReviewShareCard({
   const displayName = user.display_name ?? user.username
   const rating = (review as any).rating as number | null | undefined
   const { t } = useTranslation()
+  const [coverFailed, setCoverFailed] = useState(false)
   const body = review.contains_spoilers
     ? t('reviews.sharedSpoiler')
     : review.body.length > MAX_REVIEW_CHARS
@@ -45,7 +49,12 @@ export function ReviewShareCard({
     .toUpperCase()
 
   return (
-    <View style={s.card}>
+    <View
+      style={s.card}
+      onLayout={() => {
+        if (!bookCoverUrl) onCoverReady?.(false)
+      }}
+    >
       {/* Accent stripe */}
       <View style={s.stripe} />
 
@@ -60,12 +69,30 @@ export function ReviewShareCard({
           </Text>
           <Text style={s.username}>@{user.username}</Text>
         </View>
-        {bookCoverUrl ? (
+        {bookCoverUrl && !coverFailed ? (
           <Image
             source={{ uri: bookCoverUrl }}
             style={s.miniCover}
             contentFit="cover"
+            onDisplay={() => onCoverReady?.(false)}
+            onError={() => setCoverFailed(true)}
           />
+        ) : bookCoverUrl ? (
+          <View
+            style={[
+              s.miniCover,
+              {
+                backgroundColor: fixed.cover.backgrounds[0],
+                alignItems: 'center',
+                justifyContent: 'center'
+              }
+            ]}
+            onLayout={() => onCoverReady?.(true)}
+          >
+            <Text numberOfLines={3} style={s.bookTitle}>
+              {bookTitle ?? 'Lexa'}
+            </Text>
+          </View>
         ) : null}
       </View>
 

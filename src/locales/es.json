@@ -94,6 +94,9 @@
     "messagesHint": "Conversaciones y solicitudes"
   },
   "sharePreview": {
+    "loadingImage": "Preparando la portada…",
+    "imageFallback": "La portada no pudo cargarse. Se compartirá una cubierta de texto.",
+    "sharedBy": "Compartido por @{{username}}",
     "title": "Compartir lectura",
     "description": "Revisa la tarjeta antes de compartirla como imagen.",
     "spoilerHint": "El texto con spoilers permanece oculto en la imagen, aunque ya lo hayas revelado en la app.",

@@ -147,9 +147,14 @@ export default function ChangePasswordScreen() {
 
   // Proporciona un retorno válido también cuando la pantalla se abrió por enlace directo.
   function close() {
-    if (mutation.isPending) return
+    if (saving.current || mutation.isPending) return
     if (router.canGoBack()) router.back()
     else router.replace('/settings')
+  }
+
+  // La confirmación vuelve al destino que anuncia su botón, independientemente del historial.
+  function finish() {
+    router.replace('/settings')
   }
 
   return (
@@ -288,10 +293,10 @@ export default function ChangePasswordScreen() {
         </Pressable>
       </ScrollView>
       {saved && (
-        <StitchSheet title={t('changePasswordResult.success')} onClose={close}>
+        <StitchSheet title={t('changePasswordResult.success')} onClose={finish}>
           <StitchButton
             label={t('changePasswordResult.return')}
-            onPress={close}
+            onPress={finish}
           />
         </StitchSheet>
       )}

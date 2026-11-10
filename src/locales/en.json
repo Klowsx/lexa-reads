@@ -94,6 +94,9 @@
     "messagesHint": "Conversations and requests"
   },
   "sharePreview": {
+    "loadingImage": "Preparing the cover…",
+    "imageFallback": "The cover couldn't load. A text cover will be shared.",
+    "sharedBy": "Shared by @{{username}}",
     "title": "Share a reading",
     "description": "Preview the card before sharing it as an image.",
     "spoilerHint": "Spoiler text stays hidden in the image, even if you have revealed it in the app.",

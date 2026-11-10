@@ -100,7 +100,8 @@ export function StitchSheet({
                 minWidth: 48,
                 alignItems: 'center',
                 justifyContent: 'center',
-                opacity: busy ? 0.4 : 1
+                opacity: busy ? 0.4 : 1,
+                outlineColor: c.text
               }}
             >
               <X size={24} color={c.text} />
