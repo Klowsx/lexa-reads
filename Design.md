@@ -81,6 +81,12 @@ components:
 
 # Design System: Lexa
 
+## Adopción gradual de Stitch
+
+Las pantallas, componentes y estados nuevos utilizan el sistema de Stitch: tokens en `src/theme/stitch.ts`, Newsreader para títulos e Inter para interfaz. Reutilizar los controles `StitchButton`, `StitchSheet`, `StitchFeedback` y `StitchLoading` cuando corresponda a su responsabilidad.
+
+Las referencias de Playfair Display, DM Sans y terracota que siguen describen la interfaz existente. Su migración visual se realizará por separado; no sustituir globalmente sus tokens al añadir una superficie nueva. La fuente del diseño, las diferencias funcionales que deben respetarse y la evidencia de implementación están en [la adopción gradual](docs/stitch-adoption.md).
+
 ## Overview
 
 **Creative North Star: "La biblioteca habitada"**
