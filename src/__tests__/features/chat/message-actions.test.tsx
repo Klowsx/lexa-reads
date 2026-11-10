@@ -42,6 +42,8 @@ describe('Acciones de mensaje', () => {
     expect(mockRemove.mutate).not.toHaveBeenCalled()
     expect(view.getByText('chatStates.deleteHint')).toBeTruthy()
     fireEvent.press(view.getByText('common.delete'))
+    fireEvent.press(view.getByText('common.delete'))
+    expect(mockRemove.mutate).toHaveBeenCalledTimes(1)
     expect(mockRemove.mutate).toHaveBeenCalledWith(
       'message',
       expect.objectContaining({ onSuccess: close })
@@ -50,6 +52,23 @@ describe('Acciones de mensaje', () => {
     view.rerender(<MessageActionsSheet {...props} />)
     expect(view.getByText('chatStates.deleteError')).toBeTruthy()
     expect(close).not.toHaveBeenCalled()
+  })
+
+  it('no permite cambiar la cita mientras otro mensaje se está enviando', () => {
+    const reply = jest.fn()
+    const view = render(
+      <MessageActionsSheet
+        message={message}
+        isOwn={false}
+        conversationId="thread"
+        onClose={jest.fn()}
+        onReply={reply}
+        onReport={jest.fn()}
+        canReply={false}
+      />
+    )
+    fireEvent.press(view.getByText('chatStates.reply'))
+    expect(reply).not.toHaveBeenCalled()
   })
 
   it('ofrece reportar un mensaje ajeno sin ofrecer borrarlo', () => {

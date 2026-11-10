@@ -62,6 +62,13 @@ export function ChatThread({
   useRealtimeMessages(conversationId)
 
   const messages = data?.pages.flatMap((p) => p.items) ?? []
+  const currentReply = replyTo
+    ? (messages.find((message) => message.id === replyTo.id) ?? replyTo)
+    : null
+  const currentActionMessage = actionMessage
+    ? (messages.find((message) => message.id === actionMessage.id) ??
+      actionMessage)
+    : null
   useMarkConversationRead(conversationId, messages.length)
 
   // Bloquea pulsaciones repetidas y conserva texto y cita si el servidor falla.
@@ -80,9 +87,14 @@ export function ChatThread({
     sendMutation.mutate(
       {
         body,
-        replyTo: replyTo
-          ? { id: replyTo.id, body: replyTo.body, sender_id: replyTo.sender_id }
-          : null
+        replyTo:
+          currentReply && !currentReply.deleted_at
+            ? {
+                id: currentReply.id,
+                body: currentReply.body,
+                sender_id: currentReply.sender_id
+              }
+            : null
       },
       {
         onSuccess: () => {
@@ -193,19 +205,22 @@ export function ChatThread({
         onChangeText={setText}
         onSend={send}
         sending={sendMutation.isPending}
-        replyTo={replyTo}
+        replyTo={currentReply}
         onCancelReply={() => setReplyTo(null)}
         disabled={!canSend || isLoading || (query.isError && !data)}
         disabledHint={canSend ? undefined : disabledHint}
       />
 
-      {actionMessage && (
+      {currentActionMessage && !currentActionMessage.deleted_at && (
         <MessageActionsSheet
-          message={actionMessage}
-          isOwn={actionMessage.sender_id === currentUserId}
+          message={currentActionMessage}
+          isOwn={currentActionMessage.sender_id === currentUserId}
           conversationId={conversationId}
           onClose={() => setActionMessage(null)}
-          onReply={setReplyTo}
+          onReply={(message) => {
+            if (!sending.current && canSend) setReplyTo(message)
+          }}
+          canReply={!sendMutation.isPending && canSend}
           onReport={setReportMsg}
         />
       )}

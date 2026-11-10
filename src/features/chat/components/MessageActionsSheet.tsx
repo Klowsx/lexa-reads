@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Text } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { StitchButton } from '~/components/ui/StitchButton'
@@ -14,7 +14,8 @@ export function MessageActionsSheet({
   conversationId,
   onReply,
   onReport,
-  onClose
+  onClose,
+  canReply = true
 }: {
   message: ChatMessage
   isOwn: boolean
@@ -22,15 +23,24 @@ export function MessageActionsSheet({
   onReply: (message: ChatMessage) => void
   onReport: (message: ChatMessage) => void
   onClose: () => void
+  canReply?: boolean
 }) {
   const [confirming, setConfirming] = useState(false)
   const remove = useDeleteMessage(conversationId)
+  const deleting = useRef(false)
   const c = useStitchTheme()
   const { t } = useTranslation()
 
   // El mensaje sigue disponible y el diálogo abierto si el servidor rechaza la operación.
   function confirmDelete() {
-    if (!remove.isPending) remove.mutate(message.id, { onSuccess: onClose })
+    if (remove.isPending || deleting.current) return
+    deleting.current = true
+    remove.mutate(message.id, {
+      onSuccess: onClose,
+      onSettled: () => {
+        deleting.current = false
+      }
+    })
   }
 
   return (
@@ -38,7 +48,9 @@ export function MessageActionsSheet({
       title={t(
         confirming ? 'chatStates.deleteTitle' : 'chatStates.messageOptions'
       )}
-      onClose={onClose}
+      onClose={() => {
+        if (!deleting.current) onClose()
+      }}
       busy={remove.isPending}
     >
       <Text
@@ -80,7 +92,9 @@ export function MessageActionsSheet({
           />
           <StitchButton
             label={t('common.cancel')}
-            onPress={() => setConfirming(false)}
+            onPress={() => {
+              if (!deleting.current) setConfirming(false)
+            }}
             secondary
             disabled={remove.isPending}
           />
@@ -94,6 +108,7 @@ export function MessageActionsSheet({
               onClose()
             }}
             secondary
+            disabled={!canReply}
           />
           {isOwn ? (
             <StitchButton

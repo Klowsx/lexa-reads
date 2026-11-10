@@ -50,7 +50,7 @@ export function useSendMessage(conversationId: string) {
       }
 
       queryClient.setQueryData<InfiniteData<Page>>(queryKey, (old) => {
-        if (!old) {
+        if (!old || old.pages.length === 0) {
           return {
             pages: [{ items: [temp], nextCursor: null }],
             pageParams: [undefined]
@@ -64,6 +64,32 @@ export function useSendMessage(conversationId: string) {
       })
 
       return { temporaryId: temp.id }
+    },
+    onSuccess: (message, _vars, ctx) => {
+      // Reconcilia con la respuesta real aunque falle el refetch; descarta la copia llegada por Realtime.
+      queryClient.setQueryData<InfiniteData<Page>>(queryKey, (old) => {
+        if (!old || old.pages.length === 0) {
+          return {
+            pages: [{ items: [message], nextCursor: null }],
+            pageParams: [undefined]
+          }
+        }
+        const pages = old.pages.map((page) => ({
+          ...page,
+          items: page.items.filter(
+            (item) => item.id !== message.id && item.id !== ctx?.temporaryId
+          )
+        }))
+        pages[0] = {
+          ...pages[0],
+          items: [message, ...pages[0].items].sort(
+            (a, b) =>
+              b.created_at.localeCompare(a.created_at) ||
+              b.id.localeCompare(a.id)
+          )
+        }
+        return { ...old, pages }
+      })
     },
     onError: (_err, _vars, ctx) => {
       // Retira únicamente el mensaje temporal fallido, incluso si el hilo aún no tenía caché.

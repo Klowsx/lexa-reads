@@ -70,7 +70,7 @@ export function MessageComposer({
               {t('chatStates.replying')}
             </Text>
             <Text numberOfLines={1} className="text-[11px] font-body text-t2">
-              {replyTo.body}
+              {replyTo.deleted_at ? t('chatStates.deleted') : replyTo.body}
             </Text>
           </View>
           <Pressable

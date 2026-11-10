@@ -24,7 +24,8 @@ jest.mock('expo-router', () => ({
   useRouter: () => ({ push: mockPush, back: jest.fn() })
 }))
 jest.mock('@shopify/flash-list', () => ({
-  FlashList: require('react-native').FlatList
+  FlashList:
+    jest.requireActual<typeof import('react-native')>('react-native').FlatList
 }))
 jest.mock('~/features/chat/hooks/useDMInbox', () => ({
   useDMInbox: () => mockInbox

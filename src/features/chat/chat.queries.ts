@@ -64,6 +64,7 @@ function one<T>(rel: T | T[] | null): T | null {
 
 // ── Bandeja de entrada (DMs) ────────────────────────────────────
 
+// Carga la bandeja completa y propaga fallos parciales para no mostrarlos como ausencia de conversaciones.
 async function fetchDMInbox(userId: string): Promise<ConversationListItem[]> {
   const { data, error } = await sb
     .from('conversation_members')
@@ -82,12 +83,13 @@ async function fetchDMInbox(userId: string): Promise<ConversationListItem[]> {
     const c = r.conversation
     return c.dm_user_low === userId ? c.dm_user_high : c.dm_user_low
   })
-  const { data: users } = otherIds.length
+  const { data: users, error: usersError } = otherIds.length
     ? await sb
         .from('users')
         .select('id, username, display_name, avatar_url')
         .in('id', otherIds)
-    : { data: [] }
+    : { data: [], error: null }
+  if (usersError) throw usersError
   const userMap = new Map<string, MessageUser>(
     (users ?? []).map((u: MessageUser) => [u.id, u])
   )
@@ -101,29 +103,32 @@ async function fetchDMInbox(userId: string): Promise<ConversationListItem[]> {
       const other = userMap.get(otherId)
       if (!other) return null
 
-      const { data: last } = await sb
+      const { data: last, error: lastError } = await sb
         .from('messages')
         .select('body, deleted_at')
         .eq('conversation_id', c.id)
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle()
+      if (lastError) throw lastError
 
       let unread = 0
       if (r.last_read_at) {
-        const { count } = await sb
+        const { count, error: countError } = await sb
           .from('messages')
           .select('id', { count: 'exact', head: true })
           .eq('conversation_id', c.id)
           .neq('sender_id', userId)
           .gt('created_at', r.last_read_at)
+        if (countError) throw countError
         unread = count ?? 0
       } else {
-        const { count } = await sb
+        const { count, error: countError } = await sb
           .from('messages')
           .select('id', { count: 'exact', head: true })
           .eq('conversation_id', c.id)
           .neq('sender_id', userId)
+        if (countError) throw countError
         unread = count ?? 0
       }
 
@@ -307,6 +312,7 @@ export type ConversationMeta = {
   other: MessageUser | null
 }
 
+// Resuelve destinatario y permisos; un fallo al cargar al lector sigue siendo un error recuperable.
 async function fetchConversationMeta(
   conversationId: string,
   userId: string
@@ -322,11 +328,12 @@ async function fetchConversationMeta(
   let other: MessageUser | null = null
   if (c.kind === 'dm') {
     const otherId = c.dm_user_low === userId ? c.dm_user_high : c.dm_user_low
-    const { data: u } = await sb
+    const { data: u, error: userError } = await sb
       .from('users')
       .select('id, username, display_name, avatar_url')
       .eq('id', otherId)
       .maybeSingle()
+    if (userError) throw userError
     other = u ?? null
   }
 

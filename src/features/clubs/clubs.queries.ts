@@ -102,6 +102,7 @@ export const myClubsQueryOptions = (userId: string) =>
 
 // ── Detalle de un club ──────────────────────────────────────────
 
+// Consulta la membresía sin convertir errores de red en una falsa ausencia de acceso o de chat.
 async function fetchClub(
   slug: string,
   userId: string
@@ -116,22 +117,24 @@ async function fetchClub(
 
   const base = mapClub(data)
 
-  const { data: conv } = await sb
+  const { data: conv, error: conversationError } = await sb
     .from('conversations')
     .select('id')
     .eq('kind', 'club')
     .eq('club_id', data.id)
     .maybeSingle()
+  if (conversationError) throw conversationError
 
   let myState: ClubMemberState | null = null
   let myRole: ClubRole | null = null
   if (userId) {
-    const { data: mem } = await sb
+    const { data: mem, error: membershipError } = await sb
       .from('reading_club_members')
       .select('state, role')
       .eq('club_id', data.id)
       .eq('user_id', userId)
       .maybeSingle()
+    if (membershipError) throw membershipError
     myState = mem?.state ?? null
     myRole = mem?.role ?? null
   }

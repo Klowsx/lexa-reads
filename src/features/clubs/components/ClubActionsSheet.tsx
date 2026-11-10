@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Text } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { StitchButton } from '~/components/ui/StitchButton'
@@ -20,19 +20,31 @@ export function ClubActionsSheet({
 }) {
   const [confirming, setConfirming] = useState(false)
   const membership = useClubMembership()
+  const leaving = useRef(false)
   const c = useStitchTheme()
   const { t } = useTranslation()
 
   // Mantiene el diálogo abierto si no se pudo abandonar el club.
   function leave() {
-    if (!membership.isPending)
-      membership.mutate({ clubId, action: 'leave' }, { onSuccess: onClose })
+    if (membership.isPending || leaving.current) return
+    leaving.current = true
+    membership.mutate(
+      { clubId, action: 'leave' },
+      {
+        onSuccess: onClose,
+        onSettled: () => {
+          leaving.current = false
+        }
+      }
+    )
   }
 
   return (
     <StitchSheet
       title={t(confirming ? 'clubStates.leaveTitle' : 'clubStates.options')}
-      onClose={onClose}
+      onClose={() => {
+        if (!leaving.current) onClose()
+      }}
       busy={membership.isPending}
     >
       <Text
@@ -74,6 +86,7 @@ export function ClubActionsSheet({
           <StitchButton
             label={t('common.cancel')}
             onPress={() => {
+              if (leaving.current) return
               setConfirming(false)
               membership.reset()
             }}

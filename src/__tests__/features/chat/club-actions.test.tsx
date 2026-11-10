@@ -37,6 +37,8 @@ describe('Acciones del club', () => {
     fireEvent.press(view.getByText('clubStates.leave'))
     expect(mockMembership.mutate).not.toHaveBeenCalled()
     fireEvent.press(view.getByText('clubStates.leave'))
+    fireEvent.press(view.getByText('clubStates.leave'))
+    expect(mockMembership.mutate).toHaveBeenCalledTimes(1)
     expect(mockMembership.mutate).toHaveBeenCalledWith(
       { clubId: 'club', action: 'leave' },
       expect.any(Object)
