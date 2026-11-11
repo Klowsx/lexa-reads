@@ -40,7 +40,8 @@ jobs:
         shell: bash
         run: |
           # Las suites RLS requieren una base real y no se presentan como cobertura local.
-          mapfile -t tests < <(rg --files src/__tests__ | rg -v 'rls\.test\.ts$')
+          mapfile -d '' -t tests < <(find src/__tests__ -type f \( -name '*.test.ts' -o -name '*.test.tsx' \) ! -name '*rls.test.ts' -print0)
+          ((${#tests[@]} > 0))
           pnpm exec jest --runInBand --runTestsByPath "${tests[@]}"
       - uses: denoland/setup-deno@v2
         with:
