@@ -1,10 +1,11 @@
+import { useTranslation } from 'react-i18next'
 import { useRouter } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import { Pressable, Text, View } from 'react-native'
-import { PrimaryButton, alpha } from '~/features/auth/components'
+import { PrimaryButton } from '~/features/auth/components'
 import { useSaveOnboardingPreferences } from '~/features/auth/hooks/useOnboarding'
 import { useMe } from '~/features/user/hooks/useMe'
-import { cn } from '~/lib/utils'
+import type { TFunction } from 'i18next'
 import { useColors } from '~/theme/colors'
 import { toAppError } from '~/types'
 import { OnboardingScreen } from '~/features/auth/components/onboarding-screen'
@@ -12,22 +13,23 @@ import { OnboardingScreen } from '~/features/auth/components/onboarding-screen'
 const QUICK_GOALS = [12, 24, 50, 100]
 
 // Describe el ritmo aproximado de una meta anual para que se entienda su alcance.
-function getLabel(goal: number) {
-  if (goal === 1) return '1 libro al año'
+function getLabel(goal: number, t: TFunction) {
+  if (goal === 1) return t('stitch.authUser.annualOne')
   const perMonth = Math.round((goal / 12) * 10) / 10
   const pace =
     goal < 12
-      ? 'paso tranquilo'
+      ? t('stitch.authUser.paceCalm')
       : goal < 30
-        ? 'ritmo cómodo'
+        ? t('stitch.authUser.paceComfort')
         : goal < 60
-          ? 'lector activo'
-          : 'lector intenso'
-  return `Aprox. ${perMonth} libros al mes, ${pace}.`
+          ? t('stitch.authUser.paceActive')
+          : t('stitch.authUser.paceIntense')
+  return t('stitch.authUser.monthlyPace', { count: perMonth, pace })
 }
 
 // Permite elegir una meta y guardarla antes de pedir el nombre de usuario.
 export default function OnboardGoalScreen() {
+  const { t } = useTranslation()
   const router = useRouter()
   const c = useColors()
   const { data: profile } = useMe()
@@ -63,8 +65,10 @@ export default function OnboardGoalScreen() {
   return (
     <OnboardingScreen
       step={2}
-      title={`Tu ritmo para ${currentYear}`}
-      description={`Una meta que te acompañe. Si saltas este paso, conservaremos ${profile?.reading_goal ?? 12} libros como punto de partida. Puedes cambiarla en Ajustes.`}
+      title={t('stitch.authUser.goalTitle', { year: currentYear })}
+      description={t('stitch.authUser.goalIntro', {
+        count: profile?.reading_goal ?? 12
+      })}
       onBack={() => router.replace('/(auth)/onboarding/genres')}
       onSkip={() => handleContinue(true)}
       busy={savePreferences.isPending || !profile}
@@ -83,7 +87,7 @@ export default function OnboardGoalScreen() {
             loading={savePreferences.isPending}
             onPress={() => handleContinue()}
           >
-            Guardar meta
+            {t('stitch.authUser.saveGoal')}
           </PrimaryButton>
         </>
       }
@@ -93,7 +97,7 @@ export default function OnboardGoalScreen() {
           onPress={() => setGoal((current) => Math.max(1, current - 1))}
           className="w-12 h-12 rounded-full bg-surface border border-border items-center justify-center"
           accessibilityRole="button"
-          accessibilityLabel="Reducir meta"
+          accessibilityLabel={t('settings.reduceGoal')}
         >
           <Text className="font-body-light text-text text-md leading-7">−</Text>
         </Pressable>
@@ -102,14 +106,16 @@ export default function OnboardGoalScreen() {
           <Text className="font-display-sb text-[64px] leading-[76px] text-text">
             {goal}
           </Text>
-          <Text className="font-body text-t2 mt-1.5 text-xs">libros</Text>
+          <Text className="font-body text-t2 mt-1.5 text-xs">
+            {t('stitch.authUser.books')}
+          </Text>
         </View>
 
         <Pressable
           onPress={() => setGoal((current) => Math.min(365, current + 1))}
           className="w-12 h-12 rounded-full bg-surface border border-border items-center justify-center"
           accessibilityRole="button"
-          accessibilityLabel="Aumentar meta"
+          accessibilityLabel={t('settings.increaseGoal')}
         >
           <Text className="font-body-light text-text text-md leading-7">+</Text>
         </Pressable>
@@ -122,24 +128,24 @@ export default function OnboardGoalScreen() {
             <Pressable
               key={quickGoal}
               onPress={() => setGoal(quickGoal)}
-              className="min-h-11 justify-center py-2 px-[14px] rounded-full bg-surface border border-border"
+              className="min-h-12 justify-center py-2 px-[14px] rounded-full bg-surface border border-border"
               style={
                 selectedGoal
                   ? {
                       borderColor: c.accent,
-                      backgroundColor: alpha(c.accent, 0.14)
+                      backgroundColor: c.accent
                     }
                   : undefined
               }
               accessibilityRole="radio"
               accessibilityState={{ selected: selectedGoal }}
-              accessibilityLabel={`${quickGoal} libros`}
+              accessibilityLabel={t('stitch.authUser.bookCount', {
+                count: quickGoal
+              })}
             >
               <Text
-                className={cn(
-                  'font-body-md text-t2 text-xs',
-                  selectedGoal && 'text-text'
-                )}
+                className="font-body-md text-sm"
+                style={{ color: selectedGoal ? c.onAccent : c.t2 }}
               >
                 {quickGoal}
               </Text>
@@ -149,7 +155,7 @@ export default function OnboardGoalScreen() {
       </View>
 
       <Text className="font-body text-t2 text-center mt-7 text-xs leading-6">
-        {getLabel(goal)}
+        {getLabel(goal, t)}
       </Text>
     </OnboardingScreen>
   )

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useColors } from '~/theme/colors'
@@ -11,6 +12,7 @@ export function SessionStatus({
   error?: boolean
   onRetry?: () => void
 }) {
+  const { t } = useTranslation()
   const c = useColors()
   const insets = useSafeAreaInsets()
   return (
@@ -23,18 +25,22 @@ export function SessionStatus({
           accessibilityRole="header"
           className="font-display-sb text-lg text-text"
         >
-          {error ? 'Tu biblioteca sigue aquí' : 'Preparando tu biblioteca'}
+          {error
+            ? t('stitch.authUser.libraryHere')
+            : t('stitch.authUser.preparingLibrary')}
         </Text>
         <Text
           accessibilityLiveRegion="polite"
           className="font-body text-xs text-t2"
         >
           {error
-            ? 'No pudimos comprobar tu sesión. Revisa tu conexión y vuelve a intentarlo.'
-            : 'Estamos comprobando tu acceso de forma segura…'}
+            ? t('stitch.authUser.sessionError')
+            : t('stitch.authUser.checkingSession')}
         </Text>
         {error && onRetry ? (
-          <PrimaryButton onPress={onRetry}>Volver a intentar</PrimaryButton>
+          <PrimaryButton onPress={onRetry}>
+            {t('stitch.authUser.retry')}
+          </PrimaryButton>
         ) : (
           <ActivityIndicator color={c.text} />
         )}

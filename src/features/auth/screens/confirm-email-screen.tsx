@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Link, useLocalSearchParams } from 'expo-router'
 import { Pressable, Text, View } from 'react-native'
 import { AuthPage } from '~/features/auth/components/auth-page'
@@ -7,20 +8,21 @@ import { useResendCountdown } from '~/features/auth/hooks/use-resend-countdown'
 
 // Explica la confirmación de una cuenta nueva y permite reenviar sin perder el contexto.
 export default function ConfirmEmailScreen() {
+  const { t } = useTranslation()
   const params = useLocalSearchParams<{ email?: string }>()
   const email = typeof params.email === 'string' ? params.email : ''
   const resend = useResendConfirmation()
   const countdown = useResendCountdown()
   return (
     <AuthPage
-      title="Un último vistazo al correo"
-      description="Abre el enlace de confirmación que enviamos para volver a Lexa y preparar tu biblioteca."
+      title={t('stitch.authUser.checkInbox')}
+      description={t('stitch.authUser.confirmationIntro')}
     >
       <View className="bg-surface rounded-md p-5 mb-6">
         <Text className="font-body text-t2 text-xs mb-2">
-          Correo de tu cuenta
+          {t('stitch.authUser.accountEmail')}
         </Text>
-        <Text selectable className="font-body-md text-text text-xs">
+        <Text selectable className="font-body-md text-text text-sm">
           {email || 'Vuelve al registro para indicar tu correo.'}
         </Text>
       </View>
@@ -29,7 +31,7 @@ export default function ConfirmEmailScreen() {
         replace
         asChild
       >
-        <PrimaryButton>Ya confirmé, iniciar sesión</PrimaryButton>
+        <PrimaryButton>{t('stitch.authUser.confirmedLogin')}</PrimaryButton>
       </Link>
       <Pressable
         accessibilityRole="button"
@@ -39,10 +41,10 @@ export default function ConfirmEmailScreen() {
       >
         <Text className="font-body-md text-t2 text-xs">
           {resend.isPending
-            ? 'Reenviando…'
+            ? t('stitch.authUser.resending')
             : countdown.seconds > 0
-              ? `Reenviar en ${countdown.seconds} s`
-              : 'Reenviar confirmación'}
+              ? t('stitch.authUser.resendSeconds', { count: countdown.seconds })
+              : t('stitch.authUser.resendConfirmation')}
         </Text>
       </Pressable>
       {resend.error && (
@@ -58,14 +60,14 @@ export default function ConfirmEmailScreen() {
           accessibilityLiveRegion="polite"
           className="font-body text-text text-xs mt-3"
         >
-          Solicitud enviada. Revisa también la carpeta de correo no deseado.
+          {t('stitch.authUser.requestSent')}
         </Text>
       )}
       <View className="flex-1 min-h-8" />
       <Link href="/(auth)/register" replace asChild>
         <Pressable className="min-h-12 items-center justify-center">
           <Text className="font-body text-text text-xs">
-            ¿Correo equivocado? Volver al registro
+            {t('stitch.authUser.wrongEmail')}
           </Text>
         </Pressable>
       </Link>

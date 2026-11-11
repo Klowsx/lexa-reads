@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Check } from 'lucide-react-native'
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
@@ -19,6 +20,7 @@ import { OnboardingScreen } from '~/features/auth/components/onboarding-screen'
 
 // Pide el nombre público antes de ofrecer sugerencias de lectores para el feed inicial.
 export default function OnboardUsernameScreen() {
+  const { t } = useTranslation()
   const router = useRouter()
   const c = useColors()
   const [username, setUsername] = useState('')
@@ -32,13 +34,13 @@ export default function OnboardUsernameScreen() {
   const usernameError = !username
     ? undefined
     : !validFormat
-      ? 'Usa de 3 a 30 letras, números o guion bajo.'
+      ? t('stitch.authUser.usernameRules')
       : !isCurrent
         ? undefined
         : availability.isError
-          ? 'No pudimos comprobar el nombre. Inténtalo de nuevo.'
+          ? t('stitch.authUser.usernameCheckError')
           : availability.data === false
-            ? 'Este nombre ya está en uso.'
+            ? t('stitch.authUser.usernameTaken')
             : undefined
   const completionError = completeOnboarding.error as {
     code?: string
@@ -46,9 +48,9 @@ export default function OnboardUsernameScreen() {
   } | null
   const completionMessage =
     completionError?.code === '23505'
-      ? 'Este nombre acaba de ser elegido. Prueba otro.'
+      ? t('stitch.authUser.usernameJustTaken')
       : completionError
-        ? 'No pudimos guardar tu nombre. Revisa tu conexión e inténtalo de nuevo.'
+        ? t('stitch.authUser.usernameSaveError')
         : undefined
 
   // Normaliza el valor antes de comprobarlo para que la vista previa y la base usen el mismo nombre.
@@ -70,8 +72,8 @@ export default function OnboardUsernameScreen() {
     <OnboardingScreen
       step={3}
       total={4}
-      title="Tu firma de lector"
-      description="Elige un nombre único para tus reseñas y conversaciones. Después te mostraremos lectores para tu feed."
+      title={t('stitch.authUser.usernameTitle')}
+      description={t('stitch.authUser.usernameIntro')}
       onBack={() => router.replace('/(auth)/onboarding/goal')}
       busy={completeOnboarding.isPending}
       footer={
@@ -89,7 +91,7 @@ export default function OnboardUsernameScreen() {
             loading={completeOnboarding.isPending}
             onPress={handleComplete}
           >
-            Continuar
+            {t('consent.continue')}
           </PrimaryButton>
         </>
       }
@@ -110,7 +112,7 @@ export default function OnboardUsernameScreen() {
         </View>
 
         <AuthField
-          label="Nombre de usuario"
+          label={t('stitch.authUser.username')}
           value={username}
           onChangeText={handleChange}
           autoCapitalize="none"
@@ -130,10 +132,10 @@ export default function OnboardUsernameScreen() {
           accessibilityLiveRegion="polite"
         >
           {validFormat && (!isCurrent || availability.isFetching)
-            ? 'Comprobando disponibilidad… '
+            ? t('stitch.authUser.checkingAvailability')
             : isAvailable
-              ? 'Disponible: '
-              : 'Tu nombre público: '}
+              ? t('stitch.authUser.available')
+              : t('stitch.authUser.publicName')}
           @<Text className="text-text">{username || 'tu_nombre'}</Text>
         </Text>
         {availability.isError && (
@@ -144,8 +146,8 @@ export default function OnboardUsernameScreen() {
               }}
               disabled={availability.isFetching}
             >
-              <Text className="font-body-md text-text text-xs">
-                Volver a comprobar
+              <Text className="font-body-md text-text text-sm">
+                {t('stitch.authUser.retryAvailability')}
               </Text>
             </GhostButton>
           </View>

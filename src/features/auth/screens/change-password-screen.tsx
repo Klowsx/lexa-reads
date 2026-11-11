@@ -294,7 +294,7 @@ export default function ChangePasswordScreen() {
           {mutation.isPending ? (
             <ActivityIndicator color={c.onAccent} />
           ) : (
-            <Text className="text-sm font-body-sb text-white">
+            <Text className="text-sm font-body-sb text-on-accent">
               {t('changePassword.save')}
             </Text>
           )}

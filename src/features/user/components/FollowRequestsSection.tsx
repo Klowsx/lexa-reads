@@ -24,8 +24,8 @@ function RequestRow({ request }: { request: PendingRequest }) {
     else reject.mutate(request.follow_id)
   }
   return (
-    <View className="border-t border-border py-3 gap-2">
-      <View className="flex-row items-center gap-3">
+    <View className="bg-surface rounded-card p-4 mb-3 gap-2">
+      <View className="gap-4">
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t('search.openReader', {
@@ -37,17 +37,20 @@ function RequestRow({ request }: { request: PendingRequest }) {
               params: { username: request.requester.username }
             })
           }
-          className="min-h-12 flex-1 flex-row items-center gap-3 rounded-md focus-visible:outline focus-visible:outline-accent"
+          className="min-h-12 flex-row items-center gap-3 rounded-md focus-visible:outline focus-visible:outline-accent"
         >
           <Avatar
             neutral
             displayName={request.requester.display_name}
             username={request.requester.username}
             avatarUrl={request.requester.avatar_url}
-            size={44}
+            size={48}
           />
           <View className="min-w-0 flex-1">
-            <Text className="font-body-sb text-xs text-text" numberOfLines={1}>
+            <Text
+              className="font-body-sb text-base text-text"
+              numberOfLines={1}
+            >
               {request.requester.display_name || request.requester.username}
             </Text>
             <Text className="font-body text-xs text-t2" numberOfLines={1}>
@@ -55,30 +58,41 @@ function RequestRow({ request }: { request: PendingRequest }) {
             </Text>
           </View>
         </Pressable>
-        <Pressable
-          disabled={busy}
-          accessibilityRole="button"
-          accessibilityLabel={t('social.acceptRequest', {
-            username: request.requester.username
-          })}
-          accessibilityState={{ disabled: busy }}
-          onPress={() => respond(true)}
-          className="h-12 w-12 items-center justify-center rounded-md bg-sr hover:bg-sh focus-visible:outline focus-visible:outline-accent"
-        >
-          <Check size={20} color={c.text} />
-        </Pressable>
-        <Pressable
-          disabled={busy}
-          accessibilityRole="button"
-          accessibilityLabel={t('social.rejectRequest', {
-            username: request.requester.username
-          })}
-          accessibilityState={{ disabled: busy }}
-          onPress={() => respond(false)}
-          className="h-12 w-12 items-center justify-center rounded-md border border-border hover:bg-sr focus-visible:outline focus-visible:outline-accent"
-        >
-          <X size={20} color={c.text} />
-        </Pressable>
+        <View className="flex-row gap-2">
+          <Pressable
+            disabled={busy}
+            accessibilityRole="button"
+            accessibilityLabel={t('social.acceptRequest', {
+              username: request.requester.username
+            })}
+            accessibilityState={{ disabled: busy }}
+            onPress={() => respond(true)}
+            className="min-h-12 flex-1 flex-row gap-2 items-center justify-center rounded-md bg-accent active:opacity-70 focus-visible:outline focus-visible:outline-accent"
+          >
+            <Check size={20} color={c.onAccent} />
+            <Text
+              className="font-body-sb text-sm"
+              style={{ color: c.onAccent }}
+            >
+              {t('stitch.authUser.accept')}
+            </Text>
+          </Pressable>
+          <Pressable
+            disabled={busy}
+            accessibilityRole="button"
+            accessibilityLabel={t('social.rejectRequest', {
+              username: request.requester.username
+            })}
+            accessibilityState={{ disabled: busy }}
+            onPress={() => respond(false)}
+            className="min-h-12 flex-1 flex-row gap-2 items-center justify-center rounded-md bg-sr active:opacity-70 focus-visible:outline focus-visible:outline-accent"
+          >
+            <X size={20} color={c.text} />
+            <Text className="font-body-sb text-xs text-text">
+              {t('stitch.authUser.reject')}
+            </Text>
+          </Pressable>
+        </View>
       </View>
       {busy && (
         <Text

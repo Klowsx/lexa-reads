@@ -14,7 +14,7 @@ export function UserCard({ user }: Props) {
   const router = useRouter()
   const { t } = useTranslation()
   return (
-    <View className="mb-4 gap-2">
+    <View className="mb-3 p-4 rounded-card bg-surface gap-2">
       <View className="flex-row flex-wrap items-center gap-3">
         <Pressable
           onPress={() => router.push('/user/' + user.username)}
@@ -32,7 +32,7 @@ export function UserCard({ user }: Props) {
             size={48}
           />
           <View className="min-w-0 flex-1 gap-1">
-            <Text className="font-body-sb text-xs text-text" numberOfLines={1}>
+            <Text className="font-body-sb text-sm text-text" numberOfLines={1}>
               {user.display_name || user.username}
             </Text>
             <Text className="font-body text-xs text-t2" numberOfLines={1}>

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Eye, EyeOff } from 'lucide-react-native'
 import { Link, useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
@@ -9,6 +10,7 @@ import { useLogin } from '~/features/auth/hooks/useLogin'
 
 // Permite volver a la biblioteca con correo, contraseña y acceso directo a recuperación.
 export default function LoginScreen() {
+  const { t } = useTranslation()
   const params = useLocalSearchParams<{ email?: string }>()
   const c = useColors()
   const [email, setEmail] = useState(
@@ -19,21 +21,21 @@ export default function LoginScreen() {
   const { mutate: login, isPending, error } = useLogin()
   return (
     <AuthPage
-      title="Vuelve a tu biblioteca"
-      description="Tus lecturas, tus notas y la próxima historia que te espera."
+      title={t('stitch.authUser.welcomeBack')}
+      description={t('stitch.authUser.loginIntro')}
     >
       <AuthField
-        label="Correo"
+        label={t('stitch.authUser.email')}
         value={email}
         onChangeText={setEmail}
-        placeholder="tu@correo.com"
+        placeholder={t('stitch.authUser.emailPlaceholder')}
         keyboardType="email-address"
         autoCapitalize="none"
         textContentType="username"
         autoComplete="email"
       />
       <AuthField
-        label="Contraseña"
+        label={t('auth.password')}
         value={password}
         onChangeText={setPassword}
         autoCapitalize="none"
@@ -43,10 +45,12 @@ export default function LoginScreen() {
         trailing={
           <Pressable
             onPress={() => setShowPw(!showPw)}
-            className="w-11 h-11 -mr-3 items-center justify-center"
+            className="w-12 h-12 -mr-3 items-center justify-center"
             accessibilityRole="button"
             accessibilityLabel={
-              showPw ? 'Ocultar contraseña' : 'Mostrar contraseña'
+              showPw
+                ? t('changePasswordResult.hide')
+                : t('changePasswordResult.show')
             }
           >
             {showPw ? (
@@ -59,8 +63,8 @@ export default function LoginScreen() {
       />
       <Link href="/(auth)/forgot-password" asChild>
         <Pressable className="min-h-11 self-end justify-center mb-4">
-          <Text className="font-body-md text-text text-xs">
-            ¿Olvidaste tu contraseña?
+          <Text className="font-body-md text-text text-sm">
+            {t('auth.forgotPassword')}
           </Text>
         </Pressable>
       </Link>
@@ -81,8 +85,8 @@ export default function LoginScreen() {
           asChild
         >
           <Pressable className="min-h-11 justify-center mb-3">
-            <Text className="font-body-md text-text text-xs">
-              Revisar o reenviar la confirmación
+            <Text className="font-body-md text-text text-sm">
+              {t('stitch.authUser.checkConfirmation')}
             </Text>
           </Pressable>
         </Link>
@@ -92,16 +96,16 @@ export default function LoginScreen() {
         loading={isPending}
         onPress={() => login({ email: email.trim(), password })}
       >
-        Iniciar sesión
+        {t('auth.login')}
       </PrimaryButton>
       <View className="flex-1 min-h-12" />
       <Text className="font-body text-t2 text-xs text-center">
-        ¿Tu primera vez en Lexa?
+        {t('stitch.authUser.firstTime')}
       </Text>
       <Link href="/(auth)/register" replace asChild>
         <Pressable className="min-h-12 items-center justify-center">
-          <Text className="font-body-sb text-text text-xs">
-            Crear una cuenta
+          <Text className="font-body-sb text-text text-sm">
+            {t('stitch.authUser.createAccount')}
           </Text>
         </Pressable>
       </Link>

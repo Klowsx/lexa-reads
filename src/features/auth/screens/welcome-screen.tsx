@@ -1,11 +1,23 @@
+import { useTranslation } from 'react-i18next'
 import { Link } from 'expo-router'
+import { Image } from 'expo-image'
+import { BookOpen, Compass, Users } from 'lucide-react-native'
+import { useState } from 'react'
 import { Pressable, ScrollView, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { BookFan, PrimaryButton, Wordmark } from '~/features/auth/components'
+import { useColors } from '~/theme/colors'
+
+// Fotografía editorial que forma parte de la referencia A01 de Stitch.
+const WELCOME_IMAGE =
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuALpsp4XdlBALjT2qqQjyOECu1xHlbqhJpj6ki69cfjEhoislW_N-7dfdxzRp1N4dW4lGzlkgXyyPo1UASgBVbJxaBrCponw5-HTrlrJfIOCwX5dklA8h3wWYPxbB6GivYsQRQjNOiM9VN6MFDwNuCdp2hNllG99wE13D3Cce_xQLMz5svmw-cgccRneetqZKO1_euT9z1NXyyfmaq_Eg66hnRYdKKvm0cXDWPbwks'
 
 // Recibe a lectores nuevos y habituales con dos destinos claros antes de personalizar el perfil.
 export default function WelcomeScreen() {
+  const { t } = useTranslation()
   const insets = useSafeAreaInsets()
+  const c = useColors()
+  const [imageFailed, setImageFailed] = useState(false)
   return (
     <ScrollView
       className="flex-1 bg-bg"
@@ -13,32 +25,81 @@ export default function WelcomeScreen() {
         flexGrow: 1,
         paddingTop: insets.top + 24,
         paddingBottom: insets.bottom + 24,
-        paddingHorizontal: 24
+        paddingHorizontal: 24,
+        width: '100%',
+        maxWidth: 560,
+        alignSelf: 'center'
       }}
     >
-      <Wordmark size={32} />
-      <View className="flex-1 justify-center min-h-[250px]">
-        <BookFan />
+      <View className="items-center gap-2 mb-6">
+        <View className="h-14 w-14 items-center justify-center rounded-full bg-sr mb-1">
+          <Text className="font-display-sb text-2xl text-text italic">L</Text>
+        </View>
+        <Wordmark size={30} />
+        <Text className="font-body-sb text-xs text-t2 tracking-widest">
+          {t('stitch.authUser.readingCommunity')}
+        </Text>
       </View>
-      <View className="pb-7">
+      <View className="rounded-card bg-sr overflow-hidden mb-6">
+        {imageFailed ? (
+          <BookFan />
+        ) : (
+          <Image
+            source={{ uri: WELCOME_IMAGE }}
+            style={{ width: '100%', height: 190 }}
+            contentFit="cover"
+            onError={() => setImageFailed(true)}
+            accessible={false}
+          />
+        )}
         <Text
           accessibilityRole="header"
-          className="font-display-sb text-text text-[36px] leading-[43px]"
+          className="font-display-sb text-lg text-text text-center italic p-5 leading-7"
         >
-          Haz sitio a tus lecturas.
-        </Text>
-        <Text className="font-body text-t2 text-xs leading-6 mt-4">
-          Guarda lo que lees, encuentra tu próxima historia y conversa con
-          quienes también la han vivido.
+          {t('stitch.authUser.welcomeQuote')}
         </Text>
       </View>
+      <View className="gap-3 mb-6">
+        {[
+          {
+            Icon: BookOpen,
+            title: t('stitch.authUser.personalLibrary'),
+            body: t('stitch.authUser.personalLibraryBody')
+          },
+          {
+            Icon: Compass,
+            title: t('stitch.authUser.discover'),
+            body: t('stitch.authUser.discoverBody')
+          },
+          {
+            Icon: Users,
+            title: t('stitch.authUser.readerCommunity'),
+            body: t('stitch.authUser.readerCommunityBody')
+          }
+        ].map(({ Icon, title, body }) => (
+          <View
+            key={title}
+            className="flex-row gap-4 bg-surface p-4 rounded-card"
+          >
+            <View className="h-11 w-11 items-center justify-center bg-sr rounded-full">
+              <Icon size={22} color={c.text} />
+            </View>
+            <View className="flex-1 gap-1">
+              <Text className="font-body-sb text-sm text-text">{title}</Text>
+              <Text className="font-body text-xs text-t2 leading-6">
+                {body}
+              </Text>
+            </View>
+          </View>
+        ))}
+      </View>
       <Link href="/(auth)/register" asChild>
-        <PrimaryButton>Crear mi cuenta</PrimaryButton>
+        <PrimaryButton>{t('stitch.authUser.createMine')}</PrimaryButton>
       </Link>
       <Link href="/(auth)/login" asChild>
         <Pressable className="min-h-12 items-center justify-center mt-2">
-          <Text className="font-body-md text-text text-xs">
-            Ya tengo cuenta · Iniciar sesión
+          <Text className="font-body-md text-text text-sm">
+            {t('stitch.authUser.alreadySignIn')}
           </Text>
         </Pressable>
       </Link>

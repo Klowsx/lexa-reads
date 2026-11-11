@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'expo-router'
 import { Text, View } from 'react-native'
@@ -10,6 +11,7 @@ import { useAuthStore } from '~/stores/auth.store'
 
 // Propone lectores relevantes antes de entrar al feed sin bloquear a quien prefiera decidir después.
 export default function OnboardingSuggestionsScreen() {
+  const { t } = useTranslation()
   const router = useRouter()
   const userId = useAuthStore((state) => state.user?.id ?? '')
   const suggestions = useQuery(onboardingSuggestionsQueryOptions(userId))
@@ -27,8 +29,8 @@ export default function OnboardingSuggestionsScreen() {
     <OnboardingScreen
       step={4}
       total={4}
-      title="Encuentra a tu gente lectora"
-      description="Sigue a algunas personas para descubrir sus lecturas y reseñas en tu feed. Puedes hacerlo ahora o más adelante."
+      title={t('stitch.authUser.suggestionsTitle')}
+      description={t('stitch.authUser.suggestionsIntro')}
       busy={finish.isPending}
       footer={
         <>
@@ -37,26 +39,27 @@ export default function OnboardingSuggestionsScreen() {
               accessibilityRole="alert"
               className="mb-3 font-body text-xs text-error"
             >
-              No pudimos terminar el onboarding. Revisa tu conexión e inténtalo
-              de nuevo.
+              {t('stitch.authUser.onboardingError')}
             </Text>
           )}
           <PrimaryButton loading={finish.isPending} onPress={finishOnboarding}>
-            Ver mi feed
+            {t('stitch.authUser.viewFeed')}
           </PrimaryButton>
         </>
       }
     >
       <View className="gap-2">
         {suggestions.isPending && (
-          <Text className="font-body text-xs text-t2">Buscando lectores…</Text>
+          <Text className="font-body text-xs text-t2">
+            {t('stitch.authUser.findingReaders')}
+          </Text>
         )}
         {suggestions.isError && (
           <Text
             accessibilityRole="alert"
             className="font-body text-xs text-error"
           >
-            No pudimos cargar sugerencias. Aún puedes continuar.
+            {t('stitch.authUser.suggestionsError')}
           </Text>
         )}
         {suggestions.data?.map((user) => (
@@ -64,8 +67,7 @@ export default function OnboardingSuggestionsScreen() {
         ))}
         {suggestions.data?.length === 0 && !suggestions.isPending && (
           <Text className="font-body text-xs text-t2">
-            Todavía no hay sugerencias disponibles. Puedes encontrar lectores
-            desde Buscar.
+            {t('stitch.authUser.noSuggestions')}
           </Text>
         )}
       </View>

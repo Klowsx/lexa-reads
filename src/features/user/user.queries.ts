@@ -610,6 +610,13 @@ async function fetchNotificationPreferences(
   return data as NotificationPreferences | null
 }
 
+// Obtiene los datos de portabilidad de la cuenta autenticada para compartirlos desde el hook.
+export async function exportUserDataFn(): Promise<unknown> {
+  const { data, error } = await supabase.functions.invoke('export-user-data')
+  if (error) throw error
+  return data
+}
+
 export const notificationPreferencesQueryOptions = (userId: string) =>
   queryOptions({
     queryKey: ['notification_preferences', userId],

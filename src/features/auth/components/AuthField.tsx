@@ -55,10 +55,10 @@ export function AuthField({
   return (
     <View className="mb-[14px]">
       {label && (
-        <Text className="text-xs text-text font-body-md mb-2">{label}</Text>
+        <Text className="text-sm text-text font-body-md mb-2">{label}</Text>
       )}
       <View
-        className="flex-row items-center gap-2.5 bg-surface rounded-md px-3.5 min-h-[56px] border border-border"
+        className="flex-row items-center gap-2.5 bg-surface rounded-md px-4 min-h-[56px] border border-transparent"
         style={borderColor ? { borderColor } : undefined}
       >
         {(IconComponent || iconNode) && (
@@ -73,7 +73,7 @@ export function AuthField({
           </View>
         )}
         <TextInput
-          className="flex-1 text-text text-xs font-body min-w-0 web:outline-none"
+          className="flex-1 text-text text-base font-body min-w-0 web:outline-none py-3"
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}

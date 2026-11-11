@@ -1,14 +1,16 @@
+import { useTranslation } from 'react-i18next'
 import { Check, Eye, EyeOff, Lock, Mail, User } from 'lucide-react-native'
 import { Link } from 'expo-router'
 import { useState } from 'react'
 import { Linking, Pressable, Text, View } from 'react-native'
 import { AuthField, PrimaryButton } from '~/features/auth/components'
 import { useRegister } from '~/features/auth/hooks/useRegister'
-import { rawLight, useColors } from '~/theme/colors'
+import { useColors } from '~/theme/colors'
 import { AuthPage } from '~/features/auth/components/auth-page'
 
 // Recoge los datos de registro y muestra requisitos claros antes de crear una cuenta.
 export default function RegisterScreen() {
+  const { t } = useTranslation()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -26,11 +28,12 @@ export default function RegisterScreen() {
 
   return (
     <AuthPage
-      title="Empieza tu biblioteca"
-      description="Crea tu cuenta. Después podrás elegir tus gustos y tu nombre de lector."
+      centered={false}
+      title={t('stitch.authUser.registerTitle')}
+      description={t('stitch.authUser.registerIntro')}
     >
       <AuthField
-        label="Nombre"
+        label={t('editProfile.name')}
         value={name}
         onChangeText={setName}
         autoCapitalize="words"
@@ -39,10 +42,10 @@ export default function RegisterScreen() {
         icon={User}
       />
       <AuthField
-        label="Correo"
+        label={t('stitch.authUser.email')}
         value={email}
         onChangeText={setEmail}
-        placeholder="tu@correo.com"
+        placeholder={t('stitch.authUser.emailPlaceholder')}
         keyboardType="email-address"
         autoCapitalize="none"
         textContentType="emailAddress"
@@ -50,7 +53,7 @@ export default function RegisterScreen() {
         icon={Mail}
       />
       <AuthField
-        label="Contraseña"
+        label={t('auth.password')}
         value={password}
         onChangeText={setPassword}
         secureTextEntry={!showPassword}
@@ -61,10 +64,12 @@ export default function RegisterScreen() {
         trailing={
           <Pressable
             onPress={() => setShowPassword((visible) => !visible)}
-            className="w-11 h-11 -mr-3 items-center justify-center"
+            className="w-12 h-12 -mr-3 items-center justify-center"
             accessibilityRole="button"
             accessibilityLabel={
-              showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+              showPassword
+                ? t('changePasswordResult.hide')
+                : t('changePasswordResult.show')
             }
           >
             {showPassword ? (
@@ -78,10 +83,10 @@ export default function RegisterScreen() {
 
       <View className="mb-6 gap-2">
         <Text className="font-body text-t2 text-xs">
-          {hasMinLength ? '✓' : '·'} Al menos 8 caracteres
+          {hasMinLength ? '✓' : '·'} {t('changePassword.reqMinChars')}
         </Text>
         <Text className="font-body text-t2 text-xs">
-          {hasNumber ? '✓' : '·'} Al menos un número
+          {hasNumber ? '✓' : '·'} {t('stitch.authUser.numberPassword')}
         </Text>
       </View>
 
@@ -92,24 +97,24 @@ export default function RegisterScreen() {
           accessibilityRole="checkbox"
           accessibilityState={{ checked: terms }}
           aria-checked={terms}
-          accessibilityLabel="Acepto los documentos legales de Lexa"
+          accessibilityLabel={t('stitch.authUser.acceptLegal')}
         >
           <View
             className={`h-5 w-5 rounded-sm border-[1.5px] items-center justify-center ${terms ? 'bg-accent border-accent' : 'border-border'}`}
           >
-            {terms && <Check size={11} color={rawLight.text} />}
+            {terms && <Check size={11} color={c.onAccent} />}
           </View>
           <Text className="flex-1 text-xs text-t2 font-body">
-            He leído y acepto los documentos legales de Lexa.
+            {t('stitch.authUser.legalStatement')}
           </Text>
         </Pressable>
         <View className="flex-row flex-wrap">
           {/* Los enlaces son controles separados para que abrirlos no marque la casilla. */}
           {[
-            ['terms', 'Términos'],
-            ['eula', 'Licencia de uso'],
-            ['privacy', 'Privacidad'],
-            ['community', 'Normas de la comunidad']
+            ['terms', t('stitch.authUser.terms')],
+            ['eula', t('stitch.authUser.eula')],
+            ['privacy', t('settings.privacy')],
+            ['community', t('settings.communityGuidelines')]
           ].map(([path, label]) => (
             <Pressable
               key={path}
@@ -118,7 +123,7 @@ export default function RegisterScreen() {
               accessibilityLabel={label}
               className="min-h-11 w-1/2 justify-center rounded-md px-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
             >
-              <Text className="font-body-sb text-xs text-text underline">
+              <Text className="font-body-sb text-sm text-text underline">
                 {label}
               </Text>
             </Pressable>
@@ -148,14 +153,14 @@ export default function RegisterScreen() {
           register({ email: email.trim(), displayName: name.trim(), password })
         }
       >
-        Crear cuenta
+        {t('stitch.authUser.create')}
       </PrimaryButton>
 
       <Link href="/(auth)/login" replace asChild>
         <Pressable className="pt-[18px] items-center">
           <Text className="text-sm text-t2 font-body">
-            ¿Ya tienes cuenta?{' '}
-            <Text className="text-accent font-body-sb">Iniciar sesión</Text>
+            {t('auth.alreadyHaveAccount')}{' '}
+            <Text className="text-accent font-body-sb">{t('auth.login')}</Text>
           </Text>
         </Pressable>
       </Link>

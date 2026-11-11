@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Check, Eye, EyeOff, Lock } from 'lucide-react-native'
 import { useState } from 'react'
 import { useRouter } from 'expo-router'
@@ -9,16 +10,23 @@ import { AuthPage } from '~/features/auth/components/auth-page'
 import { useAuthStore } from '~/stores/auth.store'
 
 const REQUIREMENTS = [
-  { label: 'Al menos 8 caracteres', test: (pw: string) => pw.length >= 8 },
-  { label: 'Contiene un número', test: (pw: string) => /\d/.test(pw) },
   {
-    label: 'Las contraseñas coinciden',
+    label: 'stitch.authUser.minPassword',
+    test: (pw: string) => pw.length >= 8
+  },
+  {
+    label: 'stitch.authUser.containsNumber',
+    test: (pw: string) => /\d/.test(pw)
+  },
+  {
+    label: 'stitch.authUser.passwordsMatch',
     test: (_: string, pw2: string) => _ !== '' && _ === pw2
   }
 ]
 
 // Permite definir una contraseña nueva con controles visibles y requisitos verificables.
 export default function NewPasswordScreen() {
+  const { t } = useTranslation()
   const c = useColors()
   const router = useRouter()
   const session = useAuthStore((state) => state.session)
@@ -40,23 +48,22 @@ export default function NewPasswordScreen() {
   if (passwordUpdated)
     return (
       <AuthPage
-        title="Tu contraseña está actualizada"
-        description="Estamos cerrando la sesión temporal para que vuelvas a entrar con tu contraseña nueva."
+        title={t('stitch.authUser.passwordUpdated')}
+        description={t('stitch.authUser.endingRecovery')}
       >
         {error && (
           <Text
             accessibilityLiveRegion="polite"
             className="font-body text-xs text-error mb-4"
           >
-            La contraseña cambió, pero falta cerrar la sesión. Vuelve a
-            intentarlo.
+            {t('stitch.authUser.endRecoveryError')}
           </Text>
         )}
         <PrimaryButton
           loading={isPending}
           onPress={() => updatePassword({ password })}
         >
-          Finalizar recuperación
+          {t('stitch.authUser.finishRecovery')}
         </PrimaryButton>
       </AuthPage>
     )
@@ -65,24 +72,24 @@ export default function NewPasswordScreen() {
   if (!session || !isRecoveryMode)
     return (
       <AuthPage
-        title="Necesitas un enlace válido"
-        description="Solicita un nuevo enlace de recuperación para elegir tu contraseña."
+        title={t('stitch.authUser.validLinkNeeded')}
+        description={t('stitch.authUser.requestNewLink')}
       >
         <PrimaryButton
           onPress={() => router.replace('/(auth)/forgot-password')}
         >
-          Solicitar recuperación
+          {t('stitch.authUser.requestRecovery')}
         </PrimaryButton>
       </AuthPage>
     )
 
   return (
     <AuthPage
-      title="Una contraseña nueva"
-      description="Usa una contraseña que no utilices en otras cuentas. Al guardarla, volverás a iniciar sesión."
+      title={t('stitch.authUser.newPasswordTitle')}
+      description={t('stitch.authUser.newPasswordIntro')}
     >
       <AuthField
-        label="Nueva contraseña"
+        label={t('changePassword.new')}
         value={password}
         onChangeText={setPassword}
         secureTextEntry={!show}
@@ -93,10 +100,12 @@ export default function NewPasswordScreen() {
         trailing={
           <Pressable
             onPress={() => setShow(!show)}
-            className="w-11 h-11 -mr-3 items-center justify-center"
+            className="w-12 h-12 -mr-3 items-center justify-center"
             accessibilityRole="button"
             accessibilityLabel={
-              show ? 'Ocultar contraseña' : 'Mostrar contraseña'
+              show
+                ? t('changePasswordResult.hide')
+                : t('changePasswordResult.show')
             }
           >
             {show ? (
@@ -109,7 +118,7 @@ export default function NewPasswordScreen() {
       />
 
       <AuthField
-        label="Confirmar contraseña"
+        label={t('stitch.authUser.confirmPassword')}
         value={confirm}
         onChangeText={setConfirm}
         secureTextEntry={!show}
@@ -128,7 +137,7 @@ export default function NewPasswordScreen() {
         {REQUIREMENTS.map(({ label, test }) => {
           const ok = test(password, confirm)
           return (
-            <View key={label} className="flex-row items-center gap-2 py-1">
+            <View key={t(label)} className="flex-row items-center gap-2 py-1">
               {ok ? (
                 <View
                   className="w-4 h-4 rounded-full items-center justify-center"
@@ -161,7 +170,7 @@ export default function NewPasswordScreen() {
         loading={isPending}
         onPress={() => updatePassword({ password })}
       >
-        Guardar contraseña
+        {t('changePassword.save')}
       </PrimaryButton>
     </AuthPage>
   )

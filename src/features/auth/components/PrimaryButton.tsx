@@ -1,5 +1,5 @@
 import { ActivityIndicator, Pressable, Text, View } from 'react-native'
-import { rawLight } from '~/theme/colors'
+import { useColors } from '~/theme/colors'
 
 type Props = {
   children: React.ReactNode
@@ -18,12 +18,13 @@ export function PrimaryButton({
   accessibilityLabel
 }: Props) {
   const isDisabled = disabled || loading
+  const c = useColors()
 
   return (
     <Pressable
       onPress={onPress}
       disabled={isDisabled}
-      className="w-full min-h-12 items-center justify-center rounded-md bg-accent active:opacity-80"
+      className="w-full min-h-12 px-5 py-3 items-center justify-center rounded-md bg-accent active:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
       style={isDisabled ? { opacity: 0.42 } : undefined}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
@@ -31,10 +32,10 @@ export function PrimaryButton({
       aria-busy={Boolean(loading)}
     >
       <View className="flex-row items-center gap-2">
-        {loading && <ActivityIndicator size="small" color={rawLight.text} />}
+        {loading && <ActivityIndicator size="small" color={c.onAccent} />}
         <Text
-          className="text-base font-body-bold"
-          style={{ color: rawLight.text }}
+          className="text-sm font-body-sb text-center"
+          style={{ color: c.onAccent }}
         >
           {children}
         </Text>

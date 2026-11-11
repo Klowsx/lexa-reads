@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import type { ReactNode } from 'react'
 import {
   KeyboardAvoidingView,
@@ -36,6 +37,7 @@ export function OnboardingScreen({
   onSkip,
   busy
 }: Props) {
+  const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   const logout = useLogout()
   const locked = busy || logout.isPending
@@ -49,7 +51,10 @@ export function OnboardingScreen({
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
           flexGrow: 1,
-          paddingBottom: insets.bottom + 16
+          paddingBottom: insets.bottom + 16,
+          width: '100%',
+          maxWidth: 560,
+          alignSelf: 'center'
         }}
       >
         <OnboardHeader
@@ -80,7 +85,9 @@ export function OnboardingScreen({
           <View className="mt-3">
             <GhostButton disabled={locked} onPress={() => logout.mutate()}>
               <Text className="font-body text-t2 text-xs">
-                {logout.isPending ? 'Cerrando sesión…' : 'Usar otra cuenta'}
+                {logout.isPending
+                  ? t('stitch.authUser.signingOut')
+                  : t('stitch.authUser.anotherAccount')}
               </Text>
             </GhostButton>
           </View>
@@ -89,7 +96,7 @@ export function OnboardingScreen({
               accessibilityLiveRegion="polite"
               className="font-body text-error text-xs mt-2"
             >
-              No pudimos cerrar la sesión. Inténtalo de nuevo.
+              {t('stitch.authUser.logoutError')}
             </Text>
           )}
         </View>

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import * as Linking from 'expo-linking'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
@@ -9,6 +10,7 @@ import { useColors } from '~/theme/colors'
 
 // Consume el retorno de registro o recuperación y muestra una salida clara si el enlace no sirve.
 export default function AuthCallbackScreen() {
+  const { t } = useTranslation()
   const url = Linking.useLinkingURL()
   const router = useRouter()
   const { invalid } = useLocalSearchParams<{ invalid?: string }>()
@@ -17,9 +19,7 @@ export default function AuthCallbackScreen() {
 
   useEffect(() => {
     if (invalid === '1') {
-      setError(
-        'El enlace está incompleto, venció o ya fue utilizado. Puedes solicitar otro.'
-      )
+      setError(t('stitch.authUser.linkInvalid'))
       return
     }
     if (!url) return
@@ -42,31 +42,32 @@ export default function AuthCallbackScreen() {
     return () => {
       active = false
     }
-  }, [url, router, invalid])
+  }, [url, router, invalid, t])
 
   return (
     <AuthPage
-      title={error ? 'Necesitas otro enlace' : 'Abriendo Lexa'}
-      description={error ?? 'Estamos validando tu enlace seguro…'}
+      title={
+        error ? t('stitch.authUser.invalidLink') : t('stitch.authUser.opening')
+      }
+      description={error ?? t('stitch.authUser.validatingLink')}
     >
       {error ? (
         <View className="gap-3">
           <PrimaryButton onPress={() => router.replace('/(auth)/login')}>
-            Volver a iniciar sesión
+            {t('stitch.authUser.backLogin')}
           </PrimaryButton>
           <GhostButton
             onPress={() => router.replace('/(auth)/forgot-password')}
           >
             <Text className="font-body text-xs text-text">
-              Solicitar recuperación
+              {t('stitch.authUser.requestRecovery')}
             </Text>
           </GhostButton>
           <Text
             accessibilityLiveRegion="polite"
             className="font-body text-xs text-t2"
           >
-            Si estabas confirmando tu cuenta, puedes reenviar la confirmación
-            desde el inicio de sesión.
+            {t('stitch.authUser.confirmationHint')}
           </Text>
         </View>
       ) : (

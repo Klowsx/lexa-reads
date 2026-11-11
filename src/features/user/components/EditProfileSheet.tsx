@@ -107,24 +107,6 @@ export function EditProfileSheet({ user, onClose }: Props) {
             keyboardDismissMode="on-drag"
             contentContainerStyle={{ padding: 18, gap: 24 }}
           >
-            <View className="gap-3 border-b border-border pb-5">
-              <View className="min-h-12 flex-row items-center justify-between gap-3">
-                <Text className="font-body-sb text-sm text-text flex-1">
-                  {t('social.privateAccount')}
-                </Text>
-                <Switch
-                  value={isPrivate}
-                  onValueChange={setIsPrivate}
-                  disabled={isPending}
-                  accessibilityLabel={t('social.privateAccount')}
-                  trackColor={{ false: c.sh, true: c.accent }}
-                  thumbColor={c.text}
-                />
-              </View>
-              <Text className="font-body text-xs text-t2">
-                {t('social.privacyHint')}
-              </Text>
-            </View>
             <View className="flex-row items-center gap-3">
               <Avatar
                 displayName={name || user.display_name}
@@ -140,7 +122,7 @@ export function EditProfileSheet({ user, onClose }: Props) {
             <View className="gap-2">
               <Text
                 nativeID="profile-name-label"
-                className="font-body-sb text-xs text-text"
+                className="font-body-sb text-sm text-text"
               >
                 {t('editProfile.name')}
               </Text>
@@ -156,10 +138,11 @@ export function EditProfileSheet({ user, onClose }: Props) {
                 returnKeyType="next"
                 onFocus={() => setFocusedField('name')}
                 onBlur={() => setFocusedField(null)}
-                className="rounded-md bg-surface text-text font-body text-sm px-3 py-3 min-h-12"
+                className="rounded-md bg-surface text-text font-body text-base px-3 py-3 min-h-12"
                 style={{
                   borderWidth: 2,
-                  borderColor: focusedField === 'name' ? c.accent : c.border
+                  borderColor:
+                    focusedField === 'name' ? c.accent : 'transparent'
                 }}
                 placeholderTextColor={c.t2}
               />
@@ -167,7 +150,7 @@ export function EditProfileSheet({ user, onClose }: Props) {
             <View className="gap-2">
               <Text
                 nativeID="profile-bio-label"
-                className="font-body-sb text-xs text-text"
+                className="font-body-sb text-sm text-text"
               >
                 {t('editProfile.bio')}
               </Text>
@@ -176,7 +159,7 @@ export function EditProfileSheet({ user, onClose }: Props) {
                 onChangeText={setBio}
                 multiline
                 numberOfLines={3}
-                maxLength={160}
+                maxLength={300}
                 editable={!isPending}
                 accessibilityLabel={t('editProfile.bio')}
                 accessibilityLabelledBy="profile-bio-label"
@@ -184,20 +167,20 @@ export function EditProfileSheet({ user, onClose }: Props) {
                 placeholderTextColor={c.t2}
                 onFocus={() => setFocusedField('bio')}
                 onBlur={() => setFocusedField(null)}
-                className="rounded-md bg-surface text-text font-body text-sm px-3 py-3"
+                className="rounded-md bg-surface text-text font-body text-base px-3 py-3"
                 style={{
                   minHeight: 112,
                   textAlignVertical: 'top',
                   borderWidth: 2,
-                  borderColor: focusedField === 'bio' ? c.accent : c.border
+                  borderColor: focusedField === 'bio' ? c.accent : 'transparent'
                 }}
               />
               <Text className="font-body text-xs text-t2 text-right">
-                {bio.length}/160
+                {bio.length}/300
               </Text>
             </View>
             <View className="gap-3">
-              <Text className="font-body-sb text-xs text-text">
+              <Text className="font-body-sb text-sm text-text">
                 {t('editProfile.favoriteGenres')}
               </Text>
               <View className="flex-row flex-wrap gap-2">
@@ -226,22 +209,43 @@ export function EditProfileSheet({ user, onClose }: Props) {
                       }}
                       aria-checked={active}
                       aria-disabled={isPending}
-                      className="min-h-11 flex-row items-center gap-2 px-3 py-2 rounded-full border active:opacity-70"
+                      className="min-h-12 flex-row items-center gap-2 px-3 py-2 rounded-full border active:opacity-70"
                       style={{
-                        backgroundColor: active ? c.sr : 'transparent',
+                        backgroundColor: active ? c.accent : c.surface,
                         borderColor: active ? c.text : c.border
                       }}
                     >
                       {active ? (
-                        <Check size={16} color={c.text} strokeWidth={1.8} />
+                        <Check size={16} color={c.onAccent} strokeWidth={1.8} />
                       ) : null}
-                      <Text className="font-body text-xs text-text">
+                      <Text
+                        className="font-body text-sm"
+                        style={{ color: active ? c.onAccent : c.text }}
+                      >
                         {t(`profileGenres.${genre}`, { defaultValue: genre })}
                       </Text>
                     </Pressable>
                   )
                 })}
               </View>
+            </View>
+            <View className="gap-3 rounded-card bg-sr p-4">
+              <View className="min-h-12 flex-row items-center justify-between gap-3">
+                <Text className="font-body-sb text-sm text-text flex-1">
+                  {t('social.privateAccount')}
+                </Text>
+                <Switch
+                  value={isPrivate}
+                  onValueChange={setIsPrivate}
+                  disabled={isPending}
+                  accessibilityLabel={t('social.privateAccount')}
+                  trackColor={{ false: c.sh, true: c.accent }}
+                  thumbColor={c.text}
+                />
+              </View>
+              <Text className="font-body text-xs text-t2">
+                {t('social.privacyHint')}
+              </Text>
             </View>
           </ScrollView>
           <View className="px-container pt-3 border-t border-border gap-3">

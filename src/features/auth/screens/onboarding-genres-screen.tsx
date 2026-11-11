@@ -1,31 +1,21 @@
+import { useTranslation } from 'react-i18next'
 import { useRouter } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import { Pressable, Text, View } from 'react-native'
-import { PrimaryButton, alpha } from '~/features/auth/components'
+import { PrimaryButton } from '~/features/auth/components'
 import { useSaveOnboardingPreferences } from '~/features/auth/hooks/useOnboarding'
 import { useMe } from '~/features/user/hooks/useMe'
-import { cn } from '~/lib/utils'
+import {
+  normalizeProfileGenres,
+  PROFILE_GENRES
+} from '~/features/user/profile-genres'
 import { useColors } from '~/theme/colors'
 import { toAppError } from '~/types'
 import { OnboardingScreen } from '~/features/auth/components/onboarding-screen'
 
-const GENRES = [
-  { id: 'fantasia', label: 'Fantasía' },
-  { id: 'realismo', label: 'Realismo mágico' },
-  { id: 'dark', label: 'Dark Academia' },
-  { id: 'romance', label: 'Romance' },
-  { id: 'misterio', label: 'Misterio' },
-  { id: 'scifi', label: 'Ciencia ficción' },
-  { id: 'memorias', label: 'Memorias' },
-  { id: 'ensayo', label: 'Ensayo' },
-  { id: 'clasico', label: 'Clásicos' },
-  { id: 'historico', label: 'Histórico' },
-  { id: 'poesia', label: 'Poesía' },
-  { id: 'terror', label: 'Terror' }
-]
-
 // Permite elegir géneros y guardar este primer paso antes de continuar.
 export default function OnboardGenresScreen() {
+  const { t } = useTranslation()
   const router = useRouter()
   const c = useColors()
   const { data: profile } = useMe()
@@ -36,7 +26,7 @@ export default function OnboardGenresScreen() {
   // Recupera los géneros guardados si la persona cerró la aplicación antes de terminar.
   useEffect(() => {
     if (!profile || hasHydrated.current) return
-    setSelected(profile.favorite_genres ?? [])
+    setSelected(normalizeProfileGenres(profile.favorite_genres))
     hasHydrated.current = true
   }, [profile])
 
@@ -78,16 +68,16 @@ export default function OnboardGenresScreen() {
   return (
     <OnboardingScreen
       step={1}
-      title="¿Qué te gusta leer?"
-      description="Elige los géneros que te llaman. Puedes saltar este paso y añadirlos después en tu perfil."
+      title={t('stitch.authUser.genresTitle')}
+      description={t('stitch.authUser.genresIntro')}
       busy={savePreferences.isPending || !profile}
       onSkip={() => handleContinue('genres')}
       footer={
         <>
           <Text className="font-body text-t2 text-xs mb-4">
             {selected.length
-              ? `${selected.length} géneros elegidos`
-              : 'Sin prisa: tus gustos pueden cambiar.'}
+              ? t('stitch.authUser.selectedGenres', { count: selected.length })
+              : t('stitch.authUser.noRush')}
           </Text>
           {error && (
             <Text
@@ -102,7 +92,7 @@ export default function OnboardGenresScreen() {
             loading={savePreferences.isPending}
             onPress={() => handleContinue()}
           >
-            Continuar
+            {t('consent.continue')}
           </PrimaryButton>
           <Pressable
             accessibilityRole="button"
@@ -110,42 +100,42 @@ export default function OnboardGenresScreen() {
             onPress={() => handleContinue('all')}
             className="min-h-12 items-center justify-center mt-3 rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
           >
-            <Text className="font-body-md text-text text-xs text-center">
-              Dejar gustos y meta para después
+            <Text className="font-body-md text-text text-sm text-center">
+              {t('stitch.authUser.skipPreferences')}
             </Text>
           </Pressable>
         </>
       }
     >
       <View className="flex-row flex-wrap gap-2">
-        {GENRES.map((genre) => {
-          const selectedGenre = selected.includes(genre.id)
+        {PROFILE_GENRES.map((genre) => {
+          const selectedGenre = selected.includes(genre)
           return (
             <Pressable
-              key={genre.id}
-              onPress={() => toggle(genre.id)}
+              key={genre}
+              onPress={() => toggle(genre)}
               disabled={savePreferences.isPending}
-              className="min-h-11 justify-center py-2 px-[14px] rounded-full bg-surface border-[1.5px] border-border"
+              className="min-h-12 justify-center py-2 px-[14px] rounded-full bg-surface border-[1.5px] border-border"
               style={
                 selectedGenre
                   ? {
                       borderColor: c.accent,
-                      backgroundColor: alpha(c.accent, 0.14)
+                      backgroundColor: c.accent
                     }
                   : undefined
               }
               accessibilityRole="checkbox"
               accessibilityState={{ checked: selectedGenre }}
-              accessibilityLabel={genre.label}
+              accessibilityLabel={t(`profileGenres.${genre}`, {
+                defaultValue: genre
+              })}
             >
               <Text
-                className={cn(
-                  'font-body-md text-sm',
-                  selectedGenre ? 'text-text' : 'text-t2'
-                )}
+                className="font-body-md text-sm"
+                style={{ color: selectedGenre ? c.onAccent : c.t2 }}
               >
                 {selectedGenre ? '✓ ' : ''}
-                {genre.label}
+                {t(`profileGenres.${genre}`, { defaultValue: genre })}
               </Text>
             </Pressable>
           )

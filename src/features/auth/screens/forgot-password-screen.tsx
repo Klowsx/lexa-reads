@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Link } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, Text } from 'react-native'
@@ -7,18 +8,19 @@ import { useRequestResetPassword } from '~/features/auth/hooks/useResetPassword'
 
 // Solicita un enlace con mensajes neutros y una vuelta directa al inicio de sesión.
 export default function ForgotPasswordScreen() {
+  const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const { mutate: request, isPending, error } = useRequestResetPassword()
   return (
     <AuthPage
-      title="Retoma tus lecturas"
-      description="Escribe el correo de tu cuenta. Te enviaremos un enlace para elegir una contraseña nueva."
+      title={t('stitch.authUser.resumeReading')}
+      description={t('stitch.authUser.recoveryIntro')}
     >
       <AuthField
-        label="Correo"
+        label={t('stitch.authUser.email')}
         value={email}
         onChangeText={setEmail}
-        placeholder="tu@correo.com"
+        placeholder={t('stitch.authUser.emailPlaceholder')}
         keyboardType="email-address"
         autoCapitalize="none"
         textContentType="username"
@@ -37,12 +39,12 @@ export default function ForgotPasswordScreen() {
         loading={isPending}
         onPress={() => request({ email: email.trim() })}
       >
-        Enviar enlace
+        {t('stitch.authUser.sendLink')}
       </PrimaryButton>
       <Link href="/(auth)/login" replace asChild>
         <Pressable className="min-h-12 items-center justify-center mt-4">
-          <Text className="font-body-md text-text text-xs">
-            Volver a iniciar sesión
+          <Text className="font-body-md text-text text-sm">
+            {t('stitch.authUser.backLogin')}
           </Text>
         </Pressable>
       </Link>

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Link } from 'expo-router'
 import { Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -5,6 +6,7 @@ import { PrimaryButton, alpha } from '~/features/auth/components'
 import { useColors } from '~/theme/colors'
 
 export default function SuccessScreen() {
+  const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   const c = useColors()
 
@@ -31,15 +33,15 @@ export default function SuccessScreen() {
         </View>
 
         <Text className="font-display-sb text-text text-center mb-3 text-2xl tracking-[-0.3px]">
-          ¡Todo listo!
+          {t('stitch.authUser.allSet')}
         </Text>
         <Text className="font-body text-t2 text-sm leading-[22px] text-center mb-9 max-w-[280px]">
-          Tu contraseña ha sido actualizada. Ya puedes volver a iniciar sesión.
+          {t('stitch.authUser.resetSuccess')}
         </Text>
 
         <View className="w-full">
           <Link href="/(auth)/login" asChild>
-            <PrimaryButton>Iniciar sesión</PrimaryButton>
+            <PrimaryButton>{t('auth.login')}</PrimaryButton>
           </Link>
         </View>
       </View>

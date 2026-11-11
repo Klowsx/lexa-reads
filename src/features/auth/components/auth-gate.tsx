@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useEffect } from 'react'
 import { useRouter, useSegments } from 'expo-router'
 import { Text, View } from 'react-native'
@@ -11,6 +12,7 @@ import { SessionStatus } from './session-status'
 
 // Restringe las pantallas por sesión, recuperación y avance persistido del onboarding.
 export function AuthGate() {
+  const { t } = useTranslation()
   const session = useAuthStore((state) => state.session)
   const isRecoveryMode = useAuthStore((state) => state.isRecoveryMode)
   const segments = useSegments()
@@ -47,11 +49,10 @@ export function AuthGate() {
               accessibilityRole="header"
               className="font-display-sb text-lg text-text"
             >
-              Tu biblioteca sigue aquí
+              {t('stitch.authUser.libraryHere')}
             </Text>
             <Text className="font-body text-xs text-t2">
-              No pudimos cargar tu perfil. Revisa tu conexión y vuelve a
-              intentarlo.
+              {t('stitch.authUser.profileLoadError')}
             </Text>
             <PrimaryButton
               loading={profile.isFetching}
@@ -59,14 +60,14 @@ export function AuthGate() {
                 void profile.refetch()
               }}
             >
-              Volver a intentar
+              {t('stitch.authUser.retry')}
             </PrimaryButton>
             <GhostButton
               disabled={logout.isPending}
               onPress={() => logout.mutate()}
             >
               <Text className="font-body text-xs text-text">
-                Usar otra cuenta
+                {t('stitch.authUser.anotherAccount')}
               </Text>
             </GhostButton>
             {logout.error && (
@@ -74,7 +75,7 @@ export function AuthGate() {
                 accessibilityLiveRegion="polite"
                 className="font-body text-xs text-error"
               >
-                No pudimos cerrar la sesión. Inténtalo de nuevo.
+                {t('stitch.authUser.logoutError')}
               </Text>
             )}
           </View>

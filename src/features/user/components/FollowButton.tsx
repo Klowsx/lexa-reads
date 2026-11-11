@@ -5,6 +5,7 @@ import { ConfirmDialog } from '~/components/ui/ConfirmDialog'
 import { useAuthStore } from '~/stores/auth.store'
 import { useFollow } from '../hooks/useFollow'
 import { useProfile } from '../hooks/useProfile'
+import { useColors } from '~/theme/colors'
 
 // Comparte seguimiento persistido, cancelación, confirmación y errores entre perfiles y listados.
 export function FollowButton({
@@ -13,6 +14,7 @@ export function FollowButton({
   user: { id: string; username: string; is_private: boolean | null }
 }) {
   const { t } = useTranslation()
+  const c = useColors()
   const own = useAuthStore((s) => s.user?.id === user.id)
   const profile = useProfile(own ? '' : user.username)
   const { follow, unfollow, busy } = useFollow(user.id, user.username)
@@ -42,9 +44,13 @@ export function FollowButton({
         }
         accessibilityRole="button"
         accessibilityState={{ disabled: busy || profile.isPending, busy }}
-        className="min-h-12 justify-center items-center rounded-md border border-border bg-sr px-4 py-3 hover:bg-sh active:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+        className="min-h-12 justify-center items-center rounded-md px-4 py-3 active:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+        style={{ backgroundColor: status ? c.sr : c.accent }}
       >
-        <Text className="font-body-sb text-xs text-text">
+        <Text
+          className="font-body-sb text-sm"
+          style={{ color: status ? c.text : c.onAccent }}
+        >
           {t(
             busy
               ? 'common.loading'

@@ -46,7 +46,7 @@ export function ProfileStats({
   ]
 
   return (
-    <View className="mx-container mb-8 border-y border-border flex-row flex-wrap py-2">
+    <View className="mx-container mb-6 bg-surface rounded-card flex-row flex-wrap py-2">
       {stats.map(({ label, value, onPress }) => (
         <Pressable
           key={label}

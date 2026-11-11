@@ -30,20 +30,22 @@ export function SettingsItem({
         accessible={Boolean(onPress)}
         accessibilityRole={onPress ? 'button' : undefined}
         accessibilityLabel={onPress ? label : undefined}
-        className="min-h-12 flex-row items-center gap-3 px-4 py-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+        className="min-h-16 flex-row items-center gap-3 px-4 py-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
         style={({ pressed }) => ({
           backgroundColor: pressed && onPress ? c.sh : 'transparent'
         })}
       >
         <View className="flex-1 min-w-0">
           <Text
-            className="text-sm font-body-md"
+            className="text-sm font-body-sb"
             style={{ color: danger ? c.error : c.text }}
           >
             {label}
           </Text>
           {subtitle ? (
-            <Text className="text-xs font-body text-t3 mt-0.5">{subtitle}</Text>
+            <Text className="text-xs font-body text-t2 mt-1 leading-5">
+              {subtitle}
+            </Text>
           ) : null}
         </View>
         {trailing !== undefined ? (
@@ -52,7 +54,7 @@ export function SettingsItem({
           <ChevronRight size={16} color={c.t3} strokeWidth={1.6} />
         ) : null}
       </Pressable>
-      {separator && <View className="h-px bg-border opacity-70 mx-4" />}
+      {separator && <View className="h-px bg-border opacity-40 mx-4" />}
     </>
   )
 }

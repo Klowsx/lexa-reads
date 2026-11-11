@@ -96,7 +96,7 @@ export function ReportSheet({
                 onPress={onClose}
                 className="mt-2 py-2.5 px-8 rounded-md bg-accent"
               >
-                <Text className="text-xs font-body-sb text-white">
+                <Text className="text-xs font-body-sb text-on-accent">
                   {t('common.close')}
                 </Text>
               </Pressable>
@@ -199,9 +199,9 @@ export function ReportSheet({
                   }}
                 >
                   {report.isPending ? (
-                    <ActivityIndicator size="small" color="#fff" />
+                    <ActivityIndicator size="small" color={c.onAccent} />
                   ) : (
-                    <Text className="text-xs font-body-sb text-white">
+                    <Text className="text-xs font-body-sb text-on-accent">
                       {t('report.submit')}
                     </Text>
                   )}

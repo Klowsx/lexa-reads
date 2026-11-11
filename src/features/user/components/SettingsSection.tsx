@@ -6,13 +6,14 @@ interface Props {
   children: ReactNode
 }
 
+// Agrupa preferencias con las superficies tonales y el ritmo de secciones de Stitch.
 export function SettingsSection({ title, children }: Props) {
   return (
-    <View className="mt-[22px]">
-      <Text className="text-xs font-body-sb text-t3 tracking-widest uppercase px-4 mb-[7px]">
+    <View className="mt-6">
+      <Text className="text-lg font-display-sb text-text px-4 mb-3">
         {title}
       </Text>
-      <View className="mx-4 rounded-md border border-border bg-surface overflow-hidden">
+      <View className="mx-4 rounded-card bg-surface overflow-hidden">
         {children}
       </View>
     </View>

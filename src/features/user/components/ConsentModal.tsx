@@ -14,7 +14,7 @@ import {
   useNotificationPreferences,
   useUpsertNotificationPreferences
 } from '~/features/user/hooks/useNotificationPreferences'
-import { rawLight, useColors } from '~/theme/colors'
+import { useColors } from '~/theme/colors'
 import { SettingsToggle } from './SettingsToggle'
 
 const alpha = (hex: string, op: number) => {
@@ -128,11 +128,11 @@ export function ConsentModal() {
                 className="mt-5 min-h-12 py-3.5 rounded-md items-center justify-center bg-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-text"
               >
                 {upsert.isPending ? (
-                  <ActivityIndicator size="small" color={rawLight.text} />
+                  <ActivityIndicator size="small" color={c.onAccent} />
                 ) : (
                   <Text
                     className="text-xs font-body-sb"
-                    style={{ color: rawLight.text }}
+                    style={{ color: c.onAccent }}
                   >
                     {t('consent.continue')}
                   </Text>

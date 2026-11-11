@@ -220,7 +220,7 @@ export default function PublicProfileScreen() {
               </ProfileSectionBoundary>
             </>
           ) : (
-            <View className="mx-container py-6 items-center gap-3">
+            <View className="mx-container mb-8 p-6 items-center gap-4 bg-sr rounded-card">
               <Lock size={28} color={c.t2} />
               <Text className="font-display-sb text-lg text-text text-center">
                 {t('social.privateAccount')}
