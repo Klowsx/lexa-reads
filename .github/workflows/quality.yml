@@ -1,0 +1,49 @@
+name: Calidad
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  app:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm check:theme
+      - run: pnpm exec eslint app src scripts/generate-theme-tokens.mjs
+      - name: Comprueba el formato de los archivos del cambio
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          # Limita el formato al cambio; una rama nueva compara su último commit.
+          if ! git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
+            BASE_SHA="$(git rev-parse HEAD^)"
+          fi
+          mapfile -d '' files < <(git diff --name-only --diff-filter=ACMR -z "$BASE_SHA" HEAD -- '*.ts' '*.tsx' '*.js' '*.mjs' '*.json' '*.css' '*.md' '*.yml' '*.yaml')
+          if ((${#files[@]})); then pnpm exec prettier --check "${files[@]}"; fi
+      - name: Pruebas de la app sin credenciales de servidor
+        shell: bash
+        run: |
+          # Las suites RLS requieren una base real y no se presentan como cobertura local.
+          mapfile -t tests < <(rg --files src/__tests__ | rg -v 'rls\.test\.ts$')
+          pnpm exec jest --runInBand --runTestsByPath "${tests[@]}"
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: 2.9.6
+      - name: Contrato de eliminación de cuenta sin servicios reales
+        run: deno test --no-config --no-lock --allow-env=SUPABASE_URL,SUPABASE_ANON_KEY,SUPABASE_SERVICE_ROLE_KEY supabase/functions/delete-account/handler.test.ts
