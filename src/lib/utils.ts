@@ -1,4 +1,5 @@
 import { fixed } from '~/theme/colors'
+import i18n from '~/lib/i18n'
 
 /*
  * Utilidades generales
@@ -35,22 +36,22 @@ export function cn(...classes: (string | undefined | null | false)[]): string {
 /* ------------------------------------------------------------------ */
 
 /*
- * formatDate — fecha legible en español.
+ * formatDate — fecha legible en el idioma seleccionado en la aplicación.
  *
  * Recibe: Date, string ISO, o timestamp
  * Retorna: string tipo "15 de mayo de 2026"
  *
- * Usa Intl.DateTimeFormat con locale es-ES.
- * Si no hay fecha, retorna string vacío.
+ * Si no hay fecha o es inválida, retorna string vacío.
  */
 export function formatDate(
   date: Date | string | number | null | undefined
 ): string {
-  if (!date) return ''
+  if (date == null || date === '') return ''
   const d =
     typeof date === 'string' || typeof date === 'number' ? new Date(date) : date
 
-  return d.toLocaleDateString('es-ES', {
+  if (!Number.isFinite(d.getTime())) return ''
+  return d.toLocaleDateString(i18n.resolvedLanguage ?? i18n.language ?? 'es', {
     day: 'numeric',
     month: 'long',
     year: 'numeric'
@@ -61,28 +62,31 @@ export function formatDate(
  * formatRelativeTime — "hace 3 días", "ahora", etc.
  *
  * Útil para feeds y timestamps ubicuos.
- * Retorna string human-readable en español.
+ * Respeta el idioma de la aplicación y conserva el sentido de fechas futuras.
  */
 export function formatRelativeTime(
   date: Date | string | number | null | undefined
 ): string {
-  if (!date) return ''
+  if (date == null || date === '') return ''
   const d =
     typeof date === 'string' || typeof date === 'number' ? new Date(date) : date
 
-  const now = Date.now()
-  const diffMs = now - d.getTime()
-  const diffSec = Math.floor(diffMs / 1000)
-  const diffMin = Math.floor(diffSec / 60)
-  const diffHour = Math.floor(diffMin / 60)
-  const diffDay = Math.floor(diffHour / 24)
-  const diffMonth = Math.floor(diffDay / 30)
-
-  if (diffSec < 60) return 'ahora'
-  if (diffMin < 60) return `hace ${diffMin} min`
-  if (diffHour < 24) return `hace ${diffHour}h`
-  if (diffDay < 30) return `hace ${diffDay} día${diffDay > 1 ? 's' : ''}`
-  if (diffMonth < 12) return `hace ${diffMonth} mes${diffMonth > 1 ? 'es' : ''}`
+  if (!Number.isFinite(d.getTime())) return ''
+  const seconds = (d.getTime() - Date.now()) / 1000
+  const magnitude = Math.abs(seconds)
+  const formatter = new Intl.RelativeTimeFormat(
+    i18n.resolvedLanguage ?? i18n.language ?? 'es',
+    { numeric: 'auto', style: 'short' }
+  )
+  if (magnitude < 60) return formatter.format(0, 'second')
+  if (magnitude < 3600)
+    return formatter.format(Math.trunc(seconds / 60), 'minute')
+  if (magnitude < 86400)
+    return formatter.format(Math.trunc(seconds / 3600), 'hour')
+  if (magnitude < 2592000)
+    return formatter.format(Math.trunc(seconds / 86400), 'day')
+  if (magnitude < 31536000)
+    return formatter.format(Math.trunc(seconds / 2592000), 'month')
   return formatDate(d)
 }
 
