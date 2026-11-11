@@ -1,12 +1,14 @@
+import { StarRating } from '~/components/ui/StarRating'
 import { Image } from 'expo-image'
 import { useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { fixed } from '~/theme/colors'
+import { fixed, rawLight } from '~/theme/colors'
+import { fontFamily } from '~/theme/typography'
 import type { ReviewWithUser } from '~/features/book/book.queries'
 import { useTranslation } from 'react-i18next'
 
 const W = 320
-const BG = '#1C1208'
+const BG = rawLight.bg
 const MAX_REVIEW_CHARS = 280
 
 interface ReviewShareCardProps {
@@ -25,14 +27,14 @@ export function ReviewShareCard({
   bookId,
   onCoverReady
 }: ReviewShareCardProps) {
+  const { t } = useTranslation()
   const user = review.users ?? {
-    username: 'usuario',
+    username: t('stitch.catalog.reader'),
     display_name: null,
     avatar_url: null
   }
   const displayName = user.display_name ?? user.username
   const rating = (review as any).rating as number | null | undefined
-  const { t } = useTranslation()
   const [coverFailed, setCoverFailed] = useState(false)
   const body = review.contains_spoilers
     ? t('reviews.sharedSpoiler')
@@ -55,9 +57,6 @@ export function ReviewShareCard({
         if (!bookCoverUrl) onCoverReady?.(false)
       }}
     >
-      {/* Accent stripe */}
-      <View style={s.stripe} />
-
       {/* Reviewer header */}
       <View style={s.header}>
         <View style={s.avatarCircle}>
@@ -105,14 +104,7 @@ export function ReviewShareCard({
 
       {rating != null ? (
         <View style={s.ratingRow}>
-          {[1, 2, 3, 4, 5].map((i) => (
-            <Text
-              key={i}
-              style={[s.star, { color: rating >= i ? fixed.star : '#444' }]}
-            >
-              ★
-            </Text>
-          ))}
+          <StarRating rating={rating} size={18} />
         </View>
       ) : null}
 
@@ -142,14 +134,6 @@ const s = StyleSheet.create({
     paddingBottom: 44,
     overflow: 'hidden'
   },
-  stripe: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 3,
-    backgroundColor: fixed.accent
-  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -168,21 +152,21 @@ const s = StyleSheet.create({
   avatarText: {
     color: '#fff',
     fontSize: 14,
-    fontFamily: 'DMSans_600SemiBold'
+    fontFamily: fontFamily.sansSemiBold
   },
   headerMeta: {
     flex: 1,
     minWidth: 0
   },
   displayName: {
-    color: '#F0EAE2',
-    fontSize: 13,
-    fontFamily: 'DMSans_600SemiBold'
+    color: rawLight.text,
+    fontSize: 16,
+    fontFamily: fontFamily.sansSemiBold
   },
   username: {
-    color: 'rgba(240,234,226,0.4)',
+    color: rawLight.t2,
     fontSize: 11,
-    fontFamily: 'DMSans_400Regular'
+    fontFamily: fontFamily.sans
   },
   miniCover: {
     width: 36,
@@ -191,29 +175,25 @@ const s = StyleSheet.create({
     flexShrink: 0
   },
   bookTitle: {
-    color: 'rgba(240,234,226,0.6)',
+    color: rawLight.t2,
     fontSize: 12,
-    fontFamily: 'PlayfairDisplay_400Regular_Italic',
+    fontFamily: fontFamily.serifItalic,
     marginBottom: 6
   },
   ratingRow: {
     flexDirection: 'row',
     marginBottom: 10
   },
-  star: {
-    fontSize: 13,
-    marginRight: 2
-  },
   divider: {
     height: 1,
-    backgroundColor: 'rgba(240,234,226,0.08)',
+    backgroundColor: rawLight.border,
     marginBottom: 14
   },
   body: {
-    color: 'rgba(240,234,226,0.78)',
-    fontSize: 13,
-    fontFamily: 'DMSans_400Regular',
-    lineHeight: 21,
+    color: rawLight.t2,
+    fontSize: 16,
+    fontFamily: fontFamily.serif,
+    lineHeight: 25,
     marginBottom: 20
   },
   footer: {
@@ -229,11 +209,11 @@ const s = StyleSheet.create({
   brand: {
     color: fixed.accent,
     fontSize: 13,
-    fontFamily: 'PlayfairDisplay_400Regular_Italic'
+    fontFamily: fontFamily.serifItalic
   },
   url: {
-    color: 'rgba(240,234,226,0.25)',
+    color: rawLight.t2,
     fontSize: 9,
-    fontFamily: 'DMSans_400Regular'
+    fontFamily: fontFamily.sans
   }
 })

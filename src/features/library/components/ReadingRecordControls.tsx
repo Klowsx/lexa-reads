@@ -346,13 +346,13 @@ function ReadingDateForm({
               editable={!disabled}
               accessibilityLabel={label}
               aria-invalid={dirty && !!validation}
-              placeholder="AAAA-MM-DD"
+              placeholder={t('stitch.catalog.datePlaceholder')}
               placeholderTextColor={c.t2}
               autoCapitalize="none"
               autoCorrect={false}
               maxLength={10}
               keyboardType="numbers-and-punctuation"
-              className="min-h-12 rounded-md border border-border bg-bg px-3 py-3 font-body text-xs text-text outline-none focus:border-accent"
+              className="min-h-12 rounded-md border border-border bg-bg px-3 py-3 font-body text-base text-text outline-none focus:border-accent"
             />
             <View className="flex-row gap-3">
               <Pressable

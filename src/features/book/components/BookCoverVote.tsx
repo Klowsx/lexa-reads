@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Image } from 'expo-image'
 import { useTranslation } from 'react-i18next'
-import { Pressable, ScrollView, Text, View } from 'react-native'
+import { Pressable, Text, View } from 'react-native'
 import {
   bookCoverBallotOptions,
   proposeBookCover,
@@ -77,7 +77,7 @@ export function BookCoverVote({
 
   return (
     <View className="gap-3 border-b border-border px-container py-4">
-      <Text className="font-display-sb text-sm text-text">
+      <Text className="font-display-sb text-lg text-text">
         {t('book.coverVoteTitle')}
       </Text>
       <Text className="font-body text-xs text-t2">
@@ -104,54 +104,55 @@ export function BookCoverVote({
           {t('book.noCoverProposals')}
         </Text>
       )}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerClassName="gap-3"
-      >
+      <View className="gap-3">
         {(ballot.data ?? []).map((candidate) => (
-          <View key={candidate.id} className="w-28 gap-2">
+          <View
+            key={candidate.id}
+            className="flex-row items-center gap-5 rounded-card bg-surface p-4"
+          >
             <Image
               source={{ uri: candidate.cover_url }}
-              style={{ width: 112, height: 168, borderRadius: 5 }}
+              style={{ width: 88, height: 132, borderRadius: 6 }}
               contentFit="cover"
             />
-            <Text className="font-body text-xs text-t2">
-              {t('book.coverVotes', { count: candidate.votes })}
-            </Text>
-            {open && (
-              <Pressable
-                onPress={() => void castVote(candidate.id)}
-                disabled={vote.isPending || candidate.selected_by_me}
-                accessibilityRole="button"
-                accessibilityState={{
-                  selected: candidate.selected_by_me,
-                  disabled: vote.isPending
-                }}
-                className={
-                  candidate.selected_by_me
-                    ? 'min-h-11 items-center justify-center rounded-md bg-sr px-2'
-                    : 'min-h-11 items-center justify-center rounded-md bg-surface px-2'
-                }
-              >
-                <Text
+            <View className="flex-1 gap-4">
+              <Text className="font-display-sb text-lg text-text">
+                {t('book.coverVotes', { count: candidate.votes })}
+              </Text>
+              {open && (
+                <Pressable
+                  onPress={() => void castVote(candidate.id)}
+                  disabled={vote.isPending || candidate.selected_by_me}
+                  accessibilityRole="button"
+                  accessibilityState={{
+                    selected: candidate.selected_by_me,
+                    disabled: vote.isPending
+                  }}
                   className={
                     candidate.selected_by_me
-                      ? 'font-body-sb text-xs text-accent'
-                      : 'font-body-sb text-xs text-text'
+                      ? 'min-h-12 items-center justify-center rounded-full bg-sr px-4'
+                      : 'min-h-12 items-center justify-center rounded-full border border-border bg-bg px-4'
                   }
                 >
-                  {t(
-                    candidate.selected_by_me
-                      ? 'book.coverVoted'
-                      : 'book.coverVote'
-                  )}
-                </Text>
-              </Pressable>
-            )}
+                  <Text
+                    className={
+                      candidate.selected_by_me
+                        ? 'font-body-sb text-xs text-accent'
+                        : 'font-body-sb text-xs text-text'
+                    }
+                  >
+                    {t(
+                      candidate.selected_by_me
+                        ? 'book.coverVoted'
+                        : 'book.coverVote'
+                    )}
+                  </Text>
+                </Pressable>
+              )}
+            </View>
           </View>
         ))}
-      </ScrollView>
+      </View>
       {open && canPropose && (
         <Pressable
           onPress={() => void addCover()}

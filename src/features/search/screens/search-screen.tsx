@@ -1,3 +1,4 @@
+import { AppHeader } from '~/components/AppHeader'
 import { useState } from 'react'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { FlashList } from '@shopify/flash-list'
@@ -117,6 +118,7 @@ export default function SearchScreen() {
 
   return (
     <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
+      <AppHeader />
       <View className="w-full max-w-3xl flex-1 self-center">
         <View className="gap-3 px-container pb-3 pt-4">
           <Text
@@ -141,7 +143,7 @@ export default function SearchScreen() {
             !waiting &&
             books.length > 0 && (
               <View className="rounded-md border border-border bg-surface p-2">
-                <Text className="px-2 py-1 font-body-sb text-xs text-t2">
+                <Text className="px-2 py-1 font-body-sb text-sm text-t2">
                   {t('search.quickMatches')}
                 </Text>
                 {books.slice(0, 4).map((book) => (
@@ -156,13 +158,13 @@ export default function SearchScreen() {
                   >
                     <Text
                       numberOfLines={1}
-                      className="font-body-sb text-xs text-text"
+                      className="font-body-sb text-sm text-text"
                     >
                       {book.title}
                     </Text>
                     <Text
                       numberOfLines={1}
-                      className="font-body text-xs text-t2"
+                      className="font-body text-sm text-t2"
                     >
                       {book.authors?.join(', ')}
                     </Text>
@@ -177,7 +179,7 @@ export default function SearchScreen() {
                 onPress={openIsbnScanner}
                 accessibilityRole="button"
                 accessibilityLabel={t('search.scanIsbn')}
-                className="size-11 items-center justify-center rounded-md bg-surface active:bg-sr"
+                className="size-12 items-center justify-center rounded-md bg-surface active:bg-sr"
               >
                 <ScanLine size={20} color={c.accent} />
               </Pressable>
@@ -194,15 +196,15 @@ export default function SearchScreen() {
                 }
                 className={
                   activeFilters
-                    ? 'min-h-11 justify-center rounded-md bg-sr px-4'
-                    : 'min-h-11 justify-center rounded-md bg-surface px-4'
+                    ? 'min-h-12 justify-center rounded-md bg-sr px-4'
+                    : 'min-h-12 justify-center rounded-md bg-surface px-4'
                 }
               >
                 <Text
                   className={
                     activeFilters
-                      ? 'font-body-sb text-xs text-accent'
-                      : 'font-body-sb text-xs text-text'
+                      ? 'font-body-sb text-sm text-accent'
+                      : 'font-body-sb text-sm text-text'
                   }
                 >
                   {t('search.filters')}
@@ -213,9 +215,9 @@ export default function SearchScreen() {
                 <Pressable
                   onPress={() => setFilters(emptyCatalogFilters)}
                   accessibilityRole="button"
-                  className="min-h-11 justify-center px-2"
+                  className="min-h-12 justify-center px-2"
                 >
-                  <Text className="font-body-sb text-xs text-accent">
+                  <Text className="font-body-sb text-sm text-accent">
                     {t('search.clearFilters')}
                   </Text>
                 </Pressable>
@@ -229,6 +231,18 @@ export default function SearchScreen() {
             />
           )}
         </View>
+        {tab === 'books' && discover && (
+          <Pressable
+            onPress={openIsbnScanner}
+            accessibilityRole="button"
+            className="mx-container mb-4 flex-row items-center gap-3 rounded-card bg-sr p-4"
+          >
+            <ScanLine size={24} color={c.text} accessible={false} />
+            <Text className="flex-1 font-body text-sm leading-5 text-t2">
+              {t('stitch.catalog.scanHint')}
+            </Text>
+          </Pressable>
+        )}
         <FlashList<Item>
           data={items}
           renderItem={renderItem}
@@ -240,7 +254,7 @@ export default function SearchScreen() {
             items.length > 0 ? (
               <Text
                 accessibilityLiveRegion="polite"
-                className="mb-4 font-body text-xs text-t2"
+                className="mb-4 font-body text-sm text-t2"
               >
                 {tab === 'books'
                   ? t(discover ? 'search.inLexaNow' : 'search.booksLoaded', {

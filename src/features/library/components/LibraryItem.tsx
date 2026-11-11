@@ -33,7 +33,7 @@ export function LibraryItem({ item, itemWidth, onPress }: Props) {
       />
       <View className="mt-2" style={{ width: itemWidth }}>
         <Text
-          className="font-body-md text-xs text-text leading-tight"
+          className="font-display-sb text-base text-text leading-tight"
           numberOfLines={2}
         >
           {book.title}
@@ -43,7 +43,7 @@ export function LibraryItem({ item, itemWidth, onPress }: Props) {
         </Text>
         {item.rating != null && (
           <View className="mt-1">
-            <StarRating rating={item.rating} size={12} />
+            <StarRating rating={item.rating} size={16} />
           </View>
         )}
       </View>

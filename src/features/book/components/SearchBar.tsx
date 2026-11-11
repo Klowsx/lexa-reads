@@ -53,7 +53,7 @@ export function SearchBar({
         accessibilityRole="search"
         placeholderTextColor={c.t2}
         selectionColor={c.accent}
-        className="min-w-0 flex-1 py-3 font-body text-xs text-text web:outline-none"
+        className="min-w-0 flex-1 py-3 font-body text-base text-text web:outline-none"
         autoCapitalize="none"
         autoCorrect={false}
         returnKeyType="search"

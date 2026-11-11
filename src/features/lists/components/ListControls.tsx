@@ -63,7 +63,7 @@ export function ListHeader({
       </Pressable>
       <Text
         accessibilityRole="header"
-        className="flex-1 font-body-sb text-sm text-text"
+        className="flex-1 font-display-sb text-lg text-text"
       >
         {title}
       </Text>

@@ -56,7 +56,7 @@ export default function ScanIsbnScreen() {
           hitSlop={8}
           accessibilityRole="button"
           accessibilityLabel={t('common.back')}
-          className="size-11 items-center justify-center"
+          className="size-12 items-center justify-center"
         >
           <ChevronLeft size={24} color={c.text} />
         </Pressable>
@@ -98,7 +98,7 @@ export default function ScanIsbnScreen() {
           hitSlop={8}
           accessibilityRole="button"
           accessibilityLabel={t('common.back')}
-          className="size-11 items-center justify-center"
+          className="size-12 items-center justify-center"
         >
           <ChevronLeft size={24} color={c.text} />
         </Pressable>

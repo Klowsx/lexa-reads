@@ -31,7 +31,7 @@ export function SearchAction({
         disabled && 'opacity-50'
       )}
     >
-      <Text className="font-body-sb text-xs text-text">{label}</Text>
+      <Text className="font-body-sb text-sm text-text">{label}</Text>
     </Pressable>
   )
 }
@@ -47,7 +47,7 @@ export function SearchIconButton({
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={label}
-      className="h-12 w-12 shrink-0 items-center justify-center rounded-md hover:bg-sr active:bg-sr focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+      className="h-12 w-12 shrink-0 items-center justify-center rounded-full hover:bg-sr active:bg-sr focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
     >
       {children}
     </Pressable>
@@ -68,7 +68,7 @@ export function SearchTabs({
     { id: 'users', label: t('search.tabUsers') }
   ] as const
   return (
-    <View className="flex-row gap-1 rounded-md bg-surface p-1">
+    <View className="flex-row gap-1 rounded-full bg-surface p-1">
       {tabs.map(({ id, label }) => (
         <Pressable
           key={id}
@@ -77,24 +77,18 @@ export function SearchTabs({
           accessibilityState={{ selected: active === id }}
           aria-selected={active === id}
           className={cn(
-            'min-h-12 flex-1 items-center justify-center rounded-md px-2 py-2 active:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent',
+            'min-h-12 flex-1 items-center justify-center rounded-full px-4 py-2 active:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent',
             active === id ? 'bg-bg' : 'hover:bg-sr'
           )}
         >
           <Text
             className={cn(
-              'text-xs',
+              'text-sm',
               active === id ? 'font-body-sb text-text' : 'font-body text-t2'
             )}
           >
             {label}
           </Text>
-          <View
-            className={cn(
-              'mt-1 h-0.5 w-4 rounded-full',
-              active === id ? 'bg-accent' : 'bg-transparent'
-            )}
-          />
         </Pressable>
       ))}
     </View>

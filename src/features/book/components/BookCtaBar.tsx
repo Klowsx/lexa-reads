@@ -8,7 +8,8 @@ import {
 import { useTranslation } from 'react-i18next'
 import { Pressable, Text, View } from 'react-native'
 import { Skeleton } from '~/components/ui/Skeleton'
-import { fixed, useColors } from '~/theme/colors'
+import { StarRating } from '~/components/ui/StarRating'
+import { useColors } from '~/theme/colors'
 import { type BookStatus, STATUS_META } from '~/lib/book-status'
 import type { Tables } from '~/types/database'
 
@@ -51,7 +52,7 @@ export function BookCtaBar({
     : t('reading.add')
 
   return (
-    <View className="gap-2 px-container pb-4">
+    <View className="mx-container mb-5 gap-3 rounded-card bg-surface p-4">
       {isPending ? (
         <View
           accessibilityLabel={t('common.loading')}
@@ -65,10 +66,13 @@ export function BookCtaBar({
           onPress={onStatusPress}
           accessibilityRole="button"
           accessibilityLabel={`${statusLabel}. ${t('reading.manageStatus')}`}
-          className="min-h-14 flex-row items-center gap-3 rounded-md bg-sr px-4 py-3 active:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+          className="min-h-12 flex-row items-center gap-3 rounded-full bg-sr px-4 py-3 active:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
         >
           {status ? (
-            <BookOpen size={21} color={c.text} />
+            <BookOpen
+              size={21}
+              color={c.status[status === 'want_to_read' ? 'want' : status]}
+            />
           ) : (
             <Plus size={21} color={c.text} />
           )}
@@ -93,26 +97,26 @@ export function BookCtaBar({
           className="gap-2 py-2"
         >
           <View className="flex-row flex-wrap justify-between gap-2">
-            <Text className="font-body text-xs text-t2">
+            <Text className="font-body text-sm text-t2">
               {t('book.pageProgress', {
                 current: currentPage,
                 total: pageCount
               })}
             </Text>
-            <Text className="font-body-sb text-xs text-text">{progress}%</Text>
+            <Text className="font-body-sb text-sm text-text">{progress}%</Text>
           </View>
           <View className="h-1 rounded-full bg-sr overflow-hidden">
             <View
               className="h-full rounded-full"
               style={{
                 width: `${progress}%`,
-                backgroundColor: fixed.status.reading
+                backgroundColor: c.status.reading
               }}
             />
           </View>
         </View>
       )}
-      <View className="flex-row flex-wrap items-center justify-center gap-x-4">
+      <View className="flex-row flex-wrap items-center justify-between gap-x-4">
         <Pressable
           onPress={onRatingPress}
           disabled={isPending}
@@ -125,12 +129,12 @@ export function BookCtaBar({
           accessibilityState={{ disabled: isPending }}
           className="min-h-12 flex-row items-center justify-center gap-2 rounded-md px-3 py-2 active:bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
         >
-          <Star
-            size={19}
-            color={c.text}
-            fill={rating != null ? fixed.star : 'none'}
-          />
-          <Text className="font-body-md text-xs text-text">
+          {rating != null ? (
+            <StarRating rating={rating} size={18} />
+          ) : (
+            <Star size={19} color={c.text} fill="none" />
+          )}
+          <Text className="font-body-md text-sm text-text">
             {rating != null ? `${rating} / 5` : t('book.rate')}
           </Text>
         </Pressable>
@@ -141,7 +145,7 @@ export function BookCtaBar({
             className="min-h-12 flex-row items-center justify-center gap-2 rounded-md px-3 py-2 active:bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
           >
             <ListPlus size={20} color={c.text} />
-            <Text className="font-body-md text-xs text-text">
+            <Text className="font-body-md text-sm text-text">
               {t('reading.addToList')}
             </Text>
           </Pressable>

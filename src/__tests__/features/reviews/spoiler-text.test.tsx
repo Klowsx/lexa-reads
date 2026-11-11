@@ -4,6 +4,7 @@ import { ReviewShareCard } from '~/features/share/components/ReviewShareCard'
 import type { ReviewWithUser } from '~/features/book/book.queries'
 
 jest.mock('~/theme/colors', () => ({
+  ...jest.requireActual('~/theme/colors'),
   useColors: () => ({ text: '#111111' }),
   fixed: { accent: '#C4783A', star: '#E8C05A' }
 }))

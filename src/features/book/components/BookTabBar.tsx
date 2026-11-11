@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Pressable, ScrollView, Text, View } from 'react-native'
-import { fixed } from '~/theme/colors'
+import { useColors } from '~/theme/colors'
 
 const TAB_KEYS = [
   'book.tabs.summary',
@@ -18,6 +18,7 @@ interface BookTabBarProps {
 // Conserva etiquetas legibles y permite desplazar las pestañas cuando no caben.
 export function BookTabBar({ activeTab, onChange }: BookTabBarProps) {
   const { t } = useTranslation()
+  const c = useColors()
 
   return (
     <View className="bg-bg border-b border-border">
@@ -44,14 +45,14 @@ export function BookTabBar({ activeTab, onChange }: BookTabBarProps) {
                 className="min-h-14 grow shrink-0 items-center justify-center px-3 py-3 active:bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
                 style={{
                   borderBottomWidth: 2.5,
-                  borderBottomColor: active ? fixed.accent : 'transparent'
+                  borderBottomColor: active ? c.accent : 'transparent'
                 }}
               >
                 <Text
                   className={
                     active
-                      ? 'font-body-sb text-xs text-text'
-                      : 'font-body text-xs text-t2'
+                      ? 'font-body-sb text-sm text-text'
+                      : 'font-body text-sm text-t2'
                   }
                 >
                   {label}

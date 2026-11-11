@@ -200,7 +200,7 @@ function ListForm({
               editable={!mutation.isPending}
               placeholder={t('lists.nameExample')}
               placeholderTextColor={c.t2}
-              className="min-h-12 rounded-md border border-border bg-surface px-4 py-3 font-body text-sm text-text"
+              className="min-h-12 rounded-md border border-border bg-surface px-4 py-3 font-body text-base text-text"
             />
             <Text className="font-body text-xs text-t2">
               {name.trim().length > 0 && name.trim().length < 2
@@ -222,7 +222,7 @@ function ListForm({
               placeholder={t('lists.descPlaceholder')}
               placeholderTextColor={c.t2}
               style={{ minHeight: 116, textAlignVertical: 'top' }}
-              className="rounded-md border border-border bg-surface px-4 py-3 font-body text-sm text-text"
+              className="rounded-md border border-border bg-surface px-4 py-3 font-body text-base text-text"
             />
             <Text className="font-body text-xs text-t2">
               {description.length}/200

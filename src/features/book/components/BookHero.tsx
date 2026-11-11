@@ -39,7 +39,7 @@ export function BookHero({ book, onBack, onShare }: BookHeroProps) {
         )}
       </View>
       <View className="items-center px-container pt-2">
-        <BookCover book={book} width={132} height={198} />
+        <BookCover book={book} width={164} height={246} />
         <Text
           accessibilityRole="header"
           selectable
@@ -50,14 +50,15 @@ export function BookHero({ book, onBack, onShare }: BookHeroProps) {
         {!!book.authors?.length && (
           <Text
             selectable
-            className="mt-2 text-center font-body text-sm text-t2"
+            className="mt-2 text-center font-display-i text-md text-t2"
           >
             {book.authors.join(', ')}
           </Text>
         )}
-        {(!!book.page_count || !!book.published_year) && (
+        {(!!book.page_count || !!book.published_year || !!book.publisher) && (
           <Text className="mt-3 text-center font-body text-xs text-t2">
             {[
+              book.publisher,
               book.page_count
                 ? t('book.pagesLong', { count: book.page_count })
                 : null,
@@ -65,6 +66,14 @@ export function BookHero({ book, onBack, onShare }: BookHeroProps) {
             ]
               .filter(Boolean)
               .join(' · ')}
+          </Text>
+        )}
+        {!!book.isbn_13 && (
+          <Text
+            selectable
+            className="mt-2 text-center font-body text-xs text-t2"
+          >
+            {t('book.detail.isbn13')} {book.isbn_13}
           </Text>
         )}
       </View>

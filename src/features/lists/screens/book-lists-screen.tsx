@@ -67,10 +67,10 @@ export default function BookListsScreen() {
               paddingBottom: insets.bottom + 32
             }}
             ListHeaderComponent={
-              <View className="gap-4 pt-7 pb-5">
+              <View className="gap-4 py-5">
                 <Text
                   accessibilityRole="header"
-                  className="font-display text-xl text-text"
+                  className="rounded-card bg-surface p-4 font-display-sb text-xl text-text"
                 >
                   {bookTitle}
                 </Text>
@@ -117,7 +117,7 @@ export default function BookListsScreen() {
                   }}
                   disabled={busy}
                   onPress={() => toggle(item)}
-                  className="min-h-12 flex-row items-center gap-3 border-t border-border py-5 active:bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+                  className="mb-3 min-h-20 flex-row items-center gap-3 rounded-card bg-surface p-4 active:bg-sr focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
                 >
                   {cover ? (
                     <BookCover book={cover} width={40} height={60} />

@@ -4,6 +4,7 @@ import { Skeleton } from '~/components/ui/Skeleton'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ConfirmDialog } from '~/components/ui/ConfirmDialog'
+import { BookCover } from '~/components/ui/BookCover'
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router'
 import { useTranslation } from 'react-i18next'
 import { Controller, useForm } from 'react-hook-form'
@@ -240,16 +241,23 @@ export default function NewReviewScreen() {
             </Pressable>
           </View>
 
-          <View className="gap-3 px-container">
-            <Text className="font-display-sb text-lg text-text">
-              {bookQuery.data?.title}
-            </Text>
-            <Text className="font-body text-xs text-t2">
-              {bookQuery.data?.authors?.join(', ')}
-            </Text>
+          <View className="gap-5 px-container">
+            <View className="flex-row items-center gap-4 rounded-card bg-surface p-4">
+              {bookQuery.data && (
+                <BookCover book={bookQuery.data} width={60} height={90} />
+              )}
+              <View className="min-w-0 flex-1 gap-2">
+                <Text className="font-display-sb text-lg text-text">
+                  {bookQuery.data?.title}
+                </Text>
+                <Text className="font-body text-xs text-t2">
+                  {bookQuery.data?.authors?.join(', ')}
+                </Text>
+              </View>
+            </View>
             {/* ── Texto de la reseña ──────────────────────── */}
             <View className="mb-4">
-              <Text className="text-xs font-body-sb text-t3 uppercase tracking-widest mb-1.5">
+              <Text className="mb-3 font-display-sb text-md text-text">
                 {t('book.yourReview')}
               </Text>
 
@@ -270,7 +278,7 @@ export default function NewReviewScreen() {
                     numberOfLines={8}
                     placeholder={t('book.reviewPlaceholder')}
                     placeholderTextColor={c.t2}
-                    className="rounded-card bg-sr border text-text font-body text-sm px-[14px] py-3 min-h-[160px]"
+                    className="min-h-[280px] rounded-card border bg-surface px-4 py-4 font-display text-base leading-7 text-text"
                     style={{
                       // textAlignVertical top para que el cursor empiece arriba
                       textAlignVertical: 'top',

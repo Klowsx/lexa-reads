@@ -1,42 +1,24 @@
+import { StarRating } from '~/components/ui/StarRating'
 import { Image } from 'expo-image'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
-import { fixed } from '~/theme/colors'
+import { fixed, rawLight } from '~/theme/colors'
+import { fontFamily } from '~/theme/typography'
 import type { Tables } from '~/types/database'
 
 // Dimensiones fijas para la tarjeta de compartir — aspect ratio ~3:4
 const W = 320
-const H = 430
-const COVER_W = 110
-const COVER_H = 165
-const BG = '#1C1208'
+const H = 480
+const COVER_W = 120
+const COVER_H = 180
+const BG = rawLight.bg
 
 interface BookShareCardProps {
   book: Tables<'books'>
   rating?: number | null
   username?: string | null
   onCoverReady?: (imageFailed: boolean) => void
-}
-
-function Stars({ rating }: { rating: number }) {
-  return (
-    <View style={s.ratingRow}>
-      {[1, 2, 3, 4, 5].map((i) => {
-        const filled = rating >= i
-        const half = !filled && rating >= i - 0.5
-        return (
-          <Text
-            key={i}
-            style={[s.star, { color: filled || half ? fixed.star : '#444' }]}
-          >
-            {half ? '½' : '★'}
-          </Text>
-        )
-      })}
-      <Text style={s.ratingValue}>{rating.toFixed(1)}</Text>
-    </View>
-  )
 }
 
 // Notifica cuándo la portada o su alternativa ya se dibujaron para permitir una captura completa.
@@ -52,9 +34,6 @@ export function BookShareCard({
 
   return (
     <View style={s.card}>
-      {/* Accent stripe */}
-      <View style={s.stripe} />
-
       {/* Cover */}
       <View style={s.shadow}>
         {book.cover_url && !coverFailed ? (
@@ -87,7 +66,12 @@ export function BookShareCard({
         </Text>
       ) : null}
 
-      {rating != null && <Stars rating={rating} />}
+      {rating != null && (
+        <View style={s.ratingRow}>
+          <StarRating rating={rating} size={18} />
+          <Text style={s.ratingValue}>{rating.toFixed(1)}</Text>
+        </View>
+      )}
 
       {username ? (
         <Text style={s.username}>
@@ -115,20 +99,12 @@ const s = StyleSheet.create({
     paddingBottom: 44,
     overflow: 'hidden'
   },
-  stripe: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 3,
-    backgroundColor: fixed.accent
-  },
   shadow: {
     shadowColor: '#000',
-    shadowOpacity: 0.85,
-    shadowRadius: 24,
-    shadowOffset: { width: 0, height: 14 },
-    elevation: 18,
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
     marginBottom: 20
   },
   cover: {
@@ -137,29 +113,29 @@ const s = StyleSheet.create({
     borderRadius: 5
   },
   coverFallback: {
-    backgroundColor: '#3D2B1F',
+    backgroundColor: rawLight.sr,
     justifyContent: 'flex-end',
     padding: 8
   },
   coverText: {
-    color: 'rgba(240,234,226,0.82)',
+    color: rawLight.t2,
     fontSize: 9,
-    fontFamily: 'PlayfairDisplay_400Regular',
+    fontFamily: fontFamily.serif,
     lineHeight: 13
   },
   title: {
-    color: '#F0EAE2',
-    fontSize: 17,
-    fontFamily: 'PlayfairDisplay_600SemiBold',
+    color: rawLight.text,
+    fontSize: 22,
+    fontFamily: fontFamily.serifSemiBold,
     textAlign: 'center',
     letterSpacing: -0.3,
-    lineHeight: 23,
+    lineHeight: 28,
     marginBottom: 5
   },
   author: {
-    color: 'rgba(240,234,226,0.5)',
-    fontSize: 12,
-    fontFamily: 'DMSans_400Regular',
+    color: rawLight.t2,
+    fontSize: 14,
+    fontFamily: fontFamily.sans,
     textAlign: 'center',
     marginBottom: 10
   },
@@ -168,20 +144,16 @@ const s = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 6
   },
-  star: {
-    fontSize: 15,
-    marginHorizontal: 1
-  },
   ratingValue: {
-    color: 'rgba(240,234,226,0.5)',
+    color: rawLight.t2,
     fontSize: 11,
-    fontFamily: 'DMSans_400Regular',
+    fontFamily: fontFamily.sans,
     marginLeft: 5
   },
   username: {
-    color: 'rgba(240,234,226,0.35)',
+    color: rawLight.t2,
     fontSize: 11,
-    fontFamily: 'DMSans_400Regular',
+    fontFamily: fontFamily.sans,
     marginTop: 2
   },
   footer: {
@@ -197,12 +169,12 @@ const s = StyleSheet.create({
   brand: {
     color: fixed.accent,
     fontSize: 14,
-    fontFamily: 'PlayfairDisplay_400Regular_Italic',
+    fontFamily: fontFamily.serifItalic,
     letterSpacing: 0.4
   },
   url: {
-    color: 'rgba(240,234,226,0.25)',
+    color: rawLight.t2,
     fontSize: 9,
-    fontFamily: 'DMSans_400Regular'
+    fontFamily: fontFamily.sans
   }
 })

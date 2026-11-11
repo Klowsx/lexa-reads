@@ -29,7 +29,7 @@ import { SharePreviewSheet } from '~/features/share/components/SharePreviewSheet
 import { bookCommunityStatsQueryOptions } from '../book.queries'
 import { useAuthStore } from '~/stores/auth.store'
 import { meQueryOptions } from '~/features/user/user.queries'
-import { fixed, useColors } from '~/theme/colors'
+import { useColors } from '~/theme/colors'
 import { formatRelativeTime } from '~/lib/utils'
 import type { Tables } from '~/types/database'
 import type { ReviewWithUser } from '../book.queries'
@@ -49,7 +49,7 @@ function RatingBar({ star, pct }: { star: number; pct: number }) {
   return (
     <View className="flex-row items-center gap-[7px] py-1">
       <Text
-        className="font-body text-xs"
+        className="font-body text-sm"
         style={{
           color: c.t2,
           width: 8,
@@ -63,12 +63,12 @@ function RatingBar({ star, pct }: { star: number; pct: number }) {
           className="h-full rounded-full"
           style={{
             width: `${pct}%`,
-            backgroundColor: fixed.star
+            backgroundColor: c.star
           }}
         />
       </View>
       <Text
-        className="font-body text-xs"
+        className="font-body text-sm"
         style={{ color: c.t2, width: 36, textAlign: 'left' }}
       >
         {pct}%
@@ -107,7 +107,7 @@ function ReviewCard({
   // El usuario puede no estar disponible si la FK falla — fallback a datos básicos.
   const user = review.users ?? {
     id: review.user_id,
-    username: 'usuario',
+    username: t('stitch.catalog.reader'),
     display_name: null,
     avatar_url: null
   }
@@ -118,25 +118,25 @@ function ReviewCard({
       <View className="flex-row items-start gap-2.5 mb-2.5">
         <UserAvatar user={user} size={30} />
         <View className="flex-1">
-          <Text className="font-body-sb text-xs text-text">
+          <Text className="font-body-sb text-base text-text">
             {user.display_name ?? user.username}
           </Text>
-          <Text className="font-body text-xs text-t3">@{user.username}</Text>
+          <Text className="font-body text-sm text-t3">@{user.username}</Text>
         </View>
         <View className="items-end gap-1">
-          <Text className="font-body text-xs text-t3">
+          <Text className="font-body text-sm text-t3">
             {formatRelativeTime(review.created_at)}
           </Text>
           {review.edited_at && (
             <View
               className="rounded-full px-2 py-0.5"
               style={{
-                backgroundColor: alpha(fixed.accent, 0.12),
+                backgroundColor: alpha(c.accent, 0.12),
                 borderWidth: 1,
-                borderColor: alpha(fixed.accent, 0.3)
+                borderColor: alpha(c.accent, 0.3)
               }}
             >
-              <Text className="font-body-md text-accent text-[10px]">
+              <Text className="font-body-md text-accent text-xs">
                 {t('reviews.edited')}
               </Text>
             </View>
@@ -154,7 +154,7 @@ function ReviewCard({
 
       {/* Footer: acciones */}
       <View
-        className="flex-row gap-4 pt-2.5 border-t"
+        className="flex-row flex-wrap gap-x-3 pt-2.5 border-t"
         style={{ borderTopColor: alpha(c.border, 0.5) }}
       >
         {isOwn ? (
@@ -162,19 +162,21 @@ function ReviewCard({
           <>
             <TouchableOpacity
               onPress={onEdit}
-              className="flex-row items-center gap-[5px]"
+              accessibilityRole="button"
+              className="min-h-12 min-w-12 flex-row items-center justify-center gap-2"
             >
-              <Pencil size={13} color={c.t3} strokeWidth={1.8} />
-              <Text className="font-body text-xs text-t3">
+              <Pencil size={18} color={c.t3} strokeWidth={1.8} />
+              <Text className="font-body text-sm text-t3">
                 {t('common.edit')}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={onDelete}
-              className="flex-row items-center gap-[5px]"
+              accessibilityRole="button"
+              className="min-h-12 min-w-12 flex-row items-center justify-center gap-2"
             >
-              <Trash2 size={13} color={c.error} strokeWidth={1.8} />
-              <Text className="font-body text-xs text-error">
+              <Trash2 size={18} color={c.error} strokeWidth={1.8} />
+              <Text className="font-body text-sm text-error">
                 {t('common.delete')}
               </Text>
             </TouchableOpacity>
@@ -184,18 +186,23 @@ function ReviewCard({
           <>
             <TouchableOpacity
               onPress={() => toggle()}
+              accessibilityLabel={t(liked ? 'feed.unlike' : 'feed.like', {
+                count
+              })}
+              accessibilityState={{ disabled: isPending, selected: liked }}
               disabled={isPending}
-              className="flex-row items-center gap-[5px]"
+              accessibilityRole="button"
+              className="min-h-12 min-w-12 flex-row items-center justify-center gap-2"
             >
               <Heart
-                size={14}
-                color={liked ? fixed.accent : c.t3}
-                fill={liked ? fixed.accent : 'transparent'}
+                size={18}
+                color={liked ? c.error : c.t3}
+                fill={liked ? c.error : 'transparent'}
                 strokeWidth={1.8}
               />
               <Text
-                className="font-body text-xs"
-                style={{ color: liked ? fixed.accent : c.t3 }}
+                className="font-body text-sm"
+                style={{ color: liked ? c.error : c.t3 }}
               >
                 {count}
               </Text>
@@ -207,10 +214,11 @@ function ReviewCard({
                   params: { id: review.id, type: 'review' }
                 } as any)
               }
-              className="flex-row items-center gap-[5px]"
+              accessibilityRole="button"
+              className="min-h-12 min-w-12 flex-row items-center justify-center gap-2"
             >
-              <MessageCircle size={14} color={c.t3} strokeWidth={1.8} />
-              <Text className="font-body text-xs text-t3">
+              <MessageCircle size={18} color={c.t3} strokeWidth={1.8} />
+              <Text className="font-body text-sm text-t3">
                 {t('reviews.reply')}
               </Text>
             </TouchableOpacity>
@@ -228,7 +236,7 @@ function ReviewCard({
             className="min-h-12 flex-row items-center gap-2"
           >
             <MessageCircle size={18} color={c.text} />
-            <Text className="font-body text-xs text-text">
+            <Text className="font-body text-sm text-text">
               {t('comments.title')}
             </Text>
           </Pressable>
@@ -236,9 +244,11 @@ function ReviewCard({
         {/* Botón compartir — disponible en reseñas propias y ajenas */}
         <TouchableOpacity
           onPress={onShare}
-          className="ml-auto flex-row items-center gap-[5px]"
+          accessibilityRole="button"
+          accessibilityLabel={t('common.share')}
+          className="ml-auto min-h-12 min-w-12 flex-row items-center justify-center gap-2"
         >
-          <Share2 size={13} color={c.t3} strokeWidth={1.8} />
+          <Share2 size={18} color={c.t3} strokeWidth={1.8} />
         </TouchableOpacity>
       </View>
     </View>
@@ -260,7 +270,7 @@ export function BookReviewsTab({
   onWriteReview
 }: BookReviewsTabProps) {
   const c = useColors()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const userId = useAuthStore((s) => s.user?.id ?? '')
   const { data: ownProfile } = useQuery(meQueryOptions(userId))
@@ -311,13 +321,18 @@ export function BookReviewsTab({
         <View className="m-container mb-0 bg-surface rounded-card p-4 border border-border flex-row gap-container items-start">
           <View className="items-center shrink-0">
             <Text className="font-display-bold text-3xl text-star leading-[48px]">
-              {avgRating > 0 ? avgRating.toFixed(1) : '—'}
+              {avgRating > 0
+                ? avgRating.toLocaleString(i18n.language, {
+                    minimumFractionDigits: 1,
+                    maximumFractionDigits: 1
+                  })
+                : '—'}
             </Text>
             <View className="mt-[5px]">
               <StarRating rating={avgRating} size={12} />
             </View>
-            <Text className="font-body text-xs text-t3 mt-[5px] text-center leading-[14px]">
-              {`${ratingsCount.toLocaleString()}\n${t('reviews.ratings')}`}
+            <Text className="font-body text-sm text-t3 mt-[5px] text-center leading-[20px]">
+              {`${ratingsCount.toLocaleString(i18n.language)}\n${t('reviews.ratings')}`}
             </Text>
           </View>
           <View className="flex-1 pt-1">
@@ -365,7 +380,7 @@ export function BookReviewsTab({
         <View className="gap-2 px-container">
           <Text
             accessibilityRole="alert"
-            className="font-body text-xs text-text"
+            className="font-body text-sm text-text"
           >
             {t('reviews.loadError')}
           </Text>
@@ -413,7 +428,7 @@ export function BookReviewsTab({
         {/* Estado vacío */}
         {!isLoading && !isError && otherReviews.length === 0 && !myReview && (
           <View className="items-center py-8">
-            <Text className="font-body text-xs text-t3 text-center">
+            <Text className="font-body text-sm text-t3 text-center">
               {t('reviews.beFirst')}
             </Text>
           </View>

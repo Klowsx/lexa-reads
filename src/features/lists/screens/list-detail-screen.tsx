@@ -112,13 +112,16 @@ export default function ListDetailScreen() {
             ListHeaderComponent={
               <View className="gap-5 pt-7 pb-5">
                 {!searching && list.items.length > 0 && (
-                  <View className="flex-row gap-3" aria-hidden>
+                  <View
+                    className="flex-row justify-center gap-5 rounded-card bg-sr py-6"
+                    aria-hidden
+                  >
                     {list.items.slice(0, 3).map((i) => (
                       <BookCover
                         key={i.id}
                         book={i.book}
-                        width={66}
-                        height={99}
+                        width={84}
+                        height={126}
                       />
                     ))}
                   </View>
@@ -205,7 +208,7 @@ export default function ListDetailScreen() {
                         onChangeText={setText}
                         placeholder={t('lists.searchBooks')}
                         placeholderTextColor={c.t2}
-                        className="min-h-12 flex-1 px-3 py-3 font-body text-xs text-text"
+                        className="min-h-12 flex-1 px-3 py-3 font-body text-base text-text"
                         returnKeyType="search"
                       />
                       {!!text && (
@@ -250,7 +253,7 @@ export default function ListDetailScreen() {
               const item = list.items.find((i) => i.book.id === book.id),
                 added = membership.has(book.id)
               return (
-                <View className="flex-row items-center gap-3 border-t border-border py-4">
+                <View className="mb-3 flex-row items-center gap-3 rounded-card bg-surface p-4">
                   <View className="flex-1 min-w-0">
                     <Pressable
                       accessibilityRole="button"
@@ -266,7 +269,7 @@ export default function ListDetailScreen() {
                       <BookCover book={book} width={56} height={84} />
                       <View className="flex-1 gap-1">
                         <Text
-                          className="font-body-sb text-sm text-text"
+                          className="font-display-sb text-lg text-text"
                           numberOfLines={3}
                         >
                           {book.title}

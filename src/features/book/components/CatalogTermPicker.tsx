@@ -122,7 +122,7 @@ export function CatalogTermPicker({
                 accessibilityLabel={t('createBook.removeTerm', {
                   value: label
                 })}
-                className="min-h-11 justify-center rounded-full bg-sr px-4"
+                className="min-h-12 justify-center rounded-full bg-sr px-4"
               >
                 <Text className="font-body-sb text-xs text-accent">
                   {label} ×
@@ -144,7 +144,7 @@ export function CatalogTermPicker({
         placeholderTextColor={c.t2}
         maxLength={60}
         returnKeyType="done"
-        className="min-h-14 rounded-md border border-border bg-surface px-4 font-body text-xs text-text"
+        className="min-h-14 rounded-md border border-border bg-surface px-4 font-body text-base text-text"
       />
       {!!query && (
         <View className="overflow-hidden rounded-md border border-border bg-surface">
@@ -158,7 +158,7 @@ export function CatalogTermPicker({
                 key={facet.value}
                 onPress={() => add(facet.value)}
                 accessibilityRole="button"
-                className="min-h-11 justify-center border-b border-border px-4"
+                className="min-h-12 justify-center border-b border-border px-4"
               >
                 <Text className="font-body text-xs text-text">{label}</Text>
               </Pressable>
@@ -168,7 +168,7 @@ export function CatalogTermPicker({
             <Pressable
               onPress={() => add(input)}
               accessibilityRole="button"
-              className="min-h-11 justify-center px-4"
+              className="min-h-12 justify-center px-4"
             >
               <Text className="font-body-sb text-xs text-accent">
                 {t('createBook.addTerm', { value: input.trim() })}

@@ -23,7 +23,7 @@ export function LibraryTabs({ activeTab, countByStatus, onTabChange }: Props) {
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      className="border-b border-border"
+      className="rounded-full bg-surface"
       contentContainerStyle={{ flexGrow: 1 }}
     >
       {TABS.map(({ status, labelKey }) => {
@@ -37,8 +37,8 @@ export function LibraryTabs({ activeTab, countByStatus, onTabChange }: Props) {
             accessibilityLabel={t(labelKey)}
             accessibilityState={{ selected: active }}
             className={cn(
-              'min-h-12 flex-1 items-center justify-center border-b-2 px-3 py-3 hover:bg-surface focus-visible:outline focus-visible:outline-accent',
-              active ? 'border-accent' : 'border-transparent'
+              'min-h-12 flex-1 flex-row items-center justify-center gap-2 rounded-full px-4 py-3 hover:bg-sr focus-visible:outline focus-visible:outline-accent',
+              active ? 'bg-sr' : 'bg-transparent'
             )}
           >
             <Text
@@ -48,16 +48,16 @@ export function LibraryTabs({ activeTab, countByStatus, onTabChange }: Props) {
                   : 'font-body text-sm text-t2'
               }
             >
-              {countByStatus?.[status] ?? '…'}
+              {t(labelKey)}
             </Text>
             <Text
               className={
                 active
-                  ? 'font-body-sb text-xs text-text'
-                  : 'font-body text-xs text-t2'
+                  ? 'font-body-sb text-sm text-text'
+                  : 'font-body text-sm text-t2'
               }
             >
-              {t(labelKey)}
+              {countByStatus?.[status] ?? '…'}
             </Text>
           </Pressable>
         )

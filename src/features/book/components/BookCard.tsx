@@ -23,15 +23,18 @@ export function BookCard({ book, onPress, onQuickPeek }: Props) {
     .filter(Boolean)
     .join(' · ')
   return (
-    <View className="mb-5 flex-row items-start gap-1">
+    <View className="mb-4 flex-row items-center gap-1 rounded-card bg-surface p-3">
       <Pressable
         onPress={onPress}
         accessibilityRole="button"
         accessibilityLabel={t('search.openBook', { title: book.title })}
         className="min-w-0 flex-1 flex-row gap-4 rounded-md py-1 hover:bg-surface active:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
       >
-        <BookCover book={book} width={72} height={108} />
+        <BookCover book={book} width={80} height={120} />
         <View className="min-w-0 flex-1 gap-1">
+          {metadata ? (
+            <Text className="font-body text-xs text-t2">{metadata}</Text>
+          ) : null}
           <Text
             className="font-display-sb text-base text-text"
             numberOfLines={2}
@@ -41,11 +44,8 @@ export function BookCard({ book, onPress, onQuickPeek }: Props) {
           <Text className="font-body text-xs text-t2" numberOfLines={2}>
             {book.authors?.join(', ') || t('book.unknownAuthor')}
           </Text>
-          {metadata ? (
-            <Text className="font-body text-xs text-t2">{metadata}</Text>
-          ) : null}
           {book.genres?.[0] ? (
-            <Text className="font-body text-xs text-t2" numberOfLines={1}>
+            <Text className="mt-3 font-body text-xs text-t2" numberOfLines={1}>
               {book.genres[0]}
             </Text>
           ) : null}

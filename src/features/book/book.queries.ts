@@ -117,7 +117,7 @@ export const reviewBookQueryOptions = (bookId: string) =>
     queryFn: async () => {
       const { data, error } = await supabase
         .from('books')
-        .select('id, title, authors')
+        .select('id, title, authors, cover_url')
         .eq('id', bookId)
         .single()
       if (error) throw error

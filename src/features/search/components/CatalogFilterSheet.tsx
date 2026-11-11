@@ -115,7 +115,7 @@ export function CatalogFilterSheet({
               key === 'genre' ? 'search.findCategory' : 'search.findTag'
             )}
             placeholderTextColor={c.t2}
-            className="min-h-12 rounded-md border border-border bg-bg px-4 font-body text-xs text-text"
+            className="min-h-12 rounded-md border border-border bg-bg px-4 font-body text-base text-text"
           />
           {facets.isLoading ? (
             <Text className="font-body text-xs text-t2">
@@ -124,7 +124,7 @@ export function CatalogFilterSheet({
           ) : facets.isError ? (
             <Pressable
               onPress={() => void facets.refetch()}
-              className="min-h-11 justify-center"
+              className="min-h-12 justify-center"
             >
               <Text className="font-body-sb text-xs text-accent">
                 {t('common.retry')}
@@ -151,8 +151,8 @@ export function CatalogFilterSheet({
                     }}
                     className={
                       selected.includes(facet.value)
-                        ? 'min-h-11 justify-center rounded-full bg-sr px-4'
-                        : 'min-h-11 justify-center rounded-full bg-bg px-4'
+                        ? 'min-h-12 justify-center rounded-full bg-sr px-4'
+                        : 'min-h-12 justify-center rounded-full bg-bg px-4'
                     }
                   >
                     <Text
@@ -198,7 +198,7 @@ export function CatalogFilterSheet({
               placeholder={label}
               accessibilityLabel={label}
               placeholderTextColor={c.t2}
-              className="min-h-12 flex-1 rounded-md border border-border bg-bg px-4 font-body text-xs text-text"
+              className="min-h-12 flex-1 rounded-md border border-border bg-bg px-4 font-body text-base text-text"
             />
           ))}
         </View>
@@ -231,7 +231,7 @@ export function CatalogFilterSheet({
           accessibilityState={{ disabled: invalidYear }}
           className="min-h-12 flex-1 items-center justify-center rounded-md bg-accent px-4 disabled:opacity-50"
         >
-          <Text className="font-body-sb text-xs text-white">
+          <Text className="font-body-sb text-xs text-on-accent">
             {t('search.applyFilters')}
           </Text>
         </Pressable>

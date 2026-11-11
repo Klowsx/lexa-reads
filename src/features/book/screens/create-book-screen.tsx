@@ -134,10 +134,10 @@ export default function CreateBookScreen() {
         >
           {t('createBook.title')}
         </Text>
-        <Text className="font-body text-xs text-t2">
+        <Text className="rounded-card bg-sr p-4 font-body text-sm leading-6 text-t2">
           {t('createBook.sharedHint')}
         </Text>
-        <View className="gap-3">
+        <View className="gap-4">
           {(
             [
               ['title', title, setTitle, t('createBook.bookTitle')],
@@ -155,7 +155,7 @@ export default function CreateBookScreen() {
                 maxLength={key === 'title' ? 500 : key === 'isbn' ? 20 : 200}
                 placeholder={label}
                 placeholderTextColor={c.t2}
-                className="min-h-14 rounded-md border border-border bg-surface px-4 font-body text-xs text-text"
+                className="min-h-14 rounded-md border border-border bg-surface px-4 font-body text-base text-text"
               />
               {key === 'title' && matches.data && matches.data.length > 0 && (
                 <View className="gap-3 rounded-md border border-border bg-surface p-2">
@@ -219,7 +219,7 @@ export default function CreateBookScreen() {
           <Pressable
             onPress={() => void facets.refetch()}
             accessibilityRole="button"
-            className="min-h-11 justify-center"
+            className="min-h-12 justify-center"
           >
             <Text className="font-body-sb text-xs text-accent">
               {t('common.retry')}
@@ -227,7 +227,7 @@ export default function CreateBookScreen() {
           </Pressable>
         )}
         <View className="gap-3">
-          <Text className="font-body-sb text-xs text-text">
+          <Text className="font-display-sb text-lg text-text">
             {t('createBook.descriptionHint')}
           </Text>
           {(
@@ -247,13 +247,13 @@ export default function CreateBookScreen() {
                 placeholder={label}
                 placeholderTextColor={c.t2}
                 textAlignVertical="top"
-                className="min-h-28 rounded-md border border-border bg-surface px-4 py-3 font-body text-xs text-text"
+                className="min-h-28 rounded-md border border-border bg-surface px-4 py-3 font-body text-base text-text"
               />
             </View>
           ))}
         </View>
         <View className="gap-2">
-          <Text className="font-body-sb text-xs text-text">
+          <Text className="font-display-sb text-lg text-text">
             {t('createBook.publishedYear')}
           </Text>
           <TextInput
@@ -264,7 +264,7 @@ export default function CreateBookScreen() {
             maxLength={4}
             placeholder={t('createBook.publishedYear')}
             placeholderTextColor={c.t2}
-            className="min-h-14 rounded-md border border-border bg-surface px-4 font-body text-xs text-text"
+            className="min-h-14 rounded-md border border-border bg-surface px-4 font-body text-base text-text"
           />
         </View>
         <View className="gap-3">
@@ -320,7 +320,7 @@ export default function CreateBookScreen() {
           accessibilityState={{ disabled: createBook.isPending }}
           className="min-h-12 items-center justify-center rounded-md bg-accent px-4 disabled:opacity-50"
         >
-          <Text className="font-body-sb text-xs text-white">
+          <Text className="font-body-sb text-xs text-on-accent">
             {t(createBook.isPending ? 'createBook.saving' : 'createBook.save')}
           </Text>
         </Pressable>

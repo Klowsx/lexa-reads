@@ -1,3 +1,4 @@
+import { AppHeader } from '~/components/AppHeader'
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -34,7 +35,7 @@ export default function LibraryScreen() {
   const colors = useColors()
   const { width } = useWindowDimensions()
   const contentWidth = Math.min(width, 960)
-  const columns = Math.max(2, Math.floor((contentWidth - 36) / 112))
+  const columns = contentWidth < 600 ? 2 : contentWidth < 840 ? 3 : 4
   const itemWidth = Math.floor((contentWidth - 36) / columns) - 16
   const [activeTab, setActiveTab] = useState<BookStatus>('reading')
   const [search, setSearch] = useState('')
@@ -85,6 +86,7 @@ export default function LibraryScreen() {
 
   return (
     <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
+      <AppHeader />
       <View className="w-full max-w-[960px] flex-1 self-center">
         <View className="px-container pt-3">
           <Text
@@ -93,11 +95,6 @@ export default function LibraryScreen() {
           >
             {t('library.title')}
           </Text>
-          <LibraryTabs
-            activeTab={activeTab}
-            countByStatus={summary.data ? counts : undefined}
-            onTabChange={changeTab}
-          />
           <View className="mt-4 min-h-12 flex-row items-center rounded-md border border-border bg-surface pl-3">
             <Search size={20} color={colors.t2} accessible={false} />
             <TextInput
@@ -109,7 +106,7 @@ export default function LibraryScreen() {
               placeholderTextColor={colors.t2}
               autoCorrect={false}
               returnKeyType="search"
-              className="min-h-12 min-w-0 flex-1 rounded-md px-3 font-body text-xs text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+              className="min-h-12 min-w-0 flex-1 rounded-md px-3 font-body text-base text-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
             />
             {search.length > 0 && (
               <Pressable
@@ -121,6 +118,13 @@ export default function LibraryScreen() {
                 <X size={20} color={colors.text} />
               </Pressable>
             )}
+          </View>
+          <View className="mt-4">
+            <LibraryTabs
+              activeTab={activeTab}
+              countByStatus={summary.data ? counts : undefined}
+              onTabChange={changeTab}
+            />
           </View>
         </View>
         <ScrollView
