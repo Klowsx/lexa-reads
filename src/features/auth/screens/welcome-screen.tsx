@@ -1,23 +1,16 @@
 import { useTranslation } from 'react-i18next'
 import { Link } from 'expo-router'
-import { Image } from 'expo-image'
 import { BookOpen, Compass, Users } from 'lucide-react-native'
-import { useState } from 'react'
 import { Pressable, ScrollView, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { BookFan, PrimaryButton, Wordmark } from '~/features/auth/components'
 import { useColors } from '~/theme/colors'
-
-// Fotografía editorial que forma parte de la referencia A01 de Stitch.
-const WELCOME_IMAGE =
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuALpsp4XdlBALjT2qqQjyOECu1xHlbqhJpj6ki69cfjEhoislW_N-7dfdxzRp1N4dW4lGzlkgXyyPo1UASgBVbJxaBrCponw5-HTrlrJfIOCwX5dklA8h3wWYPxbB6GivYsQRQjNOiM9VN6MFDwNuCdp2hNllG99wE13D3Cce_xQLMz5svmw-cgccRneetqZKO1_euT9z1NXyyfmaq_Eg66hnRYdKKvm0cXDWPbwks'
 
 // Recibe a lectores nuevos y habituales con dos destinos claros antes de personalizar el perfil.
 export default function WelcomeScreen() {
   const { t } = useTranslation()
   const insets = useSafeAreaInsets()
   const c = useColors()
-  const [imageFailed, setImageFailed] = useState(false)
   return (
     <ScrollView
       className="flex-1 bg-bg"
@@ -41,17 +34,8 @@ export default function WelcomeScreen() {
         </Text>
       </View>
       <View className="rounded-card bg-sr overflow-hidden mb-6">
-        {imageFailed ? (
-          <BookFan />
-        ) : (
-          <Image
-            source={{ uri: WELCOME_IMAGE }}
-            style={{ width: '100%', height: 190 }}
-            contentFit="cover"
-            onError={() => setImageFailed(true)}
-            accessible={false}
-          />
-        )}
+        {/* Las cubiertas locales evitan el recuadro vacío de la imagen oscura de referencia. */}
+        <BookFan />
         <Text
           accessibilityRole="header"
           className="font-display-sb text-lg text-text text-center italic p-5 leading-7"
