@@ -30,6 +30,9 @@ las restricciones para ejecutarlas.
    Apple §1.2 (UGC) exige que **Términos/EULA + Normas con tolerancia cero** sean
    accesibles y que exista reportar + bloquear + respuesta ≤24h (ya implementado).
 4. Generar y revisar el inventario de licencias OSS y publicarlo en `/licenses`.
+   Los avisos completos de Newsreader, Inter y sus paquetes Expo ya están en
+   [licencias de fuentes](font-licenses.md). Incorporarlos al inventario general;
+   este archivo por sí solo no enumera todas las dependencias de la aplicación.
 5. Verificar que los enlaces abren desde **Registro** y **Ajustes → Legal**.
 6. (Recomendado) versión en inglés si se publica en mercados de habla inglesa.
 
