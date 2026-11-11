@@ -3,7 +3,14 @@
 > Pasos que **no se pueden hacer desde el repo** (requieren acceso al dashboard de
 > Supabase, Apple/Google y el hosting del dominio) más los que
 > se dejaron **solo documentados a propósito** (PostHog / crash reporting).
-> Hacer en este orden. Última actualización: 2026-06-04.
+> Hacer en este orden. Última actualización: 2026-11-10 (Panamá).
+
+Estado actual: el acceso EAS propietario funciona y el entorno `preview` contiene
+las dos variables públicas de Supabase. `delete-account` v3 y `send-push` v2 están
+activos. Las migraciones de noviembre corrigen los permisos efectivos de columnas,
+el arranque de DM y la firma de eventos. La evidencia está en
+[la adopción de Stitch](stitch-adoption.md); los pasos históricos siguientes no
+deben repetirse sin comprobar el estado remoto.
 
 Leyenda: 🔴 bloqueante de seguridad · 🟠 bloqueante de tiendas · 🔵 recomendado.
 
@@ -30,7 +37,7 @@ para los `REVOKE` de `017` y el `DELETE FROM auth.users` de `013`).
 **Verificación post-aplicación:**
 
 - `Database → Advisors`: no debe quedar el warning **"Function Search Path Mutable"**.
-- Probar como usuario normal (no admin): `UPDATE users SET is_admin = true WHERE id = auth.uid();` debe **no** cambiar el valor (sigue `false`).
+- La migración 017 por sí sola no basta: un permiso UPDATE de tabla prevalece sobre REVOKE por columna. Aplicar `20261111000141_correct_client_column_privileges.sql` y ejecutar `supabase/tests/client-column-privileges.sql` y `supabase/tests/account-lifecycle.sql` completos. Ambos pasaron contra Lexa con rollback.
 - Correr los tests de RLS con `SUPABASE_SERVICE_ROLE_KEY` seteada: `pnpm jest src/__tests__/features/auth/rls.test.ts`.
 - **Realtime:** confirmar que `messages` está en `Database → Replication → supabase_realtime` (la migración 020 lo añade; si el entorno no tenía la publicación, añadirlo a mano). Sin esto el chat no actualiza en vivo (solo al refrescar).
 - **Mensajería:** verificar que un no-admin NO puede `UPDATE reading_club_members SET role='owner'` ni `state='active'` directo (REVOKE de 020); la aprobación/rol van por los RPCs `approve_club_member`/`set_club_member_role`.
@@ -57,35 +64,41 @@ que existen porque las tablas de mensajería aún no están en `database.ts`).
 
 ## 3. 🔴 Desplegar Edge Functions y secrets
 
-```bash
-supabase functions deploy send-push
-supabase functions deploy delete-account
-supabase functions deploy export-user-data
-```
+`delete-account` requiere sus dos archivos de runtime, `index.ts` y `handler.ts`,
+y mantiene `verify_jwt=true`. `export-user-data` conserva verificación JWT.
 
-Secrets (Supabase → Edge Functions → Secrets, o CLI):
+`send-push` autentica por firma HMAC propia y usa `verify_jwt=false`; no debe
+recibir credenciales del cliente. Supabase inyecta `SUPABASE_URL`,
+`SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_ROLE_KEY` automáticamente.
 
-```bash
-supabase secrets set WEBHOOK_SECRET=<valor-aleatorio-largo>
-```
-
-- `WEBHOOK_SECRET`: sin él, `send-push` rechaza TODO (fail-closed) → las push
-  no llegan hasta configurarlo. Generar con `openssl rand -hex 32`.
-- `SUPABASE_URL` / `SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` ya las
-  inyecta Supabase automáticamente en las functions.
+La firma se prepara con `20261110152107_push_webhook_vault.sql` y se sustituye
+por `20261111000734_sign_push_events_without_queue_secrets.sql`. En instalaciones
+nuevas desplegar el handler final, aplicar las dos migraciones en orden y no
+intercalar pruebas de envío. No reutilizar el antiguo header `x-webhook-secret`
+ni configurar `WEBHOOK_SECRET`: la versión final los rechaza.
 
 ---
 
 ## 4. 🔴 Database Webhook de `send-push`
 
-En Supabase → Database → Webhooks, el webhook que dispara `send-push` en
-`INSERT` sobre `notifications` debe enviar el header:
+El trigger `lexa_private.enqueue_notification_push` encola solo INSERT de
+notificaciones persistidas con el ID y los headers `x-push-signature` y
+`x-push-issued-at`. El destino es fijo y la clave permanece en Vault. No crear
+otro webhook de dashboard, pues duplicaría el productor.
 
-```
-x-webhook-secret: <el mismo valor de WEBHOOK_SECRET>
-```
+La RPC pública de verificación es invoker y solo permite a `service_role`
+comprobar firmas. La ventana es cinco minutos, con treinta segundos de tolerancia
+futura. Una firma permite repetir ese mismo evento durante la ventana; no hay
+reintentos durables, deduplicación ni comprobación de recibos de Expo todavía.
 
-Sin este header (o con valor distinto) la función responde `403`.
+Las ACL de la cola administrada de pg_net no se pudieron retirar con `postgres`.
+La solución evita transportar allí la clave maestra y rota la usada inicialmente.
+`supabase/tests/push-webhook-deployed.sql` verifica firma válida, adulteraciones,
+caducidad y permisos sin cambiar Vault, devolver claves ni invocar HTTP.
+`push-webhook.sql` utiliza una clave sintética dentro de rollback y es solo local.
+
+Sin firma, el endpoint responde 403. La comprobación de entrega a dispositivo
+sigue pendiente; no confundir un ticket aceptado de Expo con entrega efectiva.
 
 ---
 

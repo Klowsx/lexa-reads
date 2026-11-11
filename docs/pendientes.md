@@ -12,11 +12,11 @@ enlazado o en el PR correspondiente.
 
 ## 1. Bloqueadores para una beta instalada
 
-- [ ] Configurar `send-push`, su secreto y webhook, promover el administrador
-      inicial y publicar los deep links restantes. Seguir
+- [ ] Promover el administrador
+      inicial y publicar los deep links restantes. Push y firma ya están desplegados. Seguir
       [el runbook de despliegue](despliegue.md).
-- [ ] Reparar el acceso al proyecto EAS con la cuenta propietaria y generar una
-      APK de desarrollo para Android. Registrar el identificador de build y el
+- [ ] Completar la build de EAS y generar una
+      APK interna para Android. Acceso propietario restablecido; registrar el identificador de build y el
       resultado de instalación.
 - [ ] Recorrer en el Android instalado Registro, biblioteca, ficha de libro,
       Ajustes y consentimiento. Probar TalkBack, texto ampliado, pantalla pequeña,
@@ -48,9 +48,9 @@ enlazado o en el PR correspondiente.
 
 ## 3. Recorrido esencial del producto
 
-- [ ] Continuar la migración visual de las pantallas existentes al sistema de Stitch
-      cuando se aborde su rediseño. Las superficies nuevas ya usan su tema; conservar
-      las diferencias funcionales documentadas en [la adopción gradual](stitch-adoption.md).
+- [x] Integrar las pantallas existentes con el sistema de Stitch
+      con tema y componentes compartidos. Conservar
+      las diferencias funcionales documentadas en [la adopción de Stitch](stitch-adoption.md).
 
 - [ ] Probar en Android la búsqueda por ISBN, su fallback de alta y el escáner
       de cámara ya implementados.
@@ -58,8 +58,8 @@ enlazado o en el PR correspondiente.
       lector puede completar su perfil y seguir personas después.
 - [ ] Probar enlaces y push de extremo a extremo para las notificaciones
       navegables incluidas en el lanzamiento.
-- [ ] Extraer las cadenas pendientes a los catálogos de traducción y comprobar
-      español e inglés.
+- [x] Traducir las superficies migradas y las fechas; comprobar
+      español e inglés (921 claves en cada catálogo). Auditar textos históricos fuera de este lote antes de publicación.
 
 ## 4. Calidad y operación antes de producción
 
@@ -87,7 +87,7 @@ enlazado o en el PR correspondiente.
 - [x] Incorporar las superficies nuevas de Stitch: menú Comunidad, vista previa
       de compartir, hojas y estados compartidos, recuperación de errores de chat,
       clubes y notificaciones, y confirmación real del cambio de contraseña.
-      Evidencia y límites de las comprobaciones en [la adopción gradual](stitch-adoption.md).
+      Evidencia y límites de las comprobaciones en [la adopción de Stitch](stitch-adoption.md).
 
 - [x] Aplicar en Supabase las migraciones remotas de catálogo comunitario,
       metadatos y voto de portadas, y sugerencias de seguimiento en onboarding.

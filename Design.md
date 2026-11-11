@@ -2,212 +2,78 @@
 name: Lexa
 description: Biblioteca personal y comunidad de lectura con una calma editorial.
 colors:
-  accent: '#C4783A'
-  star: '#E8C05A'
-  light-bg: '#F5F0EA'
-  light-surface: '#EBE5DE'
-  light-raised: '#E0D9D1'
-  light-text: '#1A1512'
-  dark-bg: '#100D0A'
-  dark-surface: '#1C1815'
-  dark-raised: '#252118'
-  dark-text: '#F0EAE2'
-  border-light: '#C2BAB0'
-  border-dark: '#35302B'
-  muted-light: '#685E55'
-  muted-dark: '#9E9488'
-  success: '#5CAF7E'
-  error: '#C43A3A'
-  warning: '#C49A20'
-  status-reading: '#4A96B8'
-  status-want: '#8A6CD8'
-  status-abandoned: '#787068'
+  accent: '#000000'
+  on-accent: '#ffffff'
+  light-bg: '#fff8f5'
+  light-surface: '#ffffff'
+  light-raised: '#f6ece6'
+  light-text: '#1f1b17'
+  dark-bg: '#121316'
+  dark-surface: '#1a1c22'
+  dark-raised: '#23252e'
+  dark-text: '#f8fafc'
 typography:
   display:
-    fontFamily: 'Playfair Display, Georgia, serif'
-    fontSize: '30px'
+    fontFamily: 'Newsreader, Georgia, serif'
+    fontSize: '28px'
     fontWeight: 600
-    lineHeight: '38px'
-    letterSpacing: '-0.02em'
-  headline:
-    fontFamily: 'Playfair Display, Georgia, serif'
-    fontSize: '26px'
-    fontWeight: 600
-    lineHeight: '32px'
-    letterSpacing: '-0.02em'
+    lineHeight: '36px'
   body:
-    fontFamily: 'DM Sans, system-ui, sans-serif'
-    fontSize: '20px'
-    fontWeight: 400
-    lineHeight: '28px'
-  label:
-    fontFamily: 'DM Sans, system-ui, sans-serif'
+    fontFamily: 'Inter, system-ui, sans-serif'
     fontSize: '16px'
+    fontWeight: 400
+    lineHeight: '24px'
+  label:
+    fontFamily: 'Inter, system-ui, sans-serif'
+    fontSize: '14px'
     fontWeight: 600
     lineHeight: '20px'
 rounded:
-  cover: '5px'
-  sm: '6px'
-  md: '12px'
-  card: '14px'
-  lg: '20px'
-  xl: '28px'
-  full: '999px'
+  cover: '6px'
+  card: '12px'
+  sheet: '24px'
 spacing:
-  xs: '4px'
-  sm: '8px'
-  md: '12px'
-  container: '18px'
-  lg: '20px'
-  xl: '24px'
-  xxl: '32px'
-components:
-  button-primary:
-    backgroundColor: '{colors.accent}'
-    textColor: '#FFFFFF'
-    typography: '{typography.label}'
-    rounded: '{rounded.md}'
-    padding: '15px 24px'
-  chip-selected:
-    backgroundColor: '{colors.light-raised}'
-    textColor: '{colors.accent}'
-    rounded: '{rounded.full}'
-    padding: '6px 14px'
-  tab-navigation:
-    backgroundColor: '{colors.light-surface}'
-    textColor: '{colors.muted-light}'
-    height: '56px'
+  container: '16px'
 ---
 
 # Design System: Lexa
 
-## Adopción gradual de Stitch
+## Sistema de Stitch
 
-Las pantallas, componentes y estados nuevos utilizan el sistema de Stitch: tokens en `src/theme/stitch.ts`, Newsreader para títulos e Inter para interfaz. Reutilizar los controles `StitchButton`, `StitchSheet`, `StitchFeedback` y `StitchLoading` cuando corresponda a su responsabilidad.
+El sistema de Stitch es la base compartida de las pantallas nuevas y existentes. La primera entrega fue gradual; la ampliación posterior fue autorizada expresamente por el usuario. La implementación y sus límites están en [la adopción de Stitch](docs/stitch-adoption.md).
 
-Las referencias de Playfair Display, DM Sans y terracota que siguen describen la interfaz existente. Su migración visual se realizará por separado; no sustituir globalmente sus tokens al añadir una superficie nueva. La fuente del diseño, las diferencias funcionales que deben respetarse y la evidencia de implementación están en [la adopción gradual](docs/stitch-adoption.md).
+La fuente ejecutable es `src/theme/tokens.json`. Cambiar allí la paleta y regenerar con `pnpm gen:theme`; nunca editar `colors.ts` ni `generated-colors.css` a mano. `useColors` y `useStitchTheme` consumen la misma paleta. Tailwind y `src/theme/typography.ts` comparten Newsreader e Inter.
 
-## Overview
+## Identidad y composición
 
-**Creative North Star: "La biblioteca habitada"**
+Lexa mantiene una calma editorial: las portadas y las voces de los lectores llevan el contenido. Newsreader presenta libros y títulos; Inter permite leer, escribir y actuar. Evitar decoraciones, tarjetas anidadas, sombras amplias, neón y datos de muestra que aparenten funcionalidad.
 
-Lexa combina la pausa de una biblioteca personal con la conversación de una comunidad lectora. La interfaz debe sentirse cálida, tranquila y estética, pero ante todo útil: encontrar un libro, registrar una lectura, compartir una reseña o seguir a otra persona debe requerir muy poca atención visual.
+La profundidad se construye con `bg`, `surface`, `sr` y `sh`. Usar bordes cuando sea necesario separar contenido; reservar las sombras perceptibles para las portadas. El margen horizontal de pantalla es 16 px; los bloques pueden aumentar el espacio cuando su jerarquía lo requiera.
 
-La calidez viene de los neutros tierra, de la tipografía editorial y de las portadas, no de adornos. El producto alterna superficies tonales en lugar de tarjetas flotantes. El modo oscuro debe sentirse como una sala de lectura nocturna, no como una interfaz negra de alto contraste.
+## Color y contraste
 
-**Key Characteristics:**
+La acción principal usa `accent` con `onAccent`: negro sobre el tema claro y tinta clara sobre el oscuro. Nunca fijar blanco como contenido de un botón primario. `text`, `t2` y `t3` distinguen contenido principal, secundario y auxiliar, manteniendo contraste AA sobre las superficies.
 
-- Editorial en títulos y nombres de libros; sobrio y eficiente en controles y datos.
-- Color de acento escaso y significativo; las portadas aportan la mayor riqueza cromática.
-- Jerarquía por tipografía, espacio y superficie, no por sombras decorativas.
-- Densidad cómoda para explorar, con acciones táctiles claras y estados visibles.
-- Accesibilidad WCAG AA como mínimo en ambos temas y con movimiento reducido.
+Los estados usan `error`, `success`, `warning`, `star` y `status`. Consumirlos desde `useColors` si dependen del tema; `fixed` se reserva para colores deliberadamente estables como las portadas y avatares. Los estados de lectura siempre incluyen texto o icono con significado accesible.
 
-## Colors
+## Tipografía
 
-La paleta es una escala de papel, madera y tinta. Se mantiene estable entre temas, cambiando la luminosidad de sus superficies, mientras el terracota conserva su papel de acción principal.
+- Títulos: Newsreader 400, 600 o 700; cursiva 400 para referencias editoriales.
+- Contenido y campos: Inter 400, 16 px y altura de línea de 24 px.
+- Etiquetas: Inter 500 o 600, normalmente 14 px y altura de línea de 20 px.
+- Metadatos breves: 12 px cuando no sustituyen una acción o contenido principal.
+- Respetar el escalado de texto del sistema y evitar alturas fijas que recorten etiquetas.
 
-### Primary
+## Componentes y navegación
 
-- **Terracota de lectura**: se usa para la acción primaria, selección actual, vínculos de énfasis y confirmaciones de interacción. Nunca debe ocupar grandes áreas de una pantalla.
-- **Oro de valoración**: reservado exclusivamente para estrellas y puntuaciones, nunca para botones principales.
+Reutilizar los controles existentes y los componentes `StitchButton`, `StitchSheet`, `StitchFeedback` y `StitchLoading` según su responsabilidad. Las hojas mantienen confirmación explícita y errores recuperables. Los formularios conservan el borrador cuando falla el guardado.
 
-### Secondary
+`AppHeader` comparte identidad, Comunidad y notificaciones entre Inicio, Buscar y Biblioteca. `AppTabBar` conserva cinco destinos reales: Inicio, Buscar, Biblioteca, Notificaciones y Perfil. Mantener los eventos de React Navigation, etiquetas accesibles y estado seleccionado.
 
-- **Azul de lectura**: comunica el estado “leyendo”.
-- **Violeta de intención**: comunica “quiero leer”.
-- **Verde de cierre**: comunica lecturas terminadas y confirmaciones exitosas.
+Los objetivos táctiles principales tienen al menos 48 px. Los iconos interactivos requieren etiquetas; el foco web debe ser visible. El contenido de una reseña marcada como spoiler no aparece en una tarjeta exportada, aunque el lector lo haya revelado dentro de la app.
 
-### Neutral
+## Datos y accesibilidad
 
-- **Papel claro** y **superficie clara** forman el fondo y los contenedores del tema claro.
-- **Tinta clara** y **tinta oscura** sostienen el texto principal en sus temas correspondientes.
-- **Papel nocturno** y **superficie nocturna** crean profundidad en el tema oscuro sin usar negro puro.
-- Los tonos mudos se reservan para metadatos, fechas, autorías y texto auxiliar, siempre con contraste AA sobre su superficie.
+Una referencia visual no introduce contratos de producto nuevos: no añadir planes de pago, formato enriquecido, guardado automático, llamadas o indicadores de escritura sin soporte real. Las portadas, contadores y nombres vienen del catálogo y de la cuenta; usar alternativas explícitas si faltan.
 
-**The Quiet Accent Rule.** El terracota solo identifica la acción principal, la selección o una relación activa. Si más del 10% de la pantalla es terracota, se ha usado como decoración y debe retirarse.
-
-**The Status Has Words Rule.** Los colores de estado nunca funcionan solos. Todo estado de lectura se acompaña de etiqueta, icono o texto que mantenga su significado para personas con visión cromática diversa.
-
-## Typography
-
-**Display Font:** Playfair Display (Georgia, serif)
-**Body Font:** DM Sans (system-ui, sans-serif)
-
-**Character:** Playfair Display aporta el ritmo de una cubierta o una página impresa. DM Sans mantiene la interfaz directa y legible. La serif nunca se usa en botones, campos, navegación ni datos densos.
-
-### Hierarchy
-
-- **Display**: Playfair Display semibold, para títulos de pantalla, nombres de libros destacados y encabezados de bloques editoriales.
-- **Headline**: Playfair Display semibold, para títulos de secciones y tarjetas con protagonismo.
-- **Body**: DM Sans regular, para descripciones, reseñas, campos y contenido funcional. El mínimo funcional es 16 px; las etiquetas críticas no deben reducirse por debajo de ese tamaño.
-- **Label**: DM Sans semibold, para botones, pestañas, chips y acciones. Las mayúsculas se permiten solo en rótulos muy cortos, nunca en párrafos ni acciones extensas.
-- **Book title**: puede usar Playfair Display en cursiva cuando se cite dentro de una actividad o reseña; debe conservar contraste y truncarse con cuidado.
-
-**The Editorial Boundary Rule.** La tipografía editorial narra y presenta libros. La tipografía sans permite actuar. No se intercambian esos papeles.
-
-## Elevation
-
-Lexa usa elevación tonal por defecto: fondo, superficie y superficie elevada separan contenido mediante sus valores de color y bordes discretos. Las portadas pueden usar una sombra compacta para parecer objetos físicos; los botones, hojas y tarjetas comunes no deben combinar borde visible con una sombra amplia.
-
-**The Cover Exception Rule.** Solo una portada o un elemento que represente físicamente un libro puede proyectar una sombra perceptible. Para los demás elementos, usar superficie o borde, nunca ambos para decorar.
-
-## Components
-
-### Buttons
-
-- **Shape:** esquinas suavemente redondeadas de 12 px; las acciones rápidas y chips pueden ser píldoras completas.
-- **Primary:** terracota con texto blanco, DM Sans semibold y un área táctil vertical de al menos 48 px. La etiqueta describe la acción, por ejemplo, “Guardar reseña”.
-- **Disabled / Loading:** conserva el color de acción con opacidad reducida o indicador de progreso. Nunca debe aparentar que una acción se guardó antes de confirmarse.
-- **Secondary / Ghost:** texto en color principal o tinta, sin relleno decorativo. Útil cuando acompaña una única acción primaria.
-- **Focus:** anillo visible de 2 px que no dependa solo del cambio de color; en web debe ser navegable por teclado.
-
-### Chips and Statuses
-
-- **Style:** píldoras de 999 px, con relleno tonal ligero y borde fino en reposo.
-- **Selected:** usa el color semántico del estado, texto legible y `accessibilityState.selected`.
-- **Meaning:** “Leyendo”, “Leído”, “Quiero leer” y “Abandonado” siempre se muestran como texto, no como una mera mancha de color.
-
-### Cards and Content Containers
-
-- **Corner Style:** 14 px para tarjetas funcionales; 5 px para portadas, respetando la geometría editorial de un libro.
-- **Background:** `surface` para contenido agrupado y `sr` para bloques secundarios. Evitar tarjetas dentro de tarjetas.
-- **Border:** un borde tenue de 1 px solo cuando se necesita separar contenido del mismo tono.
-- **Internal Padding:** 12 a 20 px según densidad, con 18 px como margen horizontal base de pantalla.
-
-### Inputs and Fields
-
-- **Style:** superficie tonal, borde discreto y DM Sans. El texto introducido usa tinta principal, el placeholder usa tono mudo con contraste AA.
-- **Focus:** borde o anillo de 2 px en terracota sin cambiar el tamaño del control.
-- **Error:** rojo semántico, mensaje explicado en texto y asociación accesible con el campo. No usar solo el borde rojo.
-
-### Navigation
-
-- **Tab bar:** superficie tonal con borde superior discreto. El destino activo usa terracota, icono y etiqueta; los destinos inactivos usan tono mudo.
-- **Headers:** título editorial a la izquierda y acciones con iconos reconocibles a la derecha. Cada icono interactivo requiere etiqueta accesible y área táctil mínima de 44 × 44 px.
-
-### Book Covers
-
-- **Role:** son el principal elemento visual y la fuente permitida de variedad cromática del producto.
-- **Fallback:** cuando falta imagen, utilizar una cubierta tipográfica oscura con una paleta derivada del libro, título truncado y contraste alto.
-- **Treatment:** radios de 5 px y sombra física compacta solo si la portada está aislada sobre una superficie plana.
-
-## Do's and Don'ts
-
-### Do:
-
-- **Do** usar Playfair Display para títulos que aporten contexto editorial y DM Sans para toda interacción.
-- **Do** usar el terracota para una acción primaria o una selección por área, no como relleno decorativo repetido.
-- **Do** mantener los tres niveles tonales de cada tema antes de añadir bordes o sombras.
-- **Do** mostrar estados de carga, error, vacío, éxito y deshabilitado de forma explícita.
-- **Do** respetar contraste WCAG AA, tamaños táctiles mínimos de 44 × 44 px y la preferencia de movimiento reducido.
-- **Do** dejar que las portadas y las citas de reseñas den personalidad a la pantalla.
-
-### Don't:
-
-- **Don't** copiar la paleta roja, la navegación web, carruseles decorativos o el sistema de radios de Pinterest.
-- **Don't** usar gradientes, glassmorphism, neón, sombras extensas ni tarjetas flotantes como decoración.
-- **Don't** usar Playfair Display en botones, formularios, navegación, filtros o información densa.
-- **Don't** comunicar un estado solo con color, ni usar tonos mudos que no cumplan contraste sobre la superficie.
-- **Don't** redondear todas las superficies como píldoras. Las píldoras son para filtros, etiquetas y acciones rápidas.
-- **Don't** introducir animaciones de entrada coreografiadas. El movimiento debe explicar una transición, una carga o una confirmación y respetar la reducción de movimiento.
+Distinguir carga, error y vacío; conservar los fallos parciales aunque haya datos previos. Las animaciones respetan reducir movimiento. Verificar contraste en ambos temas, teclado en web, contenido ampliado y lectores de pantalla. Las comprobaciones automatizadas no sustituyen la prueba física pendiente de publicación.
