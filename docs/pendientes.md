@@ -63,9 +63,10 @@ enlazado o en el PR correspondiente.
 
 ## 4. Calidad y operación antes de producción
 
-- [ ] Mantener una base de pruebas migrada y automatizar en CI tipos, lint,
-      formato y pruebas relevantes; añadir Maestro al camino crítico de alta,
-      búsqueda, biblioteca, reseña y reacción.
+- [x] Crear el workflow de calidad para tipos, tokens, lint, formato del cambio,
+      129 pruebas de la app y el contrato Deno de cuenta. La ejecución remota
+      comenzará al subir los commits; no incluye suites RLS sin credenciales.
+- [ ] Añadir Maestro al camino crítico de alta, búsqueda, biblioteca, reseña y reacción.
 - [ ] Añadir controles de abuso en registro, mensajes y funciones remotas;
       revisar los límites con pruebas de servidor.
 - [ ] Configurar observabilidad con consentimiento: analítica, captura de

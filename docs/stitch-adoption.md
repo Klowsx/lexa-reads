@@ -38,6 +38,7 @@ La cola de pg_net es administrada por Supabase y sus ACL no pudieron restringirs
 - TypeScript y comprobación de tokens correctos; lint estricto del código modificado y formato de los archivos modificados.
 - Veintiséis suites Jest, con 129 pruebas, sobre navegación, fechas por idioma, contraste claro/oscuro, formularios, chat/caché, compartir/spoilers y permiso push. Las suites RLS que requieren credenciales no se cuentan como cobertura de servidor.
 - Dos pruebas Deno del handler real de cuenta con SDK y transporte aislado.
+- `.github/workflows/quality.yml` ejecuta tipos, tokens, lint, formato del cambio, pruebas de la app y contrato Deno al recibir push o una pull request. Está preparado; no se ha ejecutado en GitHub durante esta sesión.
 - Cinco comprobaciones SQL reales: ciclo de cuenta, columnas de participantes, arranque de DM, permisos efectivos de cinco tablas y firmas HMAC válidas/adulteradas/caducadas. Rollback sin enviar mensajes, notificaciones o solicitudes HTTP. La prueba HMAC desplegada no modifica Vault ni devuelve su clave.
 - Español e inglés contienen las mismas 921 claves. Las fechas siguen el idioma elegido; los mensajes del servidor push siguen en español hasta disponer de idioma persistido por destinatario.
 - Exportación web de producción desde caché limpia, con configuración pública de Lexa. El contraste de los roles textuales se comprueba automáticamente sobre las cuatro superficies en ambos temas.
