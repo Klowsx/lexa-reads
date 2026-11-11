@@ -68,7 +68,7 @@ enlazado o en el PR correspondiente.
 ## 4. Calidad y operación antes de producción
 
 - [x] Crear el workflow de calidad para tipos, tokens, lint, formato del cambio,
-      129 pruebas de la app y el contrato Deno de cuenta. La ejecución remota
+      130 pruebas de la app y el contrato Deno de cuenta. La ejecución remota
       comenzará al subir los commits; no incluye suites RLS sin credenciales.
 - [ ] Añadir Maestro al camino crítico de alta, búsqueda, biblioteca, reseña y reacción.
 - [ ] Añadir controles de abuso en registro, mensajes y funciones remotas;
