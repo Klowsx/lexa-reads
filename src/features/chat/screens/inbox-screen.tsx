@@ -43,42 +43,52 @@ export default function InboxScreen() {
 
   return (
     <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
-      <View className="px-4 py-2.5 border-b border-border flex-row items-center gap-2">
+      <View className="px-4 py-2 flex-row items-center gap-2">
         <Pressable
-          hitSlop={8}
+          className="h-12 w-12 items-center justify-center rounded-full"
           onPress={() => router.back()}
           accessibilityRole="button"
-          accessibilityLabel="Volver"
+          accessibilityLabel={t('common.back')}
         >
           <ChevronLeft size={24} color={c.t3} strokeWidth={1.6} />
         </Pressable>
         <Text className="font-display-sb text-xl text-text tracking-tight flex-1">
-          Mensajes
+          {t('communityMenu.messages')}
         </Text>
       </View>
 
-      {/* Segmented */}
-      <View className="flex-row border-b border-border">
+      <View className="px-5 pb-5 pt-2 gap-2">
+        <Text
+          accessibilityRole="header"
+          className="font-display text-2xl text-text"
+        >
+          {t('stitch.social.inboxTitle')}
+        </Text>
+        <Text className="font-body text-sm text-t2">
+          {t('stitch.social.inboxSubtitle')}
+        </Text>
+      </View>
+      {/* Selección de correspondencia */}
+      <View className="mx-4 mb-4 flex-row rounded-xl bg-sr p-1">
         {(['chats', 'requests'] as Tab[]).map((tk) => {
           const active = tab === tk
           const label =
             tk === 'chats'
-              ? 'Mensajes'
-              : `Solicitudes${requests.length ? ` (${requests.length})` : ''}`
+              ? t('communityMenu.messages')
+              : `${t('stitch.social.requests')}${requests.length ? ` (${requests.length})` : ''}`
           return (
             <Pressable
               key={tk}
               onPress={() => setTab(tk)}
-              className="flex-1 py-3 items-center"
+              className="min-h-12 flex-1 justify-center rounded-lg py-3 items-center"
               accessibilityRole="tab"
               accessibilityState={{ selected: active }}
               style={{
-                borderBottomWidth: 2,
-                borderBottomColor: active ? c.accent : 'transparent'
+                backgroundColor: active ? c.surface : 'transparent'
               }}
             >
               <Text
-                className={`text-xs font-body-sb ${active ? 'text-text' : 'text-t3'}`}
+                className={`text-sm font-body-sb ${active ? 'text-text' : 'text-t3'}`}
               >
                 {label}
               </Text>

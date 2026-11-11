@@ -3,29 +3,21 @@ import { Bell, Heart, MessageCircle, UserPlus } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'
 import { Pressable, Text, View } from 'react-native'
 import { Avatar } from '~/components/ui/Avatar'
-import { fixed, useColors } from '~/theme/colors'
+import { useColors } from '~/theme/colors'
 import { formatRelativeTime } from '~/lib/utils'
 import type {
   NotificationItem,
   NotificationType
 } from '../notifications.queries'
 
-const alpha = (hex: string, op: number) => {
-  const n = parseInt(hex.replace('#', ''), 16)
-  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})`
-}
-
-// El texto vive en i18n (notif.*); aquí solo el icono y el color por tipo.
-const TYPE_CONFIG: Record<
-  NotificationType,
-  { IconComp: typeof Bell; color: string }
-> = {
-  new_follower: { IconComp: UserPlus, color: fixed.accentAlt.blue },
-  review_like: { IconComp: Heart, color: fixed.accent },
-  activity_like: { IconComp: Heart, color: fixed.accent },
-  comment_received: { IconComp: MessageCircle, color: fixed.accentAlt.green },
-  reading_challenge_completed: { IconComp: Bell, color: fixed.star },
-  recommendation_received: { IconComp: Bell, color: fixed.accentAlt.rose }
+// El símbolo identifica el evento sin añadir categorías visuales ajenas al diseño.
+const TYPE_CONFIG: Record<NotificationType, { IconComp: typeof Bell }> = {
+  new_follower: { IconComp: UserPlus },
+  review_like: { IconComp: Heart },
+  activity_like: { IconComp: Heart },
+  comment_received: { IconComp: MessageCircle },
+  reading_challenge_completed: { IconComp: Bell },
+  recommendation_received: { IconComp: Bell }
 }
 
 // Traduce cada evento del MVP a su pantalla relacionada cuando esa navegación está disponible.
@@ -55,6 +47,7 @@ interface NotificationRowProps {
   item: NotificationItem
 }
 
+// Muestra el actor y el estado real del aviso con acceso a su contexto.
 export function NotificationRow({ item }: NotificationRowProps) {
   const c = useColors()
   const router = useRouter()
@@ -81,28 +74,28 @@ export function NotificationRow({ item }: NotificationRowProps) {
             displayName={item.actor.display_name ?? item.actor.username}
             username={item.actor.username}
             avatarUrl={item.actor.avatar_url ?? undefined}
-            size={42}
+            size={48}
           />
           <View
             className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full items-center justify-center border border-bg"
-            style={{ backgroundColor: config.color }}
+            style={{ backgroundColor: c.accent }}
           >
-            <config.IconComp size={10} color="#fff" strokeWidth={2.2} />
+            <config.IconComp size={10} color={c.onAccent} strokeWidth={2.2} />
           </View>
         </View>
       ) : (
         <View
-          className="w-[42px] h-[42px] rounded-full items-center justify-center"
-          style={{ backgroundColor: alpha(config.color, 0.15) }}
+          className="w-12 h-12 rounded-full items-center justify-center"
+          style={{ backgroundColor: c.sr }}
         >
-          <config.IconComp size={20} color={config.color} strokeWidth={1.8} />
+          <config.IconComp size={20} color={c.text} strokeWidth={1.8} />
         </View>
       )}
 
       <View className="flex-1 min-w-0 gap-0.5">
         <Text
-          className="text-sm font-body text-text leading-[20px]"
-          numberOfLines={2}
+          className="text-sm font-body text-text leading-[22px]"
+          numberOfLines={3}
         >
           {label}
         </Text>
@@ -115,23 +108,22 @@ export function NotificationRow({ item }: NotificationRowProps) {
     </>
   )
 
-  const rowStyle = {
-    backgroundColor: isUnread ? alpha(c.accent, 0.06) : 'transparent',
-    borderBottomWidth: 1,
-    borderBottomColor: c.border
-  }
+  const rowStyle = { backgroundColor: isUnread ? c.sr : c.surface }
 
   return target ? (
     <Pressable
       onPress={() => router.push(target as any)}
       accessibilityRole="button"
-      className="flex-row items-center px-4 py-3 gap-3"
+      className="flex-row items-center mx-4 mb-3 p-4 gap-3 rounded-xl"
       style={rowStyle}
     >
       {content}
     </Pressable>
   ) : (
-    <View className="flex-row items-center px-4 py-3 gap-3" style={rowStyle}>
+    <View
+      className="flex-row items-center mx-4 mb-3 p-4 gap-3 rounded-xl"
+      style={rowStyle}
+    >
       {content}
     </View>
   )

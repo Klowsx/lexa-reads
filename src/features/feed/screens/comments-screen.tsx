@@ -124,7 +124,7 @@ export default function CommentsScreen() {
           >
             {t('comments.unavailable')}
           </Text>
-          <Text className="font-body text-xs text-t2">
+          <Text className="font-body text-sm text-t2">
             {t('comments.unavailableHint')}
           </Text>
           <Pressable
@@ -132,7 +132,7 @@ export default function CommentsScreen() {
             accessibilityRole="button"
             className="min-h-12 justify-center rounded-md bg-sr px-4"
           >
-            <Text className="font-body-sb text-xs text-text">
+            <Text className="font-body-sb text-sm text-text">
               {t('common.retry')}
             </Text>
           </Pressable>
@@ -151,7 +151,7 @@ export default function CommentsScreen() {
           >
             {t('comments.spoilerThread')}
           </Text>
-          <Text className="font-body text-xs text-t2">
+          <Text className="font-body text-sm text-t2">
             {t('comments.spoilerThreadHint')}
           </Text>
           <Pressable
@@ -159,7 +159,7 @@ export default function CommentsScreen() {
             accessibilityRole="button"
             className="min-h-12 items-center justify-center rounded-md bg-sr px-4 py-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
           >
-            <Text className="font-body-sb text-xs text-text">
+            <Text className="font-body-sb text-sm text-text">
               {t('comments.showThread')}
             </Text>
           </Pressable>
@@ -171,7 +171,7 @@ export default function CommentsScreen() {
               <View className="gap-3 p-5">
                 <Text
                   accessibilityRole="alert"
-                  className="font-body text-xs text-text"
+                  className="font-body text-sm text-text"
                 >
                   {t('comments.loadError')}
                 </Text>
@@ -180,7 +180,7 @@ export default function CommentsScreen() {
                   accessibilityRole="button"
                   className="min-h-12 justify-center rounded-md bg-sr px-4"
                 >
-                  <Text className="font-body-sb text-xs text-text">
+                  <Text className="font-body-sb text-sm text-text">
                     {t('common.retry')}
                   </Text>
                 </Pressable>
@@ -197,6 +197,7 @@ export default function CommentsScreen() {
                 keyboardShouldPersistTaps="handled"
                 contentContainerStyle={{
                   paddingHorizontal: 18,
+                  paddingTop: 16,
                   paddingBottom: 24
                 }}
                 ListEmptyComponent={
@@ -204,7 +205,7 @@ export default function CommentsScreen() {
                     <Text className="font-body-sb text-sm text-text">
                       {t('comments.empty')}
                     </Text>
-                    <Text className="font-body text-xs text-t2">
+                    <Text className="font-body text-sm text-t2">
                       {t('comments.emptyHint')}
                     </Text>
                   </View>
@@ -220,7 +221,7 @@ export default function CommentsScreen() {
                       {comments.isFetchingNextPage ? (
                         <ActivityIndicator color={c.text} />
                       ) : (
-                        <Text className="font-body-sb text-xs text-text">
+                        <Text className="font-body-sb text-sm text-text">
                           {t('comments.loadMore')}
                         </Text>
                       )}
@@ -228,7 +229,7 @@ export default function CommentsScreen() {
                   ) : null
                 }
                 renderItem={({ item }) => (
-                  <View className="flex-row gap-3 border-b border-border py-4">
+                  <View className="flex-row gap-3 mb-3 rounded-xl bg-surface p-4">
                     <Avatar
                       displayName={
                         item.user?.display_name ??
@@ -240,12 +241,12 @@ export default function CommentsScreen() {
                       size={36}
                     />
                     <View className="min-w-0 flex-1 gap-2">
-                      <Text className="font-body-sb text-xs text-text">
+                      <Text className="font-body-sb text-sm text-text">
                         {item.user?.display_name ??
                           item.user?.username ??
                           t('comments.reader')}
                       </Text>
-                      <Text className="font-body text-xs text-t2">
+                      <Text className="font-body text-sm text-t2">
                         {formatRelativeTime(item.created_at)}
                       </Text>
                       <SpoilerText
@@ -279,7 +280,7 @@ export default function CommentsScreen() {
             {create.isError && (
               <Text
                 accessibilityRole="alert"
-                className="font-body text-xs text-text"
+                className="font-body text-sm text-text"
               >
                 {t('comments.sendError')}
               </Text>
@@ -295,7 +296,7 @@ export default function CommentsScreen() {
               maxLength={MAX_COMMENT_LENGTH}
               returnKeyType="send"
               onSubmitEditing={submitComment}
-              className="min-h-12 rounded-md border border-border bg-bg px-3 py-3 font-body text-xs text-text outline-none focus:border-accent"
+              className="min-h-12 rounded-xl bg-sr px-4 py-3 font-body text-base text-text outline-none focus:border-accent"
             />
             <View className="flex-row flex-wrap items-center justify-between gap-3">
               <View className="flex-row items-center gap-2">
@@ -306,7 +307,7 @@ export default function CommentsScreen() {
                   accessibilityLabel={t('book.spoilers')}
                   trackColor={{ false: c.sh, true: c.accent }}
                 />
-                <Text className="font-body text-xs text-text">
+                <Text className="font-body text-sm text-text">
                   {t('book.spoilers')}
                 </Text>
               </View>
@@ -325,7 +326,7 @@ export default function CommentsScreen() {
                 ) : (
                   <Send size={20} color={c.text} />
                 )}
-                <Text className="font-body-sb text-xs text-text">
+                <Text className="font-body-sb text-sm text-text">
                   {t('comments.send')}
                 </Text>
               </Pressable>

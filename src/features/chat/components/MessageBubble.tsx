@@ -1,17 +1,18 @@
 import { Pressable, Text, View } from 'react-native'
 import { useTranslation } from 'react-i18next'
-import { useColors } from '~/theme/colors'
+import { Avatar } from '~/components/ui/Avatar'
+import { alpha, useColors } from '~/theme/colors'
 import { formatRelativeTime } from '~/lib/utils'
 import type { ChatMessage } from '../chat.queries'
 
 type Props = {
   message: ChatMessage
   isOwn: boolean
-  showSender?: boolean // en clubes: mostrar el nombre del autor
+  showSender?: boolean
   onActions: (message: ChatMessage) => void
 }
 
-// Conserva la presentación del mensaje y expone sus acciones a teclado, lector y pulsación larga.
+// Distingue autoría y citas mediante superficies editoriales sin usar color como única señal.
 export function MessageBubble({
   message,
   isOwn,
@@ -22,14 +23,28 @@ export function MessageBubble({
   const { t } = useTranslation()
   const isDeleted = !!message.deleted_at
   const isTemporary = message.id.startsWith('temp-')
+  const foreground = isOwn ? c.onAccent : c.text
 
-  // No ofrece borrar o citar un identificador temporal que todavía no existe en el servidor.
+  // Solo ofrece acciones cuando el mensaje ya existe y no se ha retirado.
   function showActions() {
     if (!isDeleted && !isTemporary) onActions(message)
   }
 
   return (
-    <View className={`px-4 py-0.5 ${isOwn ? 'items-end' : 'items-start'}`}>
+    <View className={`px-4 py-2 gap-1 ${isOwn ? 'items-end' : 'items-start'}`}>
+      {showSender && !isOwn && message.sender && (
+        <View className="flex-row items-center gap-2 pb-1">
+          <Avatar
+            displayName={message.sender.display_name ?? message.sender.username}
+            username={message.sender.username}
+            avatarUrl={message.sender.avatar_url ?? undefined}
+            size={28}
+          />
+          <Text className="font-body-sb text-sm text-text">
+            {message.sender.display_name ?? message.sender.username}
+          </Text>
+        </View>
+      )}
       <Pressable
         onLongPress={showActions}
         onPress={showActions}
@@ -39,31 +54,22 @@ export function MessageBubble({
         accessibilityHint={
           isDeleted || isTemporary ? undefined : t('chatStates.messageOptions')
         }
-        className={`max-w-[78%] rounded-2xl px-3 py-2 ${
-          isOwn ? 'bg-accent' : 'bg-surface border border-border'
-        }`}
+        className="min-h-12 max-w-[88%] gap-2 rounded-xl px-4 py-3"
+        style={{
+          backgroundColor: isOwn ? c.accent : c.surface,
+          borderTopRightRadius: isOwn ? 4 : 12,
+          borderTopLeftRadius: isOwn ? 12 : 4
+        }}
       >
-        {showSender && !isOwn && message.sender && (
-          <Text
-            className="text-[11px] font-body-sb mb-0.5"
-            style={{ color: c.accent }}
-          >
-            {message.sender.display_name ?? message.sender.username}
-          </Text>
-        )}
-
         {message.reply_to && !isDeleted && (
           <View
-            className="mb-1 pl-2 py-0.5 rounded"
-            style={{
-              borderLeftWidth: 2,
-              borderLeftColor: isOwn ? '#ffffff99' : c.t3
-            }}
+            className="rounded-lg p-3"
+            style={{ backgroundColor: isOwn ? alpha(c.onAccent, 0.12) : c.sr }}
           >
             <Text
-              numberOfLines={1}
-              className="text-[11px] font-body"
-              style={{ color: isOwn ? '#ffffffcc' : c.t2 }}
+              numberOfLines={3}
+              className="font-body text-sm italic"
+              style={{ color: foreground }}
             >
               {message.reply_to.deleted_at
                 ? t('chatStates.deleted')
@@ -71,33 +77,19 @@ export function MessageBubble({
             </Text>
           </View>
         )}
-
-        {isDeleted ? (
-          <Text
-            className="text-xs font-body italic"
-            style={{ color: isOwn ? '#ffffffcc' : c.t3 }}
-          >
-            {t('chatStates.deleted')}
-          </Text>
-        ) : (
-          <Text
-            className="text-sm font-body leading-[20px]"
-            style={{ color: isOwn ? '#fff' : c.text }}
-          >
-            {message.body}
-          </Text>
-        )}
-
         <Text
-          className="text-[10px] font-body mt-0.5 self-end"
-          style={{ color: isOwn ? '#ffffffaa' : c.t3 }}
+          className={`font-body text-base leading-[24px] ${isDeleted ? 'italic' : ''}`}
+          style={{ color: foreground }}
         >
-          {isTemporary
-            ? t('chatStates.sending')
-            : formatRelativeTime(message.created_at)}
-          {message.edited_at ? ' · editado' : ''}
+          {isDeleted ? t('chatStates.deleted') : message.body}
         </Text>
       </Pressable>
+      <Text className="px-1 font-body text-xs text-t2">
+        {isTemporary
+          ? t('chatStates.sending')
+          : formatRelativeTime(message.created_at)}
+        {message.edited_at ? ` · ${t('stitch.social.edited')}` : ''}
+      </Text>
     </View>
   )
 }

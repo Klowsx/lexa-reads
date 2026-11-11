@@ -125,10 +125,10 @@ export default function ClubScreen() {
     const header = (
       <View className="px-4 py-2.5 border-b border-border flex-row items-center gap-2.5">
         <Pressable
-          hitSlop={8}
+          className="h-12 w-12 items-center justify-center rounded-full"
           onPress={() => router.back()}
           accessibilityRole="button"
-          accessibilityLabel="Volver"
+          accessibilityLabel={t('common.back')}
         >
           <ChevronLeft size={24} color={c.t3} strokeWidth={1.6} />
         </Pressable>
@@ -139,16 +139,15 @@ export default function ClubScreen() {
           >
             {club.name}
           </Text>
-          <Text className="text-[11px] font-body text-t3">
-            {club.members_count}{' '}
-            {club.members_count === 1 ? 'miembro' : 'miembros'}
+          <Text className="text-sm font-body text-t3">
+            {t('stitch.social.members', { count: club.members_count })}
           </Text>
         </View>
         <Pressable
-          hitSlop={8}
+          className="h-12 w-12 items-center justify-center rounded-full"
           onPress={() => setShowActions(true)}
           accessibilityRole="button"
-          accessibilityLabel="Opciones del club"
+          accessibilityLabel={t('clubStates.options')}
         >
           <MoreVertical size={20} color={c.t3} strokeWidth={1.8} />
         </Pressable>
@@ -201,16 +200,16 @@ export default function ClubScreen() {
     membership.mutate({ clubId: club!.id, action })
   }
 
-  const cta = ctaFor(club, membership.isPending)
+  const cta = ctaFor(club, membership.isPending, t)
 
   return (
     <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
       <View className="px-4 py-2.5 border-b border-border flex-row items-center gap-2">
         <Pressable
-          hitSlop={8}
+          className="h-12 w-12 items-center justify-center rounded-full"
           onPress={() => router.back()}
           accessibilityRole="button"
-          accessibilityLabel="Volver"
+          accessibilityLabel={t('common.back')}
         >
           <ChevronLeft size={24} color={c.t3} strokeWidth={1.6} />
         </Pressable>
@@ -239,13 +238,12 @@ export default function ClubScreen() {
         <Text className="font-display-sb text-2xl text-text text-center tracking-tight">
           {club.name}
         </Text>
-        <Text className="text-xs font-body text-t3">
-          {club.members_count}{' '}
-          {club.members_count === 1 ? 'miembro' : 'miembros'} ·{' '}
-          {club.visibility === 'private' ? 'Privado' : 'Público'}
+        <Text className="text-sm font-body text-t3">
+          {t('stitch.social.members', { count: club.members_count })} ·{' '}
+          {t(`stitch.social.${club.visibility}`)}
         </Text>
         {club.description && (
-          <Text className="text-sm font-body text-t2 text-center leading-[21px]">
+          <Text className="text-base font-body text-t2 text-center leading-[24px]">
             {club.description}
           </Text>
         )}
@@ -253,15 +251,17 @@ export default function ClubScreen() {
         <Pressable
           onPress={cta.disabled ? undefined : primaryAction}
           disabled={cta.disabled}
-          className="mt-2 py-3 px-10 rounded-md items-center bg-accent"
+          className="mt-2 min-h-12 justify-center py-3 px-10 rounded-md items-center bg-accent"
           style={{ opacity: cta.disabled ? 0.4 : 1 }}
           accessibilityRole="button"
           accessibilityLabel={cta.label}
         >
           {membership.isPending ? (
-            <ActivityIndicator size="small" color="#fff" />
+            <ActivityIndicator size="small" color={c.onAccent} />
           ) : (
-            <Text className="text-sm font-body-sb text-white">{cta.label}</Text>
+            <Text className="text-sm font-body-sb text-on-accent">
+              {cta.label}
+            </Text>
           )}
         </Pressable>
 
@@ -270,10 +270,11 @@ export default function ClubScreen() {
             onPress={leave}
             disabled={membership.isPending}
             accessibilityRole="button"
-            accessibilityLabel="Cancelar solicitud"
+            className="min-h-12 justify-center px-4"
+            accessibilityLabel={t('stitch.social.cancelRequest')}
           >
-            <Text className="text-xs font-body-md text-t3">
-              Cancelar solicitud
+            <Text className="text-sm font-body-md text-t3">
+              {t('stitch.social.cancelRequest')}
             </Text>
           </Pressable>
         )}
@@ -292,15 +293,16 @@ export default function ClubScreen() {
 // Traduce la membresía a una única acción y bloquea los estados que no permiten incorporarse.
 function ctaFor(
   club: ClubDetail,
-  pending: boolean
+  pending: boolean,
+  t: (key: string) => string
 ): { label: string; disabled: boolean } {
   if (club.myState === 'banned')
-    return { label: 'No disponible', disabled: true }
+    return { label: t('stitch.social.unavailable'), disabled: true }
   if (club.myState === 'pending')
-    return { label: 'Solicitud pendiente', disabled: true }
+    return { label: t('stitch.social.pendingRequest'), disabled: true }
   if (club.myState === 'invited')
-    return { label: 'Aceptar invitación', disabled: pending }
+    return { label: t('stitch.social.acceptInvite'), disabled: pending }
   if (club.visibility === 'private')
-    return { label: 'Solicitar unirse', disabled: pending }
-  return { label: 'Unirse', disabled: pending }
+    return { label: t('stitch.social.requestJoin'), disabled: pending }
+  return { label: t('stitch.social.join'), disabled: pending }
 }

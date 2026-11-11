@@ -48,7 +48,7 @@ export function MessageComposer({
         className="border-t border-border bg-surface px-4"
         style={{ paddingBottom: insets.bottom + 12, paddingTop: 12 }}
       >
-        <Text className="text-xs font-body text-t3 text-center">
+        <Text className="text-sm font-body text-t3 text-center">
           {disabledHint}
         </Text>
       </View>
@@ -61,21 +61,18 @@ export function MessageComposer({
       style={{ paddingBottom: insets.bottom + 8 }}
     >
       {replyTo && (
-        <View className="flex-row items-center gap-2 px-4 pt-2">
-          <View
-            className="flex-1 pl-2"
-            style={{ borderLeftWidth: 2, borderLeftColor: c.accent }}
-          >
-            <Text className="text-[11px] font-body-sb text-accent">
+        <View className="flex-row items-center gap-2 mx-3 mt-3 p-3 rounded-xl bg-sr">
+          <View className="flex-1 gap-1">
+            <Text className="text-xs font-body-sb text-accent">
               {t('chatStates.replying')}
             </Text>
-            <Text numberOfLines={1} className="text-[11px] font-body text-t2">
+            <Text numberOfLines={1} className="text-sm font-body text-t2">
               {replyTo.deleted_at ? t('chatStates.deleted') : replyTo.body}
             </Text>
           </View>
           <Pressable
             onPress={onCancelReply}
-            hitSlop={8}
+            className="h-12 w-12 items-center justify-center"
             accessibilityRole="button"
             accessibilityLabel={t('chatStates.cancelReply')}
             disabled={sending}
@@ -96,11 +93,11 @@ export function MessageComposer({
           placeholderTextColor={c.t3}
           maxLength={MAX_MESSAGE_LENGTH}
           multiline
-          className="flex-1 text-sm font-body text-text rounded-2xl px-4 py-2 max-h-[120px] min-h-[40px] border border-border bg-sh"
+          className="flex-1 text-base font-body text-text rounded-xl px-4 py-3 max-h-[120px] min-h-[48px] bg-sr"
         />
         <Pressable
           onPress={onSend}
-          hitSlop={8}
+          className="h-12 w-12 rounded-full bg-accent items-center justify-center"
           disabled={!canSend}
           accessibilityRole="button"
           accessibilityLabel={t('chatStates.send')}
@@ -108,9 +105,9 @@ export function MessageComposer({
           style={{ opacity: canSend ? 1 : 0.35 }}
         >
           {sending ? (
-            <ActivityIndicator size="small" color={c.accent} />
+            <ActivityIndicator size="small" color={c.onAccent} />
           ) : (
-            <Send size={22} color={c.accent} strokeWidth={1.8} />
+            <Send size={22} color={c.onAccent} strokeWidth={1.8} />
           )}
         </Pressable>
       </View>

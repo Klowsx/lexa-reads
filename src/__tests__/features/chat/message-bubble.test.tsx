@@ -2,8 +2,12 @@ import { fireEvent, render } from '@testing-library/react-native'
 import { MessageBubble } from '~/features/chat/components/MessageBubble'
 import type { ChatMessage } from '~/features/chat/chat.queries'
 
+jest.mock('~/components/ui/Avatar', () => ({ Avatar: () => null }))
 jest.mock('~/lib/utils', () => ({ formatRelativeTime: () => 'ahora' }))
-jest.mock('~/theme/colors', () => ({ useColors: () => ({}) }))
+jest.mock('~/theme/colors', () => ({
+  alpha: () => 'rgba(255,255,255,0.12)',
+  useColors: () => ({ accent: '#111111', onAccent: '#ffffff' })
+}))
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key })
 }))

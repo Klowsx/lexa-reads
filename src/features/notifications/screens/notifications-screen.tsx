@@ -43,7 +43,7 @@ export default function NotificationsScreen() {
 
   const items: NotificationItem[] = data?.pages.flatMap((p) => p.items) ?? []
 
-  // Mark all as read when screen comes into focus
+  // Marca los avisos como leídos al visitar la bandeja.
   useFocusEffect(
     useCallback(() => {
       if (items.length > 0) markRead()
@@ -79,15 +79,28 @@ export default function NotificationsScreen() {
       {/* Header */}
       <View className="px-4 py-2.5 border-b border-border flex-row items-center gap-2">
         {canGoBack && (
-          <Pressable hitSlop={8} onPress={() => router.back()}>
+          <Pressable
+            className="h-12 w-12 items-center justify-center"
+            accessibilityRole="button"
+            accessibilityLabel={t('common.back')}
+            onPress={() => router.back()}
+          >
             <ChevronLeft size={24} color={c.t3} strokeWidth={1.6} />
           </Pressable>
         )}
         <Text className="font-display-sb text-xl text-text tracking-tight">
-          {t('notifications.title')}
+          Lexa
         </Text>
       </View>
 
+      <View className="px-4 pt-6 pb-5 gap-2">
+        <Text className="font-display text-2xl text-text">
+          {t('notifications.title')}
+        </Text>
+        <Text className="font-body text-sm text-t2">
+          {t('stitch.social.notificationsHint')}
+        </Text>
+      </View>
       {isLoading ? (
         <StitchLoading />
       ) : query.isError && (!data || items.length === 0) ? (
@@ -114,7 +127,7 @@ export default function NotificationsScreen() {
           <Text className="text-sm font-body-sb text-text text-center">
             {t('notifications.emptyTitle')}
           </Text>
-          <Text className="text-xs font-body text-t3 text-center leading-[20px]">
+          <Text className="text-sm font-body text-t3 text-center leading-[20px]">
             {t('notifications.emptySubtitle')}
           </Text>
         </View>

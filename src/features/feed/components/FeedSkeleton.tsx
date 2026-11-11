@@ -1,29 +1,33 @@
 import { View } from 'react-native'
 import { Skeleton } from '~/components/ui/Skeleton'
 
+// Reserva la composición compacta del feed mientras llega la actividad.
 function FeedCardSkeleton() {
   return (
-    <View className="bg-surface mb-px pb-4">
-      <View className="flex-row items-center px-3.5 pt-3 pb-2.5 gap-2.5">
-        <Skeleton width={36} height={36} radius={18} />
-        <View className="flex-1 gap-1.5">
-          <Skeleton width="55%" height={12} />
-          <Skeleton width="35%" height={10} />
+    <View className="mx-4 mb-3 rounded-xl bg-surface p-4 gap-4">
+      <View className="flex-row items-center gap-3">
+        <Skeleton width={40} height={40} radius={20} />
+        <View className="flex-1 gap-2">
+          <Skeleton width="55%" height={16} />
+          <Skeleton width="35%" height={12} />
         </View>
       </View>
-      <Skeleton width="100%" height={250} radius={0} />
-      <View className="px-3.5 pt-3 gap-2">
-        <Skeleton width="80%" height={12} />
-        <Skeleton width="60%" height={12} />
+      <View className="flex-row rounded-xl bg-sr p-3 gap-4">
+        <Skeleton width={64} height={96} radius={4} />
+        <View className="flex-1 gap-3 pt-2">
+          <Skeleton width="80%" height={20} />
+          <Skeleton width="60%" height={14} />
+        </View>
       </View>
+      <Skeleton width="80%" height={16} />
     </View>
   )
 }
 
-/** Skeleton del feed (UX-2). */
+// Mantiene la misma jerarquía y separación que las tarjetas cargadas.
 export function FeedSkeleton() {
   return (
-    <View>
+    <View className="pt-6">
       <FeedCardSkeleton />
       <FeedCardSkeleton />
     </View>

@@ -28,47 +28,61 @@ export default function ClubsScreen() {
 
   return (
     <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
-      <View className="px-4 py-2.5 border-b border-border flex-row items-center gap-2">
+      <View className="px-4 py-2 flex-row items-center gap-2">
         <Pressable
-          hitSlop={8}
+          className="h-12 w-12 items-center justify-center rounded-full"
           onPress={() => router.back()}
           accessibilityRole="button"
-          accessibilityLabel="Volver"
+          accessibilityLabel={t('common.back')}
         >
           <ChevronLeft size={24} color={c.t3} strokeWidth={1.6} />
         </Pressable>
         <Text className="font-display-sb text-xl text-text tracking-tight flex-1">
-          Clubes
+          Lexa
         </Text>
         <Pressable
-          hitSlop={8}
+          className="h-12 w-12 items-center justify-center rounded-full"
           onPress={() => router.push('/club/new')}
           accessibilityRole="button"
-          accessibilityLabel="Crear club"
+          accessibilityLabel={t('communityStates.createClub')}
         >
           <Plus size={22} color={c.accent} strokeWidth={2} />
         </Pressable>
       </View>
 
-      <View className="flex-row border-b border-border">
+      <View className="px-5 pb-5 pt-2 gap-2">
+        <Text
+          accessibilityRole="header"
+          className="font-display text-2xl text-text"
+        >
+          {t('stitch.social.clubsTitle')}
+        </Text>
+        <Text className="font-display-i text-md text-t2">
+          {t('stitch.social.clubsSubtitle')}
+        </Text>
+      </View>
+      <View className="mx-4 mb-4 flex-row rounded-full bg-sr p-1">
         {(['mine', 'discover'] as Tab[]).map((tk) => {
           const isActive = tab === tk
           return (
             <Pressable
               key={tk}
               onPress={() => setTab(tk)}
-              className="flex-1 py-3 items-center"
+              className="min-h-12 flex-1 justify-center rounded-full py-3 items-center"
               accessibilityRole="tab"
               accessibilityState={{ selected: isActive }}
               style={{
-                borderBottomWidth: 2,
-                borderBottomColor: isActive ? c.accent : 'transparent'
+                backgroundColor: isActive ? c.surface : 'transparent'
               }}
             >
               <Text
-                className={`text-xs font-body-sb ${isActive ? 'text-text' : 'text-t3'}`}
+                className={`text-sm font-body-sb ${isActive ? 'text-text' : 'text-t3'}`}
               >
-                {tk === 'mine' ? 'Mis clubes' : 'Descubrir'}
+                {t(
+                  tk === 'mine'
+                    ? 'stitch.social.myClubs'
+                    : 'stitch.social.discover'
+                )}
               </Text>
             </Pressable>
           )

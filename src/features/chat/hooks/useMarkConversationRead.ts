@@ -19,5 +19,5 @@ export function useMarkConversationRead(
         queryClient.invalidateQueries({ queryKey: ['dm-inbox', userId] })
       )
       .catch(() => {})
-  }, [conversationId, userId, messageCount])
+  }, [conversationId, userId, messageCount, queryClient])
 }

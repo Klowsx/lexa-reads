@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router'
-import { Bell, Users } from 'lucide-react-native'
+import { Users } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, Pressable, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -10,8 +10,8 @@ import { useFeed } from '~/features/feed/hooks/useFeed'
 import { UserCard } from '~/features/user/components/UserCard'
 import { useSearchUsers } from '~/features/user/hooks/useSearchUsers'
 import { QueryBoundary } from '~/components/ui/QueryBoundary'
-import { fixed, useColors } from '~/theme/colors'
-import { CommunityMenu } from '~/features/feed/components/CommunityMenu'
+import { useColors } from '~/theme/colors'
+import { AppHeader } from '~/components/AppHeader'
 
 // ─── Screen ───────────────────────────────────────────────────
 
@@ -32,23 +32,7 @@ export default function FeedScreen() {
 
   return (
     <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
-      {/* Header */}
-      <View className="px-4 py-2.5 border-b border-border flex-row items-center justify-between">
-        <Text className="font-display-sb text-xl text-text tracking-tight">
-          {t('feed.title')}
-        </Text>
-        <View className="flex-row items-center gap-2">
-          <CommunityMenu />
-          <Pressable
-            hitSlop={8}
-            onPress={() => router.push('/notifications' as any)}
-            accessibilityRole="button"
-            accessibilityLabel={t('feed.notifications')}
-          >
-            <Bell size={20} color={c.t3} strokeWidth={1.6} />
-          </Pressable>
-        </View>
-      </View>
+      <AppHeader />
 
       <QueryBoundary query={feedQuery} skeleton={<FeedSkeleton />}>
         {(data) => {
@@ -59,9 +43,9 @@ export default function FeedScreen() {
               <View className="flex-1 justify-center gap-4 px-8 py-6">
                 <View
                   className="w-16 h-16 rounded-full items-center justify-center"
-                  style={{ backgroundColor: `${fixed.accent}1A` }}
+                  style={{ backgroundColor: c.sr }}
                 >
-                  <Users size={28} color={fixed.accent} strokeWidth={1.6} />
+                  <Users size={28} color={c.accent} strokeWidth={1.6} />
                 </View>
                 <Text className="font-display-sb text-lg text-text text-center tracking-tight">
                   {t('feed.emptyTitle')}
@@ -73,9 +57,9 @@ export default function FeedScreen() {
                   onPress={() => router.push('/(tabs)/search' as any)}
                   accessibilityRole="button"
                   accessibilityLabel={t('feed.findPeople')}
-                  className="mt-2 px-6 py-3 rounded-full bg-accent"
+                  className="mt-2 min-h-12 items-center justify-center px-6 py-3 rounded-full bg-accent"
                 >
-                  <Text className="font-body-sb text-sm text-white">
+                  <Text className="font-body-sb text-sm text-on-accent">
                     {t('feed.findPeople')}
                   </Text>
                 </Pressable>
@@ -106,6 +90,16 @@ export default function FeedScreen() {
                 if (hasNextPage && !isFetchingNextPage) fetchNextPage()
               }}
               onEndReachedThreshold={0.4}
+              ListHeaderComponent={
+                <View className="px-4 pt-6 pb-5 gap-2">
+                  <Text className="font-display text-2xl text-text">
+                    {t('stitch.social.feedTitle')}
+                  </Text>
+                  <Text className="font-body-sb text-sm text-t2">
+                    {t('stitch.social.following')}
+                  </Text>
+                </View>
+              }
               ListFooterComponent={
                 isFetchingNextPage ? (
                   <View className="py-4 items-center">

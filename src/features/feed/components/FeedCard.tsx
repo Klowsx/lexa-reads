@@ -1,14 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  ActionSheetIOS,
-  Alert,
-  Platform,
-  Pressable,
-  Share,
-  Text,
-  View
-} from 'react-native'
+import { Pressable, Share, Text, View } from 'react-native'
 import { useRouter } from 'expo-router'
 import {
   BookOpen,
@@ -17,372 +9,203 @@ import {
   MoreHorizontal,
   Share2
 } from 'lucide-react-native'
-import { Image } from 'expo-image'
 import { Avatar } from '~/components/ui/Avatar'
+import { BookCover } from '~/components/ui/BookCover'
+import { StitchSheet } from '~/components/ui/StitchSheet'
+import { StitchButton } from '~/components/ui/StitchButton'
 import { BookReadingSheet } from '~/features/book/components/BookReadingSheet'
 import { SpoilerText } from '~/features/reviews/components/SpoilerText'
 import { ReportSheet } from '~/features/user/components/ReportSheet'
-import { useToggleActivityLike } from '~/features/feed/hooks/useToggleActivityLike'
-import type { ActivityType, FeedItem } from '~/features/feed/feed.queries'
-import { fixed, useColors } from '~/theme/colors'
+import { useToggleActivityLike } from '../hooks/useToggleActivityLike'
+import type { FeedItem } from '../feed.queries'
+import { useColors } from '~/theme/colors'
 import { formatRelativeTime } from '~/lib/utils'
+import { useUIStore } from '~/stores/ui.store'
 
-// ─── Constants ────────────────────────────────────────────────
-
-const ACTIVITY_COLOR: Record<ActivityType, string> = {
-  finished_book: fixed.status.read,
-  started_book: fixed.status.reading,
-  wrote_review: fixed.accent,
-  added_to_list: fixed.status.want,
-  abandoned_book: fixed.status.abandoned,
-  want_to_read: fixed.status.want
-}
-
-// Paleta de pares de colores para la cover band — derivada del ID del libro.
-const COLOR_PAIRS: [string, string][] = [
-  ['#1C1635', '#7B5EA7'],
-  ['#2A1A08', '#C49A20'],
-  ['#181818', '#AAAAAA'],
-  ['#180F0F', '#8B3A3A'],
-  ['#0A1E2A', '#2A8A8A'],
-  ['#1E0808', '#C43A3A'],
-  ['#0C1628', '#4A8AB8'],
-  ['#1A1208', '#8B6A3A'],
-  ['#0F180F', '#5A8A5A'],
-  ['#1E1408', '#D4902A'],
-  ['#1A0820', '#9B5FC0'],
-  ['#081A14', '#3A9B7A']
-]
-
-function bookColors(bookId: string): [string, string] {
-  let h = 0
-  for (let i = 0; i < bookId.length; i++) {
-    h = (h * 31 + bookId.charCodeAt(i)) >>> 0
-  }
-  return COLOR_PAIRS[h % COLOR_PAIRS.length]
-}
-
-const alpha = (hex: string, op: number) => {
-  const n = parseInt(hex.replace('#', ''), 16)
-  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})`
-}
-
-// ─── FeedCard ─────────────────────────────────────────────────
-
-interface FeedCardProps {
-  item: FeedItem
-}
-
-// Presenta la actividad y abre directamente el editor compartido para gestionar su libro.
-export function FeedCard({ item }: FeedCardProps) {
+// Reúne autoría, libro y conversación en una tarjeta editorial; las portadas conservan el protagonismo.
+export function FeedCard({ item }: { item: FeedItem }) {
   const router = useRouter()
   const c = useColors()
   const { t } = useTranslation()
   const [isPeeking, setIsPeeking] = useState(false)
   const [showReport, setShowReport] = useState(false)
-
-  // El estado de like vive en la caché del feed (D-1): leemos directo del item
-  // y el optimistic setQueryData re-renderiza esta card.
-  const liked = item.liked
-  const count = item.likes_count
+  const [showOptions, setShowOptions] = useState(false)
   const { toggle, isPending } = useToggleActivityLike(item.id)
-
   const displayName = item.user.display_name ?? item.user.username
-  const author = item.book.authors[0] ?? t('feed.unknownAuthor')
-  const [c1, c2] = bookColors(item.book.id)
-  const activityColor = ACTIVITY_COLOR[item.activity_type]
 
-  function openMenu() {
-    if (Platform.OS === 'ios') {
-      ActionSheetIOS.showActionSheetWithOptions(
-        {
-          options: [
-            t('common.cancel'),
-            t('feed.viewProfileOf', { username: item.user.username }),
-            t('feed.reportPost')
-          ],
-          cancelButtonIndex: 0
-        },
-        (index) => {
-          if (index === 1) router.push(`/user/${item.user.username}` as any)
-          if (index === 2) setShowReport(true)
-        }
-      )
-    } else {
-      Alert.alert(`@${item.user.username}`, undefined, [
-        {
-          text: t('feed.viewProfile'),
-          onPress: () => router.push(`/user/${item.user.username}` as any)
-        },
-        { text: t('feed.reportPost'), onPress: () => setShowReport(true) },
-        { text: t('common.cancel'), style: 'cancel' }
-      ])
-    }
+  // Comparte el enlace existente sin exportar texto protegido de la reseña.
+  function share() {
+    void Share.share({
+      message: t('feed.shareMessage', {
+        title: item.book.title,
+        url: `https://lexareads.app/book/${item.book.id}`
+      })
+    }).catch(() => useUIStore.getState().addToast(t('common.error')))
   }
 
   return (
     <>
-      <View className="bg-surface mb-px">
-        {/* ── Header ─────────────────────────────────── */}
-        <View className="flex-row items-center px-3.5 pt-3 pb-2.5 gap-2.5">
+      <View className="mx-4 mb-3 gap-4 rounded-xl bg-surface p-4">
+        <View className="flex-row items-center gap-3">
           <Pressable
-            onPress={() => router.push(`/user/${item.user.username}` as any)}
+            onPress={() => router.push(`/user/${item.user.username}`)}
             accessibilityRole="button"
             accessibilityLabel={t('feed.profileOf', { name: displayName })}
+            className="min-h-12 min-w-12 items-center justify-center"
           >
             <Avatar
               displayName={displayName}
               username={item.user.username}
               avatarUrl={item.user.avatar_url ?? undefined}
-              size={36}
+              size={40}
             />
           </Pressable>
-
           <Pressable
-            className="flex-1 min-w-0"
-            onPress={() => router.push(`/user/${item.user.username}` as any)}
-          >
-            <Text numberOfLines={1}>
-              <Text className="font-body-sb text-sm text-text">
-                {displayName}
-              </Text>
-              <Text className="font-body text-xs text-t3">
-                {'  @'}
-                {item.user.username}
-              </Text>
-            </Text>
-          </Pressable>
-
-          <Text className="font-body text-xs text-t3 shrink-0">
-            {formatRelativeTime(item.created_at)}
-          </Text>
-
-          <Pressable
-            hitSlop={8}
-            onPress={openMenu}
+            onPress={() => router.push(`/user/${item.user.username}`)}
             accessibilityRole="button"
-            accessibilityLabel={t('feed.moreOptions')}
-          >
-            <MoreHorizontal size={18} color={c.t3} />
-          </Pressable>
-        </View>
-
-        {/* ── Book Cover Band ─────────────────────────── */}
-        <Pressable
-          onPress={() => router.push(`/book/${item.book.id}` as any)}
-          accessibilityRole="button"
-          accessibilityLabel={t('feed.viewBook', { title: item.book.title })}
-          className="items-center justify-center py-7"
-          style={{ backgroundColor: c1 }}
-        >
-          {/* Side accent stripes */}
-          <View
-            className="absolute left-0 top-0 bottom-0 w-[5px]"
-            style={{ backgroundColor: alpha(c2, 0.55) }}
-          />
-          <View
-            className="absolute right-0 top-0 bottom-0 w-[3px]"
-            style={{ backgroundColor: alpha(c2, 0.18) }}
-          />
-
-          {/* Book cover */}
-          <View
-            className="w-[130px] h-[195px] rounded-sm overflow-hidden"
-            style={{
-              backgroundColor: c1,
-              shadowColor: '#000',
-              shadowOpacity: 0.65,
-              shadowRadius: 14,
-              shadowOffset: { width: 2, height: 8 },
-              elevation: 16
-            }}
-          >
-            {item.book.cover_url ? (
-              <Image
-                source={{ uri: item.book.cover_url }}
-                className="w-full h-full"
-                contentFit="cover"
-              />
-            ) : (
-              <>
-                {/* Spine */}
-                <View
-                  className="absolute left-0 top-0 bottom-0 w-[5px]"
-                  style={{ backgroundColor: c2 }}
-                />
-                {/* Text content */}
-                <View className="flex-1 justify-end pl-3 pr-2 pb-3">
-                  <Text
-                    className="font-display text-xs"
-                    style={{ lineHeight: 15, color: 'rgba(240,234,226,0.92)' }}
-                    numberOfLines={6}
-                  >
-                    {item.book.title}
-                  </Text>
-                  <Text
-                    className="font-body text-xs mt-[5px]"
-                    style={{ color: 'rgba(240,234,226,0.45)' }}
-                    numberOfLines={1}
-                  >
-                    {author}
-                  </Text>
-                </View>
-              </>
-            )}
-          </View>
-
-          {/* Activity badge — bottom left */}
-          <View
-            className="absolute bottom-[11px] left-[14px] rounded-full px-2.5 py-[5px] border"
-            style={{
-              backgroundColor: alpha(activityColor, 0.2),
-              borderColor: alpha(activityColor, 0.65)
-            }}
+            className="min-h-12 flex-1 justify-center gap-1"
           >
             <Text
-              className="font-body-md text-xs"
-              style={{ color: activityColor }}
+              className="font-body-sb text-base text-text"
+              numberOfLines={1}
             >
+              {displayName}
+            </Text>
+            <Text className="font-body text-xs text-t2" numberOfLines={2}>
+              {t(`feed.verb.${item.activity_type}`)} ·{' '}
+              {formatRelativeTime(item.created_at)}
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => setShowOptions(true)}
+            accessibilityRole="button"
+            accessibilityLabel={t('feed.moreOptions')}
+            className="h-12 w-12 items-center justify-center rounded-full active:bg-sr"
+          >
+            <MoreHorizontal size={22} color={c.t2} />
+          </Pressable>
+        </View>
+        {item.list_name && (
+          <View className="self-start rounded-md bg-sr px-3 py-2">
+            <Text className="font-body-sb text-xs text-text">
+              {item.list_name}
+            </Text>
+          </View>
+        )}
+        <Pressable
+          onPress={() => router.push(`/book/${item.book.id}`)}
+          accessibilityRole="button"
+          accessibilityLabel={t('feed.viewBook', { title: item.book.title })}
+          className="flex-row items-center gap-4 rounded-lg bg-bg p-3"
+        >
+          <BookCover book={item.book} width={64} height={96} />
+          <View className="flex-1 gap-2">
+            <Text
+              className="font-display-sb text-md text-text"
+              numberOfLines={2}
+            >
+              {item.book.title}
+            </Text>
+            <Text className="font-body text-sm text-t2" numberOfLines={2}>
+              {item.book.authors.join(', ') || t('feed.unknownAuthor')}
+            </Text>
+            <Text className="self-start font-body-sb text-xs text-t2">
               {t(`feed.label.${item.activity_type}`)}
             </Text>
           </View>
-
-          {/* List name badge — bottom right (added_to_list only) */}
-          {item.activity_type === 'added_to_list' && item.list_name ? (
-            <View
-              className="absolute bottom-[11px] right-[14px] rounded-sm px-2 py-1 border border-border"
-              style={{ backgroundColor: alpha(c.sr, 0.88) }}
-            >
-              <Text className="font-body text-xs text-t2" numberOfLines={1}>
-                {item.list_name}
-              </Text>
-            </View>
-          ) : null}
         </Pressable>
-
-        {/* ── Actions ─────────────────────────────────── */}
-        <View className="flex-row items-center px-3.5 pt-[11px] pb-[5px] gap-3.5">
-          {/* Like */}
+        {item.review_preview ? (
+          <SpoilerText
+            body={item.review_preview}
+            containsSpoilers={item.review_contains_spoilers}
+            contentId={item.review_id ?? item.id}
+            numberOfLines={4}
+          />
+        ) : null}
+        <View className="flex-row items-center gap-1">
           <Pressable
-            onPress={() => toggle(liked)}
+            onPress={() => toggle(item.liked)}
             disabled={isPending}
             accessibilityRole="button"
-            accessibilityState={{ selected: liked }}
-            accessibilityLabel={
-              liked ? t('feed.unlike', { count }) : t('feed.like', { count })
-            }
-            className="flex-row items-center gap-[5px]"
-            hitSlop={8}
+            accessibilityState={{ selected: item.liked, disabled: isPending }}
+            accessibilityLabel={t(item.liked ? 'feed.unlike' : 'feed.like', {
+              count: item.likes_count
+            })}
+            className="min-h-12 min-w-12 flex-row items-center justify-center gap-2 rounded-full px-2 active:bg-sr"
           >
             <Heart
-              size={22}
-              color={liked ? fixed.accent : c.t2}
-              fill={liked ? fixed.accent : 'none'}
+              size={21}
+              color={item.liked ? c.error : c.t2}
+              fill={item.liked ? c.error : 'none'}
               strokeWidth={1.7}
             />
-            <Text
-              className="font-body-md text-xs"
-              style={{ color: liked ? fixed.accent : c.t2 }}
-            >
-              {count}
+            <Text className="font-body text-sm text-t2">
+              {item.likes_count}
             </Text>
           </Pressable>
-
-          {/* Comment */}
           <Pressable
             onPress={() =>
               router.push({
                 pathname: '/comments/[id]',
                 params: { id: item.id, type: 'activity' }
-              } as any)
+              })
             }
-            className="flex-row items-center gap-[5px]"
-            hitSlop={8}
             accessibilityRole="button"
             accessibilityLabel={t('feed.comment')}
+            className="h-12 w-12 items-center justify-center rounded-full active:bg-sr"
           >
-            <MessageCircle size={21} color={c.t2} strokeWidth={1.7} />
+            <MessageCircle size={21} color={c.t2} />
           </Pressable>
-
-          {/* Share */}
           <Pressable
-            hitSlop={8}
+            onPress={share}
             accessibilityRole="button"
             accessibilityLabel={t('common.share')}
-            onPress={() =>
-              Share.share({
-                message: t('feed.shareMessage', {
-                  title: item.book.title,
-                  url: `https://lexareads.app/book/${item.book.id}`
-                })
-              }).catch(() => {})
-            }
+            className="h-12 w-12 items-center justify-center rounded-full active:bg-sr"
           >
-            <Share2 size={20} color={c.t2} strokeWidth={1.7} />
+            <Share2 size={20} color={c.t2} />
           </Pressable>
-
-          {/* Vistazo */}
           <Pressable
             onPress={() => setIsPeeking(true)}
             accessibilityRole="button"
             accessibilityLabel={t('feed.peekBook')}
-            className="ml-auto flex-row items-center gap-[5px] rounded-full px-2.5 py-[5px] border"
-            style={{
-              backgroundColor: alpha(fixed.accent, 0.1),
-              borderColor: alpha(fixed.accent, 0.3)
-            }}
-            hitSlop={8}
+            className="ml-auto min-h-12 flex-row items-center justify-center gap-2 rounded-full bg-sr px-4"
           >
-            <BookOpen size={13} color={fixed.accent} strokeWidth={2} />
-            <Text className="font-body-md text-xs text-accent">
+            <BookOpen size={17} color={c.text} />
+            <Text className="font-body-sb text-sm text-text">
               {t('feed.peek')}
             </Text>
           </Pressable>
         </View>
-
-        {/* ── Caption ─────────────────────────────────── */}
-        <View className="px-3.5 pt-1 pb-3.5 gap-[5px]">
-          {/* Activity summary */}
-          <Text className="font-body text-xs text-t2 leading-[19px]">
-            <Text className="font-body-sb text-text">{item.user.username}</Text>
-            {'  '}
-            <Text className="text-t2">
-              {t(`feed.verb.${item.activity_type}`)}
-            </Text>
-            {'  '}
-            <Text className="font-display-i text-text">
-              &ldquo;{item.book.title}&rdquo;
-            </Text>
-            {item.activity_type === 'added_to_list' && item.list_name ? (
-              <Text className="text-t2">
-                {`  ${t('feed.addedToConnector').trim()}  `}
-                <Text className="text-accent">
-                  &ldquo;{item.list_name}&rdquo;
-                </Text>
-              </Text>
-            ) : null}
-          </Text>
-
-          {/* Review preview */}
-          {item.review_preview ? (
-            <SpoilerText
-              body={item.review_preview}
-              containsSpoilers={item.review_contains_spoilers}
-              contentId={item.review_id ?? item.id}
-              numberOfLines={3}
-            />
-          ) : null}
-        </View>
       </View>
-
-      {/* Peek sheet */}
-      {isPeeking ? (
+      {showOptions && (
+        <StitchSheet
+          title={t('feed.moreOptions')}
+          onClose={() => setShowOptions(false)}
+        >
+          <StitchButton
+            label={t('feed.viewProfile')}
+            secondary
+            onPress={() => {
+              setShowOptions(false)
+              router.push(`/user/${item.user.username}`)
+            }}
+          />
+          <StitchButton
+            label={t('feed.reportPost')}
+            secondary
+            onPress={() => {
+              setShowOptions(false)
+              setShowReport(true)
+            }}
+          />
+        </StitchSheet>
+      )}
+      {isPeeking && (
         <BookReadingSheet
           book={item.book as any}
           onClose={() => setIsPeeking(false)}
         />
-      ) : null}
-
+      )}
       {showReport && (
         <ReportSheet
           targetType="activity"

@@ -70,16 +70,16 @@ export default function NewClubScreen() {
     <View className="flex-1 bg-bg" style={{ paddingTop: insets.top }}>
       <View className="px-4 py-2.5 border-b border-border flex-row items-center gap-2">
         <Pressable
-          hitSlop={8}
+          className="h-12 w-12 items-center justify-center"
           onPress={close}
           disabled={create.isPending}
           accessibilityRole="button"
-          accessibilityLabel="Volver"
+          accessibilityLabel={t('common.back')}
         >
           <ChevronLeft size={24} color={c.t3} strokeWidth={1.6} />
         </Pressable>
         <Text className="font-display-sb text-xl text-text tracking-tight flex-1">
-          Nuevo club
+          {t('stitch.social.newClub')}
         </Text>
       </View>
 
@@ -88,62 +88,62 @@ export default function NewClubScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View className="gap-2">
-          <Text className="text-xs font-body-sb text-t2 tracking-widest uppercase">
-            Nombre
+          <Text className="text-sm font-body-sb text-text">
+            {t('clubStates.nameLabel')}
           </Text>
           <TextInput
             value={name}
             onChangeText={setName}
-            placeholder="Club de fantasía en español"
+            placeholder={t('stitch.social.clubNamePlaceholder')}
             placeholderTextColor={c.t3}
             maxLength={100}
             editable={!create.isPending}
             accessibilityLabel={t('clubStates.nameLabel')}
-            className="text-sm font-body text-text bg-sh border border-border rounded-md px-3 py-2.5"
+            className="text-base font-body text-text bg-sh border border-border rounded-md px-4 py-3 min-h-12"
           />
-          <Text className="text-xs font-body text-t2">
+          <Text className="text-sm font-body text-t2">
             {t('clubStates.nameHint')} {name.length} / 100
           </Text>
         </View>
 
         <View className="gap-2">
-          <Text className="text-xs font-body-sb text-t2 tracking-widest uppercase">
-            Descripción
+          <Text className="text-sm font-body-sb text-text">
+            {t('clubStates.descriptionLabel')}
           </Text>
           <TextInput
             value={description}
             onChangeText={setDescription}
-            placeholder="¿De qué trata el club?"
+            placeholder={t('stitch.social.clubDescriptionPlaceholder')}
             placeholderTextColor={c.t3}
             multiline
             maxLength={500}
             editable={!create.isPending}
             accessibilityLabel={t('clubStates.descriptionLabel')}
-            className="text-sm font-body text-text bg-sh border border-border rounded-md px-3 py-2.5 min-h-[90px]"
+            className="text-base font-body text-text bg-sh border border-border rounded-md px-4 py-3 min-h-[120px]"
             style={{ textAlignVertical: 'top' }}
           />
-          <Text className="text-xs font-body text-t2">
+          <Text className="text-sm font-body text-t2">
             {t('clubStates.descriptionHint')} {description.length} / 500
           </Text>
         </View>
 
         <View className="gap-2">
-          <Text className="text-xs font-body-sb text-t2 tracking-widest uppercase">
-            Privacidad
+          <Text className="text-sm font-body-sb text-text">
+            {t('stitch.social.privacy')}
           </Text>
           {(
             [
               {
                 v: 'public',
                 icon: Globe,
-                title: 'Público',
-                desc: 'Cualquiera puede encontrarlo y unirse al instante.'
+                title: t('stitch.social.public'),
+                desc: t('stitch.social.publicClubHint')
               },
               {
                 v: 'private',
                 icon: Lock,
-                title: 'Privado',
-                desc: 'Solo por invitación; no aparece en búsqueda.'
+                title: t('stitch.social.private'),
+                desc: t('stitch.social.privateClubHint')
               }
             ] as const
           ).map(({ v, icon: Icon, title, desc }) => {
@@ -170,7 +170,7 @@ export default function NewClubScreen() {
                   <Text className="text-sm font-body-sb text-text">
                     {title}
                   </Text>
-                  <Text className="text-xs font-body text-t2 mt-0.5">
+                  <Text className="text-sm font-body text-t2 mt-0.5">
                     {desc}
                   </Text>
                 </View>
@@ -190,16 +190,18 @@ export default function NewClubScreen() {
         <Pressable
           onPress={submit}
           disabled={!canSubmit}
-          className="py-3.5 rounded-md items-center bg-accent mt-2"
+          className="min-h-12 justify-center py-3.5 rounded-md items-center bg-accent mt-2"
           style={{ opacity: canSubmit ? 1 : 0.4 }}
           accessibilityRole="button"
-          accessibilityLabel="Crear club"
+          accessibilityLabel={t('communityStates.createClub')}
           accessibilityState={{ disabled: !canSubmit, busy: create.isPending }}
         >
           {create.isPending ? (
-            <ActivityIndicator size="small" color="#fff" />
+            <ActivityIndicator size="small" color={c.onAccent} />
           ) : (
-            <Text className="text-sm font-body-sb text-white">Crear club</Text>
+            <Text className="text-sm font-body-sb text-on-accent">
+              {t('communityStates.createClub')}
+            </Text>
           )}
         </Pressable>
       </ScrollView>

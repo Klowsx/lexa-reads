@@ -36,5 +36,5 @@ export function useRealtimeMessages(conversationId: string) {
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [conversationId, userId])
+  }, [conversationId, userId, queryClient])
 }

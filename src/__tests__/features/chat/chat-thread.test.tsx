@@ -16,6 +16,7 @@ const mockQuery = {
   refetch: mockRefetch
 }
 const mockMutation = { mutate: mockMutate, isPending: false, isError: false }
+jest.mock('~/components/ui/Avatar', () => ({ Avatar: () => null }))
 jest.mock('~/lib/utils', () => ({ formatRelativeTime: () => 'ahora' }))
 
 jest.mock('~/features/chat/hooks/useMessages', () => ({

@@ -57,25 +57,27 @@ export default function DMThreadScreen() {
     <View>
       <View className="px-4 py-2.5 border-b border-border flex-row items-center gap-2.5">
         <Pressable
-          hitSlop={8}
+          className="h-12 w-12 items-center justify-center rounded-full"
           onPress={() => router.back()}
           accessibilityRole="button"
-          accessibilityLabel="Volver"
+          accessibilityLabel={t('common.back')}
         >
           <ChevronLeft size={24} color={c.t3} strokeWidth={1.6} />
         </Pressable>
         {other && (
           <Pressable
-            className="flex-row items-center gap-2.5 flex-1"
+            className="min-h-12 flex-row items-center gap-2.5 flex-1"
             onPress={() => router.push(`/user/${other.username}`)}
             accessibilityRole="button"
-            accessibilityLabel={`Ver perfil de ${other.username}`}
+            accessibilityLabel={t('feed.profileOf', {
+              name: other.display_name ?? other.username
+            })}
           >
             <Avatar
               displayName={other.display_name ?? other.username}
               username={other.username}
               avatarUrl={other.avatar_url ?? undefined}
-              size={34}
+              size={40}
             />
             <Text
               className="font-display-sb text-lg text-text tracking-tight"
@@ -94,28 +96,33 @@ export default function DMThreadScreen() {
 
       {isPendingRecipient && (
         <View className="px-4 py-3 border-b border-border bg-surface gap-2">
-          <Text className="text-xs font-body text-t2 text-center">
-            {other?.display_name ?? other?.username ?? 'Este usuario'} quiere
-            enviarte mensajes.
+          <Text className="text-sm font-body text-t2 text-center">
+            {t('stitch.social.wantsToMessage', {
+              name: other?.display_name ?? other?.username ?? t('notif.someone')
+            })}
           </Text>
           <View className="flex-row gap-2">
             <Pressable
               onPress={reject}
               disabled={respond.isPending}
-              className="flex-1 py-2.5 rounded-md items-center border border-border bg-sh"
+              className="min-h-12 flex-1 justify-center py-3 rounded-md items-center border border-border bg-sh"
               accessibilityRole="button"
-              accessibilityLabel="Rechazar solicitud"
+              accessibilityLabel={t('stitch.social.rejectRequest')}
             >
-              <Text className="text-xs font-body-md text-text">Rechazar</Text>
+              <Text className="text-sm font-body-md text-text">
+                {t('stitch.social.reject')}
+              </Text>
             </Pressable>
             <Pressable
               onPress={accept}
               disabled={respond.isPending}
-              className="flex-1 py-2.5 rounded-md items-center bg-accent"
+              className="min-h-12 flex-1 justify-center py-3 rounded-md items-center bg-accent"
               accessibilityRole="button"
-              accessibilityLabel="Aceptar solicitud"
+              accessibilityLabel={t('stitch.social.acceptRequest')}
             >
-              <Text className="text-xs font-body-sb text-white">Aceptar</Text>
+              <Text className="text-sm font-body-sb text-on-accent">
+                {t('stitch.social.accept')}
+              </Text>
             </Pressable>
           </View>
           {respond.isError && (
@@ -174,7 +181,7 @@ export default function DMThreadScreen() {
       conversationId={convId}
       header={header}
       canSend={!isPendingRecipient}
-      disabledHint="Acepta la solicitud para responder."
+      disabledHint={t('stitch.social.acceptToReply')}
     />
   )
 }
