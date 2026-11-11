@@ -68,8 +68,8 @@ enlazado o en el PR correspondiente.
 ## 4. Calidad y operación antes de producción
 
 - [x] Crear el workflow de calidad para tipos, tokens, lint, formato del cambio,
-      130 pruebas de la app y el contrato Deno de cuenta. La ejecución remota
-      comenzará al subir los commits; no incluye suites RLS sin credenciales.
+      130 pruebas de la app y el contrato Deno de cuenta. La [ejecución remota](https://github.com/Klowsx/lexa-reads/actions/runs/42931487848)
+      terminó correctamente; no incluye suites RLS sin credenciales.
 - [ ] Añadir Maestro al camino crítico de alta, búsqueda, biblioteca, reseña y reacción.
 - [ ] Añadir controles de abuso en registro, mensajes y funciones remotas;
       revisar los límites con pruebas de servidor.
