@@ -123,9 +123,15 @@ Plantillas en `public/.well-known/` (ver su `README.md`). Antes del submit:
   Membership) en `TEAMID.com.lexareads.app`. Servir en
   `https://lexareads.app/.well-known/apple-app-site-association`
   con `Content-Type: application/json` y **sin** extensión.
-- **Android** — `assetlinks.json`: rellenar el `sha256_cert_fingerprints` con
-  el SHA-256 de la firma de release (`eas credentials` o Play Console → App
-  signing). Servir en `https://lexareads.app/.well-known/assetlinks.json`.
+- **Android** — `assetlinks.json` contiene la huella real del certificado de la
+  distribución interna EAS. Se verificó el APK `8882369d` mediante la biblioteca
+  oficial [apksig](https://android.googlesource.com/platform/tools/apksig): firma v2
+  válida, sin advertencias. Es una huella de preview; antes de publicar en Play,
+  añadir la del certificado de **App signing** de Play Console si es diferente.
+  Servir el archivo en `https://lexareads.app/.well-known/assetlinks.json`.
+- El dominio no resolvió por DNS en la comprobación del 10 de noviembre. Preparar
+  los archivos locales no publica la asociación; falta configurar DNS/hosting
+  y verificar los endpoints reales con sus tipos de contenido correctos.
 - Verificar: [Apple AASA validator] y `https://developers.google.com/digital-asset-links/tools/generator`.
 
 ---

@@ -4,7 +4,9 @@
     "target": {
       "namespace": "android_app",
       "package_name": "com.lexareads.app",
-      "sha256_cert_fingerprints": ["REPLACE_WITH_SHA256_FINGERPRINT"]
+      "sha256_cert_fingerprints": [
+        "06:68:04:BB:A4:90:07:E8:50:94:BD:C5:62:2D:F5:C7:BC:0A:8B:80:BC:A7:75:88:2A:8B:DD:07:45:83:2F:EE"
+      ]
     }
   }
 ]

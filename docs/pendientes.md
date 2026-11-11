@@ -16,7 +16,8 @@ enlazado o en el PR correspondiente.
       inicial y publicar los deep links restantes. Push y firma ya están desplegados. Seguir
       [el runbook de despliegue](despliegue.md).
       La comprobación del 10 de noviembre no pudo resolver `lexareads.app` por DNS.
-      Faltan también la huella de firma Android y el Team ID real de Apple en `.well-known`.
+      Android ya contiene la huella verificada de la distribución interna; faltan
+      verificar la firma de Play y completar el Team ID real de Apple en `.well-known`.
 - [ ] Completar la build de EAS y generar una
       APK interna para Android. Acceso propietario restablecido; registrar el identificador de build y el
       resultado de instalación.
