@@ -60,9 +60,17 @@ function buildMessage(
 Deno.serve(async (req) => {
   if (req.method !== 'POST')
     return new Response('Method not allowed', { status: 405 })
-  const suppliedSecret = req.headers.get('x-webhook-secret')
-  if (!suppliedSecret || suppliedSecret.length > 512)
+  const signature = req.headers.get('x-push-signature')
+  const issuedAtHeader = req.headers.get('x-push-issued-at')
+  if (
+    !signature ||
+    !/^[0-9a-f]{64}$/.test(signature) ||
+    !issuedAtHeader ||
+    !/^[0-9]{1,12}$/.test(issuedAtHeader)
+  ) {
     return new Response('Forbidden', { status: 403 })
+  }
+  const issuedAt = Number(issuedAtHeader)
   const url = Deno.env.get('SUPABASE_URL')
   const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
   if (!url || !serviceKey) return new Response('Unavailable', { status: 503 })
@@ -71,13 +79,6 @@ Deno.serve(async (req) => {
   })
 
   try {
-    // La RPC solo devuelve coincidencia; Vault nunca entrega el secreto a esta función.
-    const verified = await supabaseAdmin.rpc('verify_push_webhook_secret', {
-      p_secret: suppliedSecret
-    })
-    if (verified.error) return new Response('Unavailable', { status: 503 })
-    if (verified.data !== true)
-      return new Response('Forbidden', { status: 403 })
     let payload
     try {
       payload = await req.json()
@@ -96,6 +97,15 @@ Deno.serve(async (req) => {
     ) {
       return new Response('Invalid event', { status: 400 })
     }
+    // La firma liga ID y fecha: la cola transporta un evento acotado, nunca el secreto de Vault.
+    const verified = await supabaseAdmin.rpc('verify_push_webhook_event', {
+      p_notification_id: notificationId,
+      p_issued_at: issuedAt,
+      p_signature: signature
+    })
+    if (verified.error) return new Response('Unavailable', { status: 503 })
+    if (verified.data !== true)
+      return new Response('Forbidden', { status: 403 })
     const notification = await supabaseAdmin
       .from('notifications')
       .select(

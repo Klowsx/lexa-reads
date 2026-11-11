@@ -105,10 +105,18 @@ function harness() {
       record: { id: notificationId }
     },
     method = 'POST',
-    secret: string | null = 'local-webhook-secret'
+    signature: string | null = 'a'.repeat(64),
+    issuedAt = '1794268800'
   ) => ({
     method,
-    headers: { get: () => secret },
+    headers: {
+      get: (name: string) =>
+        name === 'x-push-signature'
+          ? signature
+          : name === 'x-push-issued-at'
+            ? issuedAt
+            : null
+    },
     json: async () => payload
   })
   return { handler, request, rows, rpc, provider, eq, update, from, or }
@@ -125,6 +133,36 @@ describe('send-push: autorización, consentimiento y ciclo del token', () => {
     expect((await h.handler(h.request())).status).toBe(403)
     expect(h.from).not.toHaveBeenCalled()
     expect(h.provider).not.toHaveBeenCalled()
+  })
+  it.each([
+    ['invalid', '1794268800'],
+    ['a'.repeat(64), 'not-an-epoch'],
+    ['a'.repeat(64), '9999999999999']
+  ])(
+    'rechaza headers no firmados o fecha mal formada',
+    async (signature, issuedAt) => {
+      const h = harness()
+      expect(
+        (await h.handler(h.request(undefined, 'POST', signature, issuedAt)))
+          .status
+      ).toBe(403)
+      expect(h.rpc).not.toHaveBeenCalled()
+      expect(h.provider).not.toHaveBeenCalled()
+    }
+  )
+  it('envía a la RPC solo ID, fecha y firma y nunca acepta el header secreto anterior', async () => {
+    const h = harness()
+    await h.handler(h.request())
+    expect(h.rpc).toHaveBeenCalledWith('verify_push_webhook_event', {
+      p_notification_id: notificationId,
+      p_issued_at: 1794268800,
+      p_signature: 'a'.repeat(64)
+    })
+    const legacy = h.request()
+    legacy.headers.get = (name: string) =>
+      name === 'x-webhook-secret' ? 'old-secret' : null
+    expect((await h.handler(legacy)).status).toBe(403)
+    expect(h.rpc).toHaveBeenCalledTimes(1)
   })
   it('falla cerrado si no se puede verificar Vault', async () => {
     const h = harness()
