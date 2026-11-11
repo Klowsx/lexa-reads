@@ -15,6 +15,8 @@ enlazado o en el PR correspondiente.
 - [ ] Promover el administrador
       inicial y publicar los deep links restantes. Push y firma ya están desplegados. Seguir
       [el runbook de despliegue](despliegue.md).
+      La comprobación del 10 de noviembre no pudo resolver `lexareads.app` por DNS.
+      Faltan también la huella de firma Android y el Team ID real de Apple en `.well-known`.
 - [ ] Completar la build de EAS y generar una
       APK interna para Android. Acceso propietario restablecido; registrar el identificador de build y el
       resultado de instalación.
@@ -25,6 +27,8 @@ enlazado o en el PR correspondiente.
 - [ ] Completar los datos reales de publicación en `public/legal/release-info.json`,
       obtener revisión legal y publicar los documentos aprobados, privacidad y
       licencias. Seguir [la guía legal](../public/legal/README.md).
+      Los seis campos siguen vacíos: nombre legal, contacto de soporte y privacidad,
+      jurisdicción, edad mínima y fecha efectiva. No se han inventado estos datos.
 - [ ] Verificar desde Registro y Ajustes todos los enlaces legales publicados
       en una instalación real.
 
