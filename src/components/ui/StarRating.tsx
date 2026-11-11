@@ -1,7 +1,6 @@
 import { Text, View } from 'react-native'
-import { fixed } from '~/theme/colors'
-
-const STAR = fixed.star
+import { useColors } from '~/theme/colors'
+import { useTranslation } from 'react-i18next'
 
 const alpha = (hex: string, op: number) => {
   const n = parseInt(hex.replace('#', ''), 16)
@@ -13,7 +12,10 @@ interface StarRatingProps {
   size?: number
 }
 
+// Dibuja estrellas completas y medias con contraste adecuado al tema y una lectura accesible.
 export function StarRating({ rating, size = 12 }: StarRatingProps) {
+  const { star: STAR } = useColors()
+  const { t } = useTranslation()
   if (rating == null) return null
 
   return (
@@ -21,7 +23,7 @@ export function StarRating({ rating, size = 12 }: StarRatingProps) {
       className="flex-row gap-px"
       accessible
       accessibilityRole="image"
-      accessibilityLabel={`Calificación: ${rating} de 5 estrellas`}
+      accessibilityLabel={t('stitch.shell.rating', { rating })}
     >
       {[1, 2, 3, 4, 5].map((i) => {
         const full = rating >= i

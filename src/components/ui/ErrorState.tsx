@@ -21,7 +21,7 @@ export function ErrorState({ onRetry, message }: ErrorStateProps) {
           accessibilityLabel={t('common.retry')}
           className="mt-1 px-6 py-3 rounded-full bg-accent"
         >
-          <Text className="font-body-sb text-sm text-white">
+          <Text className="font-body-sb text-sm text-on-accent">
             {t('common.retry')}
           </Text>
         </Pressable>

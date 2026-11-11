@@ -1,17 +1,13 @@
 import '../global.css'
-import {
-  PlayfairDisplay_400Regular,
-  PlayfairDisplay_400Regular_Italic,
-  PlayfairDisplay_600SemiBold,
-  PlayfairDisplay_700Bold
-} from '@expo-google-fonts/playfair-display'
-import {
-  DMSans_300Light,
-  DMSans_400Regular,
-  DMSans_500Medium,
-  DMSans_600SemiBold,
-  DMSans_700Bold
-} from '@expo-google-fonts/dm-sans'
+import { Newsreader_400Regular } from '@expo-google-fonts/newsreader/400Regular'
+import { Newsreader_400Regular_Italic } from '@expo-google-fonts/newsreader/400Regular_Italic'
+import { Newsreader_600SemiBold } from '@expo-google-fonts/newsreader/600SemiBold'
+import { Newsreader_700Bold } from '@expo-google-fonts/newsreader/700Bold'
+import { Inter_300Light } from '@expo-google-fonts/inter/300Light'
+import { Inter_400Regular } from '@expo-google-fonts/inter/400Regular'
+import { Inter_500Medium } from '@expo-google-fonts/inter/500Medium'
+import { Inter_600SemiBold } from '@expo-google-fonts/inter/600SemiBold'
+import { Inter_700Bold } from '@expo-google-fonts/inter/700Bold'
 import { useEffect } from 'react'
 import { AppState, Platform, View } from 'react-native'
 import { Stack } from 'expo-router'
@@ -33,15 +29,15 @@ function RootLayout() {
   const scheme = useThemeStore((state) => state.scheme)
   const { isLoading, restoreError, retryRestore } = useAuthSession()
   const [fontsLoaded] = useFonts({
-    PlayfairDisplay_400Regular,
-    PlayfairDisplay_400Regular_Italic,
-    PlayfairDisplay_600SemiBold,
-    PlayfairDisplay_700Bold,
-    DMSans_300Light,
-    DMSans_400Regular,
-    DMSans_500Medium,
-    DMSans_600SemiBold,
-    DMSans_700Bold
+    Newsreader_400Regular,
+    Newsreader_400Regular_Italic,
+    Newsreader_600SemiBold,
+    Newsreader_700Bold,
+    Inter_300Light,
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold
   })
 
   // Refresca las consultas al volver a primer plano sin duplicar la renovación de Supabase.

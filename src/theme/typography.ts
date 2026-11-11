@@ -1,29 +1,30 @@
 export const fonts = {
-  serif: 'PlayfairDisplay',
-  sans: 'DMSans'
+  serif: 'Newsreader',
+  sans: 'Inter'
 } as const
 
 // Use for StyleSheet / inline styles
 export const fontFamily = {
-  serif: 'PlayfairDisplay_400Regular',
-  serifItalic: 'PlayfairDisplay_400Regular_Italic',
-  serifSemiBold: 'PlayfairDisplay_600SemiBold',
-  serifBold: 'PlayfairDisplay_700Bold',
-  sans: 'DMSans_400Regular',
-  sansLight: 'DMSans_300Light',
-  sansMedium: 'DMSans_500Medium',
-  sansSemiBold: 'DMSans_600SemiBold'
+  serif: 'Newsreader_400Regular',
+  serifItalic: 'Newsreader_400Regular_Italic',
+  serifSemiBold: 'Newsreader_600SemiBold',
+  serifBold: 'Newsreader_700Bold',
+  sans: 'Inter_400Regular',
+  sansLight: 'Inter_300Light',
+  sansMedium: 'Inter_500Medium',
+  sansSemiBold: 'Inter_600SemiBold',
+  sansBold: 'Inter_700Bold'
 } as const
 
 export const fontSize = {
-  xs: 11,
-  sm: 13,
-  base: 15,
-  md: 17,
-  lg: 20,
-  xl: 22,
-  '2xl': 28,
-  '3xl': 34
+  xs: 12,
+  sm: 14,
+  base: 16,
+  md: 18,
+  lg: 22,
+  xl: 28,
+  '2xl': 32,
+  '3xl': 36
 } as const
 
 export const lineHeight = {

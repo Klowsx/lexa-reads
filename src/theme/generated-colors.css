@@ -1,33 +1,54 @@
 /* Este archivo se genera desde src/theme/tokens.json. No editar manualmente. */
 @layer base {
   :root {
-    --color-bg: 245 240 234;
-    --color-surface: 235 229 222;
-    --color-sr: 224 217 209;
-    --color-sh: 213 206 197;
-    --color-border: 194 186 176;
-    --color-text: 26 21 18;
-    --color-t2: 104 94 85;
-    --color-t3: 116 106 97;
-    --color-accent: 196 120 58;
-    --color-star: 232 192 90;
-    --color-error: 196 58 58;
-    --color-warning: 196 154 32;
-    --color-success: 92 175 126;
-    --color-status-reading: 74 150 184;
-    --color-status-read: 92 175 126;
-    --color-status-want: 138 108 216;
-    --color-status-abandoned: 120 112 104;
+    --color-bg: 255 248 245;
+    --color-surface: 255 255 255;
+    --color-sr: 246 236 230;
+    --color-sh: 234 225 218;
+    --color-border: 198 198 205;
+    --color-text: 31 27 23;
+    --color-t2: 69 70 77;
+    --color-t3: 98 99 107;
+    --color-accent: 0 0 0;
+    --color-on-accent: 255 255 255;
+    --color-error: 186 26 26;
+    --color-success: 20 108 55;
+    --color-warning: 138 75 0;
+    --color-star: 162 96 0;
+    --color-status-reading: 155 74 0;
+    --color-status-read: 20 108 55;
+    --color-status-want: 36 95 196;
+    --color-status-abandoned: 84 93 107;
+    --color-accent: 0 0 0;
+    --color-on-accent: 255 255 255;
+    --color-star: 162 96 0;
+    --color-error: 186 26 26;
+    --color-warning: 138 75 0;
+    --color-success: 20 108 55;
+    --color-status-reading: 155 74 0;
+    --color-status-read: 20 108 55;
+    --color-status-want: 36 95 196;
+    --color-status-abandoned: 84 93 107;
   }
 
   .dark {
-    --color-bg: 16 13 10;
-    --color-surface: 28 24 21;
-    --color-sr: 37 33 24;
-    --color-sh: 45 41 34;
-    --color-border: 53 48 43;
-    --color-text: 240 234 226;
-    --color-t2: 158 148 136;
-    --color-t3: 134 125 116;
+    --color-bg: 18 19 22;
+    --color-surface: 26 28 34;
+    --color-sr: 35 37 46;
+    --color-sh: 49 53 62;
+    --color-border: 69 72 85;
+    --color-text: 248 250 252;
+    --color-t2: 182 191 205;
+    --color-t3: 162 170 186;
+    --color-accent: 248 250 252;
+    --color-on-accent: 18 19 22;
+    --color-error: 255 180 171;
+    --color-success: 119 221 165;
+    --color-warning: 255 183 125;
+    --color-star: 249 183 71;
+    --color-status-reading: 245 178 89;
+    --color-status-read: 119 221 165;
+    --color-status-want: 166 200 255;
+    --color-status-abandoned: 182 191 205;
   }
 }

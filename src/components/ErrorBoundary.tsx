@@ -45,7 +45,7 @@ export class ErrorBoundary extends Component<Props, State> {
             accessibilityLabel={i18n.t('common.retry')}
             className="mt-2 px-6 py-3 rounded-full bg-accent"
           >
-            <Text className="font-body-sb text-sm text-white">
+            <Text className="font-body-sb text-sm text-on-accent">
               {i18n.t('common.retry')}
             </Text>
           </Pressable>

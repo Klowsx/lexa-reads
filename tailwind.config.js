@@ -19,6 +19,7 @@ module.exports = {
         t2: 'rgb(var(--color-t2)      / <alpha-value>)',
         t3: 'rgb(var(--color-t3)      / <alpha-value>)',
         accent: 'rgb(var(--color-accent)  / <alpha-value>)',
+        'on-accent': 'rgb(var(--color-on-accent) / <alpha-value>)',
         star: 'rgb(var(--color-star)    / <alpha-value>)',
 
         // Feedback — se resuelve desde las variables generadas por tokens.json
@@ -37,28 +38,28 @@ module.exports = {
 
       fontFamily: {
         // Display — fuente de títulos y headings
-        display: ['PlayfairDisplay_400Regular', 'serif'],
-        'display-i': ['PlayfairDisplay_400Regular_Italic', 'serif'],
-        'display-sb': ['PlayfairDisplay_600SemiBold', 'serif'],
-        'display-bold': ['PlayfairDisplay_700Bold', 'serif'],
+        display: ['Newsreader_400Regular', 'serif'],
+        'display-i': ['Newsreader_400Regular_Italic', 'serif'],
+        'display-sb': ['Newsreader_600SemiBold', 'serif'],
+        'display-bold': ['Newsreader_700Bold', 'serif'],
 
         // Body — fuente de texto corriente
-        body: ['DMSans_400Regular', 'sans-serif'],
-        'body-light': ['DMSans_300Light', 'sans-serif'],
-        'body-md': ['DMSans_500Medium', 'sans-serif'],
-        'body-sb': ['DMSans_600SemiBold', 'sans-serif'],
-        'body-bold': ['DMSans_700Bold', 'sans-serif']
+        body: ['Inter_400Regular', 'sans-serif'],
+        'body-light': ['Inter_300Light', 'sans-serif'],
+        'body-md': ['Inter_500Medium', 'sans-serif'],
+        'body-sb': ['Inter_600SemiBold', 'sans-serif'],
+        'body-bold': ['Inter_700Bold', 'sans-serif']
       },
 
       fontSize: {
-        xs: [16, { lineHeight: '20px' }],
-        sm: [18, { lineHeight: '24px' }],
-        base: [20, { lineHeight: '28px' }],
-        md: [22, { lineHeight: '30px' }],
-        lg: [26, { lineHeight: '32px' }],
-        xl: [30, { lineHeight: '38px' }],
-        '2xl': [36, { lineHeight: '44px' }],
-        '3xl': [44, { lineHeight: '52px' }]
+        xs: [12, { lineHeight: '16px' }],
+        sm: [14, { lineHeight: '20px' }],
+        base: [16, { lineHeight: '24px' }],
+        md: [18, { lineHeight: '26px' }],
+        lg: [22, { lineHeight: '28px' }],
+        xl: [28, { lineHeight: '36px' }],
+        '2xl': [32, { lineHeight: '40px' }],
+        '3xl': [36, { lineHeight: '44px' }]
       },
 
       letterSpacing: {
@@ -74,7 +75,7 @@ module.exports = {
 
       spacing: {
         // Padding horizontal de contenedor principal (18px)
-        container: '18px',
+        container: '16px',
         // gap-4.5 = 18px (entre gap-4/16px y gap-5/20px)
         4.5: '18px'
       }
