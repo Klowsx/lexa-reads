@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react'
-import { Animated, type ViewStyle } from 'react-native'
+import { useEffect, useRef, useState } from 'react'
+import { AccessibilityInfo, Animated, type ViewStyle } from 'react-native'
 import { useColors } from '~/theme/colors'
 
 interface SkeletonProps {
@@ -22,9 +22,31 @@ export function Skeleton({
 }: SkeletonProps) {
   const c = useColors()
   const opacity = useRef(new Animated.Value(0.4)).current
+  const [reduceMotion, setReduceMotion] = useState(true)
 
   useEffect(() => {
-    if (!animate) return
+    // Mantiene el bloque estático hasta conocer la preferencia y escucha cambios del sistema.
+    let mounted = true
+    void AccessibilityInfo.isReduceMotionEnabled()
+      .then((enabled) => {
+        if (mounted) setReduceMotion(enabled)
+      })
+      .catch(() => {})
+    const subscription = AccessibilityInfo.addEventListener(
+      'reduceMotionChanged',
+      setReduceMotion
+    )
+    return () => {
+      mounted = false
+      subscription.remove()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!animate || reduceMotion) {
+      opacity.setValue(0.7)
+      return
+    }
     const loop = Animated.loop(
       Animated.sequence([
         Animated.timing(opacity, {
@@ -41,7 +63,7 @@ export function Skeleton({
     )
     loop.start()
     return () => loop.stop()
-  }, [opacity, animate])
+  }, [opacity, animate, reduceMotion])
 
   return (
     <Animated.View
