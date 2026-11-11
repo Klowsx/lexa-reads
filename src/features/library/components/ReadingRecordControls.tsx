@@ -125,8 +125,11 @@ export function ReadingRecordControls({ bookId }: { bookId: string }) {
                 style={
                   active
                     ? {
-                        borderColor: STATUS_META[item].color,
-                        backgroundColor: alpha(STATUS_META[item].color, 0.12)
+                        borderColor: c.status[STATUS_META[item].colorRole],
+                        backgroundColor: alpha(
+                          c.status[STATUS_META[item].colorRole],
+                          0.12
+                        )
                       }
                     : undefined
                 }

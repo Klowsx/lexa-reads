@@ -2,6 +2,7 @@ import { ActivityIndicator, View, Text } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import { Avatar } from '~/components/ui/Avatar'
+import { ErrorState } from '~/components/ui/ErrorState'
 import { StarRating } from '~/components/ui/StarRating'
 import {
   bookCommunityStatsQueryOptions,
@@ -9,32 +10,38 @@ import {
 } from '../book.queries'
 import { useAuthStore } from '~/stores/auth.store'
 import { STATUS_META } from '~/lib/book-status'
-import { fixed, useColors } from '~/theme/colors'
+import { alpha, useColors } from '~/theme/colors'
 
-const alpha = (hex: string, op: number) => {
-  const n = parseInt(hex.replace('#', ''), 16)
-  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${op})` as const
-}
-
+// Representa la distribución con colores del tema y porcentajes localizados.
 function RatingBar({ star, pct }: { star: number; pct: number }) {
   const c = useColors()
+  const { i18n } = useTranslation()
 
   return (
     <View className="flex-row items-center gap-[7px] py-[2px]">
-      <Text className="font-body text-xs text-t3 w-2 text-right">{star}</Text>
+      <Text className="font-body text-xs text-t3 w-2 text-right">
+        {star.toLocaleString(i18n.language)}
+      </Text>
       <View className="flex-1 h-1 bg-sh rounded-full overflow-hidden">
         <View
           className="h-full rounded-full"
-          style={{ width: `${pct}%`, backgroundColor: fixed.star }}
+          style={{
+            width: `${pct}%`,
+            backgroundColor: c.star
+          }}
         />
       </View>
-      <Text className="font-body text-xs text-t3 w-[26px] text-left">
-        {pct}%
+      <Text className="font-body text-xs text-t3 w-12 text-right">
+        {(pct / 100).toLocaleString(i18n.language, {
+          style: 'percent',
+          maximumFractionDigits: 0
+        })}
       </Text>
     </View>
   )
 }
 
+// Conserva la actividad real de cada lector y adapta su estado y progreso al tema.
 function FriendRow({
   friend,
   pageCount
@@ -43,7 +50,7 @@ function FriendRow({
   pageCount?: number | null
 }) {
   const c = useColors()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const meta = STATUS_META[friend.status as keyof typeof STATUS_META]
   if (!meta) return null
 
@@ -52,7 +59,10 @@ function FriendRow({
     friend.currentPage != null &&
     pageCount != null &&
     pageCount > 0
-      ? Math.min(100, Math.round((friend.currentPage / pageCount) * 100))
+      ? Math.max(
+          0,
+          Math.min(100, Math.round((friend.currentPage / pageCount) * 100))
+        )
       : null
 
   return (
@@ -77,14 +87,14 @@ function FriendRow({
                 className="h-full rounded-full"
                 style={{
                   width: `${progressPct}%`,
-                  backgroundColor: fixed.status.reading
+                  backgroundColor: c.status.reading
                 }}
               />
             </View>
-            <Text className="font-body text-[9px] text-t3 mt-[2px]">
+            <Text className="font-body text-xs text-t3 mt-[2px]">
               {t('book.pageProgressShort', {
-                current: friend.currentPage,
-                pct: progressPct
+                current: friend.currentPage?.toLocaleString(i18n.language),
+                pct: progressPct.toLocaleString(i18n.language)
               })}
             </Text>
           </View>
@@ -95,10 +105,13 @@ function FriendRow({
         style={{
           paddingHorizontal: 9,
           paddingVertical: 3,
-          backgroundColor: alpha(meta.color, 0.11)
+          backgroundColor: alpha(c.status[meta.colorRole], 0.11)
         }}
       >
-        <Text className="font-body-md text-xs" style={{ color: meta.color }}>
+        <Text
+          className="font-body-md text-xs"
+          style={{ color: c.status[meta.colorRole] }}
+        >
           {t(meta.labelKey)}
         </Text>
       </View>
@@ -106,6 +119,7 @@ function FriendRow({
   )
 }
 
+// Distingue carga y error recuperable sin descartar las estadísticas ya disponibles.
 export function BookCommunityTab({
   bookId,
   pageCount
@@ -114,13 +128,21 @@ export function BookCommunityTab({
   pageCount?: number | null
 }) {
   const c = useColors()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const userId = useAuthStore((s) => s.user?.id ?? '')
-  const { data, isLoading } = useQuery(
-    bookCommunityStatsQueryOptions(bookId, userId)
-  )
+  const query = useQuery(bookCommunityStatsQueryOptions(bookId, userId))
 
-  if (isLoading || !data) {
+  const { data } = query
+
+  if (query.isError && !data) {
+    return (
+      <View className="py-8">
+        <ErrorState onRetry={() => void query.refetch()} />
+      </View>
+    )
+  }
+
+  if (query.isPending || !data) {
     return (
       <View className="py-12 items-center">
         <ActivityIndicator color={c.accent} />
@@ -130,16 +152,22 @@ export function BookCommunityTab({
 
   const stats = [
     {
-      value: data.totalReaders.toLocaleString(),
+      value: data.totalReaders.toLocaleString(i18n.language),
       label: t('community.readers')
     },
     {
-      value: data.readingCount.toLocaleString(),
+      value: data.readingCount.toLocaleString(i18n.language),
       label: t('community.reading')
     },
-    { value: data.wantCount.toLocaleString(), label: t('community.toRead') },
     {
-      value: data.avgRating > 0 ? `${data.avgRating} ★` : '—',
+      value: data.wantCount.toLocaleString(i18n.language),
+      label: t('community.toRead')
+    },
+    {
+      value:
+        data.avgRating > 0
+          ? `${data.avgRating.toLocaleString(i18n.language, { maximumFractionDigits: 1 })} ★`
+          : '—',
       label: t('community.rating'),
       isRating: true
     }
@@ -163,7 +191,7 @@ export function BookCommunityTab({
             >
               <Text
                 className="font-body-bold text-md"
-                style={{ color: isRating ? fixed.star : c.text }}
+                style={{ color: isRating ? c.star : c.text }}
               >
                 {value}
               </Text>
@@ -200,13 +228,15 @@ export function BookCommunityTab({
           <View className="flex-row gap-container items-start">
             <View className="items-center shrink-0">
               <Text className="font-display-bold text-3xl text-star leading-[46px]">
-                {data.avgRating}
+                {data.avgRating.toLocaleString(i18n.language, {
+                  maximumFractionDigits: 1
+                })}
               </Text>
               <View className="mt-1">
                 <StarRating rating={data.avgRating} size={12} />
               </View>
               <Text className="font-body text-xs text-t3 mt-1">
-                {data.ratingsCount.toLocaleString()}
+                {data.ratingsCount.toLocaleString(i18n.language)}
               </Text>
             </View>
             <View className="flex-1 pt-1">

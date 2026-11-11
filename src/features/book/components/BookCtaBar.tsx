@@ -71,7 +71,7 @@ export function BookCtaBar({
           {status ? (
             <BookOpen
               size={21}
-              color={c.status[status === 'want_to_read' ? 'want' : status]}
+              color={c.status[STATUS_META[status].colorRole]}
             />
           ) : (
             <Plus size={21} color={c.text} />
